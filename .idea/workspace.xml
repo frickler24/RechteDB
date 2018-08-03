@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="9041f750-6594-46a9-8f9c-6349ba68a303" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/static/delete.svg" beforeDir="false" afterPath="$PROJECT_DIR$/rapp/static/delete.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rapp/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/rapp/admin.py" afterDir="false" />
     </list>
     <ignored path="db.sqlite3" />
     <ignored path=".directory" />
@@ -22,11 +22,11 @@
       <file leaf-file-name="admin.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/rapp/admin.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="798">
-              <caret line="96" column="6" selection-start-line="96" selection-start-column="6" selection-end-line="96" selection-end-column="6" />
+            <state relative-caret-position="477">
+              <caret line="28" column="13" selection-start-line="28" selection-start-column="13" selection-end-line="28" selection-end-column="13" />
               <folding>
                 <element signature="e#24#63#0" expanded="true" />
-                <element signature="e#970#2106#0" />
+                <element signature="e#1271#1349#1" />
               </folding>
             </state>
           </provider>
@@ -35,18 +35,14 @@
       <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/rapp/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="462">
-              <caret line="310" column="67" lean-forward="true" selection-start-line="310" selection-start-column="67" selection-end-line="310" selection-end-column="67" />
+            <state relative-caret-position="3933">
+              <caret line="310" column="67" selection-start-line="310" selection-start-column="67" selection-end-line="310" selection-end-column="67" />
               <folding>
                 <element signature="e#24#63#0" expanded="true" />
                 <element signature="e#917#3394#0" />
                 <element signature="e#3520#4900#0" />
                 <element signature="e#7919#8506#0" />
-                <element signature="e#8628#14086#0" />
                 <element signature="e#14259#17411#0" />
-                <element signature="e#17546#18255#0" />
-                <element signature="e#19690#19723#0" />
-                <element signature="e#22011#22529#0" />
               </folding>
             </state>
           </provider>
@@ -90,6 +86,11 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -161,6 +162,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -213,7 +215,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -523,7 +524,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="7" />
+      <option name="time" value="9" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
@@ -766,29 +767,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/rapp/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="462">
-          <caret line="310" column="67" lean-forward="true" selection-start-line="310" selection-start-column="67" selection-end-line="310" selection-end-column="67" />
+        <state relative-caret-position="3933">
+          <caret line="310" column="67" selection-start-line="310" selection-start-column="67" selection-end-line="310" selection-end-column="67" />
           <folding>
             <element signature="e#24#63#0" expanded="true" />
             <element signature="e#917#3394#0" />
             <element signature="e#3520#4900#0" />
             <element signature="e#7919#8506#0" />
-            <element signature="e#8628#14086#0" />
             <element signature="e#14259#17411#0" />
-            <element signature="e#17546#18255#0" />
-            <element signature="e#19690#19723#0" />
-            <element signature="e#22011#22529#0" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/rapp/admin.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="798">
-          <caret line="96" column="6" selection-start-line="96" selection-start-column="6" selection-end-line="96" selection-end-column="6" />
+        <state relative-caret-position="477">
+          <caret line="28" column="13" selection-start-line="28" selection-start-column="13" selection-end-line="28" selection-end-column="13" />
           <folding>
             <element signature="e#24#63#0" expanded="true" />
-            <element signature="e#970#2106#0" />
+            <element signature="e#1271#1349#1" />
           </folding>
         </state>
       </provider>

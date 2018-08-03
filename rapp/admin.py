@@ -25,8 +25,34 @@ from rapp.models import TblUebersichtAfGfs, TblUserIDundName, TblOrga, TblPlattf
 # Vorwärtsreferenzen gehen nicht in python :-(
 # Inline function to show all Instances in other view
 class UserhatrolleInline(admin.TabularInline):
+	model = TblUserhatrolle
+	extra = 0
+
+class GesamtInline(admin.TabularInline):
+	model = TblGesamt
+	extra = 0
+
+class UserIDundNameInline(admin.TabularInline):
+	model = TblUserIDundName
+	extra = 0
+
+class RollehatafInline(admin.TabularInline):
 	model = TblRollehataf
-	extra = 1
+	extra = 0
+
+class UebersichtAfGfsInline(admin.TabularInline):
+	model = TblUebersichtAfGfs
+	extra = 0
+
+"""
+class AflisteInline(admin.TabularInline):
+	model = TblAfliste
+	extra = 0
+
+class RollenInline(admin.TabularInline):
+	model = TblRollen
+	extra = 0
+"""
 
 
 # ######################################################################################################
@@ -58,14 +84,6 @@ class Gesamt(admin.ModelAdmin):
 	]
 
 
-# Inline function to show all Instances of Gesamt in UserIDundNameView or UebersichtAFGFs
-class GesamtInline(admin.TabularInline):
-	model = TblGesamt
-	extra = 0
-
-
-
-
 
 # ######################################################################################################
 # tbl UserIDundName
@@ -95,14 +113,6 @@ class UserIDundNameAdmin(admin.ModelAdmin):
 
 	list_per_page = 25
 	# inlines = [UserhatrolleInline]
-
-
-
-# Inline function to show all Instances of UserIDundName in OrgaView
-class UserIDundNameInline(admin.TabularInline):
-	model = TblUserIDundName
-	extra = 0
-
 
 
 # ######################################################################################################
@@ -173,11 +183,6 @@ class UebersichtAfGfs(admin.ModelAdmin):
 
 	# inlines = [GesamtInline]
 
-# Inline function to show all Instances of AF/GF who ever it needs
-class UebersichtAfGfsInline(admin.TabularInline):
-	model = TblUebersichtAfGfs
-	extra = 0
-
 
 
 # ######################################################################################################
@@ -227,11 +232,6 @@ class Userhatrolle(admin.ModelAdmin):
 	list_per_page = 25 # sys.maxsize
 
 
-# Inline function to show all Instances in other view
-class UserhatrolleInline(admin.TabularInline):
-	model = TblRollehataf
-	extra = 1
-
 
 # ######################################################################################################
 # tbl Rollen
@@ -261,11 +261,6 @@ class Rollen(admin.ModelAdmin):
 	inlines = [UserhatrolleInline]
 
 
-# Inline function to show all Instances of Rollen who ever it needs
-class RollenInline(admin.TabularInline):
-	model = TblRollen
-	extra = 0
-
 
 #
 # ######################################################################################################
@@ -282,11 +277,6 @@ class Afliste(admin.ModelAdmin):
 	# list_editable = ('af_name', )
 	search_fields = ['af_name', ]
 	# list_filter = ( )
-
-# Inline function to show all Instances in other view
-class AflisteInline(admin.TabularInline):
-	model = TblAfliste
-	extra = 0
 
 
 # ######################################################################################################
@@ -315,9 +305,4 @@ class Rollehataf(admin.ModelAdmin):
 	list_filter = ('mussfeld', 'nurxv', 'xabcv', 'dv', )
 
 	list_per_page = 20 # sys.maxsize
-
-# Inline function to show all Instances in other view
-class RollehatafInline(admin.TabularInline):
-	model = TblRollehataf
-	extra = 0
 
