@@ -292,11 +292,21 @@ class TblRollen(models.Model):
 
 # Referenz der User auf die ihnen zur Verfüung stehenden Rollen
 class TblUserhatrolle(models.Model):
+	SCHWERPUNKT_TYPE = (
+		('Schwerpunkt', 'Schwerpunktaufgabe'),
+		('Vertretung', 'Vertretungstätigkeiten, Zweitsysteme'),
+		('Allgemein', 'Rollen, die nicht Systemen zugeordnet sind'),
+	)
+
 	userundrollenid = 		models.AutoField(db_column='UserUndRollenID', primary_key=True, verbose_name='ID')  # Field name made lowercase.
 	userid = 				models.ForeignKey('Tbluseridundname', models.DO_NOTHING, to_field='userid', db_column='userid', blank=True, null=True, verbose_name='UserID, Name')  # Field name made lowercase.
 	rollenname = 			models.ForeignKey('TblRollen', models.DO_NOTHING, db_column='RollenName', blank=True, null=True)  # Field name made lowercase.
 	schwerpunkt_vertretung = \
-							models.CharField(db_column='Schwerpunkt/Vertretung', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+							models.CharField(db_column='Schwerpunkt/Vertretung',
+											 max_length=150,
+											 blank=True, null=True,
+											 choices=SCHWERPUNKT_TYPE
+							)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	bemerkung = 			models.TextField(db_column='Bemerkung', max_length=150, blank=True, null=True)  # Field name made lowercase.
 	letzte_aenderung = 		models.DateTimeField(db_column='Letzte Änderung')  # Field name made lowercase. Field renamed to remove unsuitable characters.
 
@@ -322,8 +332,15 @@ class TblUserhatrolle(models.Model):
 #  WHERE (((tblÜbersichtAF_GFs.modelliert) Is Not Null) AND ((tbl_AFListe.[AF-Name]) Is Null))
 #  GROUP BY tblÜbersichtAF_GFs.[Name AF Neu];
 
+# Dieser Hack wird benötigt, weil die Referenz von RolleHatAF auf Rollen kleinschreibung anfordert aber Klein-/Groß liefert.
+# Deshalb wird ein Teil der Felder in der Admin-Übersicht Start › Rapp › Rollen und ihre Arbeitsplatzfunktionen (tbl_RolleHatAF)
+# nicht sauber angezeigt.
+class LowerField(models.CharField):
+	def to_python(self, value):
+		return value.upper()
+
 class TblAfliste(models.Model):		# ToDo: Wegwerfen, Tabelle ist redundant
-	af_name = models.CharField(db_column='AF-Name', primary_key=True, max_length=150, verbose_name='AF-Name')  # Field name made lowercase. Field renamed to remove unsuitable characters.
+	af_name = LowerField(db_column='AF-Name', primary_key=True, max_length=150, verbose_name='AF-Name')  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	neu_ab = models.DateTimeField(db_column='neu ab')  # Field renamed to remove unsuitable characters.
 
 	class Meta:
@@ -336,7 +353,8 @@ class TblAfliste(models.Model):		# ToDo: Wegwerfen, Tabelle ist redundant
 	def __str__(self) -> str:
 		return str(self.af_name)
 
-# Meta-Tabelle, welceh Arbeitsplaftzunktion in welcher Rolle enthalten ist (n:m Beziehung)
+
+# Meta-Tabelle, welche Arbeitsplatzfunktion in welcher Rolle enthalten ist (n:m Beziehung)
 class TblRollehataf(models.Model):
 	rollenmappingid = 		models.AutoField(db_column='RollenMappingID', primary_key=True, verbose_name='ID')  # Field name made lowercase.
 	rollenname = 			models.ForeignKey('TblRollen', models.DO_NOTHING, to_field='rollenname', db_column='RollenName', blank=True, null=True)  # Field name made lowercase.

@@ -4,6 +4,7 @@
     <list default="true" id="9041f750-6594-46a9-8f9c-6349ba68a303" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rapp/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/rapp/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rapp/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/rapp/models.py" afterDir="false" />
     </list>
     <ignored path="db.sqlite3" />
     <ignored path=".directory" />
@@ -19,11 +20,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="admin.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="admin.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/rapp/admin.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="477">
-              <caret line="28" column="13" selection-start-line="28" selection-start-column="13" selection-end-line="28" selection-end-column="13" />
+            <state relative-caret-position="942">
+              <caret line="303" column="60" selection-start-line="303" selection-start-column="60" selection-end-line="303" selection-end-column="60" />
               <folding>
                 <element signature="e#24#63#0" expanded="true" />
                 <element signature="e#1271#1349#1" />
@@ -32,11 +33,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="models.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/rapp/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3933">
-              <caret line="310" column="67" selection-start-line="310" selection-start-column="67" selection-end-line="310" selection-end-column="67" />
+            <state relative-caret-position="722">
+              <caret line="339" column="26" selection-start-line="339" selection-start-column="26" selection-end-line="339" selection-end-column="26" />
               <folding>
                 <element signature="e#24#63#0" expanded="true" />
                 <element signature="e#917#3394#0" />
@@ -85,6 +86,7 @@
     </dirStrings>
   </component>
   <component name="Git.Settings">
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
@@ -143,8 +145,8 @@
         <option value="$PROJECT_DIR$/rapp/migrations/0002_auto_20180801_2141.py" />
         <option value="$PROJECT_DIR$/rapp/migrations/0003_auto_20180801_2243.py" />
         <option value="$PROJECT_DIR$/rapp/static/style.css" />
-        <option value="$PROJECT_DIR$/rapp/models.py" />
         <option value="$PROJECT_DIR$/rapp/admin.py" />
+        <option value="$PROJECT_DIR$/rapp/models.py" />
       </list>
     </option>
   </component>
@@ -219,7 +221,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$/rapp/templates/admin/base_site.html" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -425,7 +427,14 @@
       <option name="project" value="LOCAL" />
       <updated>1533248560938</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="reorganize class XXXXInline(admin.TabularInline) definitions">
+      <created>1533280563874</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1533280563874</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TodoView">
@@ -445,11 +454,11 @@
       <window_info id="DB Browser" order="5" />
       <window_info anchor="bottom" id="DB Execution Console" order="12" weight="0.4540412" />
       <window_info anchor="bottom" id="Event Log" order="2" sideWeight="0.5004184" side_tool="true" weight="0.3296355" />
-      <window_info anchor="bottom" id="Version Control" order="3" weight="0.27931595" />
+      <window_info anchor="bottom" id="Version Control" order="3" weight="0.27892235" />
       <window_info anchor="bottom" id="Python Console" order="0" weight="0.32899022" />
       <window_info anchor="bottom" id="Run" order="6" />
       <window_info anchor="bottom" id="Terminal" order="1" weight="0.32899022" />
-      <window_info active="true" content_ui="combo" id="Project" order="3" sideWeight="0.49452737" visible="true" weight="0.19665273" />
+      <window_info content_ui="combo" id="Project" order="3" sideWeight="0.49452737" visible="true" weight="0.19665273" />
       <window_info id="Project Explorer" order="2" />
       <window_info id="Job Explorer" order="4" />
       <window_info anchor="bottom" id="Docker" order="13" sideWeight="0.49958158" weight="0.3296355" />
@@ -520,7 +529,8 @@
     <MESSAGE value="add admin pane for tbl_Rollen" />
     <MESSAGE value="add admin pages for UserHatRolle etc., migrated DBs &#10;make Feierabend" />
     <MESSAGE value="add admin pages for RolleHatAF etc.&#10;make Feierabend" />
-    <option name="LAST_COMMIT_MESSAGE" value="add admin pages for RolleHatAF etc.&#10;make Feierabend" />
+    <MESSAGE value="reorganize class XXXXInline(admin.TabularInline) definitions" />
+    <option name="LAST_COMMIT_MESSAGE" value="reorganize class XXXXInline(admin.TabularInline) definitions" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -765,27 +775,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/rapp/admin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="942">
+          <caret line="303" column="60" selection-start-line="303" selection-start-column="60" selection-end-line="303" selection-end-column="60" />
+          <folding>
+            <element signature="e#24#63#0" expanded="true" />
+            <element signature="e#1271#1349#1" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/rapp/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3933">
-          <caret line="310" column="67" selection-start-line="310" selection-start-column="67" selection-end-line="310" selection-end-column="67" />
+        <state relative-caret-position="722">
+          <caret line="339" column="26" selection-start-line="339" selection-start-column="26" selection-end-line="339" selection-end-column="26" />
           <folding>
             <element signature="e#24#63#0" expanded="true" />
             <element signature="e#917#3394#0" />
             <element signature="e#3520#4900#0" />
             <element signature="e#7919#8506#0" />
             <element signature="e#14259#17411#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/rapp/admin.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="477">
-          <caret line="28" column="13" selection-start-line="28" selection-start-column="13" selection-end-line="28" selection-end-column="13" />
-          <folding>
-            <element signature="e#24#63#0" expanded="true" />
-            <element signature="e#1271#1349#1" />
           </folding>
         </state>
       </provider>

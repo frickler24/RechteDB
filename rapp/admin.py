@@ -83,7 +83,7 @@ class Gesamt(admin.ModelAdmin):
 					 # 'tf_beschreibung', 'enthalten_in_af', 'plattform', 'gf',
 	]
 
-
+	list_per_page = 25
 
 # ######################################################################################################
 # tbl UserIDundName
@@ -95,7 +95,7 @@ class UserIDundNameAdmin(admin.ModelAdmin):
 
 	fieldsets = [
 		('User-Informationen', {'fields': ['userid', 'name', 'orga', 'geloescht']}),
-		('Orga-Details      ', {'fields': ['zi_organisation', 'abteilung', 'gruppe'], 'classes': ['collapse'] }),
+		('Orga-Details      ', {'fields': ['zi_organisation', 'abteilung', 'gruppe'], 'classes': ["""'collapse'"""] }),
 	]
 
 	list_display = ('id', 'userid', 'colored_name', 'orga', 'zi_organisation', 'get_active', 'abteilung', 'gruppe',)
@@ -108,8 +108,9 @@ class UserIDundNameAdmin(admin.ModelAdmin):
 	actions_on_top = True
 	actions_on_bottom = True
 
+	inlines = [UserhatrolleInline]
 	# Nice idea, but VERY slow
-	# inlines = [GesamtInline]
+	# inlines += [GesamtInline]
 
 	list_per_page = 25
 	# inlines = [UserhatrolleInline]
@@ -258,7 +259,7 @@ class Rollen(admin.ModelAdmin):
 	list_editable = ('system', 'rollenbeschreibung', 'rollenbeschreibung',)
 	search_fields = ['rollenname', 'system', 'rollenbeschreibung', ]
 
-	inlines = [UserhatrolleInline]
+	inlines = [UserhatrolleInline, RollehatafInline]
 
 
 
@@ -277,6 +278,8 @@ class Afliste(admin.ModelAdmin):
 	# list_editable = ('af_name', )
 	search_fields = ['af_name', ]
 	# list_filter = ( )
+
+	inlines = [RollehatafInline]
 
 
 # ######################################################################################################
