@@ -257,3 +257,19 @@ UPDATE `tblGesamt` ges
     ON (`ges`.`ID` = `test`.`id` and `test`.`id` = '1')
     SET `ges`.`gelöscht` = '1';
 
+
+# SQLs zum Umsetzen der Indizes von direktem Feld auf die korrekte ID
+
+SELECT `tbl_RolleHatAF`.`RollenMappingID`, `tbl_RolleHatAF`.`RollenName`, `tbl_RolleHatAF`.`AF`, `tbl_RolleHatAF`.`AFName`,
+		`tbl_AFListe`.`ID`, `tbl_AFListe`.`AF-Name`, `tbl_AFListe`.`neu ab`
+FROM `tbl_RolleHatAF`
+	join `tbl_AFListe`
+    on (`tbl_RolleHatAF`.`AFName` = `tbl_AFListe`.`AF-Name`)
+
+    Where `RollenName` LIKE '%Produktionsvorbereitung Leitung%'
+
+
+update `tbl_RolleHatAF` raf
+	inner join `tbl_AFListe`
+    on (raf.`AFName` = `tbl_AFListe`.`AF-Name`)
+    set raf.`AF` = `tbl_AFListe`.`ID`

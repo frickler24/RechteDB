@@ -25,7 +25,6 @@
     <show-object-properties value="true" />
     <loaded-nodes>
       <connection connection-id="e0fab069-c80d-452e-b415-f960623fdbac">
-        <schema name="RechteDB" object-types="table, view" />
         <schema name="mysql" object-types="column, table, view" />
       </connection>
     </loaded-nodes>

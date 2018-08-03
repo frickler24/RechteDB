@@ -240,7 +240,7 @@ class TblGesamtHistorie(models.Model):
 	id = 				models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
 	wiedergefunden = 	models.DateTimeField(blank=True, null=True)
 	# Das ist echt blöd, dass das hier zu lange dauert
-	id_alt = 			models.ForeignKey('Tblgesamt', models.DO_NOTHING, db_column='ID-alt')  # Field name made lowercase. Field renamed to remove unsuitable characters.
+	id_alt = 			models.ForeignKey('Tblgesamt', models.PROTECT, db_column='ID-alt')  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	# id_alt = 			models.CharField(db_column='ID-alt', max_length=11)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	userid_name = 		models.ForeignKey('TblUserIDundName', on_delete=models.CASCADE, db_column='UserID + Name_ID', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	tf = 				models.CharField(db_column='TF', max_length=150)  # Field name made lowercase.
@@ -299,8 +299,8 @@ class TblUserhatrolle(models.Model):
 	)
 
 	userundrollenid = 		models.AutoField(db_column='UserUndRollenID', primary_key=True, verbose_name='ID')  # Field name made lowercase.
-	userid = 				models.ForeignKey('Tbluseridundname', models.DO_NOTHING, to_field='userid', db_column='userid', blank=True, null=True, verbose_name='UserID, Name')  # Field name made lowercase.
-	rollenname = 			models.ForeignKey('TblRollen', models.DO_NOTHING, db_column='RollenName', blank=True, null=True)  # Field name made lowercase.
+	userid = 				models.ForeignKey('Tbluseridundname', models.PROTECT, to_field='userid', db_column='userid', blank=True, null=True, verbose_name='UserID, Name')  # Field name made lowercase.
+	rollenname = 			models.ForeignKey('TblRollen', models.PROTECT, db_column='RollenName', blank=True, null=True)  # Field name made lowercase.
 	schwerpunkt_vertretung = \
 							models.CharField(db_column='Schwerpunkt/Vertretung',
 											 max_length=150,
@@ -332,16 +332,11 @@ class TblUserhatrolle(models.Model):
 #  WHERE (((tblÜbersichtAF_GFs.modelliert) Is Not Null) AND ((tbl_AFListe.[AF-Name]) Is Null))
 #  GROUP BY tblÜbersichtAF_GFs.[Name AF Neu];
 
-# Dieser Hack wird benötigt, weil die Referenz von RolleHatAF auf Rollen kleinschreibung anfordert aber Klein-/Groß liefert.
-# Deshalb wird ein Teil der Felder in der Admin-Übersicht Start › Rapp › Rollen und ihre Arbeitsplatzfunktionen (tbl_RolleHatAF)
-# nicht sauber angezeigt.
-class LowerField(models.CharField):
-	def to_python(self, value):
-		return value.upper()
 
 class TblAfliste(models.Model):		# ToDo: Wegwerfen, Tabelle ist redundant
-	af_name = LowerField(db_column='AF-Name', primary_key=True, max_length=150, verbose_name='AF-Name')  # Field name made lowercase. Field renamed to remove unsuitable characters.
-	neu_ab = models.DateTimeField(db_column='neu ab')  # Field renamed to remove unsuitable characters.
+	id = 					models.AutoField(db_column='ID', primary_key=True, verbose_name='ID')  # Field name made lowercase.
+	af_name = 				models.CharField(db_column='AF-Name', unique=True, max_length=150, verbose_name='AF-Name')  # Field name made lowercase. Field renamed to remove unsuitable characters.
+	neu_ab = 				models.DateTimeField(db_column='neu ab')  # Field renamed to remove unsuitable characters.
 
 	class Meta:
 		managed = False
@@ -357,21 +352,23 @@ class TblAfliste(models.Model):		# ToDo: Wegwerfen, Tabelle ist redundant
 # Meta-Tabelle, welche Arbeitsplatzfunktion in welcher Rolle enthalten ist (n:m Beziehung)
 class TblRollehataf(models.Model):
 	rollenmappingid = 		models.AutoField(db_column='RollenMappingID', primary_key=True, verbose_name='ID')  # Field name made lowercase.
-	rollenname = 			models.ForeignKey('TblRollen', models.DO_NOTHING, to_field='rollenname', db_column='RollenName', blank=True, null=True)  # Field name made lowercase.
-	afname = 				models.ForeignKey('TblAfliste', models.DO_NOTHING, to_field='af_name', db_column='AFName', blank=True, null=True, verbose_name='AF')  # Field name made lowercase.
+	rollenname = 			models.ForeignKey('TblRollen', models.PROTECT, to_field='rollenname', db_column='RollenName', blank=True, null=True)  # Field name made lowercase.
+	af = 					models.ForeignKey('TblAfliste', models.PROTECT, to_field='id', db_column='AF', blank=True, null=True, verbose_name='AF')  # Field name made lowercase.
+	afname = 				models.CharField('TblAfliste', db_column='AFName', max_length=150, blank=True, null=True, )  # Field name made lowercase.
 	mussfeld = 				models.IntegerField(db_column='Mussfeld', blank=True, null=True, verbose_name='Muss')  # Field name made lowercase. This field type is a guess.
 	bemerkung = 			models.CharField(db_column='Bemerkung', max_length=150, blank=True, null=True)  # Field name made lowercase.
 	nurxv = 				models.IntegerField(db_column='nurXV', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
 	xabcv = 				models.IntegerField(db_column='XABCV', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
 	dv = 					models.IntegerField(db_column='DV', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
 
+
 	class Meta:
 		managed = False
 		db_table = 'tbl_RolleHatAF'
-		unique_together = (('rollenname', 'afname'),)
+		unique_together = (('af', 'rollenname', 'afname'),)
 		verbose_name = "Rolle und ihre Arbeitsplatzfunktionen"
 		verbose_name_plural = "Rollen und ihre Arbeitsplatzfunktionen (tbl_RolleHatAF)"
-		ordering = [ 'rollenname__rollenname', 'afname__af_name', ]
+		ordering = [ 'rollenname__rollenname', 'af__af_name', ]
 
 	def __str__(self) -> str:
 		return str(self.rollenname)		# ToDo: Stimmt das?

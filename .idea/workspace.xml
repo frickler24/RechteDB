@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9041f750-6594-46a9-8f9c-6349ba68a303" name="Default" comment="">
+    <list default="true" id="9041f750-6594-46a9-8f9c-6349ba68a303" name="Default" comment="handle upper/lower case in AF-Liste">
+      <change beforePath="$PROJECT_DIR$/.idea/dbnavigator.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dbnavigator.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Spielwiese.sql" beforeDir="false" afterPath="$PROJECT_DIR$/Spielwiese.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rapp/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/rapp/admin.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rapp/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/rapp/models.py" afterDir="false" />
     </list>
@@ -23,8 +25,8 @@
       <file leaf-file-name="admin.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/rapp/admin.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="942">
-              <caret line="303" column="60" selection-start-line="303" selection-start-column="60" selection-end-line="303" selection-end-column="60" />
+            <state relative-caret-position="1018">
+              <caret line="295" column="32" lean-forward="true" selection-start-line="295" selection-start-column="32" selection-end-line="295" selection-end-column="32" />
               <folding>
                 <element signature="e#24#63#0" expanded="true" />
                 <element signature="e#1271#1349#1" />
@@ -36,14 +38,13 @@
       <file leaf-file-name="models.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/rapp/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="722">
-              <caret line="339" column="26" selection-start-line="339" selection-start-column="26" selection-end-line="339" selection-end-column="26" />
+            <state relative-caret-position="726">
+              <caret line="365" column="23" selection-start-line="365" selection-start-column="23" selection-end-line="365" selection-end-column="23" />
               <folding>
                 <element signature="e#24#63#0" expanded="true" />
                 <element signature="e#917#3394#0" />
                 <element signature="e#3520#4900#0" />
                 <element signature="e#7919#8506#0" />
-                <element signature="e#14259#17411#0" />
               </folding>
             </state>
           </provider>
@@ -69,10 +70,10 @@
       <find>&quot;container&quot;</find>
       <find>panel</find>
       <find>lat</find>
-      <find />
       <find>get_act</find>
       <find>absolute_toggle_geloescht_url</find>
       <find>'Tbluseridundname'</find>
+      <find />
     </findStrings>
     <replaceStrings>
       <replace>', '</replace>
@@ -97,10 +98,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/rapp/templates/home.html" />
-        <option value="$PROJECT_DIR$/rapp/templates/admin/base_site.html" />
-        <option value="$PROJECT_DIR$/rapp/migrations/0003_auto_20180714_2224.py" />
-        <option value="$PROJECT_DIR$/rapp/migrations/0004_auto_20180714_2225.py" />
         <option value="$PROJECT_DIR$/rapp/migrations/0005_tblgesamthistorie.py" />
         <option value="$PROJECT_DIR$/rapp/templates/rapp/userIDundName_list.html" />
         <option value="$PROJECT_DIR$/rapp/templates/rapp/base_generic.html" />
@@ -140,20 +137,25 @@
         <option value="$PROJECT_DIR$/rapp/templates/rapp/tblrollen_list.html" />
         <option value="$PROJECT_DIR$/rapp/templates/rapp/userIDpanel_list.html" />
         <option value="$PROJECT_DIR$/templates/frame.html" />
-        <option value="$PROJECT_DIR$/Spielwiese.sql" />
         <option value="$PROJECT_DIR$/rapp/migrations/0006_auto_20180801_1611.py" />
         <option value="$PROJECT_DIR$/rapp/migrations/0002_auto_20180801_2141.py" />
         <option value="$PROJECT_DIR$/rapp/migrations/0003_auto_20180801_2243.py" />
         <option value="$PROJECT_DIR$/rapp/static/style.css" />
+        <option value="$PROJECT_DIR$/Spielwiese.sql" />
         <option value="$PROJECT_DIR$/rapp/admin.py" />
+        <option value="$PROJECT_DIR$/rapp/migrations/0007_auto_20180803_1321.py" />
+        <option value="$PROJECT_DIR$/rapp/migrations/0008_auto_20180803_1321.py" />
+        <option value="$PROJECT_DIR$/rapp/migrations/0009_auto_20180803_1322.py" />
+        <option value="$PROJECT_DIR$/rapp/migrations/0010_auto_20180803_1322.py" />
+        <option value="$PROJECT_DIR$/rapp/migrations/0011_auto_20180803_1323.py" />
         <option value="$PROJECT_DIR$/rapp/models.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="115" />
+    <option name="x" value="353" />
     <option name="y" value="4" />
-    <option name="width" value="2422" />
+    <option name="width" value="2184" />
     <option name="height" value="1400" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -181,27 +183,7 @@
               <item name="RechteDB" type="b2602c69:ProjectViewProjectNode" />
               <item name="RechteDB" type="462c0819:PsiDirectoryNode" />
               <item name="rapp" type="462c0819:PsiDirectoryNode" />
-              <item name="static" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="RechteDB" type="b2602c69:ProjectViewProjectNode" />
-              <item name="RechteDB" type="462c0819:PsiDirectoryNode" />
-              <item name="rapp" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="RechteDB" type="b2602c69:ProjectViewProjectNode" />
-              <item name="RechteDB" type="462c0819:PsiDirectoryNode" />
-              <item name="rapp" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="admin" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="RechteDB" type="b2602c69:ProjectViewProjectNode" />
-              <item name="RechteDB" type="462c0819:PsiDirectoryNode" />
-              <item name="rapp" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
-              <item name="rapp" type="462c0819:PsiDirectoryNode" />
+              <item name="migrations" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="RechteDB" type="b2602c69:ProjectViewProjectNode" />
@@ -434,7 +416,14 @@
       <option name="project" value="LOCAL" />
       <updated>1533280563874</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="handle upper/lower case in AF-Liste">
+      <created>1533288445995</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1533288445995</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TodoView">
@@ -447,7 +436,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="115" y="4" width="2422" height="1400" extended-state="0" />
+    <frame x="353" y="4" width="2184" height="1400" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="10" weight="0.3296355" />
@@ -458,7 +447,7 @@
       <window_info anchor="bottom" id="Python Console" order="0" weight="0.32899022" />
       <window_info anchor="bottom" id="Run" order="6" />
       <window_info anchor="bottom" id="Terminal" order="1" weight="0.32899022" />
-      <window_info content_ui="combo" id="Project" order="3" sideWeight="0.49452737" visible="true" weight="0.19665273" />
+      <window_info active="true" content_ui="combo" id="Project" order="3" sideWeight="0.49452737" visible="true" weight="0.21840149" />
       <window_info id="Project Explorer" order="2" />
       <window_info id="Job Explorer" order="4" />
       <window_info anchor="bottom" id="Docker" order="13" sideWeight="0.49958158" weight="0.3296355" />
@@ -530,7 +519,8 @@
     <MESSAGE value="add admin pages for UserHatRolle etc., migrated DBs &#10;make Feierabend" />
     <MESSAGE value="add admin pages for RolleHatAF etc.&#10;make Feierabend" />
     <MESSAGE value="reorganize class XXXXInline(admin.TabularInline) definitions" />
-    <option name="LAST_COMMIT_MESSAGE" value="reorganize class XXXXInline(admin.TabularInline) definitions" />
+    <MESSAGE value="handle upper/lower case in AF-Liste" />
+    <option name="LAST_COMMIT_MESSAGE" value="handle upper/lower case in AF-Liste" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -538,37 +528,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/rapp/templates/rapp/tblorga_form.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="8" column="22" selection-start-line="8" selection-start-column="22" selection-end-line="8" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/rapp/templates/rapp/tbluseridundname_confirm_delete.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="15" lean-forward="true" selection-end-line="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/rapp/templates/rapp/tblorga_confirm_delete.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="4" column="29" selection-start-line="4" selection-start-column="29" selection-end-line="4" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/rapp/templates/rapp/tblgesamt_list.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="22" column="20" lean-forward="true" selection-start-line="22" selection-start-column="20" selection-end-line="22" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/rapp/static/paginator.js" />
-    <entry file="file://$PROJECT_DIR$/rapp/templates/rapp/userID_list.html" />
-    <entry file="file://$PROJECT_DIR$/qryF3_Mehrfachverwendung" />
     <entry file="file://$PROJECT_DIR$/qryF3_Mehrfachverwendung.sql" />
     <entry file="file://$PROJECT_DIR$/myvenv/lib64/python3.5/site-packages/django/contrib/admin/templates/admin/base.html">
       <provider selected="true" editor-type-id="text-editor">
@@ -728,13 +687,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Spielwiese.sql">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1070">
-          <caret line="259" lean-forward="true" selection-start-line="259" selection-end-line="259" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/rapp/migrations/0002_auto_20180714_1852.py" />
     <entry file="file://$PROJECT_DIR$/rapp/migrations/0003_auto_20180714_2224.py" />
     <entry file="file://$PROJECT_DIR$/rapp/migrations/0006_auto_20180801_1611.py" />
@@ -775,10 +727,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Spielwiese.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="823">
+          <caret line="261" selection-start-line="261" selection-end-line="261" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/rapp/admin.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="942">
-          <caret line="303" column="60" selection-start-line="303" selection-start-column="60" selection-end-line="303" selection-end-column="60" />
+        <state relative-caret-position="1018">
+          <caret line="295" column="32" lean-forward="true" selection-start-line="295" selection-start-column="32" selection-end-line="295" selection-end-column="32" />
           <folding>
             <element signature="e#24#63#0" expanded="true" />
             <element signature="e#1271#1349#1" />
@@ -786,16 +745,64 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/rapp/migrations/0006_auto_20180803_1131.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="266">
+          <caret line="14" column="157" lean-forward="true" selection-start-line="14" selection-start-column="81" selection-end-line="14" selection-end-column="157" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/rapp/migrations/0007_auto_20180803_1321.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="646">
+          <caret line="35" lean-forward="true" selection-start-line="35" selection-end-line="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/rapp/migrations/0005_auto_20180803_1131.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="13" column="33" lean-forward="true" selection-start-line="13" selection-start-column="33" selection-end-line="13" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/rapp/migrations/0008_auto_20180803_1321.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/rapp/migrations/0009_auto_20180803_1322.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="13" selection-start-line="13" selection-end-line="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/rapp/migrations/0010_auto_20180803_1322.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/rapp/migrations/0011_auto_20180803_1323.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="12" selection-start-line="12" selection-end-line="12" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/rapp/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="722">
-          <caret line="339" column="26" selection-start-line="339" selection-start-column="26" selection-end-line="339" selection-end-column="26" />
+        <state relative-caret-position="726">
+          <caret line="365" column="23" selection-start-line="365" selection-start-column="23" selection-end-line="365" selection-end-column="23" />
           <folding>
             <element signature="e#24#63#0" expanded="true" />
             <element signature="e#917#3394#0" />
             <element signature="e#3520#4900#0" />
             <element signature="e#7919#8506#0" />
-            <element signature="e#14259#17411#0" />
           </folding>
         </state>
       </provider>

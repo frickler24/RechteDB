@@ -273,13 +273,13 @@ class Afliste(admin.ModelAdmin):
 	actions_on_top = True
 	actions_on_bottom = True
 
-	list_display = ('af_name', 'neu_ab',)
-	# list_display_links = ( )
-	# list_editable = ('af_name', )
+	list_display = ('id', 'af_name', 'neu_ab',)
+	# list_display_links = ( 'id', )
+	list_editable = ('af_name', )
 	search_fields = ['af_name', ]
 	# list_filter = ( )
 
-	inlines = [RollehatafInline]
+	#inlines = [RollehatafInline]
 
 
 # ######################################################################################################
@@ -301,10 +301,10 @@ class Rollehataf(admin.ModelAdmin):
 		})},
 	}
 
-	list_display = ('rollenmappingid', 'rollenname', 'afname', 'get_muss', 'get_nurxv', 'get_xabcv', 'get_dv', 'bemerkung', )
+	list_display = ('rollenmappingid', 'rollenname', 'af', 'get_muss', 'get_nurxv', 'get_xabcv', 'get_dv', 'bemerkung', )
 	list_display_links = ('rollenname', )
-	list_editable = ('afname', 'bemerkung', )		# ToDo die vier Kreuzfelder muss..dv als klickable implementieren
-	search_fields = ['rollenname__rollenname', 'afname__af_name', 'bemerkung', ]
+	list_editable = ('af', 'bemerkung', )		# ToDo die vier Kreuzfelder muss..dv als klickable implementieren
+	search_fields = ['rollenname__rollenname', 'bemerkung', ]
 	list_filter = ('mussfeld', 'nurxv', 'xabcv', 'dv', )
 
 	list_per_page = 20 # sys.maxsize
