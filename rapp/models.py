@@ -331,6 +331,9 @@ class TblUserhatrolle(models.Model):
 #  FROM tblÜbersichtAF_GFs LEFT JOIN tbl_AFListe ON tblÜbersichtAF_GFs.[Name AF Neu] = tbl_AFListe.[AF-Name]
 #  WHERE (((tblÜbersichtAF_GFs.modelliert) Is Not Null) AND ((tbl_AFListe.[AF-Name]) Is Null))
 #  GROUP BY tblÜbersichtAF_GFs.[Name AF Neu];
+#
+# Sinn der Tabelle ist, eine eindeutige Liste an AFs vorliegen zu haben. Das GROUP- BY kann evtl teuer werden.
+# Aber das probieren wir jetzt mal aus.
 
 
 class TblAfliste(models.Model):		# ToDo: Wegwerfen, Tabelle ist redundant
@@ -401,3 +404,118 @@ class TblRollehataf(models.Model):
 	get_dv.short_description = 'DV-User'
 	dv.boolean = True
 
+###################################### Tblsubsysteme, Tblsachgebiete, TblDb2
+# Ein paar Hilfstabellen.
+# Die sind inhaltlich wahrscheinlich nicht super aktuell, helfen aber bei verschiedenen Fragen.
+
+class Tblsubsysteme(models.Model):
+	sgss = models.CharField(db_column='SGSS', primary_key=True, max_length=150)  # Field name made lowercase.
+	definition_field = models.CharField(db_column='Definition\xa0', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+	verantwortlicher_field = models.CharField(db_column='Verantwortlicher\xa0', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+	telefon_verantwortlicher_field = models.CharField(db_column='Telefon(Verantwortlicher)\xa0', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+	user_id_verantwortlicher_field = models.CharField(db_column='User-ID(Verantwortlicher)\xa0', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+	führungskraft_field = models.CharField(db_column='Führungskraft\xa0', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+
+	class Meta:
+		managed = False
+		db_table = 'tblSubsysteme'
+		verbose_name = "Subsystem"
+		verbose_name_plural = "Übersicht Subsysteme (tbl_Subsysteme)"
+		ordering = [ 'sgss' ]
+
+
+class Tblsachgebiete(models.Model): # sachgebiet, definition_field,
+	sachgebiet = models.CharField(db_column='Sachgebiet', primary_key=True, max_length=150)  # Field name made lowercase.
+	definition_field = models.CharField(db_column='Definition\xa0', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+	verantwortlicher_field = models.CharField(db_column='Verantwortlicher\xa0', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+	telefon_verantwortlicher_field = models.CharField(db_column='Telefon(Verantwortlicher)\xa0', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+	user_id_verantwortlicher_field = models.CharField(db_column='User-ID(Verantwortlicher)\xa0', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+	führungskraft_field = models.CharField(db_column='Führungskraft\xa0', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+
+	class Meta:
+		managed = False
+		db_table = 'tblSachgebiete'
+		verbose_name = "Sachgebiet"
+		verbose_name_plural = "Übersicht Sachgebiete (tbl_Sachgebiete)"
+		ordering = ['sachgebiet']
+
+
+class TblDb2(models.Model):
+	id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+	geloescht = models.TextField(blank=True, null=True, db_column='gelöscht', )  # This field type is a guess.
+	source = models.CharField(db_column='Source', max_length=15, blank=True, null=True)  # Field name made lowercase.
+	grantee = models.ForeignKey('TblRacfGruppen', models.PROTECT, to_field='group', db_column='grantee')  # Field name made lowercase.
+	creator = models.CharField(db_column='CREATOR', max_length=15, blank=True, null=True)  # Field name made lowercase.
+	table = models.CharField(db_column='TABLE', max_length=31)  # Field name made lowercase.
+	selectauth = models.CharField(db_column='SELECTAUTH', max_length=3, blank=True, null=True)  # Field name made lowercase.
+	insertauth = models.CharField(db_column='INSERTAUTH', max_length=3, blank=True, null=True)  # Field name made lowercase.
+	updateauth = models.CharField(db_column='UPDATEAUTH', max_length=3, blank=True, null=True)  # Field name made lowercase.
+	deleteauth = models.CharField(db_column='DELETEAUTH', max_length=3, blank=True, null=True)  # Field name made lowercase.
+	alterauth = models.CharField(db_column='ALTERAUTH', max_length=3, blank=True, null=True)  # Field name made lowercase.
+	indexauth = models.CharField(db_column='INDEXAUTH', max_length=3, blank=True, null=True)  # Field name made lowercase.
+	grantor = models.CharField(db_column='GRANTOR', max_length=15)  # Field name made lowercase.
+	grantedts = models.CharField(db_column='GRANTEDTS', max_length=63)  # Field name made lowercase.
+	datum = models.DateTimeField()
+
+	class Meta:
+		managed = False
+		db_table = 'tbl_DB2'
+		verbose_name = 'DB2-Berechtigung'
+		verbose_name_plural = 'DB2 - Berechtigungen (tbl_DB2)'
+		ordering = [ 'id', ]
+
+	def __str__(self) -> str:
+		return self.id
+
+	def get_grantee(self):
+		return str(self.grantee.group)
+	get_grantee.admin_order_field = 'grantee'
+	get_grantee.short_description = 'Grantee'
+
+	def get_aktiv(self):
+		return not self.geloescht
+	get_aktiv.admin_order_field = 'geloescht'
+	get_aktiv.short_description = 'Aktiv'
+
+
+class TblRacfGruppen(models.Model):
+	group = models.CharField(db_column='Group', primary_key=True, max_length=150)  # Field name made lowercase.
+	test = models.IntegerField(db_column='Test', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
+	produktion = models.IntegerField(db_column='Produktion', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
+	readonly = models.IntegerField(db_column='Readonly', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
+	db2_only = models.IntegerField(db_column='DB2-only', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. This field type is a guess.
+	stempel = models.DateTimeField(db_column='Stempel')  # Field name made lowercase.
+
+	def __str__(self) -> str:
+		return str(self.group)
+
+	class Meta:
+		managed = False
+		db_table = 'tbl_RACF_Gruppen'
+		verbose_name = 'RACF-Berechtigung'
+		verbose_name_plural = 'RACF - Berechtigungen (tbl_DB2)'
+		ordering = [ 'group', ]
+
+	def get_test(self):
+		return int(self.test)
+	get_test.boolean = True
+	get_test.admin_order_field = 'test'
+	get_test.short_description = 'Test'
+
+	def get_produktion(self):
+		return int(self.produktion)
+	get_produktion.boolean = True
+	get_produktion.admin_order_field = 'produktion'
+	get_produktion.short_description = 'Produktion'
+
+	def get_readonly(self):
+		return int(self.readonly)
+	get_readonly.boolean = True
+	get_readonly.admin_order_field = 'readonly'
+	get_readonly.short_description = 'Read only'
+
+	def get_db2_only(self):
+		return int(self.db2_only)
+	get_db2_only.boolean = True
+	get_db2_only.admin_order_field = 'db2_only'
+	get_db2_only.short_description = 'DB2 only'

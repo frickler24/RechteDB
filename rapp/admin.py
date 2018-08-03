@@ -20,7 +20,8 @@ import sys
 # Die Datenbanken / Models
 from rapp.models import TblUebersichtAfGfs, TblUserIDundName, TblOrga, TblPlattform, \
 						TblGesamt, TblGesamtHistorie, \
-						TblRollen, TblAfliste, TblUserhatrolle, TblRollehataf
+						TblRollen, TblAfliste, TblUserhatrolle, TblRollehataf, \
+						Tblsubsysteme, Tblsachgebiete, TblDb2, TblRacfGruppen
 
 # Vorwärtsreferenzen gehen nicht in python :-(
 # Inline function to show all Instances in other view
@@ -309,3 +310,31 @@ class Rollehataf(admin.ModelAdmin):
 
 	list_per_page = 20 # sys.maxsize
 
+# ######################################################################################################
+# Eine Reihe von Hilfstabellen, alle nach dem selben Schema. Keine Foreign Keys
+# ######################################################################################################
+
+@admin.register(Tblsubsysteme)
+class Subsysteme(admin.ModelAdmin):
+	alle = ['sgss', 'definition_field', 'verantwortlicher_field', 'führungskraft_field',]
+	search_fields = alle
+	list_display = alle
+
+@admin.register(Tblsachgebiete)		# ToDo Mal eine aktuelle Sachgebiets-/Subsystemtabelle runterladen
+class Sachgebiete(admin.ModelAdmin):
+	alle = ['sachgebiet', 'definition_field', 'verantwortlicher_field', 'führungskraft_field',]
+	search_fields = alle
+	list_display = alle
+
+@admin.register(TblDb2)
+class Db2(admin.ModelAdmin):
+	list_display = ['id', 'get_aktiv', 'source', 'get_grantee', 'creator', 'table',
+			'selectauth', 'insertauth', 'updateauth', 'deleteauth',
+			'alterauth', 'indexauth', 'grantor', 'grantedts', 'datum']
+	search_fields = ['table', 'grantee__group', 'grantor']
+
+@admin.register(TblRacfGruppen)
+class RacfGruppen(admin.ModelAdmin):
+	alle = ['group', 'test', 'get_produktion', 'get_readonly', 'get_db2_only', 'stempel', ]
+	search_fields = alle
+	list_display = alle
