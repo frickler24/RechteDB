@@ -6,4 +6,5 @@ db.sqlite3
 __pycache__
 .directory
 myvenv
+.idea
 01\ Mitarbeiterberechtigungen\ ZI-AI-BA.csv

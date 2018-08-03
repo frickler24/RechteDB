@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9041f750-6594-46a9-8f9c-6349ba68a303" name="Default" comment="handle upper/lower case in AF-Liste">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/rapp/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/rapp/models.py" afterDir="false" />
-    </list>
+    <list default="true" id="9041f750-6594-46a9-8f9c-6349ba68a303" name="Default" comment="" />
     <ignored path="db.sqlite3" />
     <ignored path=".directory" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -23,8 +19,8 @@
       <file leaf-file-name="admin.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/rapp/admin.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="628">
-              <caret line="333" column="45" selection-start-line="333" selection-start-column="45" selection-end-line="333" selection-end-column="45" />
+            <state relative-caret-position="761">
+              <caret line="340" lean-forward="true" selection-start-line="340" selection-end-line="340" />
               <folding>
                 <element signature="e#24#63#0" expanded="true" />
               </folding>
@@ -175,6 +171,12 @@
               <item name="RechteDB" type="b2602c69:ProjectViewProjectNode" />
               <item name="RechteDB" type="462c0819:PsiDirectoryNode" />
               <item name="rapp" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RechteDB" type="b2602c69:ProjectViewProjectNode" />
+              <item name="RechteDB" type="462c0819:PsiDirectoryNode" />
+              <item name="rapp" type="462c0819:PsiDirectoryNode" />
+              <item name="migrations" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="RechteDB" type="b2602c69:ProjectViewProjectNode" />
@@ -414,7 +416,14 @@
       <option name="project" value="LOCAL" />
       <updated>1533288445995</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Add some helper tables to admin page&#10;&#10;TblSubsysteme&#10;TblSachgebiete&#10;TblDb2&#10;TblRacfGruppen&#10;&#10;with their views">
+      <created>1533305347627</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1533305347627</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TodoView">
@@ -434,11 +443,11 @@
       <window_info id="DB Browser" order="5" />
       <window_info anchor="bottom" id="DB Execution Console" order="12" weight="0.4540412" />
       <window_info anchor="bottom" id="Event Log" order="2" sideWeight="0.5004184" side_tool="true" weight="0.3296355" />
-      <window_info active="true" anchor="bottom" id="Version Control" order="3" visible="true" weight="0.27892235" />
+      <window_info anchor="bottom" id="Version Control" order="3" visible="true" weight="0.27892235" />
       <window_info anchor="bottom" id="Python Console" order="0" weight="0.32899022" />
       <window_info anchor="bottom" id="Run" order="6" />
       <window_info anchor="bottom" id="Terminal" order="1" weight="0.32899022" />
-      <window_info content_ui="combo" id="Project" order="3" sideWeight="0.49452737" visible="true" weight="0.21840149" />
+      <window_info active="true" content_ui="combo" id="Project" order="3" sideWeight="0.49452737" visible="true" weight="0.21840149" />
       <window_info id="Project Explorer" order="2" />
       <window_info id="Job Explorer" order="4" />
       <window_info anchor="bottom" id="Docker" order="13" sideWeight="0.49958158" weight="0.3296355" />
@@ -527,7 +536,8 @@
     <MESSAGE value="add admin pages for RolleHatAF etc.&#10;make Feierabend" />
     <MESSAGE value="reorganize class XXXXInline(admin.TabularInline) definitions" />
     <MESSAGE value="handle upper/lower case in AF-Liste" />
-    <option name="LAST_COMMIT_MESSAGE" value="handle upper/lower case in AF-Liste" />
+    <MESSAGE value="Add some helper tables to admin page&#10;&#10;TblSubsysteme&#10;TblSachgebiete&#10;TblDb2&#10;TblRacfGruppen&#10;&#10;with their views" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add some helper tables to admin page&#10;&#10;TblSubsysteme&#10;TblSachgebiete&#10;TblDb2&#10;TblRacfGruppen&#10;&#10;with their views" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -763,8 +773,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/rapp/admin.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="628">
-          <caret line="333" column="45" selection-start-line="333" selection-start-column="45" selection-end-line="333" selection-end-column="45" />
+        <state relative-caret-position="761">
+          <caret line="340" lean-forward="true" selection-start-line="340" selection-end-line="340" />
           <folding>
             <element signature="e#24#63#0" expanded="true" />
           </folding>
