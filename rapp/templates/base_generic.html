@@ -92,15 +92,16 @@
 	  {% block sidebar %}
 	  <ul class="sidebar-nav">
 		  <li><a href="{% url 'index' %}">Startseite</a></li>
-		  <li><a href="">Import neue Daten</a></li>
+		  <li>&nbsp;</li>
+		  <li><a href="{% url 'neueliste' %}">Neue Daten importieren</a></li>
 		  <li><a href="{% url 'userliste' %}">User-Liste</a></li>
 		  <li><a href="{% url 'teamliste' %}">Team-Liste</a></li>
 		  <li><a href="{% url 'gesamtliste' %}">Gesamtliste</a></li>
 		  <li>&nbsp;</li>
 		  <li><a href="{% url 'panel' %}?geloescht=3&userid_name__zi_organisation=ai-ba">Gesamt-Panel</a></li>
+
 		  <li>&nbsp;</li>
 		  <li><a href="/admin/rapp/">Admin-Sichten</a></li>
-
 	      <li>&nbsp;</li>
 
 		  {% if user.is_authenticated %}

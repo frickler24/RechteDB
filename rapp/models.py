@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-from django.db.models.expressions import F
-
 # Create your models here.
 
 # This is an auto-generated Django model module.
@@ -11,9 +8,12 @@ from django.db.models.expressions import F
 #   * Make sure each ForeignKey has `on_delete` set to the desired behavior.
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
+from __future__ import unicode_literals
 from django.db import models
 from django.utils.html import format_html
 from django.urls import reverse		# Used to generate URLs by reversing the URL patterns
+
+# Für das Lesen von csv- und Excel-Dateien
 
 
 # Tabelle enthält die aktuell genehmigten (modellierten und in Modellierung befindlichen) AF + GF-Kombinationen
@@ -519,3 +519,33 @@ class TblRacfGruppen(models.Model):
 	get_db2_only.boolean = True
 	get_db2_only.admin_order_field = 'db2_only'
 	get_db2_only.short_description = 'DB2 only'
+
+###################################### Tblsubsysteme, Tblsachgebiete, TblDb2
+# Tabellen für den Import neuer Listen
+#
+
+class Tblrechteneuvonimport(models.Model):																												  
+	id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.																   
+	identitaet = models.CharField(db_column='Identität', max_length=150, blank=False, null=False, db_index=True)  # Field name made lowercase.
+	nachname = models.CharField(db_column='Nachname', max_length=150, blank=True, null=True)  # Field name made lowercase.								  
+	vorname = models.CharField(db_column='Vorname', max_length=150, blank=True, null=True)  # Field name made lowercase.									
+	tf_name = models.CharField(db_column='TF Name', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.																																				 
+	tf_beschreibung = models.CharField(db_column='TF Beschreibung', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.																																 
+	af_anzeigename = models.CharField(db_column='AF Anzeigename', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.																																   
+	af_beschreibung = models.CharField(db_column='AF Beschreibung', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.																																 
+	hoechste_kritikalitaet_tf_in_af = models.CharField(db_column='Höchste Kritikalität TF in AF', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.																									 
+	tf_eigentuemer_org = models.CharField(db_column='TF Eigentümer Org', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.																															 
+	tf_applikation = models.CharField(db_column='TF Applikation', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.																																   
+	tf_kritikalitaet = models.CharField(db_column='TF Kritikalität', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.																																 
+	gf_name = models.CharField(db_column='GF Name', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.																																				 
+	gf_beschreibung = models.CharField(db_column='GF Beschreibung', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.																																 
+	direct_connect = models.CharField(db_column='Direct Connect', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.																																   
+	af_zugewiesen_an_account_name = models.CharField(db_column='AF zugewiesen an Account-Name', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.																									 
+	af_gueltig_ab = models.DateTimeField(db_column='AF Gültig ab', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.																																				   
+	af_gueltig_bis = models.DateTimeField(db_column='AF Gültig bis', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+	af_zuweisungsdatum = models.DateTimeField(db_column='AF Zuweisungsdatum', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+
+	class Meta:
+		managed = True
+		db_table = 'tblRechteNeuVonImport'
+

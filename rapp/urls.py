@@ -82,3 +82,8 @@ urlpatterns += [
 	path('panel/', views.panel, name='panel'),
 ]
 
+# Der Link auf die Seiten zum Einlesen neuer Daten vie csv-Datei
+
+urlpatterns += [
+	path('neueliste/', views.neueListe, name='neueliste'),
+]

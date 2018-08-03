@@ -273,3 +273,97 @@ update `tbl_RolleHatAF` raf
 	inner join `tbl_AFListe`
     on (raf.`AFName` = `tbl_AFListe`.`AF-Name`)
     set raf.`AF` = `tbl_AFListe`.`ID`
+
+
+-- Manueller iMport einer neuen Liste in die Datenbank
+
+TRUNCATE `tblRechteNeuVonImport`;
+LOAD DATA LOCAL INFILE '/tmp/phpbojCHf'
+    REPLACE INTO TABLE `tblRechteNeuVonImport`
+    FIELDS TERMINATED BY ';' ENCLOSED BY '\"' ESCAPED BY '\\' LINES TERMINATED BY '\n';
+
+SELECT count(*) FROM `tblRechteNeuVonImport`
+WHERE (((tblRechteNeuVonImport.`AF zugewiesen an Account-Name`) Is Null
+    Or (tblRechteNeuVonImport.`AF zugewiesen an Account-Name`)=""));
+
+UPDATE tblRechteNeuVonImport
+    SET `AF zugewiesen an Account-Name` = `Identität`
+WHERE (((tblRechteNeuVonImport.`AF zugewiesen an Account-Name`) Is Null
+    Or (tblRechteNeuVonImport.`AF zugewiesen an Account-Name`)=""));
+
+SELECT count(*) FROM `tblRechteNeuVonImport`
+WHERE (((tblRechteNeuVonImport.`AF zugewiesen an Account-Name`) Not Like "xv86*")
+	AND ((tblRechteNeuVonImport.Identität) Like "xv86*"));
+
+UPDATE tblRechteNeuVonImport
+	SET tblRechteNeuVonImport.`AF zugewiesen an Account-Name` = `Identität`
+WHERE (((tblRechteNeuVonImport.`AF zugewiesen an Account-Name`) Not Like "xv86*")
+	AND ((tblRechteNeuVonImport.Identität) Like "xv86*"));
+
+-- Leeren und Füllen der eigentlichen Importtabelle
+truncate tblRechteAMNeu;
+
+CREATE TEMPORARY TABLE qryF3_RechteNeuVonImportDuplikatfrei (
+    SELECT tblRechteNeuVonImport.ID,
+           tblRechteNeuVonImport.`AF zugewiesen an Account-Name` AS UserID,
+           CONCAT(`Nachname`,', ',`Vorname`) AS Name,
+           tblRechteNeuVonImport.`TF Name` AS TF,
+           tblRechteNeuVonImport.`TF Beschreibung`,
+           tblRechteNeuVonImport.`AF Anzeigename` AS `Enthalten in AF`,
+           tblRechteNeuVonImport.`TF Kritikalität`,
+           tblRechteNeuVonImport.`TF Eigentümer Org`,
+           tblRechteNeuVonImport.`TF Applikation` AS `TF Technische Plattform`,
+           tblRechteNeuVonImport.`GF Name` AS GF,
+           'k.A.' AS `VIP Kennzeichen`,
+           'k.A.' AS Zufallsgenerator,
+           tblRechteNeuVonImport.`AF Gültig ab`,
+           tblRechteNeuVonImport.`AF Gültig bis`,
+           tblRechteNeuVonImport.`Direct Connect`,
+           tblRechteNeuVonImport.`Höchste Kritikalität TF in AF`,
+           tblRechteNeuVonImport.`GF Beschreibung`,
+           tblRechteNeuVonImport.`AF Zuweisungsdatum`
+    FROM tblRechteNeuVonImport
+    GROUP BY
+             tblRechteNeuVonImport.`AF zugewiesen an Account-Name`,
+             CONCAT(`Nachname`,', ',`Vorname`),
+             tblRechteNeuVonImport.`TF Name`,
+             tblRechteNeuVonImport.`TF Beschreibung`,
+             tblRechteNeuVonImport.`AF Anzeigename`,
+             tblRechteNeuVonImport.`TF Kritikalität`,
+             tblRechteNeuVonImport.`TF Eigentümer Org`,
+             tblRechteNeuVonImport.`TF Applikation`,
+             tblRechteNeuVonImport.`GF Name`,
+             tblRechteNeuVonImport.`AF Gültig ab`,
+             tblRechteNeuVonImport.`AF Gültig bis`,
+             tblRechteNeuVonImport.`Direct Connect`,
+             tblRechteNeuVonImport.`Höchste Kritikalität TF in AF`,
+             tblRechteNeuVonImport.`GF Beschreibung`,
+             tblRechteNeuVonImport.`AF Zuweisungsdatum`
+);
+
+INSERT INTO tblRechteAMNeu (UserID, Name, TF, `TF Beschreibung`, `Enthalten in AF`, `TF Kritikalität`,
+            `TF Eigentümer Org`, `TF Technische Plattform`, GF, `VIP Kennzeichen`, Zufallsgenerator, 
+            `AF Gültig ab`, `AF Gültig bis`, `Direct Connect`, `Höchste Kritikalität TF in AF`, 
+            `GF Beschreibung`, `AF Zuweisungsdatum`)
+SELECT qryF3_RechteNeuVonImportDuplikatfrei.UserID,
+       qryF3_RechteNeuVonImportDuplikatfrei.Name,
+       qryF3_RechteNeuVonImportDuplikatfrei.TF,
+       qryF3_RechteNeuVonImportDuplikatfrei.`TF Beschreibung`,
+       qryF3_RechteNeuVonImportDuplikatfrei.`Enthalten in AF`,
+       qryF3_RechteNeuVonImportDuplikatfrei.`TF Kritikalität`,
+       qryF3_RechteNeuVonImportDuplikatfrei.`TF Eigentümer Org`,
+       qryF3_RechteNeuVonImportDuplikatfrei.`TF Technische Plattform`,
+       qryF3_RechteNeuVonImportDuplikatfrei.GF,
+       qryF3_RechteNeuVonImportDuplikatfrei.`VIP Kennzeichen`,
+       qryF3_RechteNeuVonImportDuplikatfrei.Zufallsgenerator,
+       qryF3_RechteNeuVonImportDuplikatfrei.`AF Gültig ab`,
+       qryF3_RechteNeuVonImportDuplikatfrei.`AF Gültig bis`,
+       qryF3_RechteNeuVonImportDuplikatfrei.`Direct Connect`,
+       qryF3_RechteNeuVonImportDuplikatfrei.`Höchste Kritikalität TF in AF`,
+       qryF3_RechteNeuVonImportDuplikatfrei.`GF Beschreibung`,
+       qryF3_RechteNeuVonImportDuplikatfrei.`AF Zuweisungsdatum`
+FROM qryF3_RechteNeuVonImportDuplikatfrei;
+
+#1062 - Doppelter Eintrag 'AV00087-#B91MADM-rva_01219_beta91_job_abst-RACF - P-rvg_01219_be' für Schlüssel 'für _5b_'
+
+mIT DER NUMMER 1036

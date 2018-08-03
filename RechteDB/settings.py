@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 	'debug_toolbar',
 	'bootstrap4',
 	'django_tables2',
+	'import_export',
 ]
 
 MIDDLEWARE = [
@@ -138,3 +139,4 @@ STATIC_URL = '/static/'
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+IMPORT_EXPORT_USE_TRANSACTIONS = True

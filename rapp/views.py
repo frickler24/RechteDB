@@ -17,9 +17,13 @@ from django.shortcuts import render
 from .filters import PanelFilter
 from django.core.paginator import Paginator
 
-# Manuelle Konfigurieren der Table2
-# from django_tables2 import RequestConfig
-# from .tables import PanelTable
+# Zum Einlesen der csv
+import tablib
+from tablib import Dataset
+from import_export import resources
+from .ressources import MyCSVImporterModel
+from .models import Tblrechteneuvonimport
+
 
 ###################################################################
 # Die Einstiegsseite
@@ -164,3 +168,46 @@ def panel(request):
 
 	args = {'paginator': paginator, 'filter': panel_filter, 'pages': pages, 'meineTabelle': panel_list, 'pagesize': pagesize}
 	return render(request, 'rapp/panel_list.html', args)
+
+
+###################################################################
+# neueListe dient dem Einlesen einer neuen csv-Datei
+
+
+def xneueListe(request):
+
+	if request.method == 'POST':
+		myCSVImporterModel = MyCSVImporterModel()
+		dataset = Dataset()
+		csv_tabelle_von_extern = request.FILES['myfile']
+
+		imported_data = dataset.load(csv_tabelle_von_extern.read().decode('utf-8'), format='csv')
+		result = myCSVImporterModel.import_data(dataset, dry_run=True)  # Test the data import
+
+		if not result.has_errors():
+			myCSVImporterModel.import_data(dataset, dry_run=False)  # Actually import now
+
+	return render(request, 'rapp/importcsv.html')
+
+def neueListe(request):
+
+	if request.method == 'POST':
+		# csv_tabelle_von_extern = request.FILES['myfile']
+
+		imported_data = Dataset().load(open('_kurz.csv').read())
+
+		debug (imported_data)
+
+	return render(request, 'rapp/importcsv.html')
+
+
+
+
+
+
+
+
+
+
+
+
