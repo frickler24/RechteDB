@@ -17,6 +17,8 @@ from django.shortcuts import render
 from .filters import PanelFilter
 from django.core.paginator import Paginator
 
+from .forms import BastelForm
+
 # Zum Einlesen der csv
 import tablib
 from tablib import Dataset
@@ -190,24 +192,50 @@ def xneueListe(request):
 	return render(request, 'rapp/importcsv.html')
 
 def neueListe(request):
+	data = {}
+	if "GET" == request.method:
+		return render(request, "rapp/importcsv.html", data)
+	# if not GET, then proceed
+	try:
+		csv_file = request.FILES["csv_file"]
 
-	if request.method == 'POST':
-		# csv_tabelle_von_extern = request.FILES['myfile']
+		if not csv_file.name.endswith('.csv'):
+			message.error(request, 'File is not CSV type')
+			return HttpResponseRedirect(reverse("neueliste"))
+		# if file is too large, return
+		if csv_file.multiple_chunks():
+			message.error(request, "Uploaded file is too big (%.2f MB)." % (csv_file.size / (1024 * 1024),))
+			return HttpResponseRedirect(reverse("neueliste"))
 
-		imported_data = Dataset().load(open('_kurz.csv').read())
+		file_data = csv_file.read().decode("utf-8")
 
-		debug (imported_data)
+		lines = file_data.split("\n")
+		# loop over the lines and save them in db. If error , store as string and then display
+		for line in lines:
+			if line != "":
+				fields = line.split(";")
+				data_dict = {}
+				data_dict["Identität"] = fields[0]
+				data_dict["Nachname"] = fields[1]
+				data_dict["Vorname"] = fields[2]
+				try:
+					form = BastelForm(data_dict)
+					if form.is_valid():
+						form.save()
+					else:
+						print("neueListe: Form is invalid, %s")
+						messages.error(request, 'Form is invalid.').error(form.errors.as_json())
+				except Exception as e:
+					print("neueListe: Irgendwas mit der Form klappt nicht")
+					#messages.error("error_logger").error(repr(e))
+					pass
+		messages.info(request, 'Datei wurde eingelesen.')
+		print("es wurden insgesamt %d Daten verarbeitet,", lines.count)
 
-	return render(request, 'rapp/importcsv.html')
+	except Exception as e:
+		print('äh, da geht was nicht')
+	#	logging.getLogger("error_logger").error("Unable to upload file. " + repr(e))
+	#	messages.error(request, "Unable to upload file. " + repr(e))
 
-
-
-
-
-
-
-
-
-
-
+	return HttpResponseRedirect(reverse("neueliste"))
 

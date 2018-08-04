@@ -22,3 +22,5 @@ class RenewBookForm(forms.Form):
 		# Remember to always return the cleaned data.
 		return data
 
+class BastelForm(forms.Form):
+	pass
