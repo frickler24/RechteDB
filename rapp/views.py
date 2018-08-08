@@ -38,6 +38,8 @@ class IndexView(View):
 		num_userids = TblUserIDundName.objects.all().count
 		num_active_userids = TblUserIDundName.objects.filter(geloescht=False).count
 		num_plattforms = TblPlattform.objects.count
+		num_iamba = TblGesamt.objects.filter(geloescht=False,
+											 	userid_name__abteilung__icontains='ZI-AI-BA', userid_name__geloescht = False).count
 		num_userids_in_department = TblUserIDundName.objects.filter(geloescht=False, abteilung__icontains='ZI-AI-BA').count
 		num_teams = TblOrga.objects.all().count
 		num_active_rights = TblGesamt.objects.filter(geloescht=False).count
@@ -50,6 +52,7 @@ class IndexView(View):
 					'num_rights': num_rights,
 					'num_active_rights': num_active_rights,
 					'num_userIDs': num_userids,
+					'num_iam_ba': num_iamba,
 					'num_activeUserIDs': num_active_userids,
 					'num_plattforms': num_plattforms,
 					'num_userIDsInDepartment': num_userids_in_department,

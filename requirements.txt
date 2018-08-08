@@ -11,5 +11,7 @@ django-debug-toolbar >= 1.9.1
 #django-import-export >= 1.0.1
 #openpyxl >= 2.4.0
 #messages >= 0.4.3
+#django-bootstrap3 >= 10.0.1
+django-bootstrap >= 0.2.4
 
 # Images are ${Project}./myvenv/lib/python3.5/site-packages/django/contrib/gis/static/gis/img
