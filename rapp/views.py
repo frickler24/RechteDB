@@ -26,6 +26,42 @@ from import_export import resources
 from .ressources import MyCSVImporterModel
 from .models import Tblrechteneuvonimport
 
+###################################################################
+# RApp - erforderliche Sichten und Reports
+
+# ToDo: Alle User und ihre Rollen für eine Selektion
+
+# ToDo: Alle User und ihre Rollen sowie die daran hängenden AF für eine Selektion (nur zur Ansicht und Veränderung, kein PDF)
+# Kombinieren UserundIhreRollen mit RollenundIhre AF
+
+
+# ToDo: Alle Rollen sowie die daran hängenden AF für eine Selektion (gruppiert für PDF)
+
+# ToDo: Alle TF / GF / AF / Rollen für selektierte User
+# ToDo: - Evtl. gibt es das schon beim jetzigen Filterpanel
+
+# ToDo: Abgleich vorhandener Rechte selektierter User mit Zertifizierungsliste
+
+# ToDo: Abgleich vorhandener Rechte mit Rollenvorgaben
+# ToDo: - Was fehlt?
+# ToDo: - Was ist zu viel?
+# ToDo: - Jeweils aufgeteilt für XV-, jeden vorhandenen AV/BV/CV und evtl. vorhandenen DV-User
+
+# ToDo: Welche Direktzuordnungen hat eine UID schon über vorhandene AF?
+# ToDo: - Welche Zuordnung ist damit doppelt?
+# ToDo: - Welche TF fehlt als zugeordnete AF?
+# ToDo: - Welche bekannten AFen würden hier helfen?
+
+# ToDo: Importfunktion für "Alle meine TFen und die zugeordneten User"
+# ToDo: Importfunktion für "Alle meine AFen und die zugeordneten User"
+
+# ToDo: Hier werden sicherlich noch etliche Filterfunktionen benötigt:
+# ToDo: Was passt eventuell nicht (welche Personen passen nicht in die erlaubten Orgabereiche)
+# ToDo: Welche Rechte haben Ausschluss-/Einschlusskriterien und sind sie erfüllt?
+# ToDo: Welche Rechte sind redundant, weil sie neu modelliert wurden und was ist die Alternativempfehlung?
+# ToDo: Zu welchen Orgabereichen (Importfunktion dafür!) gehören die identifizierten User (Vorbereitung Mail an FK zum Prüfen und eventuellem Löschen
+
+
 
 ###################################################################
 # Die Einstiegsseite

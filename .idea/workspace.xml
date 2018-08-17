@@ -3,9 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="9041f750-6594-46a9-8f9c-6349ba68a303" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/rapp/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rapp/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/rapp/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rapp/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/rapp/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rapp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/rapp/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <ignored path="db.sqlite3" />
     <ignored path=".directory" />
@@ -21,11 +21,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="models.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/rapp/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="83" selection-start-line="83" selection-end-line="83" />
+            <state relative-caret-position="544">
+              <caret line="363" column="40" selection-start-line="363" selection-start-column="40" selection-end-line="363" selection-end-column="40" />
               <folding>
                 <element signature="e#520#559#0" expanded="true" />
                 <element signature="e#917#3394#0" />
@@ -80,7 +80,6 @@
                 <element signature="e#20751#21383#0" />
                 <element signature="e#21165#21328#0" />
                 <element signature="e#21359#21383#0" />
-                <element signature="e#21513#23849#0" />
                 <element signature="e#22804#23100#0" />
                 <element signature="e#23131#23179#0" />
                 <element signature="e#23204#23224#0" />
@@ -104,6 +103,7 @@
                 <element signature="e#30468#30495#0" />
                 <element signature="e#30653#30678#0" />
                 <element signature="e#30827#30852#0" />
+                <element signature="e#31166#34872#0" />
               </folding>
             </state>
           </provider>
@@ -112,11 +112,29 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/rapp/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="456">
-              <caret line="54" column="20" selection-start-line="54" selection-start-column="20" selection-end-line="54" selection-end-column="20" />
+            <state relative-caret-position="38">
+              <caret line="42" selection-start-line="42" selection-end-line="42" />
               <folding>
                 <element signature="e#24#63#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="admin.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/rapp/admin.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="228">
+              <caret line="54" column="33" selection-start-line="54" selection-start-column="33" selection-end-line="54" selection-end-column="33" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="requirements.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/requirements.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="323">
+              <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
             </state>
           </provider>
         </entry>
@@ -255,8 +273,6 @@
         <option value="$PROJECT_DIR$/rapp/migrations/0009_auto_20180803_1322.py" />
         <option value="$PROJECT_DIR$/rapp/migrations/0010_auto_20180803_1322.py" />
         <option value="$PROJECT_DIR$/rapp/migrations/0011_auto_20180803_1323.py" />
-        <option value="$PROJECT_DIR$/rapp/admin.py" />
-        <option value="$PROJECT_DIR$/rapp/models.py" />
         <option value="$PROJECT_DIR$/rapp/urls.py" />
         <option value="$PROJECT_DIR$/rapp/templates/base_generic.html" />
         <option value="$PROJECT_DIR$/rapp/ressources.py" />
@@ -270,8 +286,10 @@
         <option value="$PROJECT_DIR$/requirements.txt" />
         <option value="$PROJECT_DIR$/RechteDB/settings.py" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.html" />
-        <option value="$PROJECT_DIR$/rapp/views.py" />
         <option value="$PROJECT_DIR$/rapp/templates/index.html" />
+        <option value="$PROJECT_DIR$/rapp/views.py" />
+        <option value="$PROJECT_DIR$/rapp/models.py" />
+        <option value="$PROJECT_DIR$/rapp/admin.py" />
       </list>
     </option>
   </component>
@@ -606,7 +624,14 @@
       <option name="project" value="LOCAL" />
       <updated>1533590741166</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="change index page from table to bootstap4-divs">
+      <created>1533744078535</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1533744078535</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TodoView">
@@ -626,9 +651,9 @@
       <window_info id="DB Browser" order="5" />
       <window_info anchor="bottom" id="DB Execution Console" order="12" weight="0.31378764" />
       <window_info anchor="bottom" id="Event Log" order="2" sideWeight="0.5004184" side_tool="true" weight="0.3296355" />
+      <window_info anchor="bottom" id="Run" order="6" />
       <window_info anchor="bottom" id="Version Control" order="3" weight="0.27892235" />
       <window_info anchor="bottom" id="Python Console" order="0" weight="0.32899022" />
-      <window_info anchor="bottom" id="Run" order="6" />
       <window_info anchor="bottom" id="Terminal" order="1" weight="0.32899022" />
       <window_info active="true" content_ui="combo" id="Project" order="3" sideWeight="0.49452737" visible="true" weight="0.21840149" />
       <window_info id="Project Explorer" order="2" />
@@ -636,8 +661,8 @@
       <window_info anchor="bottom" id="Docker" order="13" sideWeight="0.49958158" weight="0.3296355" />
       <window_info anchor="bottom" id="Console" order="11" />
       <window_info id="Structure" order="1" sideWeight="0.5024582" side_tool="true" weight="0.26969856" />
-      <window_info id="Favorites" order="0" sideWeight="0.50547266" side_tool="true" weight="0.21213388" />
       <window_info anchor="bottom" id="Debug" order="7" weight="0.4" />
+      <window_info id="Favorites" order="0" sideWeight="0.50547266" side_tool="true" weight="0.21213388" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="9" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -680,7 +705,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/../.." />
     </ignored-roots>
-    <MESSAGE value="set sort criteria in models.py to reasonable values" />
     <MESSAGE value="set first n:1 inline functions" />
     <MESSAGE value="add tblGesamtHistorie" />
     <MESSAGE value="add better integrated change/delete/create&#10;&#10;For TblUserIDundName all functions are integrated&#10;and are accessible from within Userliste." />
@@ -705,7 +729,8 @@
     <MESSAGE value="add first steps in getting new data from cvs file" />
     <MESSAGE value="add firsst SQLs for updateing IAM Data" />
     <MESSAGE value="run import SPs without UI" />
-    <option name="LAST_COMMIT_MESSAGE" value="run import SPs without UI" />
+    <MESSAGE value="change index page from table to bootstap4-divs" />
+    <option name="LAST_COMMIT_MESSAGE" value="change index page from table to bootstap4-divs" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -813,13 +838,6 @@
     <entry file="file://$PROJECT_DIR$/rapp/migrations/0009_auto_20180803_1322.py" />
     <entry file="file://$PROJECT_DIR$/rapp/migrations/0010_auto_20180803_1322.py" />
     <entry file="file://$PROJECT_DIR$/rapp/migrations/0011_auto_20180803_1323.py" />
-    <entry file="file://$PROJECT_DIR$/rapp/admin.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-417">
-          <caret line="279" column="33" selection-start-line="279" selection-start-column="33" selection-end-line="279" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/rapp/migrations/0013_tbldb2_tblracfgruppen_tblsachgebiete_tblsubsysteme.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -932,27 +950,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/requirements.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="399">
           <caret line="21" column="62" selection-start-line="21" selection-start-column="52" selection-end-line="21" selection-end-column="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/rapp/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="456">
-          <caret line="54" column="20" selection-start-line="54" selection-start-column="20" selection-end-line="54" selection-end-column="20" />
-          <folding>
-            <element signature="e#24#63#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -967,16 +968,30 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
           <caret line="24" selection-start-line="24" selection-end-line="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/rapp/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="38">
+          <caret line="42" selection-start-line="42" selection-end-line="42" />
           <folding>
-            <element signature="e#2256#2262#0" expanded="true" />
+            <element signature="e#24#63#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/requirements.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/rapp/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="83" selection-start-line="83" selection-end-line="83" />
+        <state relative-caret-position="544">
+          <caret line="363" column="40" selection-start-line="363" selection-start-column="40" selection-end-line="363" selection-end-column="40" />
           <folding>
             <element signature="e#520#559#0" expanded="true" />
             <element signature="e#917#3394#0" />
@@ -1031,7 +1046,6 @@
             <element signature="e#20751#21383#0" />
             <element signature="e#21165#21328#0" />
             <element signature="e#21359#21383#0" />
-            <element signature="e#21513#23849#0" />
             <element signature="e#22804#23100#0" />
             <element signature="e#23131#23179#0" />
             <element signature="e#23204#23224#0" />
@@ -1055,7 +1069,15 @@
             <element signature="e#30468#30495#0" />
             <element signature="e#30653#30678#0" />
             <element signature="e#30827#30852#0" />
+            <element signature="e#31166#34872#0" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/rapp/admin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="54" column="33" selection-start-line="54" selection-start-column="33" selection-end-line="54" selection-end-column="33" />
         </state>
       </provider>
     </entry>

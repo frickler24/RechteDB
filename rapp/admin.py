@@ -29,6 +29,18 @@ class UserhatrolleInline(admin.TabularInline):
 	model = TblUserhatrolle
 	extra = 0
 
+	fields = ['userundrollenid', 'userid', 'rollenname', 'schwerpunkt_vertretung', 'bemerkung', ]
+
+	formfield_overrides = {
+		models.TextField: {
+			'widget': Textarea(
+				attrs={
+					'rows': 1,
+					'cols': 40,
+					'style': 'height: 1.4em;'
+				})},
+	}
+
 class GesamtInline(admin.TabularInline):
 	model = TblGesamt
 	extra = 0
@@ -40,6 +52,8 @@ class UserIDundNameInline(admin.TabularInline):
 class RollehatafInline(admin.TabularInline):
 	model = TblRollehataf
 	extra = 0
+	fields = ['af', 'bemerkung', 'mussfeld', 'nurxv', 'xabcv', 'dv', ]
+
 
 class UebersichtAfGfsInline(admin.TabularInline):
 	model = TblUebersichtAfGfs
@@ -260,7 +274,7 @@ class Rollen(admin.ModelAdmin):
 	list_editable = ('system', 'rollenbeschreibung', 'rollenbeschreibung',)
 	search_fields = ['rollenname', 'system', 'rollenbeschreibung', ]
 
-	inlines = [UserhatrolleInline, RollehatafInline]
+	inlines = [RollehatafInline, UserhatrolleInline, ]
 
 
 
@@ -280,12 +294,14 @@ class Afliste(admin.ModelAdmin):
 	search_fields = ['af_name', ]
 	# list_filter = ( )
 
-	#inlines = [RollehatafInline]
+	inlines = [RollehatafInline]
 
 
 # ######################################################################################################
 # tbl RolleHatAF
 # ######################################################################################################
+# ToDo: Suche AF in Rollen mit Anzeige zugehöriger User
+# ToDo: - Suche ist schon erweitert: Anzeige betroffener User integrieren (besser in neuer Abfrage?)
 
 @admin.register(TblRollehataf)
 class Rollehataf(admin.ModelAdmin):
@@ -305,7 +321,7 @@ class Rollehataf(admin.ModelAdmin):
 	list_display = ('rollenmappingid', 'rollenname', 'af', 'get_muss', 'get_nurxv', 'get_xabcv', 'get_dv', 'bemerkung', )
 	list_display_links = ('rollenname', )
 	list_editable = ('af', 'bemerkung', )		# ToDo die vier Kreuzfelder muss..dv als klickable implementieren
-	search_fields = ['rollenname__rollenname', 'bemerkung', ]
+	search_fields = ['rollenname__rollenname', 'af__af_name', 'bemerkung', ]
 	list_filter = ('mussfeld', 'nurxv', 'xabcv', 'dv', )
 
 	list_per_page = 20 # sys.maxsize

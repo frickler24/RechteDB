@@ -334,8 +334,6 @@ class TblUserhatrolle(models.Model):
 #
 # Sinn der Tabelle ist, eine eindeutige Liste an AFs vorliegen zu haben. Das GROUP- BY kann evtl teuer werden.
 # Aber das probieren wir jetzt mal aus.
-
-
 class TblAfliste(models.Model):		# ToDo: Wegwerfen, Tabelle ist redundant
 	id = 					models.AutoField(db_column='ID', primary_key=True, verbose_name='ID')  # Field name made lowercase.
 	af_name = 				models.CharField(db_column='AF-Name', unique=True, max_length=150, verbose_name='AF-Name')  # Field name made lowercase. Field renamed to remove unsuitable characters.
@@ -357,6 +355,7 @@ class TblRollehataf(models.Model):
 	rollenmappingid = 		models.AutoField(db_column='RollenMappingID', primary_key=True, verbose_name='ID')  # Field name made lowercase.
 	rollenname = 			models.ForeignKey('TblRollen', models.PROTECT, to_field='rollenname', db_column='RollenName', blank=True, null=True)  # Field name made lowercase.
 	af = 					models.ForeignKey('TblAfliste', models.PROTECT, to_field='id', db_column='AF', blank=True, null=True, verbose_name='AF')  # Field name made lowercase.
+# ToDo: AFName löschen, ist redundant mit af__af_name
 	afname = 				models.CharField('TblAfliste', db_column='AFName', max_length=150, blank=True, null=True, )  # Field name made lowercase.
 	mussfeld = 				models.IntegerField(db_column='Mussfeld', blank=True, null=True, verbose_name='Muss')  # Field name made lowercase. This field type is a guess.
 	bemerkung = 			models.CharField(db_column='Bemerkung', max_length=150, blank=True, null=True)  # Field name made lowercase.
@@ -403,6 +402,7 @@ class TblRollehataf(models.Model):
 	get_dv.admin_order_field = 'dv'
 	get_dv.short_description = 'DV-User'
 	dv.boolean = True
+
 
 ###################################### Tblsubsysteme, Tblsachgebiete, TblDb2
 # Ein paar Hilfstabellen.
