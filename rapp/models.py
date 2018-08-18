@@ -101,11 +101,8 @@ class TblUserIDundName(models.Model):
 	class Meta:
 		managed = True
 		db_table = 'tblUserIDundName'
-		unique_together = (('userid', 'name'),
-						   ('gruppe', 'geloescht'),
-						   ('userid', 'name', 'gruppe', 'orga', 'zi_organisation', 'geloescht'),
-						   ('gruppe', 'orga', 'zi_organisation', 'geloescht'),
-						)
+		unique_together = (('userid', 'name'),)
+		index_together = (('gruppe', 'geloescht'),)
 		verbose_name = "UserID-Name-Kombination"
 		verbose_name_plural = "UserID-Name-Übersicht (tblUserIDundName)"
 		ordering = ['geloescht', 'name', '-userid']
@@ -210,7 +207,7 @@ class TblGesamt(models.Model):
 		db_table = 'tblGesamt'
 		verbose_name = "Eintrag der Gesamttabelle (tblGesamt)"
 		verbose_name_plural = "Gesamttabelle Übersicht (tblGesamt)"
-		unique_together = (('userid_name', 'tf', 'enthalten_in_af', 'plattform', 'gf', 'vip_kennzeichen', 'zufallsgenerator'),)
+		index_together = (('userid_name', 'tf', 'enthalten_in_af', 'plattform', 'gf', 'vip_kennzeichen', 'zufallsgenerator'),)
 
 	def __str__(self) -> str:
 		return str(self.id)
@@ -247,15 +244,15 @@ class TblGesamt(models.Model):
 # tblGesamtHistorie enthält alle Daten zu TFs in GFs in AFs für jeden User und seine UserIDen, wenn der User (mal) gelöscht wurde
 class TblGesamtHistorie(models.Model):
 	id = 				models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-	id_alt = 			models.ForeignKey('Tblgesamt', on_delete=models.PROTECT, to_field='id', db_column='ID-alt', blank=False, null=False, db_index=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-	userid_name = 		models.ForeignKey('TblUserIDundName', on_delete=models.PROTECT, to_field='id', db_column='UserID + Name_ID', blank=False, null=False)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+	id_alt = 			models.IntegerField(db_column='ID-alt', blank=False, null=False, db_index=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+	userid_name = 		models.ForeignKey('TblUserIDundName', models.PROTECT, to_field='id', db_column='UserID + Name_ID', blank=False, null=False)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	tf = 				models.CharField(db_column='TF', max_length=150)  # Field name made lowercase.
 	tf_beschreibung = 	models.CharField(db_column='TF Beschreibung', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	enthalten_in_af = 	models.CharField(db_column='Enthalten in AF', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-	modell = 			models.ForeignKey('TblUebersichtafGfs', on_delete=models.CASCADE, db_column='Modell')  # Field name made lowercase.
+	modell = 			models.ForeignKey('TblUebersichtafGfs', models.PROTECT, db_column='Modell')  # Field name made lowercase.
 	tf_kritikalitaet = 	models.CharField(db_column='TF Kritikalität', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	tf_eigentuemer_org =	models.CharField(db_column='TF Eigentümer Org', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-	plattform = 		models.ForeignKey('TblPlattform', on_delete=models.CASCADE, db_column='Plattform_ID', blank=False, null=False)  # Field name made lowercase.
+	plattform = 		models.ForeignKey('TblPlattform', models.PROTECT, db_column='Plattform_ID', blank=False, null=False)  # Field name made lowercase.
 	gf = 				models.CharField(db_column='GF', max_length=150, blank=True, null=True)  # Field name made lowercase.
 	vip_kennzeichen = 	models.CharField(db_column='VIP Kennzeichen', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	zufallsgenerator =	models.CharField(db_column='Zufallsgenerator', max_length=150, blank=True, null=True)  # Field name made lowercase.
@@ -362,10 +359,11 @@ class TblAfliste(models.Model):		# ToDo: Wegwerfen, Tabelle könnte eventuell er
 class TblRollehataf(models.Model):
 	rollenmappingid = 		models.AutoField(db_column='RollenMappingID', primary_key=True, verbose_name='ID')  # Field name made lowercase.
 	rollenname = 			models.ForeignKey('TblRollen', models.PROTECT, to_field='rollenname', db_column='RollenName', blank=False, null=False, db_index=True)  # Field name made lowercase.
-	# ToDo: AF umsetzen von AFName in TblRollehataf
-	#af = 					models.ForeignKey('TblAfliste', models.PROTECT, to_field='id', db_column='AF', blank=True, null=True, verbose_name='AF')  # Field name made lowercase.
-	af =	 				models.IntegerField(db_column='AF', blank=True, null=True, verbose_name='AF')
-	afname = 				models.ForeignKey('TblAfliste', models.PROTECT, to_field='af_name', db_column='AFName', verbose_name='AF Name', )  # Field name made lowercase.
+	#af = 					models.IntegerField(db_column='AF', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
+	af = 					models.ForeignKey('TblAfliste', models.PROTECT, to_field='id', db_column='AF', blank=True, null=True, verbose_name='AF')  # Field name made lowercase.
+	# ToDo: Lösche AFName, wenn Migration und das Laden der Daten erledigt sind.
+	afname = 				models.CharField(db_column='AFName', max_length=150, verbose_name='AF Name', )  # Field name made lowercase.
+	#afname = 				models.ForeignKey('TblAfliste', models.PROTECT, to_field='af_name', db_column='AFName', verbose_name='AF-Name')  # Field name made lowercase.
 	mussfeld = 				models.IntegerField(db_column='Mussfeld', blank=True, null=True, verbose_name='Muss')  # Field name made lowercase. This field type is a guess.
 	bemerkung = 			models.CharField(db_column='Bemerkung', max_length=150, blank=True, null=True)  # Field name made lowercase.
 	nurxv = 				models.IntegerField(db_column='nurXV', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
@@ -375,7 +373,7 @@ class TblRollehataf(models.Model):
 
 	class Meta:
 		managed = True
-		db_table = 'tbl_RolleHatAFNeu'
+		db_table = 'tbl_RolleHatAF'
 		unique_together = (('rollenname', 'af'),)
 		verbose_name = "Rolle und ihre Arbeitsplatzfunktionen"
 		verbose_name_plural = "Rollen und ihre Arbeitsplatzfunktionen (tbl_RolleHatAF)"

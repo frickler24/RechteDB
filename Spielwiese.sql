@@ -274,3 +274,24 @@ update `tbl_RolleHatAFNeu` raf
     on (raf.`AFName` = `tbl_AFListe`.`AF-Name`)
     set raf.`AF` = `tbl_AFListe`.`ID`
 
+
+
+
+
+(echo "use RechteDB;"; cat RechteDB_table_*) | mysql -uroot -pgeheim
+
+
+-- Suche nach doppelten Einträgen in der UserUndIhreRollen-Tabelle
+SELECT tbl_UserHatRolle.`UserID`, 
+	tbl_UserHatRolle.`RollenName`, 
+	tbl_UserHatRolle.`UserUndRollenID`, tbl_UserHatRolle.`Schwerpunkt/Vertretung`, 
+	tbl_UserHatRolle.`Bemerkung`, tbl_UserHatRolle.`Letzte Änderung`
+
+FROM tbl_UserHatRolle
+WHERE (((tbl_UserHatRolle.`UserID`) 
+	In (SELECT `UserID` 
+	FROM `tbl_UserHatRolle` As Tmp 
+	GROUP BY `UserID`,`RollenName` 
+	HAVING Count(*)>1  
+		And `RollenName` = `tbl_UserHatRolle`.`RollenName`)))
+ORDER BY tbl_UserHatRolle.`UserID`, tbl_UserHatRolle.`RollenName`;
