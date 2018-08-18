@@ -2,26 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9041f750-6594-46a9-8f9c-6349ba68a303" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0002_auto_20180818_1113.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dbnavigator.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dbnavigator.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RechteDB/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Spielwiese.sql" beforeDir="false" afterPath="$PROJECT_DIR$/Spielwiese.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/rapp/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/migrations/0002_auto_20180801_2141.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/migrations/0003_auto_20180801_2243.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/migrations/0004_tblgesamthistorie_tblrollen.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/migrations/0005_auto_20180803_1131.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/migrations/0006_auto_20180803_1131.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/migrations/0008_auto_20180803_1321.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/migrations/0009_auto_20180803_1322.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/migrations/0010_auto_20180803_1322.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/migrations/0011_auto_20180803_1323.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/migrations/0012_auto_20180803_1331.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/migrations/0013_tbldb2_tblracfgruppen_tblsachgebiete_tblsubsysteme.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rapp/migrations/0014_tblrechteneuvonimport.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rapp/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rapp/migrations/0002_auto_20180818_1113.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rapp/migrations/0003_auto_20180818_1120.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/rapp/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/rapp/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <ignored path="db.sqlite3" />
     <ignored path=".directory" />
@@ -61,11 +46,8 @@
       <file leaf-file-name="models.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/rapp/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="760">
-              <caret line="262" column="38" selection-start-line="262" selection-start-column="38" selection-end-line="262" selection-end-column="38" />
-              <folding>
-                <element signature="e#8628#14086#0" />
-              </folding>
+            <state relative-caret-position="285">
+              <caret line="21" column="64" selection-start-line="21" selection-start-column="64" selection-end-line="21" selection-end-column="64" />
             </state>
           </provider>
         </entry>
@@ -332,7 +314,61 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.0003_auto_20180818_1120">
+    <configuration name="0001_initial" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="RechteDB" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/rapp/migrations" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/rapp/migrations/0001_initial.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="0002_auto_20180818_1113" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="RechteDB" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/rapp/migrations" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/rapp/migrations/0002_auto_20180818_1113.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="0003_auto_20180818_1120" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="RechteDB" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/rapp/migrations" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/rapp/migrations/0003_auto_20180818_1120.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
     <configuration name="Dockerfile" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
       <deployment type="dockerfile">
         <settings>
@@ -350,6 +386,19 @@
         </settings>
       </deployment>
     </configuration>
+    <list>
+      <item itemvalue="Docker.Dockerfile" />
+      <item itemvalue="Python.0001_initial" />
+      <item itemvalue="Python.0002_auto_20180818_1113" />
+      <item itemvalue="Python.0003_auto_20180818_1120" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.0003_auto_20180818_1120" />
+        <item itemvalue="Python.0002_auto_20180818_1113" />
+        <item itemvalue="Python.0001_initial" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -572,10 +621,17 @@
       <option name="project" value="LOCAL" />
       <updated>1534583770073</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="create fresh database and tables step 2&#10;&#10;rename tblGesamtHistorieNeu back to tblGesamtHistorie">
+      <created>1534584135550</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1534584135550</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
-  <component name="TodoView">
+  <component name="TodoView" selected-index="4">
     <todo-panel id="selected-file">
       <is-autoscroll-to-source value="true" />
     </todo-panel>
@@ -594,13 +650,14 @@
       <window_info anchor="bottom" id="Event Log" order="2" sideWeight="0.5004184" side_tool="true" weight="0.3296355" />
       <window_info anchor="bottom" id="Version Control" order="3" weight="0.27892235" />
       <window_info anchor="bottom" id="Python Console" order="0" weight="0.32899022" />
-      <window_info anchor="bottom" id="Run" order="6" />
+      <window_info anchor="bottom" id="Run" order="6" visible="true" weight="0.3296355" />
       <window_info anchor="bottom" id="Terminal" order="1" weight="0.32899022" />
       <window_info active="true" content_ui="combo" id="Project" order="3" sideWeight="0.49452737" visible="true" weight="0.2179368" />
       <window_info id="Project Explorer" order="2" />
       <window_info id="Job Explorer" order="4" />
       <window_info anchor="bottom" id="Docker" order="13" sideWeight="0.49958158" weight="0.3296355" />
       <window_info anchor="bottom" id="Console" order="11" />
+      <window_info anchor="bottom" id="Find" order="5" weight="0.3296355" />
       <window_info id="Structure" order="1" sideWeight="0.5024582" side_tool="true" weight="0.26969856" />
       <window_info id="Favorites" order="0" sideWeight="0.50547266" side_tool="true" weight="0.21213388" />
       <window_info anchor="bottom" id="Debug" order="7" weight="0.4" />
@@ -610,7 +667,6 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="Message" order="4" />
       <window_info anchor="bottom" id="Cvs" order="8" weight="0.25" />
-      <window_info anchor="bottom" id="Find" order="5" weight="0.3296355" />
     </layout>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -646,7 +702,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/../.." />
     </ignored-roots>
-    <MESSAGE value="add better integrated change/delete/create&#10;&#10;For TblUserIDundName all functions are integrated&#10;and are accessible from within Userliste." />
     <MESSAGE value="add views for team tabel tblOrga" />
     <MESSAGE value="add first experiments with filters" />
     <MESSAGE value="add pagination 1st step to users list" />
@@ -671,7 +726,8 @@
     <MESSAGE value="change index page from table to bootstap4-divs" />
     <MESSAGE value="add search for AF in RolleHatAF and formatting some inlines" />
     <MESSAGE value="create fresh database and tables step 1&#10;&#10;Table tbl_RolleHatAF has still the old index topthe charfield in tbl_AFListe." />
-    <option name="LAST_COMMIT_MESSAGE" value="create fresh database and tables step 1&#10;&#10;Table tbl_RolleHatAF has still the old index topthe charfield in tbl_AFListe." />
+    <MESSAGE value="create fresh database and tables step 2&#10;&#10;rename tblGesamtHistorieNeu back to tblGesamtHistorie" />
+    <option name="LAST_COMMIT_MESSAGE" value="create fresh database and tables step 2&#10;&#10;rename tblGesamtHistorieNeu back to tblGesamtHistorie" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/RechteDB/urls.py">
@@ -880,11 +936,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/rapp/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="760">
-          <caret line="262" column="38" selection-start-line="262" selection-start-column="38" selection-end-line="262" selection-end-column="38" />
-          <folding>
-            <element signature="e#8628#14086#0" />
-          </folding>
+        <state relative-caret-position="285">
+          <caret line="21" column="64" selection-start-line="21" selection-start-column="64" selection-end-line="21" selection-end-column="64" />
         </state>
       </provider>
     </entry>
