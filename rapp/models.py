@@ -41,7 +41,7 @@ class TblUebersichtAfGfs(models.Model):
 			('name_gf_neu', 'name_af_neu'),
 		)
 		verbose_name = "Erlaubte AF/GF-Kombination"
-		verbose_name_plural = "Erlaubte AF/GF-Kombinationen-Übersicht (tblUebersichtAfGfs)"
+		verbose_name_plural = "04 Erlaubte AF/GF-Kombinationen-Übersicht (tblUebersichtAfGfs)"
 		ordering = ['-id']
 
 	def __str__(self) -> str:
@@ -60,7 +60,7 @@ class TblOrga(models.Model):
 		managed = True
 		db_table = 'tblOrga'
 		verbose_name = "Orga-Information"
-		verbose_name_plural = "Organisations-Übersicht (tblOrga)"
+		verbose_name_plural = "06 Organisations-Übersicht (tblOrga)"
 		ordering = ['team']
 
 	def __str__(self) -> str:
@@ -104,7 +104,7 @@ class TblUserIDundName(models.Model):
 		unique_together = (('userid', 'name'),)
 		index_together = (('gruppe', 'geloescht'),)
 		verbose_name = "UserID-Name-Kombination"
-		verbose_name_plural = "UserID-Name-Übersicht (tblUserIDundName)"
+		verbose_name_plural = "05 UserID-Name-Übersicht (tblUserIDundName)"
 		ordering = ['geloescht', 'name', '-userid']
 
 	def __str__(self) -> str:
@@ -160,7 +160,7 @@ class TblPlattform(models.Model):
 		managed = True
 		db_table = 'tblPlattform'
 		verbose_name = "Plattform"
-		verbose_name_plural = "Plattform-Übersicht (tblPlattform)"
+		verbose_name_plural = "07 Plattform-Übersicht (tblPlattform)"
 		# ordering = ['tf_technische_plattform']
 
 
@@ -206,7 +206,7 @@ class TblGesamt(models.Model):
 		managed = True
 		db_table = 'tblGesamt'
 		verbose_name = "Eintrag der Gesamttabelle (tblGesamt)"
-		verbose_name_plural = "Gesamttabelle Übersicht (tblGesamt)"
+		verbose_name_plural = "08 Gesamttabelle Übersicht (tblGesamt)"
 		index_together = (('userid_name', 'tf', 'enthalten_in_af', 'plattform', 'gf', 'vip_kennzeichen', 'zufallsgenerator'),)
 
 	def __str__(self) -> str:
@@ -268,7 +268,7 @@ class TblGesamtHistorie(models.Model):
 		managed = True
 		db_table = 'tblGesamtHistorie'
 		verbose_name = "Historisierter Eintrag der Gesamttabelle (tblGesamtHistorie)"
-		verbose_name_plural = "Historisierte Einträge der Gesamttabelle (tblGesamtHistorie)"
+		verbose_name_plural = "99 Historisierte Einträge der Gesamttabelle (tblGesamtHistorie)"
 
 	def __str__(self) -> str:
 		return str(self.id)
@@ -285,7 +285,7 @@ class TblRollen(models.Model):
 		managed = True
 		db_table = 'tbl_Rollen'
 		verbose_name = "Rollenliste"
-		verbose_name_plural = "Rollen-Übersicht (tbl_Rollen)"
+		verbose_name_plural = "03 Rollen-Übersicht (tbl_Rollen)"
 		ordering = [ 'rollenname' ]
 		unique_together = (('rollenname', 'system'),)
 
@@ -318,7 +318,7 @@ class TblUserhatrolle(models.Model):
 		managed = True
 		db_table = 'tbl_UserHatRolle'
 		verbose_name = "User und Ihre Rollen"
-		verbose_name_plural = "User und Ihre Rollen (tbl_UserHatRolle)"
+		verbose_name_plural = "01 User und Ihre Rollen (tbl_UserHatRolle)"
 		ordering = [ 'userid__name', '-userid__userid', 'schwerpunkt_vertretung', 'rollenname', ]
 		unique_together = (('userid', 'rollenname'),)
 
@@ -348,7 +348,7 @@ class TblAfliste(models.Model):		# ToDo: Wegwerfen, Tabelle könnte eventuell er
 		managed = True
 		db_table = 'tbl_AFListe'
 		verbose_name = "Gültige AF"
-		verbose_name_plural = "Übersicht gültiger AFen (tbl_AFListe)"
+		verbose_name_plural = "98 Übersicht gültiger AFen (tbl_AFListe)"
 		ordering = [ 'af_name' ]
 
 	def __str__(self) -> str:
@@ -376,7 +376,7 @@ class TblRollehataf(models.Model):
 		db_table = 'tbl_RolleHatAF'
 		unique_together = (('rollenname', 'af'),)
 		verbose_name = "Rolle und ihre Arbeitsplatzfunktionen"
-		verbose_name_plural = "Rollen und ihre Arbeitsplatzfunktionen (tbl_RolleHatAF)"
+		verbose_name_plural = "02 Rollen und ihre Arbeitsplatzfunktionen (tbl_RolleHatAF)"
 		ordering = [ 'rollenname__rollenname', 'af__af_name', ]
 
 	def __str__(self) -> str:
@@ -427,7 +427,7 @@ class Tblsubsysteme(models.Model):
 		managed = True
 		db_table = 'tblSubsysteme'
 		verbose_name = "Subsystem"
-		verbose_name_plural = "Übersicht Subsysteme (tbl_Subsysteme)"
+		verbose_name_plural = "50 Übersicht Subsysteme (tbl_Subsysteme)"
 		ordering = [ 'sgss' ]
 
 
@@ -443,7 +443,7 @@ class Tblsachgebiete(models.Model): # sachgebiet, definition_field,
 		managed = True
 		db_table = 'tblSachgebiete'
 		verbose_name = "Sachgebiet"
-		verbose_name_plural = "Übersicht Sachgebiete (tbl_Sachgebiete)"
+		verbose_name_plural = "51 Übersicht Sachgebiete (tbl_Sachgebiete)"
 		ordering = ['sachgebiet']
 
 
@@ -468,7 +468,7 @@ class TblDb2(models.Model):
 		managed = True
 		db_table = 'tbl_DB2'
 		verbose_name = 'DB2-Berechtigung'
-		verbose_name_plural = 'DB2 - Berechtigungen (tbl_DB2)'
+		verbose_name_plural = '52 DB2 - Berechtigungen (tbl_DB2)'
 		ordering = [ 'id', ]
 
 	def __str__(self) -> str:
@@ -500,7 +500,7 @@ class TblRacfGruppen(models.Model):
 		managed = True
 		db_table = 'tbl_RACF_Gruppen'
 		verbose_name = 'RACF-Berechtigung'
-		verbose_name_plural = 'RACF - Berechtigungen (tbl_DB2)'
+		verbose_name_plural = '53 RACF - Berechtigungen (tbl_DB2)'
 		ordering = [ 'group', ]
 
 	def get_test(self):

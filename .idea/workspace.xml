@@ -1,27 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9041f750-6594-46a9-8f9c-6349ba68a303" name="Default" comment="create fresh database and tables step 1 reloadable&#10;&#10;All Tables and indices are created. This is repeatable.&#10;As next the stored Procs are handled.">
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0003_auto_20180818_1226.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0004_auto_20180818_1235.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0005_auto_20180818_1237.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0006_auto_20180818_1316.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0007_auto_20180818_1317.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0008_auto_20180818_1317.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0009_auto_20180818_1320.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0010_auto_20180818_1320.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0011_auto_20180818_1337.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0012_auto_20180818_1344.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0013_auto_20180818_1549.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0014_auto_20180818_1551.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0015_auto_20180818_1553.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0016_auto_20180818_1714.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0017_auto_20180818_1721.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rapp/migrations/0018_auto_20180818_1755.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dbnavigator.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dbnavigator.xml" afterDir="false" />
+    <list default="true" id="9041f750-6594-46a9-8f9c-6349ba68a303" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Spielwiese.sql" beforeDir="false" afterPath="$PROJECT_DIR$/Spielwiese.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rapp/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/rapp/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rapp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/rapp/views.py" afterDir="false" />
     </list>
     <ignored path="db.sqlite3" />
     <ignored path=".directory" />
@@ -61,14 +45,15 @@
       <file leaf-file-name="models.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/rapp/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="503">
-              <caret line="254" column="72" selection-start-line="254" selection-start-column="72" selection-end-line="254" selection-end-column="72" />
+            <state relative-caret-position="1425">
+              <caret line="533" selection-start-line="533" selection-end-line="533" />
               <folding>
                 <element signature="e#917#3394#0" />
                 <element signature="e#3520#4900#0" />
                 <element signature="e#5054#7787#0" />
                 <element signature="e#7919#8506#0" />
                 <element signature="e#8625#14578#0" />
+                <element signature="e#14259#17475#0" />
                 <element signature="e#17610#18318#0" />
                 <element signature="e#18425#19969#0" />
                 <element signature="e#19972#20005#0" />
@@ -80,6 +65,18 @@
                 <element signature="e#29203#30893#0" />
                 <element signature="e#31088#34794#0" />
                 <element signature="e#35217#38822#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/rapp/views.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="608">
+              <caret line="57" column="34" selection-start-line="57" selection-start-column="34" selection-end-line="57" selection-end-column="34" />
+              <folding>
+                <element signature="e#24#63#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -228,7 +225,6 @@
         <option value="$PROJECT_DIR$/storedProc.sql" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.html" />
         <option value="$PROJECT_DIR$/rapp/templates/index.html" />
-        <option value="$PROJECT_DIR$/rapp/views.py" />
         <option value="$PROJECT_DIR$/rapp/admin.py" />
         <option value="$PROJECT_DIR$/rapp/migrations/0015_auto_20180817_2015.py" />
         <option value="$PROJECT_DIR$/rapp/migrations/0016_auto_20180817_2116.py" />
@@ -243,6 +239,7 @@
         <option value="$APPLICATION_CONFIG_DIR$/scratches/LadeDaten.sh" />
         <option value="$PROJECT_DIR$/Spielwiese.sql" />
         <option value="$PROJECT_DIR$/rapp/models.py" />
+        <option value="$PROJECT_DIR$/rapp/views.py" />
       </list>
     </option>
   </component>
@@ -672,7 +669,14 @@
       <option name="project" value="LOCAL" />
       <updated>1534599310721</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="create fresh database and tables step 2&#10;&#10;All Data is loaded. &#10;With this, some constraints have changed&#10;to more reasonable conditions.&#10;&#10;No Proc has been loaded.&#10;Did not test if repeatable yet.">
+      <created>1534625369727</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1534625369727</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TodoView" selected-index="5">
@@ -746,7 +750,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/../.." />
     </ignored-roots>
-    <MESSAGE value="add pagination 1st step to users list" />
     <MESSAGE value="add pagination to panel for Gesamt." />
     <MESSAGE value="add first view to DB (vw_mehrfach)" />
     <MESSAGE value="add django-tables2 for testing" />
@@ -771,18 +774,12 @@
     <MESSAGE value="create fresh database and tables step 2&#10;&#10;rename tblGesamtHistorieNeu back to tblGesamtHistorie" />
     <MESSAGE value="create fresh database and tables step 1 again&#10;&#10;First series of indizes for tblGesamt&#10;rename tblGesamtHistorieNeu back to tblGesamtHistorie" />
     <MESSAGE value="create fresh database and tables step 1 reloadable&#10;&#10;All Tables and indices are created. This is repeatable.&#10;As next the stored Procs are handled." />
-    <option name="LAST_COMMIT_MESSAGE" value="create fresh database and tables step 1 reloadable&#10;&#10;All Tables and indices are created. This is repeatable.&#10;As next the stored Procs are handled." />
+    <MESSAGE value="create fresh database and tables step 2&#10;&#10;All Data is loaded. &#10;With this, some constraints have changed&#10;to more reasonable conditions.&#10;&#10;No Proc has been loaded.&#10;Did not test if repeatable yet." />
+    <option name="LAST_COMMIT_MESSAGE" value="create fresh database and tables step 2&#10;&#10;All Data is loaded. &#10;With this, some constraints have changed&#10;to more reasonable conditions.&#10;&#10;No Proc has been loaded.&#10;Did not test if repeatable yet." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/rapp/models.py</url>
-          <line>90</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-      <option name="time" value="3" />
+      <option name="time" value="9" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
@@ -892,13 +889,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/rapp/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="42" selection-start-line="42" selection-end-line="42" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/rapp/urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1577">
@@ -994,16 +984,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/rapp/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="608">
+          <caret line="57" column="34" selection-start-line="57" selection-start-column="34" selection-end-line="57" selection-end-column="34" />
+          <folding>
+            <element signature="e#24#63#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/rapp/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="503">
-          <caret line="254" column="72" selection-start-line="254" selection-start-column="72" selection-end-line="254" selection-end-column="72" />
+        <state relative-caret-position="1425">
+          <caret line="533" selection-start-line="533" selection-end-line="533" />
           <folding>
             <element signature="e#917#3394#0" />
             <element signature="e#3520#4900#0" />
             <element signature="e#5054#7787#0" />
             <element signature="e#7919#8506#0" />
             <element signature="e#8625#14578#0" />
+            <element signature="e#14259#17475#0" />
             <element signature="e#17610#18318#0" />
             <element signature="e#18425#19969#0" />
             <element signature="e#19972#20005#0" />

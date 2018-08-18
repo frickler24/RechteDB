@@ -55,6 +55,8 @@ from .models import Tblrechteneuvonimport
 # ToDo: Importfunktion für "Alle meine TFen und die zugeordneten User"
 # ToDo: Importfunktion für "Alle meine AFen und die zugeordneten User"
 
+# ToDo: Alten "Finde Datei"-Dialog implemenieren
+
 # ToDo: Hier werden sicherlich noch etliche Filterfunktionen benötigt:
 # ToDo: Was passt eventuell nicht (welche Personen passen nicht in die erlaubten Orgabereiche)
 # ToDo: Welche Rechte haben Ausschluss-/Einschlusskriterien und sind sie erfüllt?
