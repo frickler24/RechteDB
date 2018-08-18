@@ -83,7 +83,21 @@ WSGI_APPLICATION = 'RechteDB.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
-	'default': {
+	'default': {	# Konfiguration gegen Mainfrix-Container
+		'ENGINE': 'django.db.backends.mysql',  # ToDo Remote MySQL DB anbinden / Config anpassen über meinNetz
+		'NAME': 'RechteDB',
+		'USER': 'RechteFuzzi',
+		'PASSWORD': 'Nn9ryRCh3342554323455235254235z2m7zEbwTvM',
+		'HOST': '192.168.21.36',
+		'PORT': '13306',
+		'default-character-set': 'utf8mb4_unicode_ci',
+		'OPTIONS': {
+			'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+		}
+	},
+
+	# Alte Standardkonfiguration gegen Naschef mysql ohne Container
+	'naschef-Server-reichlich-kaputt': {
 		# 'ENGINE': 'django.db.backends.sqlite3',
 		# 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 		'ENGINE': 'django.db.backends.mysql',		# ToDo Remote MySQL DB anbinden / Config anpassen über meinNetz

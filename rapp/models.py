@@ -260,7 +260,7 @@ class TblGesamtHistorie(models.Model):
 
 	class Meta:
 		managed = True
-		db_table = 'tblGesamtHistorieNeu'		# Achtung: Tabelle umbenannt wegen schweren Fehlers bei Inizes
+		db_table = 'tblGesamtHistorie'
 		verbose_name = "Historisierter Eintrag der Gesamttabelle (tblGesamtHistorie)"
 		verbose_name_plural = "Historisierte Einträge der Gesamttabelle (tblGesamtHistorie)"
 
