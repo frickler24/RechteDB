@@ -10,5 +10,5 @@ class MyCSVImporterModel(resources.ModelResource):
 	class Meta:
 		delimiter = ";"
 		model = Tblrechteneuvonimport
-		encoding = "utf-8"
+		encoding = "utf8mb4"
 

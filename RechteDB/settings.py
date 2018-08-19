@@ -42,7 +42,6 @@ INSTALLED_APPS = [
 	'widget_tweaks',
 	'debug_toolbar',
 	'bootstrap4',
-	'django_tables2',
 	'import_export',
 ]
 
@@ -63,7 +62,7 @@ TEMPLATES = [
 	{
 		'BACKEND': 'django.template.backends.django.DjangoTemplates',
 		'DIRS': ['./templates', ],
-		# 'DIRS': [os.path.join(BASE_DIR, 'templates')],		# Todo Pfade richtig setzen!!!
+		# 'DIRS': [os.path.join(BASE_DIR, 'templates')],		# Todo Pfade richtig setzen und Files verteilen!!!
 		'APP_DIRS': True,
 		'OPTIONS': {
 			'context_processors': [

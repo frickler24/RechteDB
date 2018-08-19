@@ -19,7 +19,7 @@ import sys
 
 # Die Datenbanken / Models
 from rapp.models import TblUebersichtAfGfs, TblUserIDundName, TblOrga, TblPlattform, \
-						TblGesamt, TblGesamtHistorie, \
+						TblGesamt, TblGesamtHistorie, Tblrechteneuvonimport, \
 						TblRollen, TblAfliste, TblUserhatrolle, TblRollehataf, \
 						Tblsubsysteme, Tblsachgebiete, TblDb2, TblRacfGruppen
 
@@ -54,12 +54,10 @@ class RollehatafInline(admin.TabularInline):
 	extra = 0
 	fields = ['af', 'bemerkung', 'mussfeld', 'nurxv', 'xabcv', 'dv', ]
 
-
 class UebersichtAfGfsInline(admin.TabularInline):
 	model = TblUebersichtAfGfs
 	extra = 0
 
-"""
 class AflisteInline(admin.TabularInline):
 	model = TblAfliste
 	extra = 0
@@ -67,7 +65,7 @@ class AflisteInline(admin.TabularInline):
 class RollenInline(admin.TabularInline):
 	model = TblRollen
 	extra = 0
-"""
+
 
 
 # ######################################################################################################
@@ -200,9 +198,8 @@ class UebersichtAfGfs(admin.ModelAdmin):
 	# inlines = [GesamtInline]
 
 
-
 # ######################################################################################################
-# tbl GesatHistorie
+# tbl GesamtHistorie
 # ######################################################################################################
 
 @admin.register(TblGesamtHistorie)
@@ -248,7 +245,6 @@ class Userhatrolle(admin.ModelAdmin):
 	list_per_page = 25 # sys.maxsize
 
 
-
 # ######################################################################################################
 # tbl Rollen
 # ######################################################################################################
@@ -277,10 +273,8 @@ class Rollen(admin.ModelAdmin):
 	inlines = [RollehatafInline, UserhatrolleInline, ]
 
 
-
-#
 # ######################################################################################################
-# tbl Rollen
+# tbl AFListe
 # ######################################################################################################
 
 @admin.register(TblAfliste)
@@ -354,3 +348,22 @@ class RacfGruppen(admin.ModelAdmin):
 	alle = ['group', 'test', 'get_produktion', 'get_readonly', 'get_db2_only', 'stempel', ]
 	search_fields = alle
 	list_display = alle
+
+
+# Versuch des Im- und Exports via CSV / XLSX / JSON und den Browser
+# https://django-import-export.readthedocs.io/en/latest/getting_started.html#admin-integration
+from import_export import resources
+from import_export.admin import ImportExportActionModelAdmin
+class TblrechteneuvonimportResource(resources.ModelResource):
+	class Meta:
+		model = Tblrechteneuvonimport
+
+@admin.register(Tblrechteneuvonimport)
+class Tblrechteneuvonimport(ImportExportActionModelAdmin):
+	alle = ['identitaet', 'nachname', 'vorname', 'tf_name', 'af_anzeigename', 'gf_name', ]
+	search_fields = alle
+	alle.insert(0, 'id')
+	list_display = alle
+
+
+
