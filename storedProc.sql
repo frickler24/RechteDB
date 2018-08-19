@@ -323,7 +323,7 @@ BEGIN
         müssen deren derzeit vorhandenen Rechte in die Historientabelle verschoben werden.
     */
 
-    INSERT INTO tblGesamtHistorieNeu (
+    INSERT INTO tblGesamtHistorie (
                 `UserID + Name_ID`, TF, `TF Beschreibung`, `Enthalten in AF`,
                 Modell, `TF Kritikalität`, `TF Eigentümer Org`, `AF Zuweisungsdatum`,
                 Plattform_ID, GF, gelöscht, gefunden, wiedergefunden, geändert, löschdatum, NeueAF, Datum, `ID-alt`
@@ -566,7 +566,7 @@ BEGIN
         In die Historientabelle werden die zur Änderung vorgemerkten Einträge aus der Gesamttabelle kopiert.
     */
 
-    INSERT INTO tblGesamtHistorieNeu (`UserID + Name_ID`, TF, `TF Beschreibung`, `Enthalten in AF`, Modell, `TF Kritikalität`,
+    INSERT INTO tblGesamtHistorie (`UserID + Name_ID`, TF, `TF Beschreibung`, `Enthalten in AF`, Modell, `TF Kritikalität`,
                 `TF Eigentümer Org`, Plattform_ID, GF, `VIP Kennzeichen`, Zufallsgenerator, gelöscht, gefunden,
                 wiedergefunden, geändert, NeueAF, Datum, `ID-alt`, löschdatum)
     SELECT tblGesamt.`UserID + Name_ID`,
@@ -1089,6 +1089,7 @@ BEGIN
                 AND tblGesamt.ID In (SELECT ID FROM qryF3_DoppelteElementeFilterAusGesamtTabelle GROUP BY ID);
     END IF;
 END//
+delimiter ;
 
 -- -------------------------------------------------------------------------------------
 -- -------------------------------------------------------------------------------------
@@ -1100,31 +1101,34 @@ END//
 -- ToDo: temporär genutzte Tabellen entsorgen
 -- ToDo: Notieren, welche Tabellen wirklich genutzt werden
 
-delimiter ;
 
 use RechteDB;
-call vorbereitung();
-call neueUser(@neue, @gelöschte, @gelesene, @inAMneu);
-select @neue as 'Anzahl neuer User', @gelöschte as 'Anzahl zu löschender User',
-        @gelesene as 'Zeile in Eingabetabelle', @inAMneu as 'Zu verarbeitende Zeilen';
+delimiter //
+drop procedure testeImport//
+create procedure testeImport ()
+BEGIN
+    call vorbereitung();
+    call neueUser(@neue, @gelöschte, @gelesene, @inAMneu);
+    select @neue as 'Anzahl neuer User', @gelöschte as 'Anzahl zu löschender User',
+            @gelesene as 'Zeile in Eingabetabelle', @inAMneu as 'Zu verarbeitende Zeilen';
 
-call behandleUser();
-call neueUser(@neue, @gelöschte, @gelesene, @inAMneu);
-select @neue as 'Anzahl neuer User', @gelöschte as 'Anzahl zu löschender User',
-        @gelesene as 'Zeile in Eingabetabelle', @inAMneu as 'Zu verarbeitende Zeilen';
+    call behandleUser();
+    call neueUser(@neue, @gelöschte, @gelesene, @inAMneu);
+    select @neue as 'Anzahl neuer User', @gelöschte as 'Anzahl zu löschender User',
+            @gelesene as 'Zeile in Eingabetabelle', @inAMneu as 'Zu verarbeitende Zeilen';
 
-call behandleRechte();
-call loescheDoppelteRechte(false);
+    call behandleRechte();
+    call loescheDoppelteRechte(false);
 
-select count(*)
-from tblGesamt
-    join tblUserIDundName
-        on tblGesamt.`UserID + Name_ID` = tblUserIDundName.ID
-    WHERE COALESCE(tblGesamt.`gelöscht`, false) = false
-    	AND COALESCE(tblUserIDundName.`gelöscht`, false) = false
-        AND tblUserIDundName.`ZI-Organisation` = 'AI-BA'
-;
+    select count(*)
+    from tblGesamt
+        join tblUserIDundName
+            on tblGesamt.`UserID + Name_ID` = tblUserIDundName.ID
+        WHERE COALESCE(tblGesamt.`gelöscht`, false) = false
+            AND COALESCE(tblUserIDundName.`gelöscht`, false) = false
+            AND tblUserIDundName.`ZI-Organisation` = 'AI-BA';
+END//
+delimiter ;
 
-
-
+call testeImport();
 

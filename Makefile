@@ -18,6 +18,7 @@ mariadb:
 		-p 13306:3306 \
 		-e MYSQL_ROOT_PASSWORD=geheim \
 		-v /home/lutz/datadir:/var/lib/mysql \
+		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/mariadbconf.d:/etc/mysql/conf.d \
 		mariadb:5.5.61-trusty
 
 
