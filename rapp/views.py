@@ -23,7 +23,7 @@ from .forms import BastelForm
 import tablib
 from tablib import Dataset
 from import_export import resources
-from .ressources import MyCSVImporterModel
+from .resources import MyCSVImporterModel
 from .models import Tblrechteneuvonimport
 
 ###################################################################

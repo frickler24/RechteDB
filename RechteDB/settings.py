@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 	'widget_tweaks',
 	'debug_toolbar',
 	'bootstrap4',
+	'django_tables2',
 	'import_export',
 ]
 
@@ -152,4 +153,11 @@ STATIC_URL = '/static/'
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-IMPORT_EXPORT_USE_TRANSACTIONS = True
+
+# Some config for import-export
+IMPORT_EXPORT_USE_TRANSACTIONS = False
+IMPORT_EXPORT_SKIP_ADMIN_LOG = True
+IMPORT_EXPORT_IMPORT_PERMISSION_CODE = 'add'
+IMPORT_EXPORT_EXPORT_PERMISSION_CODE = 'add'
+
+

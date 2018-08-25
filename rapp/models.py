@@ -556,6 +556,10 @@ class Tblrechteneuvonimport(models.Model):
 	class Meta:
 		managed = True
 		db_table = 'tblRechteNeuVonImport'
+		verbose_name = 'Importiere neue Daten (tblRechteNeuVonImport)'
+		verbose_name_plural = 'Importiere neue Daten (tblRechteNeuVonImport)'
+		ordering = [ 'id', ]
+
 
 class Tblrechteamneu(models.Model):
 	id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.

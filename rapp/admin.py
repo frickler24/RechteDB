@@ -7,9 +7,6 @@ from django.contrib import admin
 
 # Register your models here.
 
-# from .models import Bastel, TblAflisteZiaiba, TblCicsdetails, TblDb2
-# from .models import TblGesamtKomplett, Tblp0Gesamt, Tblgesamthistorie
-
 # Zum Verändern der Standardeigenschaften eines Textpanes
 from django.db import models
 from django.forms import Textarea
@@ -353,17 +350,22 @@ class RacfGruppen(admin.ModelAdmin):
 # Versuch des Im- und Exports via CSV / XLSX / JSON und den Browser
 # https://django-import-export.readthedocs.io/en/latest/getting_started.html#admin-integration
 from import_export import resources
-from import_export.admin import ImportExportActionModelAdmin
+from import_export.admin import ImportExportActionModelAdmin, ImportExportModelAdmin
 class TblrechteneuvonimportResource(resources.ModelResource):
 	class Meta:
 		model = Tblrechteneuvonimport
 
+
+from rapp.resources import MyCSVImporterModel
+from django.urls import reverse
+
 @admin.register(Tblrechteneuvonimport)
-class Tblrechteneuvonimport(ImportExportActionModelAdmin):
+class Tblrechteneuvonimport(ImportExportModelAdmin):
+	import_template_name = 'admin/admin_import.html'
+	resource_class = MyCSVImporterModel
 	alle = ['identitaet', 'nachname', 'vorname', 'tf_name', 'af_anzeigename', 'gf_name', ]
 	search_fields = alle
 	alle.insert(0, 'id')
 	list_display = alle
-
-
+	list_per_page = 10
 
