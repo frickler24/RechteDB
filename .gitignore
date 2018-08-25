@@ -6,6 +6,9 @@ db.sqlite3
 __pycache__
 .directory
 my3.6venv
-.idea\*
+.idea/workspace.xml
+.idea/*
 01\ Mitarbeiterberechtigungen\ ZI-AI-BA.csv
 .env
+*.xmi
+*.mdj
