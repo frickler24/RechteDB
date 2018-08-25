@@ -23,11 +23,7 @@
     <autoscroll-to-editor value="false" />
     <autoscroll-from-editor value="true" />
     <show-object-properties value="true" />
-    <loaded-nodes>
-      <connection connection-id="e0fab069-c80d-452e-b415-f960623fdbac">
-        <schema name="mysql" object-types="column, table, view" />
-      </connection>
-    </loaded-nodes>
+    <loaded-nodes />
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="e0fab069-c80d-452e-b415-f960623fdbac">
@@ -41,10 +37,8 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.FileConnectionMappingManager">
-    <mapping file-url="file://$PROJECT_DIR$/storedProc.sql" connection-id="e0fab069-c80d-452e-b415-f960623fdbac" session-id="MAIN" current-schema="RechteDB" />
-    <mapping file-url="file://$PROJECT_DIR$/storedProc.sql" connection-id="e0fab069-c80d-452e-b415-f960623fdbac" session-id="MAIN" current-schema="RechteDB" />
     <mapping file-url="file://$PROJECT_DIR$/Spielwiese.sql" connection-id="e0fab069-c80d-452e-b415-f960623fdbac" session-id="MAIN" current-schema="RECHTEFUZZI" />
-    <mapping file-url="file://$PROJECT_DIR$/Spielwiese.sql" connection-id="e0fab069-c80d-452e-b415-f960623fdbac" session-id="MAIN" current-schema="RECHTEFUZZI" />
+    <mapping file-url="file://$PROJECT_DIR$/storedProc.sql" connection-id="e0fab069-c80d-452e-b415-f960623fdbac" session-id="MAIN" current-schema="RechteDB" />
   </component>
   <component name="DBNavigator.Project.MethodExecutionManager">
     <method-browser />

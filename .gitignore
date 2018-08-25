@@ -5,6 +5,7 @@ db.sqlite3
 *.swp
 __pycache__
 .directory
-myvenv
+my3.6venv
 .idea\*
 01\ Mitarbeiterberechtigungen\ ZI-AI-BA.csv
+.env

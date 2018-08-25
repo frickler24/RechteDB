@@ -1,8 +1,14 @@
 # All requirement needed for app "rapp" which is short for RechteDB-APP
 
+# Step 1: Standard
 django >= 2.1
-django-bootstrap4 >= 0.0.6
+
+# Step 2: Decoupling sensitive infos from GIT repo
+python-decouple >= 3.1
+dj-database-url >= 0.5.0
 mysqlclient >= 1.3.13
+
+django-bootstrap4 >= 0.0.6
 docutils >= 0.14
 django-filter >= 2.0.0
 django-widget-tweaks >= 1.4.2
