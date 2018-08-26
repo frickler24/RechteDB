@@ -15,11 +15,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.conf.urls import url
-
-from rapp import views
+from django.urls import path
 
 urlpatterns = [
-	url(r'^$', views.home, name='home'),
-	url(r'^admin/', admin.site.urls),
+	path('admin', admin.site.urls),
 ]
 
+from django.conf.urls import include
+# Use include() to add paths from the rapp application
+urlpatterns += [
+	path('rapp/', include('rapp.urls')),
+]
+
+# Das ist die wichtigste Zeile: / wird auf /rapp gemappt
+from django.views.generic import RedirectView
+urlpatterns += [
+	path('', RedirectView.as_view(url='/rapp')),
+]

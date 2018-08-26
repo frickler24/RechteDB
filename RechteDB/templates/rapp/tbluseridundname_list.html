@@ -1,0 +1,96 @@
+{% extends "base_generic.html" %}
+{% load static %}
+
+{% block content %}
+    <ol class="breadcrumb my-4">
+      <li class="breadcrumb-item">Start</li>
+      <li class="breadcrumb-item active">UserID-Liste</li>
+    </ol>
+
+	<h1>User-Liste</h1>
+
+    <table style="width: 100%;">
+        <thead></thead>
+        <tbody>
+            <tr>
+                <td style="width: 50%">
+                    Ungefiltert mit allen aktiven und gelöschten Usern
+                </td>
+                <td style="width: 25%;">
+                </td>
+                <td style="width: 25%;">
+                    <a href="{% url 'user-create' %}">
+                        Neuer Eintrag
+                        <img src="{% static 'create.png' %}" alt="Icon: Erzeuge Neuen User-Eintrag" width="15" />
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p>&nbsp;</p>
+	{% if tbluseridundname_list %}
+        <table width="100%">
+            <thead>
+                <tr>
+                    <th>UserID</th>
+                    <th>Name</th>
+                    <th>Team</th>
+                    <th>ZI-Organisation</th>
+                    <th>aktiv</th>
+                    <th>Abteilung</th>
+                    <th>Gruppe</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in tbluseridundname_list %}
+                    <tr>
+                        <td> <a href="{{ user.get_absolute_update_url }}" >{{ user.userid }} </a> </td>
+                        <td> <a href="{{ user.get_absolute_update_url }}" >{{ user.name }} </a> </td>
+                        <td>{{user.orga}}</td>
+                        <td>{{user.zi_organisation}}</td>
+                        <td align="center">
+                        {% if user.geloescht %}
+                            <a href="{{ user.get_absolute_toggle_geloescht_url }}" >
+                                <img src="{% static 'admin/img/icon-no.svg' %}">
+                            </a>
+                        {% else %}
+                            <a href="{{ user.get_absolute_toggle_geloescht_url }}" >
+                                <img src="{% static 'admin/img/icon-yes.svg' %}">
+                            </a>
+                        {% endif %}
+                        </td>
+                        <td>{{user.abteilung}}</td>
+                        <td>{{user.gruppe}}</td>
+                        <td>
+                            <a href="{{ user.get_absolute_delete_url }}" >
+                                <img src="{% static 'delete.svg' %}" width="15" />
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Es gibt keine UserIDen in der Gesamtliste (!??)</p>
+    {% endif %}
+
+    {% block pagination %}
+     {# ToDo: Alten Paginierungsblock aufräumen #}
+
+      {% if is_paginated %}
+        <div class="pagination col-12">
+          <div class="page-links ">
+            {% if page_obj.has_previous %}
+              <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">zurück</a>
+            {% endif %}
+            Page {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}
+            {% if page_obj.has_next %}
+              <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">weiter</a>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    {% endblock %}
+
+{% endblock %}

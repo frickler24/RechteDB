@@ -40,3 +40,10 @@ phpmyadmin_pma:
 		-e PMA_CONTROLPASS=0oWiPLfdhAcSqy9TnmhKcI222QQIO87BvvjiHX9r57\
 		phpmyadmin/phpmyadmin
 
+importfile:
+	cd irgendwohin
+	zcat RechteDB\ 20180825\ Letzter\ Export\ vor\ Neuimplementierung.sql.gz > import.sql
+	vi import.sql
+	change
+	docker cp import.sql mariadb:/tmp
+

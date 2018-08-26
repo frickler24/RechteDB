@@ -23,6 +23,8 @@ from decouple import config, Csv
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+INTERNAL_IPS = config('INTERNAL_IPS', cast=Csv())
+
 
 import dj_database_url
 
@@ -44,11 +46,18 @@ INSTALLED_APPS = [
 	'django.contrib.staticfiles',
 
 	'rapp',
-	'boards',
+	'django_filters',
+	'debug_toolbar',
+
+	'widget_tweaks',
+	'bootstrap4',
+	'django_tables2',
+	'import_export',
 
 ]
 
 MIDDLEWARE = [
+	'debug_toolbar.middleware.DebugToolbarMiddleware',
 	'django.middleware.security.SecurityMiddleware',
 	'django.contrib.sessions.middleware.SessionMiddleware',
 	'django.middleware.common.CommonMiddleware',
@@ -63,7 +72,9 @@ ROOT_URLCONF = 'RechteDB.urls'
 TEMPLATES = [
 	{
 		'BACKEND': 'django.template.backends.django.DjangoTemplates',
-		'DIRS': [],
+		'DIRS': [
+			os.path.join(BASE_DIR, 'templates'),
+		],
 		'APP_DIRS': True,
 		'OPTIONS': {
 			'context_processors': [
@@ -119,3 +130,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# Redirect to home URL after login (Default redirects to /accounts/profile/)
+LOGIN_REDIRECT_URL = '/'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Some config for import-export
+IMPORT_EXPORT_USE_TRANSACTIONS = False
+IMPORT_EXPORT_SKIP_ADMIN_LOG = True
+IMPORT_EXPORT_IMPORT_PERMISSION_CODE = 'add'
+IMPORT_EXPORT_EXPORT_PERMISSION_CODE = 'add'
+

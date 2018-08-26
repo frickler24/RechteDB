@@ -96,7 +96,6 @@ class TblUserIDundName(models.Model):
 	class Meta:
 		managed = True
 		db_table = 'tblUserIDundName'
-		unique_together = (('userid', 'name'),)
 		index_together = (('gruppe', 'geloescht'),)
 		verbose_name = "UserID-Name-Kombination"
 		verbose_name_plural = "05 UserID-Name-Übersicht (tblUserIDundName)"
@@ -201,6 +200,7 @@ class TblGesamt(models.Model):
 		verbose_name = "Eintrag der Gesamttabelle (tblGesamt)"
 		verbose_name_plural = "08 Gesamttabelle Übersicht (tblGesamt)"
 		index_together = (('userid_name', 'tf', 'enthalten_in_af', 'plattform', 'gf', 'vip_kennzeichen', 'zufallsgenerator'),)
+		ordering = ['id']
 
 	def __str__(self) -> str:
 		return str(self.id)
@@ -259,6 +259,9 @@ class TblGesamtHistorie(models.Model):
 	neueaf = 				models.CharField(db_column='neueaf', max_length=50, blank=True, null=True, db_index=True)  # Field name made lowercase.
 	loeschdatum = 			models.DateTimeField(db_column='loeschdatum', blank=True, null=True, verbose_name='Löschdatum')
 	af_zuweisungsdatum = 	models.DateTimeField(db_column='af_zuweisungsdatum', blank=True, null=True, verbose_name='AF Zuweisung')  # Field name made lowercase. Field renamed to remove unsuitable characters.
+	# ToDo: überlegen, ob af_zuweisungsdatum_alt weg kann oder wozu es genutzt werden soll
+	af_zuweisungsdatum_alt =\
+							models.DateTimeField(db_column='af_zuweisungsdatum_alt', blank=True, null=True, verbose_name='AF Zuweisung alt')  # Field name made lowercase. Field renamed to remove unsuitable characters.
 
 	af_gueltig_ab = 		models.DateTimeField(db_column='af_gueltig_ab', blank=True, null=True, verbose_name='AF gültig ab')  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	af_gueltig_bis = 		models.DateTimeField(db_column='af_gueltig_bis', blank=True, null=True, verbose_name='AF gültig bis')  # Field name made lowercase. Field renamed to remove unsuitable characters.
@@ -421,30 +424,15 @@ class TblRollehataf(models.Model):
 ###################################### Tblsubsysteme, Tblsachgebiete, TblDb2
 # Ein paar Hilfstabellen.
 # Die sind inhaltlich wahrscheinlich nicht super aktuell, helfen aber bei verschiedenen Fragen.
+# Leider müssen die Modelle und ihre Columns so heißen, wie ihre Übreschriften es vorgeben (kein SQL-Standard)
 
-class Tblsubsysteme(models.Model):
-	sgss = models.CharField(db_column='sgss', primary_key=True, max_length=32)  # Field name made lowercase.
-	definition_field = models.CharField(db_column='definition', max_length=250, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
-	verantwortlicher_field = models.CharField(db_column='verantwortlicher', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
-	telefon_verantwortlicher_field = models.CharField(db_column='telefon', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
-	user_id_verantwortlicher_field = models.CharField(db_column='userid', max_length=50, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
-	fk_field = models.CharField(db_column='fk', max_length=250, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
-
-	class Meta:
-		managed = True
-		db_table = 'tblSubsysteme'
-		verbose_name = "Subsystem"
-		verbose_name_plural = "50 Übersicht Subsysteme (tbl_Subsysteme)"
-		ordering = [ 'sgss' ]
-
-
-class Tblsachgebiete(models.Model): # sachgebiet, definition_field,
-	sachgebiet = models.CharField(db_column='sachgebiet', primary_key=True, max_length=32)  # Field name made lowercase.
-	definition_field = models.CharField(db_column='definition', max_length=250, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
-	verantwortlicher_field = models.CharField(db_column='verantwortlicher', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
-	telefon_verantwortlicher_field = models.CharField(db_column='telefon', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
-	user_id_verantwortlicher_field = models.CharField(db_column='userid', max_length=50, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
-	fk_field = models.CharField(db_column='fk', max_length=250, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+class Tblsachgebiete(models.Model):
+	sachgebiet = models.CharField(db_column='Sachgebiet', primary_key=True, max_length=32)  # Field name made lowercase.
+	definition = models.CharField(db_column='Definition', max_length=250, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+	verantwortlicher = models.CharField(db_column='Verantwortlicher', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+	telefon_verantwortlicher = models.CharField(db_column='Telefon', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+	user_id_verantwortlicher = models.CharField(db_column='user_id', max_length=50, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+	fk = models.CharField(db_column='Führungskraft', max_length=250, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
 
 	class Meta:
 		managed = True
@@ -452,6 +440,22 @@ class Tblsachgebiete(models.Model): # sachgebiet, definition_field,
 		verbose_name = "Sachgebiet"
 		verbose_name_plural = "51 Übersicht Sachgebiete (tbl_Sachgebiete)"
 		ordering = ['sachgebiet']
+
+
+class Tblsubsysteme(models.Model):
+	sgss = models.CharField(db_column='sgss', primary_key=True, max_length=32)  # Field name made lowercase.
+	definition = models.CharField(db_column='Definition', max_length=250, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+	verantwortlicher = models.CharField(db_column='Verantwortlicher', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+	telefon_verantwortlicher = models.CharField(db_column='Telefon', max_length=150, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+	user_id_verantwortlicher = models.CharField(db_column='user_id', max_length=50, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+	fk = models.CharField(db_column='Führungskraft', max_length=250, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+
+	class Meta:
+		managed = True
+		db_table = 'tblSubsysteme'
+		verbose_name = "Subsystem"
+		verbose_name_plural = "50 Übersicht Subsysteme (tbl_Subsysteme)"
+		ordering = [ 'sgss' ]
 
 
 class TblDb2(models.Model):
@@ -600,6 +604,7 @@ class Tblrechteamneu(models.Model):
 		managed = True
 		db_table = 'tblRechteAMNeu'
 		#unique_together = (('userid', 'tf', 'enthalten_in_af', 'tf_technische_plattform', 'gf'),)
+
 
 class Qryf3Rechteneuvonimportduplikatfrei(models.Model):
 	userid = 				models.CharField(db_column='userid', max_length=32, blank=True, null=True, db_index=True)  # Field name made lowercase.

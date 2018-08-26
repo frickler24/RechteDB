@@ -1,0 +1,25 @@
+#!/bin/bash
+
+DATEI=import.sql
+
+# run twice - some fields seem to be resistant...
+for x in a b ; do
+    while IFS=',' read -ra MERKER; do
+        echo Suche nach Text: ${MERKER[1]}
+        echo -n Ersetze durch  : ${MERKER[0]}...
+        sed -i -- "s/${MERKER[1]}/${MERKER[0]}/g" ${DATEI}
+        echo
+    done < difffile 
+done
+
+echo und der Nachbrenner...
+# der eine oder andere  will nie mitspielen
+sed -i -- "s/userid + name_id/userid_und_name_id/g" import.sql
+sed -i -- "s/\xC2\xA0//ig" ${DATEI}
+sed -i -- "s/(verantwortlicher)//ig" ${DATEI}
+sed -i -- "s/tbluseridundname/tblUserIDundName/g" ${DATEI}
+sed -i -- "s/tblÜbersichtAF_GFs/tblUEbersichtAF_GFs/g" ${DATEI}
+sed -i -- "s/tbl_RACF_gruppen/tbl_RACF_Gruppen/g" ${DATEI}
+
+echo " fertig."
+exit 0
