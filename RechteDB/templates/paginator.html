@@ -1,0 +1,82 @@
+{% comment %}
+    Ab hier geht es nur noch um Paginierung
+    Inhalte, die nicht paginiert werden müssen, brauchen die Footerzeile nicht
+{% endcomment %}
+
+{% if pages.has_other_pages %}
+    <div class = "container-fluid">
+        <div class = "col-12 col-md-6">
+          <nav aria-label="Page navigation example">
+            <ul class="pagination">
+
+              <li class="page-item">    <!-- Jump to First Page -->
+                {% if pages.number != 1 %}
+                   <li class="previous">
+                      <a href="?page=1{% for key,value in request.GET.items %}{% ifnotequal key 'page' %}&{{ key }}={{ value }}{% endifnotequal %}{% endfor %}">
+                        <span aria-hidden="true">&laquo;</span></a>
+                   </li>
+                {% else %}
+                    <li class="previous disabled">
+                        <a><span aria-hidden="true">&laquo;</span></a>
+                    </li>
+                {% endif %}
+              </li>
+
+              <li class="page-item">  <!-- Jump to Previous Page -->
+                {% if pages.has_previous %}
+                   <li class="previous">
+                    <a href="?page={{ pages.previous_page_number }}{% for key,value in request.GET.items %}{% ifnotequal key 'page' %}&{{ key }}={{ value }}{% endifnotequal %}{% endfor %}">‹</a></li>
+                   <span aria-hidden="true">‹</span></a>
+                {% else %}
+                    <li class="previous disabled"><a>‹</a>
+                {% endif %}
+              </li>
+
+              {% if pages.has_previous %}
+              <li class="page-item">  <!-- Show previous set of page numbers -->
+                  <li class="previous">
+                    <a class="skip_prev" href="{% for key,value in request.GET.items %}{% ifnotequal key 'page' %}&{{ key }}={{ value }}{% endifnotequal %}{% endfor %}">...</a></li>
+                    </li>
+              {% else %}
+                    <li class="next disabled"><a>...</a>
+                    </li>
+              {% endif %}
+              </li>
+
+              {% for i in "12345" %}
+            <!-- Change the range ("12345") according to your choice to show numbers -->
+                <li class="pg" data = {{i}}><a class="page_number" href="{% for key,value in request.GET.items %}{% ifnotequal key 'page' %}&{{ key }}={{ value }}{% endifnotequal %}{% endfor %}"></a></li>
+              {% endfor %}
+
+              {% if pages.has_next %}
+              <li class="page-item">  <!-- Show next set of page numbers -->
+                  <li class="previous">
+                    <a class="skip_next" href="{% for key,value in request.GET.items %}{% ifnotequal key 'page' %}&{{ key }}={{ value }}{% endifnotequal %}{% endfor %}">...</a>
+                  </li>
+              {% else %}
+                    <li class="next disabled"><a>...</a>
+                    </li>
+              {% endif %}
+              </li>
+
+              <li class="page-item">  <!-- Jump to Next Page -->
+                {% if pages.has_next %}
+                    <a class="previous" href="?page={{ pages.next_page_number }}{% for key,value in request.GET.items %}{% ifnotequal key 'page' %}&{{ key }}={{ value }}{% endifnotequal %}{% endfor %}">›</a></li>
+                {% else %}
+                    <li class="next disabled"><a>›</a></li>
+                {% endif %}
+              </li>
+
+              <li class="page-item">  <!-- Jump to Last Page -->
+                {% if pages.number != pages.paginator.num_pages %}
+                  <li class="previous">
+                    <a class="previous" href="?page={{ pages.paginator.num_pages }}{% for key,value in request.GET.items %}{% ifnotequal key 'page' %}&{{ key }}={{ value }}{% endifnotequal %}{% endfor %}">»</a></li>
+                {% else %}
+                    <li class="next disabled"><a>›</a></li>
+                {% endif %}
+              </li>
+            </ul>
+          </nav>
+        </div>
+    </div>
+{% endif %}

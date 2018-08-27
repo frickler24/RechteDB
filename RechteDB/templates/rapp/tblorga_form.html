@@ -1,0 +1,38 @@
+{% extends "base_generic.html" %}
+{% load static %}
+{% block content %}
+
+    <h1>
+        {% if object.team %}
+        User-Eintrag ändern für <strong>{{ object.name }}</strong>
+        {% else %}
+            Neuen Team-Eintrag anlegen
+        {% endif %}
+    </h1>
+    <p>&nbsp;</p>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <table>
+        {{ form.as_table }}
+        </table>
+        <p>&nbsp;</p>
+        <table>
+            <tr>
+                <td>
+                    <input type="submit" value="Submit" />
+                </td>
+                {% if object.team %}
+                    <td>
+                       <a href="{{ object.get_absolute_delete_url }}" > Eintrag löschen
+                            <img src="{% static 'delete.svg' %}" width="15" />
+                        </a>
+                    </td>
+                {% endif %}
+                <td>
+                    <a href="{% url 'teamliste' %}">Bearbeitung abbrechen!</a>
+                </td>
+            </tr>
+        </table>
+    </form>
+{% endblock %}

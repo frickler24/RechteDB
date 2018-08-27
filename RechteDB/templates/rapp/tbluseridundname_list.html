@@ -2,11 +2,6 @@
 {% load static %}
 
 {% block content %}
-    <ol class="breadcrumb my-4">
-      <li class="breadcrumb-item">Start</li>
-      <li class="breadcrumb-item active">UserID-Liste</li>
-    </ol>
-
 	<h1>User-Liste</h1>
 
     <table style="width: 100%;">
@@ -76,8 +71,6 @@
     {% endif %}
 
     {% block pagination %}
-     {# ToDo: Alten Paginierungsblock aufräumen #}
-
       {% if is_paginated %}
         <div class="pagination col-12">
           <div class="page-links ">

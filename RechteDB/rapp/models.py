@@ -155,7 +155,7 @@ class TblPlattform(models.Model):
 		db_table = 'tblPlattform'
 		verbose_name = "Plattform"
 		verbose_name_plural = "07 Plattform-Übersicht (tblPlattform)"
-		# ordering = ['tf_technische_plattform']
+		ordering = ['tf_technische_plattform']
 
 	def __str__(self) -> str:
 		return self.tf_technische_plattform
@@ -298,7 +298,7 @@ class TblRollen(models.Model):
 		verbose_name = "Rollenliste"
 		verbose_name_plural = "03 Rollen-Übersicht (tbl_Rollen)"
 		ordering = [ 'rollenname' ]
-#		unique_together = (('rollenname', 'system'),)
+		unique_together = (('rollenname', 'system'),)
 
 	def __str__(self) -> str:
 		return str(self.rollenname)
@@ -331,7 +331,7 @@ class TblUserhatrolle(models.Model):
 		verbose_name = "User und Ihre Rollen"
 		verbose_name_plural = "01 User und Ihre Rollen (tbl_UserHatRolle)"
 		ordering = [ 'userid__name', '-userid__userid', 'schwerpunkt_vertretung', 'rollenname', ]
-#		unique_together = (('userid', 'rollenname'),)
+		unique_together = (('userid', 'rollenname'),)
 
 	def __str__(self) -> str:
 		return str(self.userundrollenid)		# ToDo: Stimmt das?
@@ -603,7 +603,7 @@ class Tblrechteamneu(models.Model):
 	class Meta:
 		managed = True
 		db_table = 'tblRechteAMNeu'
-		#unique_together = (('userid', 'tf', 'enthalten_in_af', 'tf_technische_plattform', 'gf'),)
+		unique_together = (('userid', 'tf', 'enthalten_in_af', 'tf_technische_plattform', 'gf'),)
 
 
 class Qryf3Rechteneuvonimportduplikatfrei(models.Model):
@@ -630,5 +630,5 @@ class Qryf3Rechteneuvonimportduplikatfrei(models.Model):
 	class Meta:
 		managed = True
 		db_table = 'qryF3_RechteNeuVonImportDuplikatfrei'
-		#unique_together = (('userid', 'tf', 'enthalten_in_af', 'tf_technische_plattform', 'gf'),)
+		unique_together = (('userid', 'tf', 'enthalten_in_af', 'tf_technische_plattform', 'gf'),)
 

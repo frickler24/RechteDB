@@ -3,7 +3,7 @@
 
 from django.urls import reverse, resolve
 from django.test import TestCase
-from .views import home
+from .views import home, GesamtDetailView
 
 class HomeTests(TestCase):
 	# Generell: Funktioniert irgend etwas?
@@ -153,7 +153,7 @@ class GesamtlisteTests(TestCase):
 
 		TblPlattform.objects.create(tf_technische_plattform = 'RACFP')
 
-		TblGesamt.objects.create(	# hat die id=3 - warum auch immer
+		TblGesamt.objects.create(
 			userid_name = 			TblUserIDundName.objects.get(userid = 'xv10011'),
 			tf = 					'Die superlange schnuckelige TF',
 			tf_beschreibung = 		'Die superlange schnuckelige TF-Beschreibung',
@@ -185,7 +185,7 @@ class GesamtlisteTests(TestCase):
 			letzte_aenderung =		None
 		)
 
-		TblGesamt.objects.create(	# hat die id=6 - warum auch immer
+		TblGesamt.objects.create(
 			userid_name = 			TblUserIDundName.objects.get(userid = 'xv10012'),
 			tf = 					'Die superlange schnuckelige TF2',
 			tf_beschreibung = 		'Die superlange schnuckelige TF-Beschreibung',
@@ -237,7 +237,8 @@ class GesamtlisteTests(TestCase):
 
 """
 	def test_gesamtliste_url_resolves_view(self):
-		view = resolve('/gesamtliste/3/')
-		self.assertEquals(view.func, GesamtUpdateView)
+		url= reverse('gesamt-detail', kwargs={'pk': TblGesamt.objects.get(tf = 'Die superlange schnuckelige TF').id})
+		view = resolve(url)
+		self.assertEquals(view.func, GesamtListView.as_view)
 """
 

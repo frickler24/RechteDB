@@ -78,18 +78,17 @@
 	  <ul class="sidebar-nav">
 		  <li><a href="{% url 'home' %}">Startseite</a></li>
 		  <li>&nbsp;</li>
-		  <li><a href="{ % url 'neueliste' %}">Neue Daten importieren</a></li>
-		  <li><a href="{% url 'userliste' %}">User-Liste</a></li>
-		  <li><a href="{ % url 'teamliste' %}">Team-Liste</a></li>
-		  <li><a href="{% url 'gesamtliste' %}">Gesamtliste</a></li>
-		  <li>&nbsp;</li>
-		  <li><a href="{ % url 'panel' %}?geloescht=3&userid_name__zi_organisation=ai-ba">Gesamt-Panel</a></li>
+		  <li><a href="{% url 'panel' %}?geloescht=3&userid_name__zi_organisation=ai-ba">Filteseite</a></li>
 
-		  <li>&nbsp;</li>
 		  <li><a href="/admin">Admin-Sichten</a></li>
 	      <li>&nbsp;</li>
+		  <li><a href="{% url 'userliste' %}">User-Liste</a></li>
+		  <li><a href="{% url 'teamliste' %}">Team-Liste</a></li>
+		  <li><a href="{% url 'gesamtliste' %}">Gesamtliste</a></li>
+
 
 		  {% if user.is_authenticated %}
+		    <li>&nbsp;</li>
 			<li>User: {{ user.get_username }}</li>
 			<li><a href="{ % url 'logout' %}?next={{request.path}}">Logout</a></li>
 		  {% else %}
@@ -126,7 +125,7 @@
   </div>
 
 	{% comment %}
-	{# Load the tag library for Bootstrap-4#}
+	{# Load the tag library for Bootstrap-4 #}
 	{% load bootstrap4 %}
 
 	{# Load CSS and JavaScript #}

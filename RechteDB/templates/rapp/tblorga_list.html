@@ -1,0 +1,26 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+	<h1>Team-Liste</h1>
+    <h2>Auflistung der definierten Teams, alphabetisch sortiert</h2>
+
+	{% if tblorga_list %}
+        <table>
+            <tr>
+                <th>Team</th>
+                <th>Definiert durch </th>
+            </tr>
+            {% for team in tblorga_list %}
+                <tr>
+                    <td> <a href="{{ team.get_absolute_update_url }}">{{ team.team }} </a> </td>
+                    <td>{{ team.themeneigentuemer }}</td>
+                </tr>
+        {% endfor %}
+
+        </table>
+    {% else %}
+        <p>Es gibt keine Teams in der Orga-Liste.</p>
+    {% endif %}
+    <p>&nbsp;</p>
+
+{% endblock %}

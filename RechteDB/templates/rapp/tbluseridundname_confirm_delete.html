@@ -1,0 +1,15 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<h1>User-Eintrag löschen</h1>
+
+<p>Sie löschen gerade den folgenden User-Eintrag: {{ object }}?</p>
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" action="" value="Ja, bitte löschen." />
+  <div><p>&nbsp;</p><a href="{% url 'userliste' %}">Nein, abbrechen!</a></div>
+</form>
+
+{% endblock %}

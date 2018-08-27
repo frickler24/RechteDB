@@ -12,9 +12,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.core.paginator import Paginator
-# from .filters import PanelFilter
-
-# from .forms import BastelForm
+from .filters import PanelFilter
 
 # Zum Einlesen der csv
 # import tablib
@@ -137,3 +135,65 @@ def userToggleGeloescht(request, pk):
 
 	# redirect to a new URL:
 	return HttpResponseRedirect(reverse('userliste') )
+
+
+###################################################################
+# Die Gesamtliste der Teams (TblOrga)
+
+class TeamListView(generic.ListView):
+	model = TblOrga
+
+class TblOrgaCreate(CreateView):
+	model = TblOrga
+	fields = '__all__'
+	initial = {'geloscht' : 'False',}
+
+class TblOrgaUpdate(UpdateView):
+	model = TblOrga
+	fields = '__all__'
+
+class TblOrgaDelete(DeleteView):
+	model = TblOrga
+	success_url = reverse_lazy('teamliste')
+
+
+###################################################################
+# Die Ab hier kommen die Views für das Panel
+
+"""
+###################################################################
+# Nur zum Zeigen, wie das mit den Panels gehen könnte....
+
+def search(request):
+	user_list = User.objects.all()
+	user_filter = UserFilter(request.GET, queryset=user_list)
+	return render(request, 'rapp/user_list.html', {'filter': user_filter})
+"""
+
+###################################################################
+# Panel geht direkt auf die Gesamt-Datentabelle
+
+def panel(request):
+	panel_list = TblGesamt.objects.all()
+	panel_filter = PanelFilter(request.GET, queryset=panel_list)
+	panel_list = panel_filter.qs
+
+	pagesize = request.GET.get('pagesize')
+
+	if type(pagesize) == type(None) or int(pagesize) < 1:
+		pagesize = 20
+	else:
+		pagesize = int(pagesize)
+
+	paginator = Paginator(panel_list, pagesize)
+	page = request.GET.get('page', 1)
+	try:
+		pages = paginator.page(page)
+	except PageNotAnInteger:
+		pages = paginator.page(1)
+	except EmptyPage:
+		pages = paginator.page(paginator.num_pages)
+
+	args = {'paginator': paginator, 'filter': panel_filter, 'pages': pages, 'meineTabelle': panel_list, 'pagesize': pagesize}
+	return render(request, 'rapp/panel_list.html', args)
+
