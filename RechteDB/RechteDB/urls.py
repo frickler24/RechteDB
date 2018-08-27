@@ -16,10 +16,18 @@ Including another URLconf
 from django.contrib import admin
 from django.conf.urls import url
 from django.urls import path
+from django.conf import settings
+from django.conf.urls import include
 
 urlpatterns = [
 	path('admin', admin.site.urls),
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ]
 
 from django.conf.urls import include
 # Use include() to add paths from the rapp application

@@ -228,12 +228,13 @@ class Userhatrolle(admin.ModelAdmin):
 			'widget': Textarea (
 				attrs = {
 						'rows': 1,
-						'cols': 60,
+						'cols': 40,
 						'style': 'height: 1.4em;'
 		})},
 	}
 
-	list_display = ('userundrollenid', 'userid', 'rollenname', 'schwerpunkt_vertretung', 'bemerkung', 'letzte_aenderung', )
+	list_display = ('userundrollenid', 'userid', 'rollenname', 'schwerpunkt_vertretung',
+					'get_rollenbeschreibung', 'bemerkung', 'letzte_aenderung', )
 	list_filter = ('schwerpunkt_vertretung', )
 	list_display_links = ('userundrollenid', 'rollenname', )
 	list_editable = ('schwerpunkt_vertretung', 'bemerkung', )
@@ -357,7 +358,6 @@ class TblrechteneuvonimportResource(resources.ModelResource):
 
 
 from rapp.resources import MyCSVImporterModel
-from django.urls import reverse
 
 @admin.register(Tblrechteneuvonimport)
 class Tblrechteneuvonimport(ImportExportModelAdmin):

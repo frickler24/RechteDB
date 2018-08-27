@@ -336,6 +336,9 @@ class TblUserhatrolle(models.Model):
 	def __str__(self) -> str:
 		return str(self.userundrollenid)		# ToDo: Stimmt das?
 
+	def get_rollenbeschreibung (self):
+		return str(self.rollenname.rollenbeschreibung)
+	get_rollenbeschreibung.short_description = 'Rollenbeschreibung'
 
 # Dies ist nur eine Hilfstabelle.
 # Sie besteht aus dem `tblÜbersichtAF_GFs`.`Name AF Neu` für alle Felder, bei denen `modelliert` nicht null ist.

@@ -1,12 +1,16 @@
-{% extends "base_generic.html" %}
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item active">Gesamtliste</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Gesamtliste - {{ block.super }}
+{% endblock %}
 
 {% block content %}
     <div class="container">
-        <ol class="breadcrumb my-4">
-          <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
-          <li class="breadcrumb-item active">Gesamtliste</li>
-        </ol>
-
         <h1>Gesamtliste</h1>
         <h5>Ungefiltert mit allen aktiven und gelöschten Rechten jedes Users</h5>
 
@@ -52,4 +56,4 @@
             <p>Es gibt keine Rechte in der Gesamtliste.</p>
         {% endif %}
     </div>
-{% endblock %}
+{% endblock content %}

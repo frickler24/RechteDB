@@ -242,3 +242,48 @@ class GesamtlisteTests(TestCase):
 		self.assertEquals(view.func, GesamtListView.as_view)
 """
 
+# Geht die User-Liste?
+class UserListTests(TestCase):
+	# Ist die Seite da?
+	# ToDo: Beim Test der Userliste fehlen noch die drei subpanels. Aber evtl. fällt die gesamte Liste weg
+	def test_userlist_view_status_code(self):
+		url = reverse('userliste')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+
+
+# Geht die Team-Liste?
+class UserListTests(TestCase):
+	# Ist die Seite da?
+	# ToDo: Beim Test der Teamliste fehlen noch die drei subpanels. Aber evtl. fällt die gesamte Liste weg
+	def test_teamlist_view_status_code(self):
+		url = reverse('teamliste')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+
+
+# Suche-/Filterpanel. Das wird mal die Hauptseite
+class PanelTests(TestCase):
+	# Ist die Seite da?
+	def test_panel_view_status_code(self):
+		url = reverse('panel')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+
+	def test_panel_view_with_valid_selection_status_code(self):
+		url = '{0}{1}'.format(reverse('panel'), '?geloescht=3&userid_name__zi_organisation=ai-ba')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+
+	def test_panel_view_with_invalid_selection1_status_code(self):
+		url = '{0}{1}'.format(reverse('panel'), '?geloescht=99&userid_name__zi_organisation=ZZ-XX')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+		self.assertContains(response, "Keine Treffer")
+
+	def test_panel_view_with_invalid_selection2_status_code(self):
+		url = '{0}{1}'.format(reverse('panel'), '?DAS_FELD_GIBTS_NICHT=1')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+		self.assertContains(response, "Keine Treffer")
+

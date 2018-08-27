@@ -98,6 +98,7 @@ class GesamtListView(generic.ListView):
 	paginate_by = 50
 
 # Die Detailsicht eines einzelnen Rechts
+
 class GesamtDetailView(generic.DetailView):
 	model = TblGesamt
 
@@ -139,7 +140,6 @@ def userToggleGeloescht(request, pk):
 
 ###################################################################
 # Die Gesamtliste der Teams (TblOrga)
-
 class TeamListView(generic.ListView):
 	model = TblOrga
 

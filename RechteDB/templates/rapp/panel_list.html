@@ -1,18 +1,22 @@
-{% extends 'base_generic.html' %}
+{% extends 'base.html' %}
 
 {% load static %}
 {% load widget_tweaks %}
 { % load render_table from django_tables2 %}
 
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item active">Filterseite</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Filter - {{ block.super }}
+{% endblock %}
+
 {% block content %}
-
     <div class="container">
-        <ol class="breadcrumb my-4">
-          <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
-          <li class="breadcrumb-item active">Filterseite</li>
-        </ol>
-
 		<form method="get">
+			{% csrf_token %}
 			<div class="well">
 			   {% comment for field in filter.form.visible_fields %}
 					<div class="form-group">
@@ -140,4 +144,4 @@
     {% endcomment %}
 
     {% include "paginator.html" %}
-{% endblock %}
+{% endblock content %}

@@ -1,4 +1,12 @@
-{% extends "base_generic.html" %}
+{% extends "base.html" %}
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item active">Team-Liste</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Team-Liste - {{ block.super }}
+{% endblock %}
 
 {% block content %}
 	<h1>Team-Liste</h1>

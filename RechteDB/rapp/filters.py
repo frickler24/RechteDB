@@ -18,7 +18,7 @@ class UserFilter(django_filters.FilterSet):
 		}
 		# fields = ['username', 'first_name', 'last_name', ]
 
-"""
+
 
 class UserFilter(django_filters.FilterSet):
 	first_name = django_filters.CharFilter(lookup_expr='icontains')
@@ -38,7 +38,7 @@ class UserIDFilter(django_filters.FilterSet):
 	class Meta:
 		model = TblUserIDundName
 		fields = '__all__'
-
+"""
 
 
 class PanelFilter(django_filters.FilterSet):

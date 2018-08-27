@@ -1,8 +1,17 @@
-{% extends "base_generic.html" %}
-{% load static %}
+{% extends "base.html" %}
 
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item active">UserID-Detail</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	UserID-Liste - {{ block.super }}
+{% endblock %}
+
+{% load static %}
 {% block content %}
-	<h1>User-Liste</h1>
+	<h1>UserID-Liste</h1>
 
     <table style="width: 100%;">
         <thead></thead>
@@ -84,6 +93,6 @@
           </div>
         </div>
       {% endif %}
-    {% endblock %}
+    {% endblock pagination %}
 
-{% endblock %}
+{% endblock content %}

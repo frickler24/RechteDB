@@ -23,8 +23,9 @@ from decouple import config, Csv
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
-INTERNAL_IPS = config('INTERNAL_IPS', cast=Csv())
 
+# Die internal_IPs sind für den Debugger. In Produktion läuft dieser nicht mit (DEBUG=False)
+INTERNAL_IPS = config('INTERNAL_IPS')
 
 import dj_database_url
 

@@ -1,7 +1,17 @@
-{% extends "base_generic.html" %}
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item active"><a href="{% url 'userliste' %}">UserID-Liste</a></li>
+    <li class="breadcrumb-item active">UserID-Detail</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	UserID-Liste - {{ block.super }}
+{% endblock %}
+
 {% load static %}
 {% block content %}
-
     <h1>
         {% if object.name %}
         User-Eintrag ändern für <strong>{{ object.name }}</strong>
@@ -35,4 +45,4 @@
             </tr>
         </table>
     </form>
-{% endblock %}
+{% endblock content %}
