@@ -53,16 +53,16 @@ urlpatterns += [
 	path('user/<int:pk>/toggle_geloescht/', views.userToggleGeloescht, name='user-toggle-geloescht'),
 ]
 
-# Generische Formulare für CUD Orga (werden im Frontend bedient)
+# Der Link auf die Team-liste
+urlpatterns += [
+	path('teamliste/', views.TeamListView.as_view(), name='teamliste'),
+]
+
+# Generische Formulare für CUD Orga (Teams, werden im Frontend bedient)
 urlpatterns += [
 	path('team/<int:pk>/delete/', views.TblOrgaDelete.as_view(), name='team-delete'),
 	path('team/create/', views.TblOrgaCreate.as_view(), name='team-create'),
 	path('team/<int:pk>/update/', views.TblOrgaUpdate.as_view(), name='team-update'),
-]
-
-# Der Link auf die Team-liste
-urlpatterns += [
-	path('teamliste/', views.TeamListView.as_view(), name='teamliste'),
 ]
 
 # Der Link auf das Eingabepanel zur freien Selektion direkt auf der Gesamttabelle

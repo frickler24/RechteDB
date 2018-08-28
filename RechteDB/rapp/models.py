@@ -80,7 +80,6 @@ class TblOrga(models.Model):
 		return reverse('team-create', args=[])
 
 
-
 # Die Namen aller aktiven und gelöschten UserIDen und der dazugehörenden Namen (Realnamen und Technische User)
 class TblUserIDundName(models.Model):
 	id = 				models.AutoField(db_column='id', primary_key=True)  # Field name made lowercase.

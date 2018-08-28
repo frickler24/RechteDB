@@ -242,6 +242,35 @@ class GesamtlisteTests(TestCase):
 		self.assertEquals(view.func, GesamtListView.as_view)
 """
 
+# Geht die Team-Liste?
+class TeamListTests(TestCase):
+	# Ist die Seite da?
+	# ToDo: Beim Test der Teamliste fehlen noch die drei subpanels. Aber evtl. fällt die gesamte Liste weg
+	def test_teamlist_view_status_code(self):
+		url = reverse('teamliste')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+class CreateTeamTests(TestCase):
+	def setUp(self):
+		TblOrga.objects.create(team='MeinTeam', themeneigentuemer='Icke')
+
+	def test_create_team_view_success_status_code(self):
+		url = reverse('team-create')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+	"""
+	def test_create_team_url_resolves_new_topic_view(self):
+		view = resolve('/teamliste/create/')
+		self.assertEquals(view.func, TblOrgaCreate.as_view)
+	"""
+
+	def test_create_team_view_contains_link_back_to_board_topics_view(self):
+		new_team_url = reverse('team-create')
+		teamlist_url = reverse('teamliste')
+		response = self.client.get(new_team_url)
+		self.assertContains(response, 'href="{0}"'.format(teamlist_url))
+
+
 # Geht die User-Liste?
 class UserListTests(TestCase):
 	# Ist die Seite da?
@@ -250,16 +279,61 @@ class UserListTests(TestCase):
 		url = reverse('userliste')
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
+class CreateUserTests(TestCase):
+	def setUp(self):
+		TblOrga.objects.create(team = 'Django-Team', themeneigentuemer = 'Ihmchen')
 
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu =			'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
+			name_af_neu =			'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+			kommentar =				'Kein Kommentar',
+			zielperson =			'Lutz',
+			af_text =				'Das ist der AF-normaltext',
+			gf_text = 				'Das ist der AF-normaltext',
+			af_langtext = 			'Das ist der AF-Laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaang-Text',
+			af_ausschlussgruppen =	'Das soll niemand außer mir bekommen!!!',
+			af_einschlussgruppen =	'das soll die ganze Welt erhalten können',
+			af_sonstige_vergabehinweise = 'Keine Hinweise',
+			geloescht =				False,
+			kannweg = 				False,
+			modelliert = 			timezone.now(),
+		)
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu =			'rvg_00500_neueAF mit echt mehr Zeichen als üblich',
+			name_af_neu =			'rva_00500_neue_AF auch mit mehr Zeichen als üblich',
+		)
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu =			'rvg_00380_neueAF mit echt mehr Zeichen als üblich',
+			name_af_neu =			'rva_00380_neue_AF auch mit mehr Zeichen als üblich',
+		)
 
-# Geht die Team-Liste?
-class UserListTests(TestCase):
-	# Ist die Seite da?
-	# ToDo: Beim Test der Teamliste fehlen noch die drei subpanels. Aber evtl. fällt die gesamte Liste weg
-	def test_teamlist_view_status_code(self):
-		url = reverse('teamliste')
+		TblUserIDundName.objects.create(
+			userid = 			'xv10010',
+			name = 				'User_xv10010',
+			orga = 				TblOrga.objects.get(team = 'Django-Team'),
+			zi_organisation =	'AI-BA',
+			geloescht = 		False,
+			abteilung = 		'ZI-AI-BA',
+			gruppe = 			'ZI-AI-BA-PS',
+		)
+
+	def test_create_user_view_success_status_code(self):
+		url = reverse('user-create')
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
+
+	"""
+	def test_create_user_url_resolves_new_topic_view(self):
+		view = resolve('/userliste/create/')
+		self.assertEquals(view.func, TblOrgaCreate.as_view)
+
+	"""
+
+	def test_create_user_view_contains_link_back_to_board_topics_view(self):
+		new_user_url = reverse('user-create')
+		userlist_url = reverse('userliste')
+		response = self.client.get(new_user_url)
+		self.assertContains(response, 'href="{0}"'.format(userlist_url))
 
 
 # Suche-/Filterpanel. Das wird mal die Hauptseite
@@ -286,4 +360,5 @@ class PanelTests(TestCase):
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
 		self.assertContains(response, "Keine Treffer")
+
 

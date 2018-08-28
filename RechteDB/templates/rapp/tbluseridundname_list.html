@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
@@ -9,32 +10,31 @@
 	UserID-Liste - {{ block.super }}
 {% endblock %}
 
-{% load static %}
 {% block content %}
-	<h1>UserID-Liste</h1>
-
-    <table style="width: 100%;">
-        <thead></thead>
-        <tbody>
-            <tr>
-                <td style="width: 50%">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-12 col-md-4 col-lg-3 col-xl-3" style="text-align: bottom;">
+                <h1>UserID-Liste</h1>
+            </div>
+            <div class="col mt-3">
+                <h5>
                     Ungefiltert mit allen aktiven und gelöschten Usern
-                </td>
-                <td style="width: 25%;">
-                </td>
-                <td style="width: 25%;">
-                    <a href="{% url 'user-create' %}">
-                        Neuer Eintrag
-                        <img src="{% static 'create.png' %}" alt="Icon: Erzeuge Neuen User-Eintrag" width="15" />
-                    </a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <p>&nbsp;</p>
+                </h5>
+            </div>
+            <div class="col-3 mt-3">
+                <a href="{% url 'user-create' %}">
+                    Neuer Eintrag
+                    <img src="{% static 'create.png' %}" alt="Icon: Erzeuge Neuen User-Eintrag" width="15" />
+                </a>
+            </div>
+        </div>
+        <div class="row mb-5 align-bottom">
+        </div>
+    </div>
+
 	{% if tbluseridundname_list %}
-        <table width="100%">
-            <thead>
+        <table class="table table-striped" width="100%">
+            <thead class="thead-light">
                 <tr>
                     <th>UserID</th>
                     <th>Name</th>

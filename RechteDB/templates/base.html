@@ -1,4 +1,5 @@
-{% load static %}<!DOCTYPE html>
+<!DOCTYPE html>
+{% load static %}
 <html lang="de">
 	<head>
 		<meta charset="utf-8">
@@ -27,70 +28,76 @@
 		</nav>
 
 		<div class="container-fluid">
-			<div class="container">
-				<ol class="breadcrumb my-4">
-					{% block breadcrumb %}
-					{% endblock %}
-				</ol>
-				{% block content %}
+			<ol class="breadcrumb my-4">
+				{% block breadcrumb %}
 				{% endblock %}
-			</div>
-
-			<!-- Tiny script for pagination in filtered views  (https://djangopy.org/how-to/pagination-with-django/) -->
-			{% block script %}
-				<script>
-				$(document).ready(function(){
-
-				var skip_pages = 5; //change your number accordingly you want to show numbers
-
-				var total_pages = {{pages.paginator.num_pages}};
-				var current_page = {{pages.number}};
-				var factor = Math.floor(current_page/skip_pages);
-
-				$(".page_number").each(function(i, obj) {   //Showing the discrete numbers
-				var page = factor*(skip_pages) + i + 1;
-				if(current_page%skip_pages == 0)
-				page = (factor-1)*skip_pages + i + 1;
-				if(page - 1 < total_pages){
-				$(this).html(page);
-				existing = $(this).attr("href");
-				$(this).attr("href", "?page=" + page + existing);
-				}
-				else{
-				var x = i+1;
-				$('li[data=' + x + ']').css("display", "none");
-				}
-				});
-				var page = current_page%skip_pages;
-				if(page == 0)
-				page = skip_pages;
-				$('li[data=' + page + ']').each(function(){   //Deciding the active class
-				$('li[data=' + page + ']').addClass("active");
-				});
-
-				$(".skip_next").click(function(){   //Skip next ... Function
-				if(current_page%skip_pages == 0)
-				factor = factor-1;
-				var page = (factor+1)*skip_pages + 1;
-				existing = $(this).attr("href");
-				if(page < total_pages)
-				$(this).attr("href", "?page=" + page + existing);
-				else
-				$(this).attr("href", "?page=" + total_pages + existing);
-				})
-				$(".skip_prev").click(function(){ //Skip Previous ... Function
-				if(current_page%skip_pages == 0)
-				factor = factor-1;
-				var page = skip_pages*(factor-1) + 1;
-				existing = $(this).attr("href");
-				if(page > 0)
-				$(this).attr("href", "?page=" + page + existing);
-				else
-				$(this).attr("href", "?page=" + "1" + existing);
-				})
-				});
-				</script>
-			{% endblock script %}
+			</ol>
+			{% block content %}
+			{% endblock %}
 		</div>
+		{# Load the tag library for Bootstrap-4 #}
+		{% load bootstrap4 %}
+
+		{# Load CSS and JavaScript #}
+		{% bootstrap_css %}
+		{% bootstrap_javascript jquery='full' %}
+
+		{# Display django.contrib.messages as Bootstrap alerts #}
+		{% bootstrap_messages %}
+		<!-- Tiny script for pagination in filtered views  (https://djangopy.org/how-to/pagination-with-django/) -->
+		{% block script %}
+			<script>
+			$(document).ready(function(){
+
+			var skip_pages = 5; //change your number accordingly you want to show numbers
+
+			var total_pages = {{pages.paginator.num_pages}};
+			var current_page = {{pages.number}};
+			var factor = Math.floor(current_page/skip_pages);
+
+			$(".page_number").each(function(i, obj) {   //Showing the discrete numbers
+			var page = factor*(skip_pages) + i + 1;
+			if(current_page%skip_pages == 0)
+			page = (factor-1)*skip_pages + i + 1;
+			if(page - 1 < total_pages){
+			$(this).html(page);
+			existing = $(this).attr("href");
+			$(this).attr("href", "?page=" + page + existing);
+			}
+			else{
+			var x = i+1;
+			$('li[data=' + x + ']').css("display", "none");
+			}
+			});
+			var page = current_page%skip_pages;
+			if(page == 0)
+			page = skip_pages;
+			$('li[data=' + page + ']').each(function(){   //Deciding the active class
+			$('li[data=' + page + ']').addClass("active");
+			});
+
+			$(".skip_next").click(function(){   //Skip next ... Function
+			if(current_page%skip_pages == 0)
+			factor = factor-1;
+			var page = (factor+1)*skip_pages + 1;
+			existing = $(this).attr("href");
+			if(page < total_pages)
+			$(this).attr("href", "?page=" + page + existing);
+			else
+			$(this).attr("href", "?page=" + total_pages + existing);
+			})
+			$(".skip_prev").click(function(){ //Skip Previous ... Function
+			if(current_page%skip_pages == 0)
+			factor = factor-1;
+			var page = skip_pages*(factor-1) + 1;
+			existing = $(this).attr("href");
+			if(page > 0)
+			$(this).attr("href", "?page=" + page + existing);
+			else
+			$(this).attr("href", "?page=" + "1" + existing);
+			})
+			});
+			</script>
+		{% endblock script %}
 	</body>
 </html>
