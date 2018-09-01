@@ -13,13 +13,15 @@ from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from .filters import PanelFilter
+from .forms import ShowGesamtForm
 
 # Zum Einlesen der csv
 # import tablib
 # from tablib import Dataset
 # from import_export import resources
 # from .resources import MyCSVImporterModel
-from rapp.models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, Tblrechteneuvonimport
+from rapp.models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, Tblrechteneuvonimport, \
+						TblRollen
 
 ###################################################################
 # RApp - erforderliche Sichten und Reports
@@ -196,4 +198,51 @@ def panel(request):
 
 	args = {'paginator': paginator, 'filter': panel_filter, 'pages': pages, 'meineTabelle': panel_list, 'pagesize': pagesize}
 	return render(request, 'rapp/panel_list.html', args)
+
+###################################################################
+# Panel Versuch 2
+
+def panel_user_rolle_af(request):
+	panel_list = TblGesamt.objects.all().order_by('userid_name__name', 'userid_name__userid', )
+	panel_filter = PanelFilter(request.GET, queryset=panel_list)
+	panel_list = panel_filter.qs
+
+	user_liste = TblUserIDundName.objects.all().order_by('name', 'userid', )
+	rollen_liste = TblRollen.objects.all().order_by('rollenname', )
+
+	if request.method == 'POST':
+		form = ShowGesamtForm(request.POST)
+		if form.is_valid():
+			post = Post.objects.create(
+			)
+			return redirect('home')  # TODO: redirect ordentlich machen
+	else:
+		form = ShowGesamtForm()
+		pagesize = request.GET.get('pagesize')
+
+		if type(pagesize) == type(None) or pagesize == '' or int(pagesize) < 1:
+			pagesize = 20
+		else:
+			pagesize = int(pagesize)
+
+		paginator = Paginator(panel_list, pagesize)
+		page = request.GET.get('page', 1)
+		try:
+			pages = paginator.page(page)
+		except PageNotAnInteger:
+			pages = paginator.page(1)
+		except EmptyPage:
+			pages = paginator.page(paginator.num_pages)
+
+	args = {
+		'paginator': paginator, 'filter': panel_filter, 'pages': pages,
+		'meineTabelle': panel_list, 'pagesize': pagesize, 'form': form,
+		'user_liste': user_liste,
+		'rollen_liste': rollen_liste,
+	}
+	return render(request, 'rapp/panel-user-rolle-af.html', args)
+
+
+
+
 

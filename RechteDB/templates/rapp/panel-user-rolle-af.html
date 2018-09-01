@@ -6,7 +6,7 @@
 
 {% block breadcrumb %}
 	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
-	<li class="breadcrumb-item active">Filterseite</li>
+	<li class="breadcrumb-item active">User, Rollen und Arbeitsplatzfunktionen</li>
 {% endblock breadcrumb %}
 
 {% block title %}
@@ -16,6 +16,8 @@
 {% block content %}
     <div class="container">
 		<form method="get">
+			{% csrf_token %}
+
 			<div class="well">
 			   {% comment for field in filter.form.visible_fields %}
 					<div class="form-group">
@@ -75,11 +77,17 @@
 						{{ filter.form.modell__name_gf_neu.label_tag }}
 						{% render_field filter.form.modell__name_gf_neu class="form-control" %}
 					</div>
-
+					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-3 col-xl-3">
+						<label for="pagesize">Zeilen pro Seite</label>
+						<input class="input" id="pagesize" name="pagesize" type="text" width="5" maxlength="5"
+						{% if pagesize %}
+		 					value="{{ pagesize }}"
+						{% endif %}
+						/>
+					</div>
 				</div>
 
 				{% comment %} Suche und Abbruch-Buttons {% endcomment %}
-
 				<div class="form-group marin-top-3">
 						<button type="submit" class="btn btn-primary">
 								<span class="glyphicon glyphicon-search"></span> Suche
@@ -89,74 +97,35 @@
 			</div>
 		</form>
 	</div>
-    {% comment %} Die alte Ergebnismenge, manuell zu einer Tabelle zusammengestellt {% endcomment %}
-	<table class="table table-bordered vllzulangertext">
-		<thead>
-			<tr class="bg-primary">
-				<th>Name</th>
-				<th>Team</th>
-				<th>TF</th>
-				<th>AF</th>
-				<th>GF</th>
-				<th>ZI-Orga</th>
-				<th>Plattform</th>
-				<th>AF Neu</th>
-				<th>GF Neu</th>
-				<th>Recht aktiv</th>
-				<th>User aktiv</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for row in pages %}
-				<tr>
-					<td class="vllzulangertext knappeTabelle">{{ row.userid_name }}</td>
-                    <td class="vllzulangertext knappeTabelle">{{ row.userid_name.orga }}</td>
-					<td class="vllzulangertext knappeTabelle">{{ row.tf }}</td>
-					<td class="vllzulangertext knappeTabelle">{{ row.enthalten_in_af }}</td>
-					<td class="vllzulangertext knappeTabelle">{{ row.gf }}</td>
-                    <td class="vllzulangertext knappeTabelle">{{ row.userid_name.zi_organisation }}</td>
-					<td class="vllzulangertext knappeTabelle">{{ row.plattform }}</td>
-					<td class="vllzulangertext knappeTabelle">{{ row.modell.name_af_neu }}</td>
-					<td class="vllzulangertext knappeTabelle">{{ row.modell.name_gf_neu }}</td>
 
-                    {# Das "Gelöscht"-Flag wird als aktiv angezeigt und damit invertiert als Grafik #}
-                    <td align="center" class="knappeTabelle">
-                        {% if row.geloescht %}
-                            <a href="{{ user.get_absolute_toggle_geloescht_url }}">
-                                <img src="{% static 'admin/img/icon-no.svg' %}">
-                            </a>
-                        {% else %}
-                            <a href="{{ user.get_absolute_toggle_geloescht_url }}">
-                                <img src="{% static 'admin/img/icon-yes.svg' %}">
-                            </a>
-                        {% endif %}
-                    </td>
-                    <td align="center" class="knappeTabelle">
-                        {% if row.userid_name.geloescht %}
-                            <a href="{{ user.get_absolute_toggle_geloescht_url }}">
-                                <img src="{% static 'admin/img/icon-no.svg' %}">
-                            </a>
-                        {% else %}
-                            <a href="{{ user.get_absolute_toggle_geloescht_url }}">
-                                <img src="{% static 'admin/img/icon-yes.svg' %}">
-                            </a>
-                        {% endif %}
-                    </td>
-				</tr>
-			{% empty %}
-				<tr>
-					<td colspan="5">Keine Treffer</td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+	{{ meineTabelle }}
 
-    {% comment %} Ergebnismenge über table.py eigen-konfigurierbar { % endcomment %}
-        <div class="breiteTabelle" style="white-space: nowrap;">
-            { % comment %} render_table meineTabelle { % endcomment %}
-            {% render_table table %}
-        </div>
-    {% endcomment %}
+	<p></p><p>
+	{% for row in pages %}
+		{{ row.enthalten_in_af }},
+		"{{ row.userid_name.name }}",
+
+		{% for userid in row.userid_name.  %}
+			{{ userid }},
+		{% empty %}
+			<p>Keine einzelnen UserIDs</p>
+		{% endfor %}
+	{% empty %}
+		<p>Keine Treffer</p>
+	{% endfor %}
+
+	{% for r in rollen_liste %}
+		{{ r }}, <br />
+	{% empty %}
+		<p>Keine Treffer</p>
+	{% endfor %}
+
+	{% for u in user_liste %}
+		{{ u }}, <br />
+	{% empty %}
+		<p>Keine Treffer</p>
+	{% endfor %}
 
     {% include "paginator.html" %}
+
 {% endblock content %}

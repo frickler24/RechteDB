@@ -5,74 +5,83 @@
 {% endblock breadcrumb %}
 
 {% block content %}
-  <h1>Hauptseite</h1>
 
-  <p>Willkommen in der <em>RechteDB</em>,
-      einer sehr einfachen Django Website zur Pflege der Berechtigungsdaten für die Abteilung
-  </p>
-
-  <div class="container-fluid rounded bg-success">
+  <div class="container rounded bg-light text-secondary">
     <div class="row ">
-      <div class="col col-sm-5">
-        <h3>Statistik aus MariaDB</h3>
+      <h1>Hauptseite</h1>
+    </div>
+    <div class="row ">
+        <p>Willkommen in der <em>RechteDB</em>,
+        einer sehr einfachen Django Website zur Pflege der Berechtigungsdaten für die Abteilung
+      </p>
+    </div>
+  </div>
+
+  <div class="container rounded bg-dark">
+    <div class="row">
+      <div class="text-light col-xs-12 col-sm-8 col-md-6 col-lg 4 col-xl-4 mt-4">
+        <h5>Statistik über die RechteDB:</h5>
       </div>
     </div>
-    <div class="container rounded bg-success">
-      <div class="row ">
-        <div class="col col-sm-3">
-          <strong>Administrierte Berechtigungen:</strong>
+    <div class="container rounded bg-info text-light">
+      <div class="row pt-3 ">
+        <div class="col col-xs-10 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Administrierte Berechtigungen:
         </div>
-        <div class="col col-sm-1 text-right">{{ num_rights }}</div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_rights }}</div>
       </div>
       <div class="row">
-        <div class="col col-sm-3">
-          <strong>Aktive Rechte:</strong>
+        <div class="col col-xs-8 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Aktive Rechte:
         </div>
-        <div class="col col-sm-1 text-right">{{ num_active_rights }}</div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_active_rights }}</div>
       </div>
       <div class="row">
-        <div class="col col-sm-3">
-          <strong>Administrierte UserIDs:</strong>
+        <div class="col col-xs-8 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Administrierte UserIDs:
         </div>
-        <div class="col col-sm-1 text-right">{{ num_userIDs }}</div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_userIDs }}</div>
       </div>
       <div class="row">
-        <div class="col col-sm-3">
-          <strong>Aktive UserIDs:</strong>
+        <div class="col col-xs-8 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Aktive UserIDs:
         </div>
-        <div class="col col-sm-1 text-right">{{ num_activeUserIDs }}</div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_activeUserIDs }}</div>
       </div>
       <div class="row">
-        <div class="col col-sm-3">
-          <strong>UserIDs von AI-BA:</strong>
+        <div class="col col-xs-8 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          UserIDs von AI-BA:
         </div>
-        <div class="col col-sm-1 text-right">{{ num_userIDsInDepartment }}</div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_userIDsInDepartment }}</div>
       </div>
       <div class="row">
-        <div class="col col-sm-3">
-          <strong>Vorhandene Teams:</strong>
+        <div class="col col-xs-8 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Vorhandene Teams:
         </div>
-        <div class="col col-sm-1 text-right">{{ num_teams }}</div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_teams }}</div>
       </div>
       <div class="row">
-        <div class="col col-sm-3">
-          <strong>Bekannte Plattformen:</strong>
+        <div class="col col-xs-8 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Bekannte Plattformen:
         </div>
-        <div class="col col-sm-1 text-right">{{ num_plattforms }}</div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_plattforms }}</div>
       </div>
       <div class="row">
-        <div class="col col-sm-3">
-          <strong>Anwender der RechteDB:</strong>
+        <div class="col col-xs-8 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Anwender der RechteDB:
         </div>
-        <div class="col col-sm-1 text-right">{{ num_users }}</div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_users }}</div>
       </div>
       <div class="row">
-        <div class="col col-sm-3">
-          <strong>Aktuelle TFen in AI-BA:</strong>
+        <div class="col col-xs-8 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Aktuelle TFen in AI-BA:
         </div>
-        <div class="col col-sm-1 text-right ">{{ num_iam_ba }}</div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ num_iam_ba }}</div>
       </div>
-      <div class="row"><div class="col col-sm-3">&nbsp;</div></div>
+    </div>
+    <div class="row ">
+      <div class="text-light col-1 mt-4">
+      </div>
     </div>
   </div>
 {% endblock %}

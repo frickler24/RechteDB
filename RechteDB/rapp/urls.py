@@ -70,3 +70,8 @@ urlpatterns += [
 	path('panel/', views.panel, name='panel'),
 ]
 
+# Der Link auf das Eingabepanel zur freien Selektion direkt auf der Gesamttabelle
+urlpatterns += [
+	path('user_rolle_af/', views.panel_user_rolle_af, name='user_rolle_af'),
+]
+

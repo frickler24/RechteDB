@@ -163,7 +163,7 @@ class TblPlattform(models.Model):
 # tblGesamt enthält alle Daten zu TFs in GFs in AFs für jeden User und seine UserIDen
 class TblGesamt(models.Model):
 	id = 					models.AutoField(db_column='id', primary_key=True)  # Field name made lowercase.
-	userid_name = 			models.ForeignKey('TblUserIDundName', db_column='userid_und_name_id', on_delete=models.CASCADE, db_index=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+	userid_name = 			models.ForeignKey('TblUserIDundName', db_column='userid_und_name_id', on_delete=models.CASCADE, related_name="userIDen", db_index=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	tf = 					models.CharField(db_column='tf', max_length=100, verbose_name='TF', db_index=True)  # Field name made lowercase.
 	tf_beschreibung = 		models.CharField(db_column='tf_beschreibung', max_length=250, blank=True, null=True, verbose_name='TF-Beschreibung')  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	enthalten_in_af = 		models.CharField(db_column='enthalten_in_af', max_length=100, blank=True, null=True, verbose_name='AF', db_index=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.

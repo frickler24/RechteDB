@@ -117,7 +117,7 @@ class GesamtlisteTests(TestCase):
 			)
 
 		TblUebersichtAfGfs.objects.create(
-			name_gf_neu =			'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
+			name_gf_neu =			'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
 			name_af_neu =			'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
 			kommentar =				'Kein Kommentar',
 			zielperson =			'Lutz',
@@ -132,11 +132,11 @@ class GesamtlisteTests(TestCase):
 			modelliert = 			timezone.now(),
 		)
 		TblUebersichtAfGfs.objects.create(
-			name_gf_neu =			'rvg_00500_neueAF mit echt mehr Zeichen als üblich',
+			name_gf_neu =			'rvg_00500_neueGF mit echt mehr Zeichen als üblich',
 			name_af_neu =			'rva_00500_neue_AF auch mit mehr Zeichen als üblich',
 		)
 		TblUebersichtAfGfs.objects.create(
-			name_gf_neu =			'rvg_00380_neueAF mit echt mehr Zeichen als üblich',
+			name_gf_neu =			'rvg_00380_neueGF mit echt mehr Zeichen als üblich',
 			name_af_neu =			'rva_00380_neue_AF auch mit mehr Zeichen als üblich',
 		)
 
@@ -159,11 +159,11 @@ class GesamtlisteTests(TestCase):
 			tf_beschreibung = 		'Die superlange schnuckelige TF-Beschreibung',
 			enthalten_in_af = 		'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
 			modell = 				TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
-																   name_gf_neu='rvg_00458_neueAF mit echt mehr Zeichen als üblich'),
+																   name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
 			tf_kritikalitaet = 		'Superkritisch sich ist das auch schon zu lang',
 			tf_eigentuemer_org = 	'Keine Ahnung Org',
 			plattform = 			TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
-			gf = 					'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
+			gf = 					'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
 			vip_kennzeichen = 		'',
 			zufallsgenerator = 		'',
 			af_gueltig_ab = 		timezone.now() - timedelta(days=365),
@@ -191,11 +191,11 @@ class GesamtlisteTests(TestCase):
 			tf_beschreibung = 		'Die superlange schnuckelige TF-Beschreibung',
 			enthalten_in_af = 		'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
 			modell = 				TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
-																   name_gf_neu='rvg_00458_neueAF mit echt mehr Zeichen als üblich'),
+																   name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
 			tf_kritikalitaet = 		'Superkritisch sich ist das auch schon zu lang',
 			tf_eigentuemer_org = 	'Keine Ahnung Org',
 			plattform = 			TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
-			gf = 					'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
+			gf = 					'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
 			vip_kennzeichen = 		'',
 			zufallsgenerator = 		'',
 			af_gueltig_ab = 		timezone.now() - timedelta(days=365),
@@ -284,12 +284,12 @@ class CreateUserTests(TestCase):
 		TblOrga.objects.create(team = 'Django-Team', themeneigentuemer = 'Ihmchen')
 
 		TblUebersichtAfGfs.objects.create(
-			name_gf_neu =			'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
+			name_gf_neu =			'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
 			name_af_neu =			'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
 			kommentar =				'Kein Kommentar',
 			zielperson =			'Lutz',
 			af_text =				'Das ist der AF-normaltext',
-			gf_text = 				'Das ist der AF-normaltext',
+			gf_text = 				'Das ist der GF-normaltext',
 			af_langtext = 			'Das ist der AF-Laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaang-Text',
 			af_ausschlussgruppen =	'Das soll niemand außer mir bekommen!!!',
 			af_einschlussgruppen =	'das soll die ganze Welt erhalten können',
@@ -336,8 +336,114 @@ class CreateUserTests(TestCase):
 		self.assertContains(response, 'href="{0}"'.format(userlist_url))
 
 
-# Suche-/Filterpanel. Das wird mal die Hauptseite
+# Suche-/Filterpanel. Das wird mal die Hauptseite für Reports
 class PanelTests(TestCase):
+	def setUp(self):
+		TblOrga.objects.create(
+			team = 'Django-Team-01',
+			themeneigentuemer = 'Ihmchen_01'
+		)
+
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu =			'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
+			name_af_neu =			'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+			kommentar =				'Kein Kommentar',
+			zielperson =			'Lutz',
+			af_text =				'Das ist der AF-normaltext',
+			gf_text = 				'Das ist der GF-normaltext',
+			af_langtext = 			'Das ist der AF-Laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaang-Text',
+			af_ausschlussgruppen =	'Das soll niemand außer mir bekommen!!!',
+			af_einschlussgruppen =	'das soll die ganze Welt erhalten können',
+			af_sonstige_vergabehinweise = 'Keine Hinweise',
+			geloescht =				False,
+			kannweg = 				False,
+			modelliert = 			timezone.now(),
+		)
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu =			'rvg_00500_neueAF mit echt mehr Zeichen als üblich',
+			name_af_neu =			'rva_00500_neue_AF auch mit mehr Zeichen als üblich',
+		)
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu =			'rvg_00380_neueAF mit echt mehr Zeichen als üblich',
+			name_af_neu =			'rva_00380_neue_AF auch mit mehr Zeichen als üblich',
+		)
+
+		TblUserIDundName.objects.create(
+			userid = 			'xv10099',
+			name = 				'User_xv10099',
+			orga = 				TblOrga.objects.get(team = 'Django-Team-01'),
+			zi_organisation =	'AI-BA',
+			geloescht = 		False,
+			abteilung = 		'ZI-AI-BA',
+			gruppe = 			'ZI-AI-BA-PS',
+		)
+
+		TblPlattform.objects.create(tf_technische_plattform = 'RACFP')
+
+		TblGesamt.objects.create(
+			userid_name = 			TblUserIDundName.objects.get(userid = 'xv10099'),
+			tf = 					'Die superlange schnuckelige TF',
+			tf_beschreibung = 		'Die superlange schnuckelige TF-Beschreibung',
+			enthalten_in_af = 		'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+			modell = 				TblUebersichtAfGfs.objects.get(name_af_neu='rva_00380_neue_AF auch mit mehr Zeichen als üblich',
+																   name_gf_neu='rvg_00380_neueAF mit echt mehr Zeichen als üblich'),
+			tf_kritikalitaet = 		'Superkritisch sich ist das auch schon zu lang',
+			tf_eigentuemer_org = 	'Keine Ahnung Org',
+			plattform = 			TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
+			gf = 					'rvg_00380_neueGF mit echt mehr Zeichen als üblich',
+			vip_kennzeichen = 		'',
+			zufallsgenerator = 		'',
+			af_gueltig_ab = 		timezone.now() - timedelta(days=365),
+			af_gueltig_bis = 		timezone.now() + timedelta(days=365),
+			direct_connect = 		'no direct connect',
+			hoechste_kritikalitaet_tf_in_af = 'u',
+			gf_beschreibung = 		'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
+			af_zuweisungsdatum = 	timezone.now() - timedelta(days=200),
+			datum = 				timezone.now() - timedelta(days=500),
+			geloescht = 			False,
+			gefunden = 				True,
+			wiedergefunden = 		timezone.now(),
+			geaendert = 			False,
+			neueaf = 				'',
+			nicht_ai = 				False,
+			patchdatum = 			None,
+			wertmodellvorpatch =	'Hier kommt nix rein',
+			loeschdatum = 			None,
+			letzte_aenderung =		None
+		)
+
+		TblGesamt.objects.create(
+			userid_name = 			TblUserIDundName.objects.get(userid = 'xv10099'),
+			tf = 					'Die superlange schnuckelige TF2',
+			tf_beschreibung = 		'Die superlange schnuckelige TF-Beschreibung',
+			enthalten_in_af = 		'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+			modell = 				TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+																   name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
+			tf_kritikalitaet = 		'Superkritisch sich ist das auch schon zu lang',
+			tf_eigentuemer_org = 	'Keine Ahnung Org',
+			plattform = 			TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
+			gf = 					'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
+			vip_kennzeichen = 		'',
+			zufallsgenerator = 		'',
+			af_gueltig_ab = 		timezone.now() - timedelta(days=365),
+			af_gueltig_bis = 		timezone.now() + timedelta(days=365),
+			direct_connect = 		'no direct connect',
+			hoechste_kritikalitaet_tf_in_af = 'u',
+			gf_beschreibung = 		'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
+			af_zuweisungsdatum = 	timezone.now() - timedelta(days=200),
+			datum = 				timezone.now() - timedelta(days=500),
+			geloescht = 			False,
+			gefunden = 				True,
+			wiedergefunden = 		timezone.now(),
+			geaendert = 			False,
+			neueaf = 				'',
+			nicht_ai = 				False,
+			patchdatum = 			None,
+			wertmodellvorpatch =	'Hier kommt nix rein',
+			loeschdatum = 			None,
+			letzte_aenderung =		None
+		)
+
 	# Ist die Seite da?
 	def test_panel_view_status_code(self):
 		url = reverse('panel')
@@ -348,6 +454,7 @@ class PanelTests(TestCase):
 		url = '{0}{1}'.format(reverse('panel'), '?geloescht=3&userid_name__zi_organisation=ai-ba')
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
+		self.assertContains(response, "User_xv10099")
 
 	def test_panel_view_with_invalid_selection1_status_code(self):
 		url = '{0}{1}'.format(reverse('panel'), '?geloescht=99&userid_name__zi_organisation=ZZ-XX')
@@ -359,6 +466,141 @@ class PanelTests(TestCase):
 		url = '{0}{1}'.format(reverse('panel'), '?DAS_FELD_GIBTS_NICHT=1')
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
+		self.assertContains(response, "User_xv10099")
+
+
+# User / Rolle / AF : Das wird mal die Hauptseite für Aktualisierungen * Ergänzungen / Löschungen von Rollen und Verbindungen
+class user_rolle_afTests(TestCase):
+	def setUp(self):
+		TblOrga.objects.create(
+			team = 'Django-Team-01',
+			themeneigentuemer = 'Ihmchen_01'
+		)
+
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu =			'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
+			name_af_neu =			'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+			kommentar =				'Kein Kommentar',
+			zielperson =			'Lutz',
+			af_text =				'Das ist der AF-normaltext',
+			gf_text = 				'Das ist der GF-normaltext',
+			af_langtext = 			'Das ist der AF-Laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaang-Text',
+			af_ausschlussgruppen =	'Das soll niemand außer mir bekommen!!!',
+			af_einschlussgruppen =	'das soll die ganze Welt erhalten können',
+			af_sonstige_vergabehinweise = 'Keine Hinweise',
+			geloescht =				False,
+			kannweg = 				False,
+			modelliert = 			timezone.now(),
+		)
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu =			'rvg_00500_neueAF mit echt mehr Zeichen als üblich',
+			name_af_neu =			'rva_00500_neue_AF auch mit mehr Zeichen als üblich',
+		)
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu =			'rvg_00380_neueAF mit echt mehr Zeichen als üblich',
+			name_af_neu =			'rva_00380_neue_AF auch mit mehr Zeichen als üblich',
+		)
+
+		TblUserIDundName.objects.create(
+			userid = 			'xv10099',
+			name = 				'User_xv10099',
+			orga = 				TblOrga.objects.get(team = 'Django-Team-01'),
+			zi_organisation =	'AI-BA',
+			geloescht = 		False,
+			abteilung = 		'ZI-AI-BA',
+			gruppe = 			'ZI-AI-BA-PS',
+		)
+
+		TblPlattform.objects.create(tf_technische_plattform = 'RACFP')
+
+		TblGesamt.objects.create(
+			userid_name = 			TblUserIDundName.objects.get(userid = 'xv10099'),
+			tf = 					'Die superlange schnuckelige TF',
+			tf_beschreibung = 		'Die superlange schnuckelige TF-Beschreibung',
+			enthalten_in_af = 		'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+			modell = 				TblUebersichtAfGfs.objects.get(name_af_neu='rva_00380_neue_AF auch mit mehr Zeichen als üblich',
+																   name_gf_neu='rvg_00380_neueAF mit echt mehr Zeichen als üblich'),
+			tf_kritikalitaet = 		'Superkritisch sich ist das auch schon zu lang',
+			tf_eigentuemer_org = 	'Keine Ahnung Org',
+			plattform = 			TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
+			gf = 					'rvg_00380_neueGF mit echt mehr Zeichen als üblich',
+			vip_kennzeichen = 		'',
+			zufallsgenerator = 		'',
+			af_gueltig_ab = 		timezone.now() - timedelta(days=365),
+			af_gueltig_bis = 		timezone.now() + timedelta(days=365),
+			direct_connect = 		'no direct connect',
+			hoechste_kritikalitaet_tf_in_af = 'u',
+			gf_beschreibung = 		'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
+			af_zuweisungsdatum = 	timezone.now() - timedelta(days=200),
+			datum = 				timezone.now() - timedelta(days=500),
+			geloescht = 			False,
+			gefunden = 				True,
+			wiedergefunden = 		timezone.now(),
+			geaendert = 			False,
+			neueaf = 				'',
+			nicht_ai = 				False,
+			patchdatum = 			None,
+			wertmodellvorpatch =	'Hier kommt nix rein',
+			loeschdatum = 			None,
+			letzte_aenderung =		None
+		)
+
+		TblGesamt.objects.create(
+			userid_name = 			TblUserIDundName.objects.get(userid = 'xv10099'),
+			tf = 					'Die superlange schnuckelige TF2',
+			tf_beschreibung = 		'Die superlange schnuckelige TF-Beschreibung',
+			enthalten_in_af = 		'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+			modell = 				TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+																   name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
+			tf_kritikalitaet = 		'Superkritisch sich ist das auch schon zu lang',
+			tf_eigentuemer_org = 	'Keine Ahnung Org',
+			plattform = 			TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
+			gf = 					'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
+			vip_kennzeichen = 		'',
+			zufallsgenerator = 		'',
+			af_gueltig_ab = 		timezone.now() - timedelta(days=365),
+			af_gueltig_bis = 		timezone.now() + timedelta(days=365),
+			direct_connect = 		'no direct connect',
+			hoechste_kritikalitaet_tf_in_af = 'u',
+			gf_beschreibung = 		'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
+			af_zuweisungsdatum = 	timezone.now() - timedelta(days=200),
+			datum = 				timezone.now() - timedelta(days=500),
+			geloescht = 			False,
+			gefunden = 				True,
+			wiedergefunden = 		timezone.now(),
+			geaendert = 			False,
+			neueaf = 				'',
+			nicht_ai = 				False,
+			patchdatum = 			None,
+			wertmodellvorpatch =	'Hier kommt nix rein',
+			loeschdatum = 			None,
+			letzte_aenderung =		None
+		)
+
+	# Ist die Seite da?
+	def test_panel_view_status_code(self):
+		url = reverse('user_rolle_af')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+	def test_panel_view_with_valid_selection_status_code(self):
+		url = '{0}{1}'.format(reverse('user_rolle_af'), '?geloescht=3&userid_name__zi_organisation=ai-ba')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+		self.assertContains(response, "User_xv10099")
+	def test_panel_view_with_invalid_selection_status_code(self):
+		url = '{0}{1}'.format(reverse('user_rolle_af'), '?geloescht=99&userid_name__zi_organisation=ZZ-XX')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
 		self.assertContains(response, "Keine Treffer")
+	def test_panel_view_with_invalid_selection_returns_complete_list_status_code(self):
+		url = '{0}{1}'.format(reverse('user_rolle_af'), '?DAS_FELD_GIBTS_NICHT=1')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+		self.assertContains(response, "User_xv10099")
+	def test_panel_view_contains_link_back_to_home_view(self):
+		new_user_url = reverse('user_rolle_af')
+		userlist_url = reverse('home')
+		response = self.client.get(new_user_url)
+		self.assertContains(response, 'href="{0}"'.format(userlist_url))
 
 
