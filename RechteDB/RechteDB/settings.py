@@ -45,13 +45,13 @@ INSTALLED_APPS = [
 	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
+	'bootstrap4',
 
 	'rapp',
 	'django_filters',
 	'debug_toolbar',
 
 	'widget_tweaks',
-	'bootstrap4',
 	'django_tables2',
 	'import_export',
 

@@ -16,8 +16,6 @@
 {% block content %}
     <div class="container">
 		<form method="get">
-			{% csrf_token %}
-
 			<div class="well">
 			   {% comment for field in filter.form.visible_fields %}
 					<div class="form-group">
@@ -32,19 +30,23 @@
 
 				<div class="row">
 
-					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-2 col-xl-2">
-						<label for="{{ filter.form.userid_name__userid.id_for_label }}">UserID</label>
-						{%comment%}{{ kein_filter.form.userid_name__userid.label_tag }}{%endcomment%}
-						{% render_field filter.form.userid_name__userid class="form-control" %}
-					</div>
 					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
 						<label for="{{ filter.form.userid_name__name.id_for_label }}">Name beginnt mit</label>
 						{% render_field filter.form.userid_name__name class="form-control" %}
 					</div>
-					<div class="form-group col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+					<div class="form-group col-12 col-sm-6 col-md-6 col-lg-6 col-xl-5">
 						<label for="{{ filter.form.userid_name__orga.id_for_label }}">Team</label>
 						{% render_field filter.form.userid_name__orga class="form-control" %}
 					</div>
+					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-2 col-xl-2">
+						<label for="pagesize">Zeilen pro Seite</label>
+						<input class="input" id="pagesize" name="pagesize" type="text" maxlength="5"
+						{% if pagesize %}
+		 					value="{{ pagesize }}"
+						{% endif %}
+						/>
+					</div>
+
 					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
 						{{ filter.form.enthalten_in_af.label_tag }}
 						{% render_field filter.form.enthalten_in_af class="form-control" %}
@@ -65,26 +67,40 @@
 						<label for="{{ filter.form.userid_name__geloescht_for_label }}">User gelöscht</label>
 						{% render_field filter.form.userid_name__geloescht class="form-control" %}
 					</div>
-					<div class="form-group col-12 col-sm-4 col-md-3 col-lg-3 col-xl-3">
-						{{ filter.form.plattform.label_tag }}
-						{% render_field filter.form.plattform class="form-control" %}
-					</div>
+
+
+					{% comment %}
 					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-3 col-xl-3">
-						{{ filter.form.modell__name_af_neu.label_tag }}
-						{% render_field filter.form.modell__name_af_neu class="form-control" %}
+						{{ form.pagesize.label_tag }}
+						{% render_field form.pagesize class="form-control" %}
 					</div>
-					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-3 col-xl-3">
-						{{ filter.form.modell__name_gf_neu.label_tag }}
-						{% render_field filter.form.modell__name_gf_neu class="form-control" %}
-					</div>
-					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-3 col-xl-3">
-						<label for="pagesize">Zeilen pro Seite</label>
-						<input class="input" id="pagesize" name="pagesize" type="text" width="5" maxlength="5"
-						{% if pagesize %}
-		 					value="{{ pagesize }}"
-						{% endif %}
-						/>
-					</div>
+					{% endcomment %}
+
+				</div>
+				<div class="row">
+					<table class="table table-striped">
+						<thead></thead>
+						<tbody>
+							{% for name in usernamen %}
+								<tr>
+									<td>
+										some radio button
+									</td>
+									<td>
+										{{ name }}
+									</td>
+								</tr>
+							{% endfor usernamen %}
+						</tbody>
+					</table>
+
+					<p>Und jetzt die Liste mit Radio Buttons</p>
+					{% for name in usernamen %}
+						<label for="{{ name.id_for_label }}">
+							{{ name.choice_label }}
+							<span class="radio">{{ name.tag }}</span>
+						</label>
+					{% endfor %}
 				</div>
 
 				{% comment %} Suche und Abbruch-Buttons {% endcomment %}
@@ -96,32 +112,57 @@
 				</div>
 			</div>
 		</form>
+
+		{% comment %}
+		<form method="post">
+			{% csrf_token %}
+			<div class="row">
+				<div class="form-group col-6 col-sm-4 col-md-4 col-lg-3 col-xl-3">
+					<label for="pagesize">Zeilen pro Seite</label>
+					<input class="input" id="pagesize" name="pagesize" type="text" width="5" maxlength="5"
+					{% if pagesize %}
+						value="{{ pagesize }}"
+					{% endif %}
+					/>
+				</div>
+				<div class="form-group col-6 col-sm-4 col-md-4 col-lg-3 col-xl-3 mt-4">
+					<button type="submit" class="btn btn-primary">
+							<span class="glyphicon glyphicon-search"></span> Setze Pagesize
+					</button>
+					<a href="{% url 'home' %}" class="btn btn-default">Abbruch</a>
+				</div>
+			</div>
+
+		</div>
+		</form>
+		{% endcomment %}
 	</div>
 
-	{{ meineTabelle }}
+	<p></p>
+	<p>
 
-	<p></p><p>
+
+
+
+
 	{% for row in pages %}
-		{{ row.enthalten_in_af }},
-		"{{ row.userid_name.name }}",
-
-		{% for userid in row.userid_name.  %}
-			{{ userid }},
-		{% empty %}
-			<p>Keine einzelnen UserIDs</p>
-		{% endfor %}
+		<p>
+			{{ row.enthalten_in_af }},
+			"{{ row.userid_name.name }}",
+			>>> {{ row.userid_name.rolle.all }} <<<,
+		</p>
 	{% empty %}
 		<p>Keine Treffer</p>
 	{% endfor %}
 
-	{% for r in rollen_liste %}
-		{{ r }}, <br />
+	{% for id in userids %}
+		{{ id }},
 	{% empty %}
 		<p>Keine Treffer</p>
 	{% endfor %}
 
-	{% for u in user_liste %}
-		{{ u }}, <br />
+	{% for n in usernamen %}
+		{{ n }},
 	{% empty %}
 		<p>Keine Treffer</p>
 	{% endfor %}

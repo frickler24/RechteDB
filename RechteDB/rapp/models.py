@@ -13,6 +13,114 @@ from django.db import models
 from django.utils.html import format_html
 from django.urls import reverse		# Used to generate URLs by reversing the URL patterns
 
+# Die drei Rollentabellen sowie die AF.-Liste hängen inhaltlich zusammen
+# Die Definition der Rollen
+class TblRollen(models.Model):
+	rollenname = 			models.CharField(db_column='rollenname', primary_key=True, max_length=100, verbose_name='Rollen-Name')  # Field name made lowercase.
+	system = 				models.CharField(db_column='system', max_length=150, verbose_name='System', db_index=True)  # Field name made lowercase.
+	rollenbeschreibung = 	models.TextField(db_column='rollenbeschreibung', blank=True, null=True)  # Field name made lowercase.
+	datum = 				models.DateTimeField(db_column='datum')  # Field name made lowercase.
+
+	class Meta:
+		managed = True
+		db_table = 'tbl_Rollen'
+		verbose_name = "Rollenliste"
+		verbose_name_plural = "03 Rollen-Übersicht (tbl_Rollen)"
+		ordering = [ 'rollenname' ]
+		unique_together = (('rollenname', 'system'),)
+
+	def __str__(self) -> str:
+		return str(self.rollenname)
+
+# Meta-Tabelle, welche Arbeitsplatzfunktion in welcher Rolle enthalten ist (n:m Beziehung)
+class TblRollehataf(models.Model):
+	rollenmappingid = 		models.AutoField(db_column='rollenmappingid', primary_key=True, verbose_name='ID')  # Field name made lowercase.
+	rollenname = 			models.ForeignKey('TblRollen', models.PROTECT, to_field='rollenname', db_column='rollenname')  # Field name made lowercase.
+	af = 					models.ForeignKey('TblAfliste', models.PROTECT, to_field='id', db_column='af', blank=True, null=True, verbose_name='AF')  # Field name made lowercase.
+	# ToDo: Lösche AFName, wenn Migration und das Laden der Daten erledigt sind.
+	afname = 				models.CharField(db_column='afname', max_length=100, verbose_name='AF Name', )  # Field name made lowercase.
+	#afname = 				models.ForeignKey('TblAfliste', models.PROTECT, to_field='af_name', db_column='AFName', verbose_name='AF-Name')  # Field name made lowercase.
+	mussfeld = 				models.IntegerField(db_column='mussfeld', blank=True, null=True, verbose_name='Muss')  # Field name made lowercase. This field type is a guess.
+	bemerkung = 			models.CharField(db_column='bemerkung', max_length=250, blank=True, null=True)  # Field name made lowercase.
+	nurxv = 				models.IntegerField(db_column='nurxv', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
+	xabcv = 				models.IntegerField(db_column='xabcv', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
+	dv = 					models.IntegerField(db_column='dv', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
+
+
+	class Meta:
+		managed = True
+		db_table = 'tbl_RolleHatAF'
+		unique_together = (('rollenname', 'af'),)
+		verbose_name = "Rolle und ihre Arbeitsplatzfunktionen"
+		verbose_name_plural = "02 Rollen und ihre Arbeitsplatzfunktionen (tbl_RolleHatAF)"
+		ordering = [ 'rollenname__rollenname', 'af__af_name', ]
+
+	def __str__(self) -> str:
+		return str(self.rollenname)
+
+	def get_muss(self):
+		return self.mussfeld
+	get_muss.boolean = True
+	get_muss.admin_order_field = 'mussfeld'
+	get_muss.short_description = 'Muss'
+	mussfeld.boolean = True
+
+	def get_nurxv(self):
+		return self.nurxv
+	get_nurxv.boolean = True
+	get_nurxv.admin_order_field = 'nurxv'
+	get_nurxv.short_description = 'Nur XV'
+	nurxv.boolean = True
+
+	def get_xabcv(self):
+		return self.xabcv
+	get_xabcv.boolean = True
+	get_xabcv.admin_order_field = 'xabcv'
+	get_xabcv.short_description = 'Erst+ZweitUID'
+	xabcv.boolean = True
+
+	def get_dv(self):
+		return self.dv
+	get_dv.boolean = True
+	get_dv.admin_order_field = 'dv'
+	get_dv.short_description = 'DV-User'
+	dv.boolean = True
+
+# Referenz der User auf die ihnen zur Verfügung stehenden Rollen
+class TblUserhatrolle(models.Model):
+	SCHWERPUNKT_TYPE = (
+		('Schwerpunkt', 'Schwerpunktaufgabe'),
+		('Vertretung', 'Vertretungstätigkeiten, Zweitsysteme'),
+		('Allgemein', 'Rollen, die nicht Systemen zugeordnet sind'),
+	)
+
+	userundrollenid = 		models.AutoField(db_column='userundrollenid', primary_key=True, verbose_name='ID')  # Field name made lowercase.
+	userid = 				models.ForeignKey('Tbluseridundname', models.PROTECT, to_field='userid', db_column='userid', verbose_name='UserID, Name')  # Field name made lowercase.
+	rollenname = 			models.ForeignKey('TblRollen', models.PROTECT, db_column='rollenname')  # Field name made lowercase.
+	schwerpunkt_vertretung = \
+							models.CharField(db_column='schwerpunkt_vertretung',
+											 max_length=100,
+											 blank=True, null=True,
+											 choices=SCHWERPUNKT_TYPE,
+											 db_index=True
+							)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+	bemerkung = 			models.TextField(db_column='bemerkung', blank=True, null=True)  # Field name made lowercase.
+	letzte_aenderung = 		models.DateTimeField(db_column='letzte_aenderung', db_index=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+
+	class Meta:
+		managed = True
+		db_table = 'tbl_UserHatRolle'
+		verbose_name = "User und Ihre Rollen"
+		verbose_name_plural = "01 User und Ihre Rollen (tbl_UserHatRolle)"
+		ordering = [ 'userid__name', '-userid__userid', 'schwerpunkt_vertretung', 'rollenname', ]
+		unique_together = (('userid', 'rollenname'),)
+
+	def __str__(self) -> str:
+		return str(self.userundrollenid)		# ToDo: Stimmt das?
+
+	def get_rollenbeschreibung (self):
+		return str(self.rollenname.rollenbeschreibung)
+	get_rollenbeschreibung.short_description = 'Rollenbeschreibung'
 
 # Tabelle enthält die aktuell genehmigten (modellierten und in Modellierung befindlichen) AF + GF-Kombinationen
 class TblUebersichtAfGfs(models.Model):
@@ -79,7 +187,6 @@ class TblOrga(models.Model):
 		# Returns the url to open the create-instance of the model (no ID given, the element does not exist yet).
 		return reverse('team-create', args=[])
 
-
 # Die Namen aller aktiven und gelöschten UserIDen und der dazugehörenden Namen (Realnamen und Technische User)
 class TblUserIDundName(models.Model):
 	id = 				models.AutoField(db_column='id', primary_key=True)  # Field name made lowercase.
@@ -90,7 +197,7 @@ class TblUserIDundName(models.Model):
 	geloescht = 		models.IntegerField(db_column='geloescht', blank=True, null=True, verbose_name='gelöscht', db_index=True)
 	abteilung = 		models.CharField(db_column='abteilung', max_length=64, )  # Field name made lowercase.
 	gruppe = 			models.CharField(db_column='gruppe', max_length=32, db_index=True)  # Field name made lowercase.
-
+	rolle = 			models.ManyToManyField(TblRollen, through = 'TblUserhatrolle')
 
 	class Meta:
 		managed = True
@@ -99,6 +206,8 @@ class TblUserIDundName(models.Model):
 		verbose_name = "UserID-Name-Kombination"
 		verbose_name_plural = "05 UserID-Name-Übersicht (tblUserIDundName)"
 		ordering = ['geloescht', 'name', '-userid']
+		unique_together = (('userid', 'name'),)
+		index_together = (('geloescht', 'name', 'userid'),)
 
 	def __str__(self) -> str:
 		return str(self.userid + ' | ' + self.name)
@@ -143,7 +252,6 @@ class TblUserIDundName(models.Model):
 		# Returns the url to open the create-instance of the model (no ID given, the element does not exist yet).
 		return reverse('user-create', args=[])
 
-
 # Die verschiedenen technischne Plattformen (RACF, CICS, Unix, Win, AD, LDAP, test/Prod usw.)
 class TblPlattform(models.Model):
 	id = 						models.AutoField(db_column='id', primary_key=True)  # Field name made lowercase.
@@ -158,7 +266,6 @@ class TblPlattform(models.Model):
 
 	def __str__(self) -> str:
 		return self.tf_technische_plattform
-
 
 # tblGesamt enthält alle Daten zu TFs in GFs in AFs für jeden User und seine UserIDen
 class TblGesamt(models.Model):
@@ -232,7 +339,6 @@ class TblGesamt(models.Model):
 		# Returns the url to access a particular instance of the model.
 		return reverse('gesamt-detail', args=[str(self.id)])
 
-
 # tblGesamtHistorie enthält alle Daten zu TFs in GFs in AFs für jeden User und seine UserIDen, wenn der User (mal) gelöscht wurde
 class TblGesamtHistorie(models.Model):
 	id = 				models.AutoField(db_column='id', primary_key=True)  # Field name made lowercase.
@@ -283,62 +389,6 @@ class TblGesamtHistorie(models.Model):
 	def __str__(self) -> str:
 		return str(self.id)
 
-# Die drei Rollentabellen sowie die AF.-Liste hängen inhaltlich zusammen
-# Die Definition der Rollen
-class TblRollen(models.Model):
-	rollenname = 			models.CharField(db_column='rollenname', primary_key=True, max_length=100, verbose_name='Rollen-Name')  # Field name made lowercase.
-	system = 				models.CharField(db_column='system', max_length=150, verbose_name='System', db_index=True)  # Field name made lowercase.
-	rollenbeschreibung = 	models.TextField(db_column='rollenbeschreibung', blank=True, null=True)  # Field name made lowercase.
-	datum = 				models.DateTimeField(db_column='datum')  # Field name made lowercase.
-
-	class Meta:
-		managed = True
-		db_table = 'tbl_Rollen'
-		verbose_name = "Rollenliste"
-		verbose_name_plural = "03 Rollen-Übersicht (tbl_Rollen)"
-		ordering = [ 'rollenname' ]
-		unique_together = (('rollenname', 'system'),)
-
-	def __str__(self) -> str:
-		return str(self.rollenname)
-
-
-# Referenz der User auf die ihnen zur Verfüung stehenden Rollen
-class TblUserhatrolle(models.Model):
-	SCHWERPUNKT_TYPE = (
-		('Schwerpunkt', 'Schwerpunktaufgabe'),
-		('Vertretung', 'Vertretungstätigkeiten, Zweitsysteme'),
-		('Allgemein', 'Rollen, die nicht Systemen zugeordnet sind'),
-	)
-
-	userundrollenid = 		models.AutoField(db_column='userundrollenid', primary_key=True, verbose_name='ID')  # Field name made lowercase.
-	userid = 				models.ForeignKey('Tbluseridundname', models.PROTECT, to_field='userid', db_column='userid', verbose_name='UserID, Name')  # Field name made lowercase.
-	rollenname = 			models.ForeignKey('TblRollen', models.PROTECT, db_column='rollenname')  # Field name made lowercase.
-	schwerpunkt_vertretung = \
-							models.CharField(db_column='schwerpunkt_vertretung',
-											 max_length=100,
-											 blank=True, null=True,
-											 choices=SCHWERPUNKT_TYPE,
-											 db_index=True
-							)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-	bemerkung = 			models.TextField(db_column='bemerkung', blank=True, null=True)  # Field name made lowercase.
-	letzte_aenderung = 		models.DateTimeField(db_column='letzte_aenderung', db_index=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-
-	class Meta:
-		managed = True
-		db_table = 'tbl_UserHatRolle'
-		verbose_name = "User und Ihre Rollen"
-		verbose_name_plural = "01 User und Ihre Rollen (tbl_UserHatRolle)"
-		ordering = [ 'userid__name', '-userid__userid', 'schwerpunkt_vertretung', 'rollenname', ]
-		unique_together = (('userid', 'rollenname'),)
-
-	def __str__(self) -> str:
-		return str(self.userundrollenid)		# ToDo: Stimmt das?
-
-	def get_rollenbeschreibung (self):
-		return str(self.rollenname.rollenbeschreibung)
-	get_rollenbeschreibung.short_description = 'Rollenbeschreibung'
-
 # Dies ist nur eine Hilfstabelle.
 # Sie besteht aus dem `tblÜbersichtAF_GFs`.`Name AF Neu` für alle Felder, bei denen `modelliert` nicht null ist.
 # (das automatisch ergänzte Datum wird nicht benötigt, hier könnte auch das `modelliert`genommen werden)
@@ -367,62 +417,6 @@ class TblAfliste(models.Model):		# ToDo: Wegwerfen, Tabelle könnte eventuell er
 	def __str__(self) -> str:
 		return str(self.af_name)
 
-
-# Meta-Tabelle, welche Arbeitsplatzfunktion in welcher Rolle enthalten ist (n:m Beziehung)
-class TblRollehataf(models.Model):
-	rollenmappingid = 		models.AutoField(db_column='rollenmappingid', primary_key=True, verbose_name='ID')  # Field name made lowercase.
-	rollenname = 			models.ForeignKey('TblRollen', models.PROTECT, to_field='rollenname', db_column='rollenname')  # Field name made lowercase.
-	af = 					models.ForeignKey('TblAfliste', models.PROTECT, to_field='id', db_column='af', blank=True, null=True, verbose_name='AF')  # Field name made lowercase.
-	# ToDo: Lösche AFName, wenn Migration und das Laden der Daten erledigt sind.
-	afname = 				models.CharField(db_column='afname', max_length=100, verbose_name='AF Name', )  # Field name made lowercase.
-	#afname = 				models.ForeignKey('TblAfliste', models.PROTECT, to_field='af_name', db_column='AFName', verbose_name='AF-Name')  # Field name made lowercase.
-	mussfeld = 				models.IntegerField(db_column='mussfeld', blank=True, null=True, verbose_name='Muss')  # Field name made lowercase. This field type is a guess.
-	bemerkung = 			models.CharField(db_column='bemerkung', max_length=250, blank=True, null=True)  # Field name made lowercase.
-	nurxv = 				models.IntegerField(db_column='nurxv', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
-	xabcv = 				models.IntegerField(db_column='xabcv', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
-	dv = 					models.IntegerField(db_column='dv', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
-
-
-	class Meta:
-		managed = True
-		db_table = 'tbl_RolleHatAF'
-		unique_together = (('rollenname', 'af'),)
-		verbose_name = "Rolle und ihre Arbeitsplatzfunktionen"
-		verbose_name_plural = "02 Rollen und ihre Arbeitsplatzfunktionen (tbl_RolleHatAF)"
-		ordering = [ 'rollenname__rollenname', 'af__af_name', ]
-
-	def __str__(self) -> str:
-		return str(self.rollenname)
-
-	def get_muss(self):
-		return self.mussfeld
-	get_muss.boolean = True
-	get_muss.admin_order_field = 'mussfeld'
-	get_muss.short_description = 'Muss'
-	mussfeld.boolean = True
-
-	def get_nurxv(self):
-		return self.nurxv
-	get_nurxv.boolean = True
-	get_nurxv.admin_order_field = 'nurxv'
-	get_nurxv.short_description = 'Nur XV'
-	nurxv.boolean = True
-
-	def get_xabcv(self):
-		return self.xabcv
-	get_xabcv.boolean = True
-	get_xabcv.admin_order_field = 'xabcv'
-	get_xabcv.short_description = 'Erst+ZweitUID'
-	xabcv.boolean = True
-
-	def get_dv(self):
-		return self.dv
-	get_dv.boolean = True
-	get_dv.admin_order_field = 'dv'
-	get_dv.short_description = 'DV-User'
-	dv.boolean = True
-
-
 ###################################### Tblsubsysteme, Tblsachgebiete, TblDb2
 # Ein paar Hilfstabellen.
 # Die sind inhaltlich wahrscheinlich nicht super aktuell, helfen aber bei verschiedenen Fragen.
@@ -443,7 +437,6 @@ class Tblsachgebiete(models.Model):
 		verbose_name_plural = "51 Übersicht Sachgebiete (tbl_Sachgebiete)"
 		ordering = ['sachgebiet']
 
-
 class Tblsubsysteme(models.Model):
 	sgss = models.CharField(db_column='sgss', primary_key=True, max_length=32)  # Field name made lowercase.
 	definition = models.CharField(db_column='Definition', max_length=250, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
@@ -458,7 +451,6 @@ class Tblsubsysteme(models.Model):
 		verbose_name = "Subsystem"
 		verbose_name_plural = "50 Übersicht Subsysteme (tbl_Subsysteme)"
 		ordering = [ 'sgss' ]
-
 
 class TblDb2(models.Model):
 	id = models.AutoField(db_column='id', primary_key=True)  # Field name made lowercase.
@@ -496,7 +488,6 @@ class TblDb2(models.Model):
 		return not self.geloescht
 	get_aktiv.admin_order_field = 'geloescht'
 	get_aktiv.short_description = 'Aktiv'
-
 
 class TblRacfGruppen(models.Model):
 	group = models.CharField(db_column='Group', primary_key=True, max_length=150)  # Field name made lowercase.
@@ -574,7 +565,6 @@ class Tblrechteneuvonimport(models.Model):
 		verbose_name_plural = 'Importiere neue Daten (tblRechteNeuVonImport)'
 		ordering = [ 'id', ]
 
-
 class Tblrechteamneu(models.Model):
 	id = 					models.AutoField(db_column='id', primary_key=True)  # Field name made lowercase.
 	userid = 				models.CharField(db_column='userid', max_length=50, blank=True, null=True, db_index=True)  # Field name made lowercase.
@@ -607,7 +597,6 @@ class Tblrechteamneu(models.Model):
 		db_table = 'tblRechteAMNeu'
 		unique_together = (('userid', 'tf', 'enthalten_in_af', 'tf_technische_plattform', 'gf'),)
 
-
 class Qryf3Rechteneuvonimportduplikatfrei(models.Model):
 	userid = 				models.CharField(db_column='userid', max_length=32, blank=True, null=True, db_index=True)  # Field name made lowercase.
 	name = 					models.CharField(db_column='name', max_length=100, blank=True, null=True, db_index=True)  # Field name made lowercase.
@@ -633,4 +622,3 @@ class Qryf3Rechteneuvonimportduplikatfrei(models.Model):
 		managed = True
 		db_table = 'qryF3_RechteNeuVonImportDuplikatfrei'
 		unique_together = (('userid', 'tf', 'enthalten_in_af', 'tf_technische_plattform', 'gf'),)
-

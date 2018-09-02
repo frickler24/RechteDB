@@ -36,3 +36,14 @@ class PanelFilter(django_filters.FilterSet):
 			'modell__name_af_neu', \
 			'modell__name_gf_neu', \
 			]
+
+class UseridFilter(django_filters.FilterSet):
+	userid_name__name = 			django_filters.CharFilter(lookup_expr='istartswith')
+	userid_name__userid = 			django_filters.CharFilter(lookup_expr='istartswith')
+
+	class Meta:
+		model = TblGesamt
+		fields = [
+			'userid_name__name', \
+			'userid_name__userid', \
+			]
