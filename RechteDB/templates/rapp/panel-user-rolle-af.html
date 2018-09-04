@@ -17,26 +17,27 @@
     <div class="container">
 		<form method="get">
 			<div class="well">
-			   {% comment for field in filter.form.visible_fields %}
-					<div class="form-group">
-						<label for="{{ field.id_for_label }}">{{ field.label }}, {{ field.name }}</label>
-							{{ field | add_class:'form-control' }}
-						{% for error in field.errors %}
-							<span class="help-block">{{ error }}</span>
-						{% endfor %}
-					</div>
-				{% endfor %}
-				{% endcomment %}
+				{ % endcomment %}
+					{% for field in filter.form.visible_fields %}
+						<div class="form-group">
+							<label for="{{ field.id_for_label }}">{{ field.label }}, {{ field.name }}</label>
+								{{ field | add_class:'form-control' }}
+							{% for error in field.errors %}
+								<span class="help-block">{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% endfor %}
+				{ % endcomment %}
 
 				<div class="row">
 
 					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
-						<label for="{{ filter.form.userid_name__name.id_for_label }}">Name beginnt mit</label>
-						{% render_field filter.form.userid_name__name class="form-control" %}
+						<label for="{{ filter.form.userid__name.id_for_label }}">Name beginnt mit</label>
+						{% render_field filter.form.userid__name class="form-control" %}
 					</div>
 					<div class="form-group col-12 col-sm-6 col-md-6 col-lg-6 col-xl-5">
-						<label for="{{ filter.form.userid_name__orga.id_for_label }}">Team</label>
-						{% render_field filter.form.userid_name__orga class="form-control" %}
+						<label for="{{ filter.form.userid__orga.id_for_label }}">Team</label>
+						{% render_field filter.form.userid__orga class="form-control" %}
 					</div>
 					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-2 col-xl-2">
 						<label for="pagesize">Zeilen pro Seite</label>
@@ -47,60 +48,39 @@
 						/>
 					</div>
 
-					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
-						{{ filter.form.enthalten_in_af.label_tag }}
-						{% render_field filter.form.enthalten_in_af class="form-control" %}
-					</div>
-					<div class="form-group col-12 col-sm-4 col-md-3 col-lg-3 col-xl-3">
-						{{ filter.form.tf.label_tag }}
-						{% render_field filter.form.tf class="form-control" %}
-					</div>
 					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
-						<label for="{{ filter.form.userid_name__zi_organisation.id_for_label }}">ZI-Organisation</label>
-						{% render_field filter.form.userid_name__zi_organisation class="form-control" %}
+						<label for="{{ filter.form.userid__zi_organisation.id_for_label }}">ZI-Organisation</label>
+						{% render_field filter.form.userid__zi_organisation class="form-control" %}
 					</div>
+
 					<div class="form-group col-12 col-sm-4 col-md-3 col-lg-2 col-xl-2">
-						<label for="{{ filter.form.geloescht_for_label }}">Recht gelöscht</label>
-						{% render_field filter.form.geloescht class="form-control" %}
+						<label for="{{ filter.form.userid__geloescht_for_label }}">User gelöscht</label>
+						{% render_field filter.form.userid__geloescht class="form-control" %}
 					</div>
-					<div class="form-group col-12 col-sm-4 col-md-3 col-lg-2 col-xl-2">
-						<label for="{{ filter.form.userid_name__geloescht_for_label }}">User gelöscht</label>
-						{% render_field filter.form.userid_name__geloescht class="form-control" %}
-					</div>
-
-
-					{% comment %}
-					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-3 col-xl-3">
-						{{ form.pagesize.label_tag }}
-						{% render_field form.pagesize class="form-control" %}
-					</div>
-					{% endcomment %}
-
 				</div>
+
 				<div class="row">
 					<table class="table table-striped">
 						<thead></thead>
 						<tbody>
-							{% for name in usernamen %}
+							{% for row in filter.userid %}
 								<tr>
 									<td>
 										some radio button
 									</td>
 									<td>
-										{{ name }}
+										{{ row.userid }}
+									</td>
+									<td>
+										{{ row.userid__userid }}
+									</td>
+									<td>
+										{{ row.userid__name }}
 									</td>
 								</tr>
-							{% endfor usernamen %}
+							{% endfor %}
 						</tbody>
 					</table>
-
-					<p>Und jetzt die Liste mit Radio Buttons</p>
-					{% for name in usernamen %}
-						<label for="{{ name.id_for_label }}">
-							{{ name.choice_label }}
-							<span class="radio">{{ name.tag }}</span>
-						</label>
-					{% endfor %}
 				</div>
 
 				{% comment %} Suche und Abbruch-Buttons {% endcomment %}
@@ -112,60 +92,7 @@
 				</div>
 			</div>
 		</form>
-
-		{% comment %}
-		<form method="post">
-			{% csrf_token %}
-			<div class="row">
-				<div class="form-group col-6 col-sm-4 col-md-4 col-lg-3 col-xl-3">
-					<label for="pagesize">Zeilen pro Seite</label>
-					<input class="input" id="pagesize" name="pagesize" type="text" width="5" maxlength="5"
-					{% if pagesize %}
-						value="{{ pagesize }}"
-					{% endif %}
-					/>
-				</div>
-				<div class="form-group col-6 col-sm-4 col-md-4 col-lg-3 col-xl-3 mt-4">
-					<button type="submit" class="btn btn-primary">
-							<span class="glyphicon glyphicon-search"></span> Setze Pagesize
-					</button>
-					<a href="{% url 'home' %}" class="btn btn-default">Abbruch</a>
-				</div>
-			</div>
-
-		</div>
-		</form>
-		{% endcomment %}
 	</div>
-
-	<p></p>
-	<p>
-
-
-
-
-
-	{% for row in pages %}
-		<p>
-			{{ row.enthalten_in_af }},
-			"{{ row.userid_name.name }}",
-			>>> {{ row.userid_name.rolle.all }} <<<,
-		</p>
-	{% empty %}
-		<p>Keine Treffer</p>
-	{% endfor %}
-
-	{% for id in userids %}
-		{{ id }},
-	{% empty %}
-		<p>Keine Treffer</p>
-	{% endfor %}
-
-	{% for n in usernamen %}
-		{{ n }},
-	{% empty %}
-		<p>Keine Treffer</p>
-	{% endfor %}
 
     {% include "paginator.html" %}
 

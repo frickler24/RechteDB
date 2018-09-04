@@ -18,7 +18,10 @@
                 <div class="navbar-nav">
                     <a class="nav-item nav-link" <a href="{% url 'home' %}">Startseite <span class="sr-only">(current)</span></a>
                     <a class="nav-item nav-link" href="{% url 'panel' %}?geloescht=3&userid_name__geloescht=3&userid_name__zi_organisation=ai-ba">Filterseite</a>
-                    <a class="nav-item nav-link" href="{% url 'user_rolle_af' %}?geloescht=3&userid_name__geloescht=3&userid_name__name=eichler, lutz">User und Rollen</a>
+                    {% comment %}
+					<a class="nav-item nav-link" href="{% url 'user_rolle_af' %}?geloescht=3&userid_name__geloescht=3&userid_name__name=eichler, lutz">User und Rollen</a>
+                    {% endcomment %}
+					<a class="nav-item nav-link" href="{% url 'user_rolle_af' %}?userid__geloescht=3&userid__name=eichler, lutz">User und Rollen</a>
                     <a class="nav-item nav-link" href="/admin">Admin-Sichten</a>
                     <a class="nav-item nav-link" href="{% url 'userliste' %}">UserID-Liste</a>
                     <a class="nav-item nav-link" href="{% url 'teamliste' %}">Team-Liste</a>

@@ -47,3 +47,21 @@ class UseridFilter(django_filters.FilterSet):
 			'userid_name__name', \
 			'userid_name__userid', \
 			]
+
+
+class UseridRollenFilter(django_filters.FilterSet):
+	userid__name = 				django_filters.CharFilter(lookup_expr='istartswith')
+	userid__userid = 			django_filters.CharFilter(lookup_expr='istartswith')
+	userid__geloescht = 		django_filters.BooleanFilter()
+
+	userid__zi_organisation = 	django_filters.CharFilter(lookup_expr='icontains')
+
+
+	class Meta:
+		model = TblUserhatrolle
+		fields = [
+			'rollenname', 'userid', 'schwerpunkt_vertretung', 'letzte_aenderung',
+			'userid__name', 'rollenname__rollenname', 'rollenname__system', 'rollenname__rollenbeschreibung', \
+			'userid__geloescht',
+			]
+

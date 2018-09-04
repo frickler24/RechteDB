@@ -97,6 +97,7 @@ class TblUserhatrolle(models.Model):
 	userundrollenid = 		models.AutoField(db_column='userundrollenid', primary_key=True, verbose_name='ID')  # Field name made lowercase.
 	userid = 				models.ForeignKey('Tbluseridundname', models.PROTECT, to_field='userid', db_column='userid', verbose_name='UserID, Name')  # Field name made lowercase.
 	rollenname = 			models.ForeignKey('TblRollen', models.PROTECT, db_column='rollenname')  # Field name made lowercase.
+
 	schwerpunkt_vertretung = \
 							models.CharField(db_column='schwerpunkt_vertretung',
 											 max_length=100,
