@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.core.paginator import Paginator
-from .filters import PanelFilter, UseridFilter
+from .filters import PanelFilter, UseridRollenFilter
 from .forms import ShowGesamtForm, ShowUhRForm
 
 # Zum Einlesen der csv
@@ -203,94 +203,22 @@ def panel(request):
 # Panel Versuch 2
 # Selektiere alle relevanten Informationen zur aktuellen Selektion:
 #
-#	- Liste der gefundenen TF-GF-AF Kombinationen (Tblgesamt)
-#	- Listen der UserIDs und Namen der betroffenen User
-#	ToDO Liste im KOmmentar vervollständigen
-
-def panel_user_rolle_af_ersterVersuch(request):
-	panel_liste = TblGesamt.objects.all().order_by('userid_name__name', 'userid_name__userid', )
-	panel_filter = PanelFilter(request.GET, queryset=panel_liste)
-	panel_liste = panel_filter.qs \
-		.select_related("userid_name") \
-		.select_related("modell") \
-		.select_related("plattform") \
-		.select_related("userid_name__orga")
-
-	idliste = panel_filter.qs \
-		.select_related("userid_name")
-
-	# Aus der Trefferliste extrahieren wir die Liste der betroffenen User-Namen.
-	# Da zu einem Namen mehrere UserIDs vorliegen können, brauchen wir zwei Ergebnislisten
-	usernamen = []
-	userids = []
-	for row in idliste:
-		x = row.userid_name.name
-		try:
-			usernamen.index(x)
-		except ValueError:
-			usernamen.append(x)
-
-		x = row.userid_name.userid
-		try:
-			userids.index(x)
-		except ValueError:
-			userids.append(x)
-
-	userHatRolle_liste = TblUserhatrolle.objects.filter(userid__in=userids).order_by('userid')
-	print(userHatRolle_liste.count())
-
-	# for r in panel_liste:
-		#print (r.userid_name.rolle.all().count())
-
-	if request.method == 'POST':
-		form = ShowGesamtForm(request.POST)
-		if form.is_valid():
-			return redirect('home')  # TODO: redirect ordentlich machen
-
-	else:
-		form = ShowGesamtForm()
-		pagesize = request.GET.get('pagesize')
-
-		if type(pagesize) == type(None) or pagesize == '' or int(pagesize) < 1:
-			pagesize = 20
-		else:
-			pagesize = int(pagesize)
-
-		paginator = Paginator(panel_liste, pagesize)
-		page = request.GET.get('page', 1)
-		try:
-			pages = paginator.page(page)
-		except PageNotAnInteger:
-			pages = paginator.page(1)
-		except EmptyPage:
-			pages = paginator.page(paginator.num_pages)
-
-	args = {
-		'paginator': paginator,
-		'pages': pages,
-		'pagesize': pagesize,
-		'form': form,
-		'filter': panel_filter,
-		'usernamen': usernamen,
-		'userids': userids,
-	}
-	return render(request, 'rapp/panel-user-rolle-af.html', args)
-
+#	Ausgangspunkt ist TblUserHatRolle.
+#   Von dort aus gibt eine eine FK-Verbindung zu TblRollen.
+#   Problematisch ist noch die Verbindung zwischen TblRollen und TblRollaHatAf,
+#   Weil hier der Foreign Key Definition in TblRolleHatAf liegt.
+#   Das kann aber aufgelöst werden,
+#   sobald ein konkreter User betrachtet wird und nicht mehr eine Menge an Usern.
 
 def panel_user_rolle_af(request):
 	panel_liste = TblUserhatrolle.objects.all().order_by('userid', 'rollenname', )
-	panel_filter = PanelFilter(request.GET, queryset=panel_liste)
+	panel_filter = UseridRollenFilter(request.GET, queryset=panel_liste)
 	panel_liste = panel_filter.qs \
 		.select_related("rollenname") \
 		.select_related("userid")
 
-	for r in panel_liste:
-		print (r.rollenname)
-		print (r.userid)
-		RHFliste = TblRollehataf.objects.filter(rollenname__rollenname__contains = r.rollenname).order_by('rollenname', )
-
 	if request.method == 'POST':
-		form = ShowGesamtForm(request.POST)
+		form = ShowUhRForm(request.POST)
 		if form.is_valid():
 			return redirect('home')  # TODO: redirect ordentlich machen
 
@@ -317,10 +245,6 @@ def panel_user_rolle_af(request):
 		'pages': pages,
 		'pagesize': pagesize, 'form': form,
 		'filter': panel_filter,
-		'rollehataf': RHFliste,
 	}
-	return render(request, 'rapp/panel-user-rolle-af.html', args)
-
-
-
+	return render(request, 'rapp/panel_user_rolle_af.html', args)
 

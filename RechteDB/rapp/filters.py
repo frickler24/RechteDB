@@ -61,7 +61,7 @@ class UseridRollenFilter(django_filters.FilterSet):
 		model = TblUserhatrolle
 		fields = [
 			'rollenname', 'userid', 'schwerpunkt_vertretung', 'letzte_aenderung',
-			'userid__name', 'rollenname__rollenname', 'rollenname__system', 'rollenname__rollenbeschreibung', \
-			'userid__geloescht',
+			'rollenname__rollenname', 'rollenname__system', 'rollenname__rollenbeschreibung', 'rollenname__datum', \
+			'userid__geloescht', 'userid__name', 'userid__orga',
 			]
 

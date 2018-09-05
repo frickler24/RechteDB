@@ -10,14 +10,14 @@
 {% endblock breadcrumb %}
 
 {% block title %}
-	Filter - {{ block.super }}
+	User, Rollen und Arbeitsplatzfunktionen - {{ block.super }}
 {% endblock %}
 
 {% block content %}
     <div class="container">
 		<form method="get">
 			<div class="well">
-				{ % endcomment %}
+				{% comment %}
 					{% for field in filter.form.visible_fields %}
 						<div class="form-group">
 							<label for="{{ field.id_for_label }}">{{ field.label }}, {{ field.name }}</label>
@@ -27,17 +27,25 @@
 							{% endfor %}
 						</div>
 					{% endfor %}
-				{ % endcomment %}
+				{% endcomment %}
 
 				<div class="row">
-
 					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
 						<label for="{{ filter.form.userid__name.id_for_label }}">Name beginnt mit</label>
 						{% render_field filter.form.userid__name class="form-control" %}
 					</div>
-					<div class="form-group col-12 col-sm-6 col-md-6 col-lg-6 col-xl-5">
+					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
 						<label for="{{ filter.form.userid__orga.id_for_label }}">Team</label>
 						{% render_field filter.form.userid__orga class="form-control" %}
+					</div>
+					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
+						<label for="{{ filter.form.userid__zi_organisation.id_for_label }}">ZI-Organisation</label>
+						{% render_field filter.form.userid__zi_organisation class="form-control" %}
+					</div>
+
+					<div class="form-group col-12 col-sm-4 col-md-3 col-lg-2 col-xl-2">
+						<label for="{{ filter.form.userid__geloescht_for_label }}">User gelöscht</label>
+						{% render_field filter.form.userid__geloescht class="form-control" %}
 					</div>
 					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-2 col-xl-2">
 						<label for="pagesize">Zeilen pro Seite</label>
@@ -48,14 +56,12 @@
 						/>
 					</div>
 
-					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
-						<label for="{{ filter.form.userid__zi_organisation.id_for_label }}">ZI-Organisation</label>
-						{% render_field filter.form.userid__zi_organisation class="form-control" %}
-					</div>
-
-					<div class="form-group col-12 col-sm-4 col-md-3 col-lg-2 col-xl-2">
-						<label for="{{ filter.form.userid__geloescht_for_label }}">User gelöscht</label>
-						{% render_field filter.form.userid__geloescht class="form-control" %}
+					{% comment %} Suche und Abbruch-Buttons {% endcomment %}
+					<div class="form-group marin-top-3">
+							<button type="submit" class="btn btn-primary">
+									<span class="glyphicon glyphicon-search"></span> Suche
+							</button>
+							<a href="{% url 'home' %}" class="btn btn-default">Abbruch</a>
 					</div>
 				</div>
 
@@ -63,19 +69,28 @@
 					<table class="table table-striped">
 						<thead></thead>
 						<tbody>
-							{% for row in filter.userid %}
+							{% for row in pages %}
 								<tr>
+									{% ifchanged row.userid.name %}
+										<td>
+											button
+										</td>
+										<td>
+											{{ row.userid.name }}
+										</td>
+									{% else %} <td></td><td></td>
+									{% endifchanged %}
 									<td>
-										some radio button
+										{% ifchanged row.rollenname %} {{ row.rollenname }} {% endifchanged %}
 									</td>
 									<td>
-										{{ row.userid }}
+										{{ row.rollenname.rollenbeschreibung }}
 									</td>
 									<td>
-										{{ row.userid__userid }}
+										{{ row.rollenname.system }}
 									</td>
 									<td>
-										{{ row.userid__name }}
+										radio delete button
 									</td>
 								</tr>
 							{% endfor %}
@@ -83,13 +98,6 @@
 					</table>
 				</div>
 
-				{% comment %} Suche und Abbruch-Buttons {% endcomment %}
-				<div class="form-group marin-top-3">
-						<button type="submit" class="btn btn-primary">
-								<span class="glyphicon glyphicon-search"></span> Suche
-						</button>
-						<a href="{% url 'home' %}" class="btn btn-default">Abbruch</a>
-				</div>
 			</div>
 		</form>
 	</div>
