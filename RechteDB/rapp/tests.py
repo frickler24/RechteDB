@@ -5,6 +5,12 @@ from django.urls import reverse, resolve
 from django.test import TestCase
 from .views import home, GesamtDetailView
 
+from .models import TblOrga, TblUebersichtAfGfs, TblUserIDundName, TblPlattform, TblGesamt, TblAfliste, TblUserhatrolle, TblRollehataf, TblRollen
+
+from datetime import datetime, timedelta
+from django.utils import timezone
+
+# Sind die einzelnen Hsuptseiten erreichbar?
 class HomeTests(TestCase):
 	# Generell: Funktioniert irgend etwas?
 	def test_something_is_running(self):
@@ -101,11 +107,6 @@ class HomeTests(TestCase):
 		url = reverse('home')[:-5] + 'adminrapp/tblrechteneuvonimport'
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 301)
-
-from .models import TblOrga, TblUebersichtAfGfs, TblUserIDundName, TblPlattform, TblGesamt
-
-from datetime import datetime, timedelta
-from django.utils import timezone
 
 # Funktioniert die Gesamtliste?
 class GesamtlisteTests(TestCase):
@@ -472,36 +473,17 @@ class PanelTests(TestCase):
 # User / Rolle / AF : Das wird mal die Hauptseite für Aktualisierungen * Ergänzungen / Löschungen von Rollen und Verbindungen
 class user_rolle_afTests(TestCase):
 	def setUp(self):
-		TblOrga.objects.create(
+		TblOrga.objects.create (
 			team = 'Django-Team-01',
-			themeneigentuemer = 'Ihmchen_01'
+			themeneigentuemer = 'Ihmchen_01',
 		)
 
-		TblUebersichtAfGfs.objects.create(
-			name_gf_neu =			'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
-			name_af_neu =			'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
-			kommentar =				'Kein Kommentar',
-			zielperson =			'Lutz',
-			af_text =				'Das ist der AF-normaltext',
-			gf_text = 				'Das ist der GF-normaltext',
-			af_langtext = 			'Das ist der AF-Laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaang-Text',
-			af_ausschlussgruppen =	'Das soll niemand außer mir bekommen!!!',
-			af_einschlussgruppen =	'das soll die ganze Welt erhalten können',
-			af_sonstige_vergabehinweise = 'Keine Hinweise',
-			geloescht =				False,
-			kannweg = 				False,
-			modelliert = 			timezone.now(),
-		)
-		TblUebersichtAfGfs.objects.create(
-			name_gf_neu =			'rvg_00500_neueAF mit echt mehr Zeichen als üblich',
-			name_af_neu =			'rva_00500_neue_AF auch mit mehr Zeichen als üblich',
-		)
-		TblUebersichtAfGfs.objects.create(
-			name_gf_neu =			'rvg_00380_neueAF mit echt mehr Zeichen als üblich',
-			name_af_neu =			'rva_00380_neue_AF auch mit mehr Zeichen als üblich',
+		TblAfliste.objects.create (
+			af_name = 			'rva_01219_beta91_job_abst',
+			neu_ab = 			timezone.now(),
 		)
 
-		TblUserIDundName.objects.create(
+		TblUserIDundName.objects.create (
 			userid = 			'xv10099',
 			name = 				'User_xv10099',
 			orga = 				TblOrga.objects.get(team = 'Django-Team-01'),
@@ -511,70 +493,32 @@ class user_rolle_afTests(TestCase):
 			gruppe = 			'ZI-AI-BA-PS',
 		)
 
-		TblPlattform.objects.create(tf_technische_plattform = 'RACFP')
-
-		TblGesamt.objects.create(
-			userid_name = 			TblUserIDundName.objects.get(userid = 'xv10099'),
-			tf = 					'Die superlange schnuckelige TF',
-			tf_beschreibung = 		'Die superlange schnuckelige TF-Beschreibung',
-			enthalten_in_af = 		'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
-			modell = 				TblUebersichtAfGfs.objects.get(name_af_neu='rva_00380_neue_AF auch mit mehr Zeichen als üblich',
-																   name_gf_neu='rvg_00380_neueAF mit echt mehr Zeichen als üblich'),
-			tf_kritikalitaet = 		'Superkritisch sich ist das auch schon zu lang',
-			tf_eigentuemer_org = 	'Keine Ahnung Org',
-			plattform = 			TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
-			gf = 					'rvg_00380_neueGF mit echt mehr Zeichen als üblich',
-			vip_kennzeichen = 		'',
-			zufallsgenerator = 		'',
-			af_gueltig_ab = 		timezone.now() - timedelta(days=365),
-			af_gueltig_bis = 		timezone.now() + timedelta(days=365),
-			direct_connect = 		'no direct connect',
-			hoechste_kritikalitaet_tf_in_af = 'u',
-			gf_beschreibung = 		'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
-			af_zuweisungsdatum = 	timezone.now() - timedelta(days=200),
-			datum = 				timezone.now() - timedelta(days=500),
-			geloescht = 			False,
-			gefunden = 				True,
-			wiedergefunden = 		timezone.now(),
-			geaendert = 			False,
-			neueaf = 				'',
-			nicht_ai = 				False,
-			patchdatum = 			None,
-			wertmodellvorpatch =	'Hier kommt nix rein',
-			loeschdatum = 			None,
-			letzte_aenderung =		None
+		TblRollen.objects.create (
+			rollenname = 		'Erste Neue Rolle',
+			system =			'Testsystem',
+			rollenbeschreibung = 'Das ist eine Testrolle für das Gesamtsystem',
+			datum =				timezone.now(),
 		)
 
-		TblGesamt.objects.create(
-			userid_name = 			TblUserIDundName.objects.get(userid = 'xv10099'),
-			tf = 					'Die superlange schnuckelige TF2',
-			tf_beschreibung = 		'Die superlange schnuckelige TF-Beschreibung',
-			enthalten_in_af = 		'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
-			modell = 				TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
-																   name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
-			tf_kritikalitaet = 		'Superkritisch sich ist das auch schon zu lang',
-			tf_eigentuemer_org = 	'Keine Ahnung Org',
-			plattform = 			TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
-			gf = 					'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
-			vip_kennzeichen = 		'',
-			zufallsgenerator = 		'',
-			af_gueltig_ab = 		timezone.now() - timedelta(days=365),
-			af_gueltig_bis = 		timezone.now() + timedelta(days=365),
-			direct_connect = 		'no direct connect',
-			hoechste_kritikalitaet_tf_in_af = 'u',
-			gf_beschreibung = 		'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
-			af_zuweisungsdatum = 	timezone.now() - timedelta(days=200),
-			datum = 				timezone.now() - timedelta(days=500),
-			geloescht = 			False,
-			gefunden = 				True,
-			wiedergefunden = 		timezone.now(),
-			geaendert = 			False,
-			neueaf = 				'',
-			nicht_ai = 				False,
-			patchdatum = 			None,
-			wertmodellvorpatch =	'Hier kommt nix rein',
-			loeschdatum = 			None,
-			letzte_aenderung =		None
+		TblRollehataf.objects.create (
+			afname = 			'Das Feld wird eigentlich nicht mehr genutzt',
+			mussfeld =			True,
+			nurxv =				False,
+			xabcv =				True,
+			dv =				False,
+			bemerkung = 		'Irgend eine halbwegs sinnvolle Beschreibung',
+			af = 				TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
+			rollenname = 		TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
+
+		)
+
+		TblUserhatrolle.objects.create (
+			userid = 			TblUserIDundName.objects.get(userid = 'xv10099'),
+			# rollenname = 		TblRollen.objects.get(rollenname = 'Erste Neue Rolle'),
+			rollenname = 		TblRollen.objects.first(),
+			schwerpunkt_vertretung = 'Schwerpunkt',
+			bemerkung = 		'Das ist eine Testrolle für ZI-AI-BA-PS',
+			letzte_aenderung= 	timezone.now(),
 		)
 
 	# Ist die Seite da?
@@ -588,7 +532,7 @@ class user_rolle_afTests(TestCase):
 		self.assertEquals(response.status_code, 200)
 		self.assertContains(response, "User_xv10099")
 	def test_panel_view_with_invalid_selection_status_code(self):
-		url = '{0}{1}'.format(reverse('user_rolle_af'), '?geloescht=99&userid_name__zi_organisation=ZZ-XX')
+		url = '{0}{1}'.format(reverse('user_rolle_af'), '?geloescht=99&zi_organisation=ZZ-XX')
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
 		self.assertContains(response, "Keine Treffer")
@@ -602,5 +546,4 @@ class user_rolle_afTests(TestCase):
 		userlist_url = reverse('home')
 		response = self.client.get(new_user_url)
 		self.assertContains(response, 'href="{0}"'.format(userlist_url))
-
 

@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.core.paginator import Paginator
-from .filters import PanelFilter, UseridRollenFilter
+from .filters import PanelFilter, UseridRollenFilter, UseridFilter
 from .forms import ShowGesamtForm, ShowUhRForm
 
 # Zum Einlesen der csv
@@ -211,11 +211,9 @@ def panel(request):
 #   sobald ein konkreter User betrachtet wird und nicht mehr eine Menge an Usern.
 
 def panel_user_rolle_af(request):
-	panel_liste = TblUserhatrolle.objects.filter(userid__geloescht = False).order_by('userid', 'rollenname', )
-	panel_filter = UseridRollenFilter(request.GET, queryset=panel_liste)
-	panel_liste = panel_filter.qs \
-		.select_related("rollenname") \
-		.select_related("userid")
+	panel_liste = TblUserIDundName.objects.filter(geloescht=False).order_by('name')
+	panel_filter = UseridFilter(request.GET, queryset=panel_liste)
+	panel_liste = panel_filter.qs.select_related("orga")
 
 	if request.method == 'POST':
 		form = ShowUhRForm(request.POST)
@@ -226,8 +224,12 @@ def panel_user_rolle_af(request):
 		form = ShowUhRForm()
 		pagesize = request.GET.get('pagesize')
 
+		# rollen_liste = TblUserhatrolle.objects.filter(userid__geloescht=False).order_by('userid', 'rollenname', )
+		# rollen_filter = UseridRollenFilter(request.GET, queryset=rollen_liste)
+		# rollen_liste = rollen_filter.qs.select_related("rollenname").select_related("userid")
+
 		if type(pagesize) == type(None) or pagesize == '' or int(pagesize) < 1:
-			pagesize = 20
+			pagesize = 100
 		else:
 			pagesize = int(pagesize)
 

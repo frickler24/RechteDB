@@ -31,22 +31,22 @@
 
 				<div class="row">
 					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
-						<label for="{{ filter.form.userid__name.id_for_label }}">Name beginnt mit</label>
-						{% render_field filter.form.userid__name class="form-control" %}
+						<label for="{{ filter.form.name.id_for_label }}">Name beginnt mit</label>
+						{% render_field filter.form.name class="form-control" %}
 					</div>
 					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
-						<label for="{{ filter.form.userid__orga.id_for_label }}">Team</label>
-						{% render_field filter.form.userid__orga class="form-control" %}
+						<label for="{{ filter.form.orga.id_for_label }}">Team</label>
+						{% render_field filter.form.orga class="form-control" %}
 					</div>
 					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
-						<label for="{{ filter.form.userid__zi_organisation.id_for_label }}">ZI-Organisation</label>
-						{% render_field filter.form.userid__zi_organisation class="form-control" %}
+						<label for="{{ filter.form.zi_organisation.id_for_label }}">ZI-Organisation</label>
+						{% render_field filter.form.zi_organisation class="form-control" %}
+					</div>
+					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
+						<label for="{{ filter.form.gruppe.id_for_label }}">Abteilung/Gruppe</label>
+						{% render_field filter.form.gruppe class="form-control" %}
 					</div>
 
-					<div class="form-group col-12 col-sm-4 col-md-3 col-lg-2 col-xl-2">
-						<label for="{{ filter.form.userid__geloescht_for_label }}">User gelöscht</label>
-						{% render_field filter.form.userid__geloescht class="form-control" %}
-					</div>
 					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-2 col-xl-2">
 						<label for="pagesize">Zeilen pro Seite</label>
 						<input class="input" id="pagesize" name="pagesize" type="text" maxlength="5"
@@ -65,39 +65,27 @@
 					</div>
 				</div>
 
-				<div class="row">
-					<table class="table table-striped">
-						<thead></thead>
-						<tbody>
+				<div class="well">
+					<div class="row">
+						<div class="btn-group-vertical btn-group-sm ">
 							{% for row in pages %}
-								<tr>
-									{% ifchanged row.userid.name %}
-										<td>
-											button
-										</td>
-										<td>
-											{{ row.userid.name }}
-										</td>
-									{% else %} <td></td><td></td>
-									{% endifchanged %}
-									<td>
-										{% ifchanged row.rollenname %} {{ row.rollenname }} {% endifchanged %}
-									</td>
-									<td>
-										{{ row.rollenname.rollenbeschreibung }}
-									</td>
-									<td>
-										{{ row.rollenname.system }}
-									</td>
-									<td>
-										radio delete button
-									</td>
-								</tr>
+								{% ifchanged row.name %}
+									<button type="button" class="btn btn-outline-primary">
+										<div class="col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
+											{{ row.name }}
+										</div>
+									</button>
+								{% endifchanged %}
+							{% empty %}
+								<div class="row">
+									<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+										Keine Treffer
+									</div>
+								</div>
 							{% endfor %}
-						</tbody>
-					</table>
+						</div>
+					</div>
 				</div>
-
 			</div>
 		</form>
 	</div>

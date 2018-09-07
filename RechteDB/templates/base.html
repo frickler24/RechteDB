@@ -39,17 +39,12 @@
 			{% block content %}
 			{% endblock %}
 		</div>
-		{# Load the tag library for Bootstrap-4 #}
-		{% load bootstrap4 %}
 
-		{# Load CSS and JavaScript #}
-		{% bootstrap_css %}
-		{% bootstrap_javascript jquery='full' %}
-
-		{# Display django.contrib.messages as Bootstrap alerts #}
-		{% bootstrap_messages %}
-		<!-- Tiny script for pagination in filtered views  (https://djangopy.org/how-to/pagination-with-django/) -->
+		<script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+		<script src="{% static 'js/popper.min.js' %}"></script>
+		<script src="{% static 'js/bootstrap.min.js' %}"></script>
 		{% block script %}
+			<!-- Tiny script for pagination in filtered views (https://djangopy.org/how-to/pagination-with-django/) -->
 			<script>
 			$(document).ready(function(){
 

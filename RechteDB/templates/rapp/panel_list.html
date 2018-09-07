@@ -31,25 +31,21 @@
 				<div class="row">
 
 					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-2 col-xl-2">
-						<label for="{{ filter.form.userid_name__userid.id_for_label }}">UserID</label>
+						<label for="{{ filter.form.userid_name__userid.id_for_label }}">UserID:</label>
 						{%comment%}{{ kein_filter.form.userid_name__userid.label_tag }}{%endcomment%}
 						{% render_field filter.form.userid_name__userid class="form-control" %}
 					</div>
 					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
-						<label for="{{ filter.form.userid_name__name.id_for_label }}">Name beginnt mit</label>
+						<label for="{{ filter.form.userid_name__name.id_for_label }}">Name beginnt mit:</label>
 						{% render_field filter.form.userid_name__name class="form-control" %}
 					</div>
 					<div class="form-group col-12 col-sm-6 col-md-6 col-lg-6 col-xl-5">
-						<label for="{{ filter.form.userid_name__orga.id_for_label }}">Team</label>
+						<label for="{{ filter.form.userid_name__orga.id_for_label }}">Team:</label>
 						{% render_field filter.form.userid_name__orga class="form-control" %}
 					</div>
-					<div class="form-group col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
-						<label for="pagesize">Zeilen pro Seite</label>
-						<input class="input" id="pagesize" name="pagesize" type="text" maxlength="5"
-						{% if pagesize %}
-		 					value="{{ pagesize }}"
-						{% endif %}
-						/>
+					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-3 col-xl-2">
+						<label for="{{ filter.form.userid_name__gruppe_for_label }}">Gruppe:</label>
+						{% render_field filter.form.userid_name__gruppe class="form-control" %}
 					</div>
 
 					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
@@ -61,15 +57,15 @@
 						{% render_field filter.form.tf class="form-control" %}
 					</div>
 					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
-						<label for="{{ filter.form.userid_name__zi_organisation.id_for_label }}">ZI-Organisation</label>
+						<label for="{{ filter.form.userid_name__zi_organisation.id_for_label }}">ZI-Organisation:</label>
 						{% render_field filter.form.userid_name__zi_organisation class="form-control" %}
 					</div>
 					<div class="form-group col-12 col-sm-4 col-md-3 col-lg-2 col-xl-2">
-						<label for="{{ filter.form.geloescht_for_label }}">Recht gelöscht</label>
+						<label for="{{ filter.form.geloescht_for_label }}">Recht gelöscht:</label>
 						{% render_field filter.form.geloescht class="form-control" %}
 					</div>
 					<div class="form-group col-12 col-sm-4 col-md-3 col-lg-2 col-xl-2">
-						<label for="{{ filter.form.userid_name__geloescht_for_label }}">User gelöscht</label>
+						<label for="{{ filter.form.userid_name__geloescht_for_label }}">User gelöscht:</label>
 						{% render_field filter.form.userid_name__geloescht class="form-control" %}
 					</div>
 					<div class="form-group col-12 col-sm-4 col-md-3 col-lg-3 col-xl-3">
@@ -85,6 +81,14 @@
 						{% render_field filter.form.modell__name_gf_neu class="form-control" %}
 					</div>
 
+					<div class="form-group col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+						<label for="pagesize">Zeilen pro Seite</label>
+						<input class="input" id="pagesize" name="pagesize" type="text" maxlength="5"
+						{% if pagesize %}
+		 					value="{{ pagesize }}"
+						{% endif %}
+						/>
+					</div>
 				</div>
 
 				{% comment %} Suche und Abbruch-Buttons {% endcomment %}
