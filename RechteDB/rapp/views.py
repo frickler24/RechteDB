@@ -211,7 +211,7 @@ def panel(request):
 #   sobald ein konkreter User betrachtet wird und nicht mehr eine Menge an Usern.
 
 def panel_user_rolle_af(request):
-	panel_liste = TblUserhatrolle.objects.all().order_by('userid', 'rollenname', )
+	panel_liste = TblUserhatrolle.objects.filter(userid__geloescht = False).order_by('userid', 'rollenname', )
 	panel_filter = UseridRollenFilter(request.GET, queryset=panel_liste)
 	panel_liste = panel_filter.qs \
 		.select_related("rollenname") \
