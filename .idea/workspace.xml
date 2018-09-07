@@ -1,18 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9041f750-6594-46a9-8f9c-6349ba68a303" name="Default" comment="add first search elements for user-and-role panel">
-      <change afterPath="$PROJECT_DIR$/RechteDB/static/js/bootstrap.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RechteDB/static/js/jquery-3.3.1.min.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RechteDB/static/js/popper.min.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+    <list default="true" id="9041f750-6594-46a9-8f9c-6349ba68a303" name="Default" comment="fix regression test case &quot;No reults&quot;&#10;&#10;zi_organisation is now direct addressable,&#10;not vie userids__zi_organisation.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RechteDB/rapp/filters.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/rapp/filters.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RechteDB/rapp/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/rapp/tests.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RechteDB/rapp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/rapp/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RechteDB/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RechteDB/templates/rapp/panel_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/templates/rapp/panel_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RechteDB/templates/rapp/panel_user_rolle_af.html" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/templates/rapp/panel_user_rolle_af.html" afterDir="false" />
     </list>
     <ignored path="db.sqlite3" />
     <ignored path=".directory" />
@@ -26,7 +16,7 @@
     <session id="-68445925">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="6" />
+          <entry key="project.closed" value="7" />
           <entry key="project.open.time.18" value="1" />
           <entry key="project.open.time.5" value="1" />
           <entry key="project.open.time.6" value="2" />
@@ -39,13 +29,13 @@
         <counts>
           <entry key="html" value="2909" />
           <entry key="py" value="6395" />
-          <entry key="txt" value="351" />
+          <entry key="txt" value="456" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="HTML" value="2892" />
-          <entry key="PLAIN_TEXT" value="351" />
+          <entry key="PLAIN_TEXT" value="456" />
           <entry key="Python" value="6303" />
           <entry key="Scratch" value="109" />
         </counts>
@@ -75,8 +65,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/RechteDB/rapp/tests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="812">
-              <caret line="534" column="71" selection-start-line="534" selection-start-column="71" selection-end-line="534" selection-end-column="71" />
+            <state relative-caret-position="565">
+              <caret line="521" column="9" lean-forward="true" selection-start-line="521" selection-start-column="9" selection-end-line="521" selection-end-column="9" />
               <folding>
                 <element signature="e#28#68#0" expanded="true" />
               </folding>
@@ -529,13 +519,6 @@
       <option name="presentableId" value="Default" />
       <updated>1530730479029</updated>
     </task>
-    <task id="LOCAL-00002" summary="set names in models.py to readable ones">
-      <created>1531420939108</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1531420939108</updated>
-    </task>
     <task id="LOCAL-00003" summary="set sort criteria in models.py to reasonable values">
       <created>1531421921310</created>
       <option name="number" value="00003" />
@@ -872,7 +855,14 @@
       <option name="project" value="LOCAL" />
       <updated>1536354946848</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="fix regression test case &quot;No reults&quot;&#10;&#10;zi_organisation is now direct addressable,&#10;not vie userids__zi_organisation.">
+      <created>1536355553457</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1536355553457</updated>
+    </task>
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="TodoView">
@@ -946,7 +936,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/../.." />
     </ignored-roots>
-    <MESSAGE value="add first steps in getting new data from cvs file" />
     <MESSAGE value="add firsst SQLs for updateing IAM Data" />
     <MESSAGE value="run import SPs without UI" />
     <MESSAGE value="change index page from table to bootstap4-divs" />
@@ -971,7 +960,8 @@
     <MESSAGE value="add first search elements for user-and-role panel" />
     <MESSAGE value="create some output but wrong table&#10;&#10;The data must be selected from tblUserIdUndName &#10;instead of TblUserHatRolle.&#10;&#10;TblUserHatRolle is used in the detail panel later on." />
     <MESSAGE value="set correct tabel for userids and impl. better pagination" />
-    <option name="LAST_COMMIT_MESSAGE" value="set correct tabel for userids and impl. better pagination" />
+    <MESSAGE value="fix regression test case &quot;No reults&quot;&#10;&#10;zi_organisation is now direct addressable,&#10;not vie userids__zi_organisation." />
+    <option name="LAST_COMMIT_MESSAGE" value="fix regression test case &quot;No reults&quot;&#10;&#10;zi_organisation is now direct addressable,&#10;not vie userids__zi_organisation." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/rapp/migrations/0029_auto_20180819_1051.py" />
@@ -1141,6 +1131,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="931">
           <caret line="100" selection-start-line="45" selection-end-line="100" />
+          <folding>
+            <element signature="n#script#3;n#body#0;n#html#0;n#!!top" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1230,8 +1223,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/RechteDB/rapp/tests.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="812">
-          <caret line="534" column="71" selection-start-line="534" selection-start-column="71" selection-end-line="534" selection-end-column="71" />
+        <state relative-caret-position="565">
+          <caret line="521" column="9" lean-forward="true" selection-start-line="521" selection-start-column="9" selection-end-line="521" selection-end-column="9" />
           <folding>
             <element signature="e#28#68#0" expanded="true" />
           </folding>
