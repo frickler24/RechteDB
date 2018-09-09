@@ -200,40 +200,76 @@ def panel(request):
 	return render(request, 'rapp/panel_list.html', args)
 
 ###################################################################
-# Panel Versuch 2
-# Selektiere alle relevanten Informationen zur aktuellen Selektion:
+# Finde alle relevanten Informationen zur aktuellen Selektion:
 #
-#	Ausgangspunkt ist TblUserHatRolle.
-#   Von dort aus gibt eine eine FK-Verbindung zu TblRollen.
-#   Problematisch ist noch die Verbindung zwischen TblRollen und TblRollaHatAf,
-#   Weil hier der Foreign Key Definition in TblRolleHatAf liegt.
-#   Das kann aber aufgelöst werden,
-#   sobald ein konkreter User betrachtet wird und nicht mehr eine Menge an Usern.
+# Ausgangspunkt ist TblUseridUndName.
+# Hierfür gibt es einen Filter, der per GET abgefragt wird.
+# Geliefert werden nur die XV-Nummern zu den Namen (diese muss es je Namen zwingend geben)
+#
+# Die dort gefundene Treffermenge wird angereichert um die relevanten Daten aus TblUserHatRolle.
+# Hier werden allerdings alle UserIDen zurückgeliefert je Name.
+# Von dort aus gibt eine ForeignKey-Verbindung zu TblRollen.
+#
+# Problematisch ist noch die Verbindung zwischen TblRollen und TblRollaHatAf,
+# Weil hier der Foreign Key Definition in TblRolleHatAf liegt.
+# Das kann aber aufgelöst werden,
+# sobald ein konkreter User betrachtet wird und nicht mehr eine Menge an Usern.
 
-def panel_user_rolle_af(request):
+def panel_user_rolle_af(request, id = 0):
 	panel_liste = TblUserIDundName.objects.filter(geloescht=False).order_by('name')
 	panel_filter = UseridFilter(request.GET, queryset=panel_liste)
+	namen_liste = panel_filter.qs.filter(userid__istartswith="xv")
 	panel_liste = panel_filter.qs.select_related("orga")
 
 	if request.method == 'POST':
-		form = ShowUhRForm(request.POST)
+		#form = ShowUhRForm(request.POST)
 		if form.is_valid():
 			return redirect('home')  # TODO: redirect ordentlich machen
 
 	else:
-		form = ShowUhRForm()
+		#form = ShowUhRForm()
+
+		# Selektiere alle Userids und alle Namen in TblUserHatRolle, die auch in der Selektion vorkommen
+		# Hier könnte man mal einen reverse lookup einbauen von TblUserUndName zu TblUserHatRolle
+		#
+		# Die Liste der disjunkten UserIDs wird später in der Anzeige benötigt (Welche UserID gehören zu einem Namen).
+		# Hintergrund ist die Festlegung, dass die Rollen am UserNAMEN un dnicht an der UserID hängen.
+		# Dennoch gibt es Rollen, die nur zu bestimmten Userid-Typen (also bspw. nur für XV-Nummer) sinnvoll
+		# und gültig sind.
+		usernamen = []
+		userids = []
+		for row in panel_liste:
+			x = row.name
+			try:
+				usernamen.index(x)
+			except ValueError:
+				usernamen.append(x)
+
+			x = row.userid
+			try:
+				userids.index(x)
+			except ValueError:
+				userids.append(x)
+
+		if (id != 0):	# Dann wurde der ReST-Parameter 'id' mitgegeben
+			userHatRolle_liste = TblUserhatrolle.objects.filter(userid__id=id).order_by('rollenname')
+			selektierter_name = TblUserIDundName.objects.get(id=id).name
+			"""
+			print(userHatRolle_liste.count())
+			print(userHatRolle_liste)
+			for x in userHatRolle_liste:
+				print (id, x.userid.id, x.userid, x.rollenname, x.rollenname.system, x.rollenname.datum)
+			"""
+		else:
+			userHatRolle_liste = []
+			selektierter_name = -1
+
 		pagesize = request.GET.get('pagesize')
-
-		# rollen_liste = TblUserhatrolle.objects.filter(userid__geloescht=False).order_by('userid', 'rollenname', )
-		# rollen_filter = UseridRollenFilter(request.GET, queryset=rollen_liste)
-		# rollen_liste = rollen_filter.qs.select_related("rollenname").select_related("userid")
-
 		if type(pagesize) == type(None) or pagesize == '' or int(pagesize) < 1:
-			pagesize = 100
+			pagesize = 100	# Eigentlich sollte hier nie gepaget werden, dient nur dem Schutz vor Fehlabfragen
 		else:
 			pagesize = int(pagesize)
-
-		paginator = Paginator(panel_liste, pagesize)
+		paginator = Paginator(namen_liste, pagesize)
 		page = request.GET.get('page', 1)
 		try:
 			pages = paginator.page(page)
@@ -245,8 +281,15 @@ def panel_user_rolle_af(request):
 	args = {
 		'paginator': paginator,
 		'pages': pages,
-		'pagesize': pagesize, 'form': form,
+		'pagesize': pagesize,
+		# 'form': form,
 		'filter': panel_filter,
+		'userids': userids,
+		'usernamen': usernamen,
+		'userHatRolle_liste': userHatRolle_liste,
+		'id': id,
 	}
-	return render(request, 'rapp/panel_user_rolle_af.html', args)
 
+	if id != 0:
+		args['selektierter_name'] = selektierter_name
+	return render(request, 'rapp/panel_user_rolle_af.html', args)

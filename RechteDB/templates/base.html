@@ -25,7 +25,9 @@
                     <a class="nav-item nav-link" href="/admin">Admin-Sichten</a>
                     <a class="nav-item nav-link" href="{% url 'userliste' %}">UserID-Liste</a>
                     <a class="nav-item nav-link" href="{% url 'teamliste' %}">Team-Liste</a>
-                    <a class="nav-item nav-link" href="{% url 'gesamtliste' %}">Gesamtliste</a>
+                    {% comment %}
+	 				<a class="nav-item nav-link" href="{% url 'gesamtliste' %}">Gesamtliste</a>
+                    {% endcomment %}
                 </div>
             </div>
 
@@ -100,3 +102,5 @@
 		{% endblock script %}
 	</body>
 </html>
+
+

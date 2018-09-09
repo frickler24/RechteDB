@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container">
+	<div class="container">
 		<form method="get">
 			<div class="well">
 				{% comment %}
@@ -30,66 +30,118 @@
 				{% endcomment %}
 
 				<div class="row">
-					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
-						<label for="{{ filter.form.name.id_for_label }}">Name beginnt mit</label>
+					<div class="form-group form-group-sm col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
+						<label class="control-label" for="{{ filter.form.name.id_for_label }}">Name beginnt mit</label>
 						{% render_field filter.form.name class="form-control" %}
 					</div>
-					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
-						<label for="{{ filter.form.orga.id_for_label }}">Team</label>
+					<div class="form-group form-group-sm col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
+						<label class="control-label" for="{{ filter.form.orga.id_for_label }}">Team</label>
 						{% render_field filter.form.orga class="form-control" %}
 					</div>
-					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
-						<label for="{{ filter.form.zi_organisation.id_for_label }}">ZI-Organisation</label>
+					{% comment %}
+					<div class="form-group form-group-sm col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
+						<label class="control-label" for="{{ filter.form.zi_organisation.id_for_label }}">ZI-Organisation</label>
 						{% render_field filter.form.zi_organisation class="form-control" %}
 					</div>
-					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
-						<label for="{{ filter.form.gruppe.id_for_label }}">Abteilung/Gruppe</label>
+					{% endcomment %}
+					<div class="form-group form-group-sm col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
+						<label class="control-label" for="{{ filter.form.gruppe.id_for_label }}">Abteilung/Gruppe</label>
 						{% render_field filter.form.gruppe class="form-control" %}
 					</div>
 
-					<div class="form-group col-12 col-sm-6 col-md-3 col-lg-2 col-xl-2">
-						<label for="pagesize">Zeilen pro Seite</label>
-						<input class="input" id="pagesize" name="pagesize" type="text" maxlength="5"
-						{% if pagesize %}
-		 					value="{{ pagesize }}"
-						{% endif %}
-						/>
+					<div class="form-group form-group-sm col-12 col-sm-6 col-md-3 col-lg-2 col-xl-2">
+						<label class="control-label" for="pagesize">Zeilen pro Seite</label>
+						<input type="text" class="form-control" placeholder="# Zeilen/Seite"
+							   id="pagesize" name="pagesize" type="text" maxlength="5"
+							   {% if pagesize %} value="{{ pagesize }}" {% endif %} />
 					</div>
-
-					{% comment %} Suche und Abbruch-Buttons {% endcomment %}
-					<div class="form-group marin-top-3">
-							<button type="submit" class="btn btn-primary">
-									<span class="glyphicon glyphicon-search"></span> Suche
-							</button>
-							<a href="{% url 'home' %}" class="btn btn-default">Abbruch</a>
+					<div class="form-group-sm col-12 col-sm-6 col-md-3 col-lg-2 col-xl-2">
+						<label class="control-label" for="suche">
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+						<button type="submit" class="btn btn-primary" id="suche">
+								<span class="glyphicon glyphicon-search"></span> Suche
+						</button>
+						<a href="{% url 'home' %}" class="btn btn-default">Abbruch</a>
 					</div>
 				</div>
 
-				<div class="well">
-					<div class="row">
-						<div class="btn-group-vertical btn-group-sm ">
-							{% for row in pages %}
-								{% ifchanged row.name %}
-									<button type="button" class="btn btn-outline-primary">
-										<div class="col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
-											{{ row.name }}
-										</div>
-									</button>
-								{% endifchanged %}
-							{% empty %}
-								<div class="row">
-									<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-										Keine Treffer
-									</div>
-								</div>
-							{% endfor %}
+				{# Ergebnis der Filterung: Liste gefundener User mit Änderungs-Button #}
+				{% for row in pages %}
+					{% ifchanged row.name %}
+						<div class="row">
+							<div class="col-6 col-sm-6 col-md-2 col-lg-1 col-xl-1">
+								<a href="{% url 'user_rolle_af_parm' row.pk %}
+										?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}"
+									class="btn btn-outline-primary btn-sm"
+									role="button">ändern</a>
+							</div>
+							<div class="col-6 col-sm-6 col-md-2 col-lg-1 col-xl-1">
+								{{ row.userid }}
+							</div>
+							<div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+								{{ row.name }}
+							</div>
 						</div>
+					{% endifchanged %}
+				{% empty %}
+					<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+						Keine Treffer
 					</div>
-				</div>
+				{% endfor %}
 			</div>
 		</form>
+		<div class="row mb-5"></div>
 	</div>
 
-    {% include "paginator.html" %}
+	{# Die spezifischen Daten können verändert werden, deshalb als POST-Formular #}
 
+	{% if userHatRolle_liste %}
+		<div class="container">
+			<form method="post">
+				<div class="card bg-faded">
+					<div class="card-block">
+						<div class="col-12 mt-4">
+							<h3>Rollen zum User {{ selektierter_name }}</h3>
+						</div>
+					</div>
+					<div class="card-block">
+
+							<table class="table table-bordered vllzulangertext">
+								<thead>
+									<tr class="bg-primary">
+										<th>ID</th>
+										<th>Rollenname</th>
+										<th>System</th>
+										<th>Zuordnung ab</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for rolle in userHatRolle_liste %}
+										<tr>
+											<td class="vllzulangertext knappeTabelle">{{ rolle }}</td>
+											<td class="vllzulangertext knappeTabelle">{{ rolle.rollenname }}</td>
+											<td class="vllzulangertext knappeTabelle">{{ rolle.rollenname.system }}</td>
+											<td class="vllzulangertext knappeTabelle">{{ rolle.rollenname.datum|date }}</td>
+										</tr>
+									{% endfor pages %}
+								</tbody>
+							</table>
+					</div>
+				</div>
+			</form>
+		</div>
+	{% else %}
+		{% if selektierter_name %}
+			<div class="col-12">User {{ selektierter_name }} ist noch keine Rolle zugeordnet</div>
+		{% else %}
+			<div class="col-12">
+				Kein User selektiert
+			</div>
+		{% endif %}
+
+
+
+	{% endif %}
+
+	{% include "paginator.html" %}
 {% endblock content %}

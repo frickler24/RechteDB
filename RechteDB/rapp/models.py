@@ -13,7 +13,7 @@ from django.db import models
 from django.utils.html import format_html
 from django.urls import reverse		# Used to generate URLs by reversing the URL patterns
 
-# Die drei Rollentabellen sowie die AF.-Liste hängen inhaltlich zusammen
+# Die drei Rollentabellen sowie die AF-Liste hängen inhaltlich zusammen
 # Die Definition der Rollen
 class TblRollen(models.Model):
 	rollenname = 			models.CharField(db_column='rollenname', primary_key=True, max_length=100, verbose_name='Rollen-Name')  # Field name made lowercase.
@@ -198,7 +198,7 @@ class TblUserIDundName(models.Model):
 	geloescht = 		models.IntegerField(db_column='geloescht', blank=True, null=True, verbose_name='gelöscht', db_index=True)
 	abteilung = 		models.CharField(db_column='abteilung', max_length=64, )  # Field name made lowercase.
 	gruppe = 			models.CharField(db_column='gruppe', max_length=32, db_index=True)  # Field name made lowercase.
-	rolle = 			models.ManyToManyField(TblRollen, through = 'TblUserhatrolle')
+	rollen = 			models.ManyToManyField(TblRollen, through = 'TblUserhatrolle')
 
 	class Meta:
 		managed = True
