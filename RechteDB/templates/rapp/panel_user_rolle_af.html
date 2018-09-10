@@ -17,18 +17,6 @@
 	<div class="container">
 		<form method="get">
 			<div class="well">
-				{% comment %}
-					{% for field in filter.form.visible_fields %}
-						<div class="form-group">
-							<label for="{{ field.id_for_label }}">{{ field.label }}, {{ field.name }}</label>
-								{{ field | add_class:'form-control' }}
-							{% for error in field.errors %}
-								<span class="help-block">{{ error }}</span>
-							{% endfor %}
-						</div>
-					{% endfor %}
-				{% endcomment %}
-
 				<div class="row">
 					<div class="form-group form-group-sm col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
 						<label class="control-label" for="{{ filter.form.name.id_for_label }}">Name beginnt mit</label>
@@ -57,9 +45,10 @@
 					</div>
 					<div class="form-group-sm col-12 col-sm-6 col-md-3 col-lg-2 col-xl-2">
 						<label class="control-label" for="suche">
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
 						<button type="submit" class="btn btn-primary" id="suche">
-								<span class="glyphicon glyphicon-search"></span> Suche
+							<span class="glyphicon glyphicon-search"></span> Suche
 						</button>
 						<a href="{% url 'home' %}" class="btn btn-default">Abbruch</a>
 					</div>
@@ -95,8 +84,8 @@
 
 	{# Die spezifischen Daten können verändert werden, deshalb als POST-Formular #}
 
-	{% if userHatRolle_liste %}
-		<div class="container">
+	<div class="container">
+    	{% if userHatRolle_liste %}
 			<form method="post">
 				<div class="card bg-faded">
 					<div class="card-block">
@@ -104,44 +93,91 @@
 							<h3>Rollen zum User {{ selektierter_name }}</h3>
 						</div>
 					</div>
-					<div class="card-block">
-
-							<table class="table table-bordered vllzulangertext">
-								<thead>
-									<tr class="bg-primary">
-										<th>ID</th>
-										<th>Rollenname</th>
-										<th>System</th>
-										<th>Zuordnung ab</th>
-									</tr>
-								</thead>
-								<tbody>
-									{% for rolle in userHatRolle_liste %}
-										<tr>
-											<td class="vllzulangertext knappeTabelle">{{ rolle }}</td>
-											<td class="vllzulangertext knappeTabelle">{{ rolle.rollenname }}</td>
-											<td class="vllzulangertext knappeTabelle">{{ rolle.rollenname.system }}</td>
-											<td class="vllzulangertext knappeTabelle">{{ rolle.rollenname.datum|date }}</td>
-										</tr>
-									{% endfor pages %}
-								</tbody>
-							</table>
-					</div>
+					<table class="table table-bordered ">
+						<thead>
+							<tr class="bg-primary text-center">
+								<th>
+									<button class="btn btn-outline-important btn-sm " type="button"
+											data-toggle="collapse"
+											aria-expanded="false"
+											data-target=".multi-collapse"
+											aria-controls="
+											  {% for rolle in userHatRolle_liste %} rolle_{{ rolle }} {% endfor %}"
+									 >ID
+									</button>
+								</th>
+								<th>Rollenname</th>
+								<th>System</th>
+								<th>Zuordnung ab</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for rolle in userHatRolle_liste %}
+								<tr>
+									<td width="10%" class="text-center">
+										<button class="btn btn-outline-primary btn-sm" type="button"
+												data-toggle="collapse" data-target="#rolle_{{ rolle }}"
+												aria-expanded="false" aria-controls="rolle_{{ rolle }}">
+											{{ rolle }}
+										</button>
+									</td>
+									<td>
+										<input type="text" class="form-control col-12 col-sm-6 col-md-4 col-lg-4 col-xl-12"
+											   placeholder="Rollenname"
+											   id="id_rollenname" name="rollenname" maxlength="100"
+											   value="{{ rolle.rollenname }}" />
+									</td>
+									<td>
+										<input type="text" class="form-control" placeholder="System"
+											   id="id_system" name="system" maxlength="150"
+											   value="{{ rolle.rollenname.system }}" />
+									</td>
+									<td width="16%">
+										<input type="text" class="form-control" disabled="disabled"
+											   id="id_datum" name="datum"
+											   value="{{ rolle.rollenname.datum|date }}" />
+									</td>
+								</tr>
+								<tr>
+									<td colspan="4" class="mt-1 mb-1 pt-1 pb-1">
+										<div class="collapse multi-collapse" id="rolle_{{ rolle }}">
+											<table class="table">
+												<thead>
+													<tr class="bg-secondary text-left">
+														<th>Rollenname</th>
+														<th>AF</th>
+														<th>AF-ID in Rolle</th>
+													</tr>
+												</thead>
+												<tbody>
+													{% for meinaf in rolle.rollenname.tblrollehataf_set.all %}
+														<tr>
+															<td>{% ifchanged meinaf.rollenname %}{{ meinaf.rollenname }}{% endifchanged %}</td>
+															<td>{{ meinaf.af }}</td>
+															<td>{{ meinaf.rollenmappingid }}</td>
+														</tr>
+													{% empty %}
+														Nix gefunden!?
+													{% endfor rolle.rollenname.tblrollehataf_set.all %}
+												</tbody>
+											</table>
+										</div>
+									</td>
+								</tr>
+							{% endfor userHatRolle_liste %}
+						</tbody>
+					</table>
 				</div>
 			</form>
-		</div>
-	{% else %}
-		{% if selektierter_name %}
-			<div class="col-12">User {{ selektierter_name }} ist noch keine Rolle zugeordnet</div>
-		{% else %}
-			<div class="col-12">
-				Kein User selektiert
+	    {% else %}
+			{% if selektierter_name %}
+				<div class="col-12 bg-warning">User {{ selektierter_name }} ist noch keine Rolle zugeordnet</div>
+			{% else %}
+				<div class="col-12">
+					Kein User selektiert
+				</div>
+			{% endif %}
 			</div>
 		{% endif %}
-
-
-
-	{% endif %}
-
 	{% include "paginator.html" %}
 {% endblock content %}

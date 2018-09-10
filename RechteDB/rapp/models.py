@@ -198,7 +198,7 @@ class TblUserIDundName(models.Model):
 	geloescht = 		models.IntegerField(db_column='geloescht', blank=True, null=True, verbose_name='gelöscht', db_index=True)
 	abteilung = 		models.CharField(db_column='abteilung', max_length=64, )  # Field name made lowercase.
 	gruppe = 			models.CharField(db_column='gruppe', max_length=32, db_index=True)  # Field name made lowercase.
-	rollen = 			models.ManyToManyField(TblRollen, through = 'TblUserhatrolle')
+	# rollen = 			models.ManyToManyField(TblRollen, through = 'TblUserhatrolle')
 
 	class Meta:
 		managed = True

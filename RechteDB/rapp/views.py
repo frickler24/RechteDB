@@ -221,6 +221,31 @@ def panel_user_rolle_af(request, id = 0):
 	namen_liste = panel_filter.qs.filter(userid__istartswith="xv")
 	panel_liste = panel_filter.qs.select_related("orga")
 
+	# ToDo: Die gesamten Modellnamen können mal überarbeitet werden (kein TBL am Anfang etc.)
+	"""
+	# Ein paar Testzugriffe über das komplette Modell
+	#   Hier ist die korrekte Hierarchie abgebildet von UserID bis AF:
+    #   TblUserIDundName ethält Userid
+    #       TblUserHatRolle hat FK 'userid' auf TblUserIDundName
+    #       -> tbluserhatrolle_set.all auf eine aktuelle UserID-row liefert die Menge der relevanten Rollen
+    #           Rolle hat ForeignKey 'rollenname' auf TblRolle und erhält damit die nicht-User-spezifischen Rollen-Parameter
+    #               TblRolleHatAF hat ebenfalls einen ForeignKey 'rollennname' auf TblRollen
+    #               -> rollenname.tblrollehataf_set.all liefert für eine konkrete Rolle die Liste der zugehörigen AF-Detailinformationen
+	#
+	
+	user = TblUserIDundName.objects.filter(userid = 'XV13254')[0]
+	print ('1:', user)
+	foo = user.tbluserhatrolle_set.all()
+	print ('2:', foo)
+
+	for x in foo:
+		print ('3:', x, ',', x.rollenname, ',', x.rollenname.system)
+		foo2 = x.rollenname.tblrollehataf_set.all()
+		for y in foo2:
+			print ('4:', y, ', AF=', y.af, ', Muss:', y.mussfeld, ', XABCV:', y.xabcv, ', DV:', y.dv)
+		print ()
+	"""
+
 	if request.method == 'POST':
 		#form = ShowUhRForm(request.POST)
 		if form.is_valid():
@@ -254,16 +279,11 @@ def panel_user_rolle_af(request, id = 0):
 		if (id != 0):	# Dann wurde der ReST-Parameter 'id' mitgegeben
 			userHatRolle_liste = TblUserhatrolle.objects.filter(userid__id=id).order_by('rollenname')
 			selektierter_name = TblUserIDundName.objects.get(id=id).name
-			"""
-			print(userHatRolle_liste.count())
-			print(userHatRolle_liste)
-			for x in userHatRolle_liste:
-				print (id, x.userid.id, x.userid, x.rollenname, x.rollenname.system, x.rollenname.datum)
-			"""
 		else:
 			userHatRolle_liste = []
 			selektierter_name = -1
 
+		# Paginierung nach Tutorial
 		pagesize = request.GET.get('pagesize')
 		if type(pagesize) == type(None) or pagesize == '' or int(pagesize) < 1:
 			pagesize = 100	# Eigentlich sollte hier nie gepaget werden, dient nur dem Schutz vor Fehlabfragen
