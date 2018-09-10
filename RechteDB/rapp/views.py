@@ -60,6 +60,12 @@ from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, Tblrecht
 # ToDo: Welche Rechte sind redundant, weil sie neu modelliert wurden und was ist die Alternativempfehlung?
 # ToDo: Zu welchen Orgabereichen (Importfunktion dafür!) gehören die identifizierten User (Vorbereitung Mail an FK zum Prüfen und eventuellem Löschen
 
+# ToDo: Zusammenfassen der Flags xv, xabcv, dv und die neue Variante ABCv
+# ToDo: Die Table alternierend einfärben
+# ToDo: Links auf die change- create- und delete-Seiten ausprobieren. Sind eigene Seiten im Frontend besser?
+# ToDo: Filter-Panel mit excel Export versorgen
+# ToDo: Kompakte Liste für Rolle und AF mit Filtermöglichkeit und PDF Generierung
+
 from django.http import HttpResponse
 
 # Der Direkteinsteig für die gesamte Anwendung
