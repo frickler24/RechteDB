@@ -33,19 +33,40 @@ class TblRollen(models.Model):
 		return str(self.rollenname)
 
 # Meta-Tabelle, welche Arbeitsplatzfunktion in welcher Rolle enthalten ist (n:m Beziehung)
+#
+# Die drei ursprünglichen Einzelfelder nurXV, XABCV und DV wurden zusammengefast zu einer Col: einsatz:
+# 	einsatz = 8:	Nur gültig für AV, BV, CV-User (z.B. Zweituser-Recht)
+#	einsatz = 4:	Nur gültig für XV-Userid
+#	einsatz = 2: 	Gültig für alles außer DV-User
+#	einsatz = 1:	Nur gültig für DV-User
+
 class TblRollehataf(models.Model):
+	EINSATZ_NONE  = 0
+	EINSATZ_NURDV = 1
+	EINSATZ_XABCV = 2
+	EINSATZ_NURXV = 4
+	EINSATZ_ABCV  = 8
+	EINSATZ_CHOICES = (
+		(EINSATZ_NONE,  'nicht zugewiesen'),
+		(EINSATZ_NURDV, 'Nur DV-User'),
+		(EINSATZ_XABCV, 'XV, AV, BV, CV-User'),
+		(EINSATZ_NURXV, 'nur DV-User'),
+		(EINSATZ_ABCV,  'AV, BV, CV-User'),
+	)
+
+
 	rollenmappingid = 		models.AutoField(db_column='rollenmappingid', primary_key=True, verbose_name='ID')  # Field name made lowercase.
 	rollenname = 			models.ForeignKey('TblRollen', models.PROTECT, to_field='rollenname', db_column='rollenname')  # Field name made lowercase.
 	af = 					models.ForeignKey('TblAfliste', models.PROTECT, to_field='id', db_column='af', blank=True, null=True, verbose_name='AF')  # Field name made lowercase.
 	# ToDo: Lösche AFName, wenn Migration und das Laden der Daten erledigt sind.
-	afname = 				models.CharField(db_column='afname', max_length=100, verbose_name='AF Name', )  # Field name made lowercase.
+	# afname = 				models.CharField(db_column='afname', max_length=100, verbose_name='AF Name', )  # Field name made lowercase.
 	#afname = 				models.ForeignKey('TblAfliste', models.PROTECT, to_field='af_name', db_column='AFName', verbose_name='AF-Name')  # Field name made lowercase.
 	mussfeld = 				models.IntegerField(db_column='mussfeld', blank=True, null=True, verbose_name='Muss')  # Field name made lowercase. This field type is a guess.
 	bemerkung = 			models.CharField(db_column='bemerkung', max_length=250, blank=True, null=True)  # Field name made lowercase.
-	nurxv = 				models.IntegerField(db_column='nurxv', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
-	xabcv = 				models.IntegerField(db_column='xabcv', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
-	dv = 					models.IntegerField(db_column='dv', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
-
+	# nurxv = 				models.IntegerField(db_column='nurxv', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
+	# xabcv = 				models.IntegerField(db_column='xabcv', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
+	# dv = 					models.IntegerField(db_column='dv', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
+	einsatz = 				models.IntegerField(db_column='einsatz', choices=EINSATZ_CHOICES, default=EINSATZ_NONE)
 
 	class Meta:
 		managed = True
@@ -65,6 +86,7 @@ class TblRollehataf(models.Model):
 	get_muss.short_description = 'Muss'
 	mussfeld.boolean = True
 
+	"""
 	def get_nurxv(self):
 		return self.nurxv
 	get_nurxv.boolean = True
@@ -85,6 +107,7 @@ class TblRollehataf(models.Model):
 	get_dv.admin_order_field = 'dv'
 	get_dv.short_description = 'DV-User'
 	dv.boolean = True
+	"""
 
 # Referenz der User auf die ihnen zur Verfügung stehenden Rollen
 class TblUserhatrolle(models.Model):

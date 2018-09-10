@@ -248,7 +248,7 @@ def panel_user_rolle_af(request, id = 0):
 		print ('3:', x, ',', x.rollenname, ',', x.rollenname.system)
 		foo2 = x.rollenname.tblrollehataf_set.all()
 		for y in foo2:
-			print ('4:', y, ', AF=', y.af, ', Muss:', y.mussfeld, ', XABCV:', y.xabcv, ', DV:', y.dv)
+			print ('4:', y, ', AF=', y.af, ', Muss:', y.mussfeld, ', Einsatz:', y.einsatz)
 		print ()
 	"""
 

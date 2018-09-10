@@ -310,11 +310,11 @@ class Rollehataf(admin.ModelAdmin):
 		})},
 	}
 
-	list_display = ('rollenmappingid', 'rollenname', 'af', 'get_muss', 'get_nurxv', 'get_xabcv', 'get_dv', 'bemerkung', )
+	list_display = ('rollenmappingid', 'rollenname', 'af', 'get_muss', 'einsatz', 'bemerkung', )
 	list_display_links = ('rollenname', )
 	list_editable = ('af', 'bemerkung', )		# ToDo die vier Kreuzfelder muss..dv als klickable implementieren
 	search_fields = ['rollenname__rollenname', 'af__af_name', 'bemerkung', ]
-	list_filter = ('mussfeld', 'nurxv', 'xabcv', 'dv', )
+	list_filter = ('mussfeld', 'einsatz', )
 
 	list_per_page = 20 # sys.maxsize
 

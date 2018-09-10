@@ -4,9 +4,11 @@
     <bookmark url="file://$PROJECT_DIR$/RechteDB/templates/rapp/panel_user_rolle_af.html" line="116" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9041f750-6594-46a9-8f9c-6349ba68a303" name="Default" comment="add display of user roles with first error msgs">
+    <list default="true" id="9041f750-6594-46a9-8f9c-6349ba68a303" name="Default" comment="add some ToDos">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RechteDB/rapp/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/rapp/admin.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RechteDB/rapp/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/rapp/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RechteDB/rapp/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/rapp/tests.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RechteDB/rapp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/rapp/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RechteDB/templates/rapp/panel_user_rolle_af.html" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/templates/rapp/panel_user_rolle_af.html" afterDir="false" />
     </list>
@@ -33,22 +35,22 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="html" value="7008" />
-          <entry key="py" value="9013" />
-          <entry key="txt" value="564" />
+          <entry key="html" value="7328" />
+          <entry key="py" value="9722" />
+          <entry key="txt" value="637" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="HTML" value="6968" />
-          <entry key="PLAIN_TEXT" value="564" />
-          <entry key="Python" value="8921" />
-          <entry key="Scratch" value="132" />
+          <entry key="HTML" value="7259" />
+          <entry key="PLAIN_TEXT" value="637" />
+          <entry key="Python" value="9630" />
+          <entry key="Scratch" value="161" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="html" value="25" />
+          <entry key="html" value="26" />
           <entry key="js" value="1" />
           <entry key="py" value="11" />
         </counts>
@@ -58,7 +60,7 @@
           <entry key="HTML" value="18" />
           <entry key="JavaScript" value="1" />
           <entry key="Python" value="5" />
-          <entry key="Scratch" value="13" />
+          <entry key="Scratch" value="14" />
         </counts>
       </usages-collector>
     </session>
@@ -68,11 +70,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/RechteDB/rapp/tests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="9842">
-              <caret line="525" column="36" selection-start-line="525" selection-start-column="23" selection-end-line="525" selection-end-column="36" />
+            <state relative-caret-position="513">
+              <caret line="505" column="64" selection-start-line="505" selection-start-column="64" selection-end-line="505" selection-end-column="64" />
               <folding>
                 <element signature="e#28#68#0" expanded="true" />
               </folding>
@@ -81,24 +83,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/RechteDB/rapp/models.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1634">
-              <caret line="89" column="21" selection-start-line="89" selection-start-column="6" selection-end-line="89" selection-end-column="21" />
-              <folding>
-                <element signature="e#520#559#0" expanded="true" />
-                <element signature="e#6247#8708#0" />
-                <element signature="e#8834#10202#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RechteDB/rapp/admin.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4009">
-              <caret line="230" column="33" selection-start-line="230" selection-start-column="33" selection-end-line="230" selection-end-column="33" />
+            <state relative-caret-position="570">
+              <caret line="316" column="42" selection-start-line="316" selection-start-column="42" selection-end-line="316" selection-end-column="42" />
             </state>
           </provider>
         </entry>
@@ -106,8 +94,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RechteDB/rapp/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="19">
-              <caret line="258" column="9" selection-start-line="258" selection-start-column="9" selection-end-line="258" selection-end-column="9" />
+            <state relative-caret-position="786">
+              <caret line="250" column="89" selection-start-line="250" selection-start-column="89" selection-end-line="250" selection-end-column="89" />
               <folding>
                 <element signature="e#24#63#0" expanded="true" />
                 <element signature="e#5763#6081#1" />
@@ -118,34 +106,56 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.html">
+        <entry file="file://$PROJECT_DIR$/RechteDB/rapp/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="983">
-              <caret line="310" selection-start-line="310" selection-end-line="310" />
+            <state relative-caret-position="319">
+              <caret line="45" column="17" selection-start-line="45" selection-start-column="4" selection-end-line="45" selection-end-column="17" />
+              <folding>
+                <element signature="e#520#559#0" expanded="true" />
+                <element signature="e#851#1625#0" />
+                <element signature="e#6247#8708#0" />
+                <element signature="e#8834#10202#0" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RechteDB/templates/rapp/panel_user_rolle_af.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="540">
-              <caret line="156" column="92" selection-start-line="156" selection-start-column="92" selection-end-line="156" selection-end-column="92" />
+            <state relative-caret-position="1192">
+              <caret line="150" column="75" selection-start-line="150" selection-start-column="75" selection-end-line="150" selection-end-column="75" />
               <folding>
-                <element signature="e#2553#2559#0" expanded="true" />
-                <element signature="e#2559#2565#0" expanded="true" />
-                <element signature="e#2565#2571#0" expanded="true" />
-                <element signature="e#2571#2577#0" expanded="true" />
-                <element signature="e#2577#2583#0" expanded="true" />
-                <element signature="e#2583#2589#0" expanded="true" />
-                <element signature="e#2589#2595#0" expanded="true" />
-                <element signature="e#2595#2601#0" expanded="true" />
-                <element signature="e#2601#2607#0" expanded="true" />
-                <element signature="e#2607#2613#0" expanded="true" />
-                <element signature="e#2613#2619#0" expanded="true" />
-                <element signature="e#2619#2625#0" expanded="true" />
-                <element signature="e#2625#2631#0" expanded="true" />
-                <element signature="e#2631#2637#0" expanded="true" />
+                <element signature="e#2135#2141#0" expanded="true" />
+                <element signature="e#2141#2147#0" expanded="true" />
+                <element signature="e#2147#2153#0" expanded="true" />
+                <element signature="e#2153#2159#0" expanded="true" />
+                <element signature="e#2159#2165#0" expanded="true" />
+                <element signature="e#2165#2171#0" expanded="true" />
+                <element signature="e#2171#2177#0" expanded="true" />
+                <element signature="e#2177#2183#0" expanded="true" />
+                <element signature="e#2183#2189#0" expanded="true" />
+                <element signature="e#2189#2195#0" expanded="true" />
+                <element signature="e#2195#2201#0" expanded="true" />
+                <element signature="e#2201#2207#0" expanded="true" />
+                <element signature="e#2207#2213#0" expanded="true" />
+                <element signature="e#2213#2219#0" expanded="true" />
+                <element signature="e#2219#2225#0" expanded="true" />
+                <element signature="e#2233#2239#0" expanded="true" />
+                <element signature="e#2239#2245#0" expanded="true" />
+                <element signature="e#2245#2251#0" expanded="true" />
+                <element signature="e#2251#2257#0" expanded="true" />
+                <element signature="e#2257#2263#0" expanded="true" />
+                <element signature="e#2263#2269#0" expanded="true" />
+                <element signature="e#2269#2275#0" expanded="true" />
+                <element signature="e#2275#2281#0" expanded="true" />
+                <element signature="e#2281#2287#0" expanded="true" />
+                <element signature="e#2287#2293#0" expanded="true" />
+                <element signature="e#2293#2299#0" expanded="true" />
+                <element signature="e#2299#2305#0" expanded="true" />
+                <element signature="e#2305#2311#0" expanded="true" />
+                <element signature="e#3747#3772#0" expanded="true" />
+                <element signature="e#5424#5430#1" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -187,7 +197,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>]</find>
       <find>[</find>
       <find>tbl_RolleHatAF</find>
       <find>managed = False</find>
@@ -216,6 +225,7 @@
       <find>test_gesamtliste_view_not_found_status_code</find>
       <find>test_panel_view_with_invalid_selection_returns_complete_list_status_code</find>
       <find>test_panel_view_contains_link_back_to_home_view</find>
+      <find>\t</find>
       <find />
     </findStrings>
     <replaceStrings>
@@ -230,6 +240,7 @@
       <replace>sql' \</replace>
       <replace>=300</replace>
       <replace>user</replace>
+      <replace />
       <replace>\t</replace>
     </replaceStrings>
     <dirStrings>
@@ -275,7 +286,6 @@
         <option value="$PROJECT_DIR$/RechteDB/templates/rapp/tbluseridundname_form.html" />
         <option value="$PROJECT_DIR$/RechteDB/templates/base_generic.html" />
         <option value="$PROJECT_DIR$/RechteDB/static/css/style.css" />
-        <option value="$PROJECT_DIR$/RechteDB/rapp/admin.py" />
         <option value="$PROJECT_DIR$/RechteDB/RechteDB/urls.py" />
         <option value="$PROJECT_DIR$/RechteDB/.env" />
         <option value="$PROJECT_DIR$/RechteDB/templates/rapp/tblorga_list.html" />
@@ -290,15 +300,16 @@
         <option value="$PROJECT_DIR$/RechteDB/templates/rapp/panel-user-rolle-af.html" />
         <option value="$PROJECT_DIR$/RechteDB/rapp/filters.py" />
         <option value="$PROJECT_DIR$/RechteDB/templates/paginator.html" />
-        <option value="$PROJECT_DIR$/RechteDB/rapp/tests.py" />
         <option value="$PROJECT_DIR$/RechteDB/templates/base.html" />
         <option value="$PROJECT_DIR$/RechteDB/rapp/urls.py" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.py" />
         <option value="$PROJECT_DIR$/RechteDB/templates/rapp/panel_list.html" />
-        <option value="$PROJECT_DIR$/RechteDB/rapp/models.py" />
         <option value="$PROJECT_DIR$/RechteDB/rapp/views.py" />
-        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.html" />
+        <option value="$PROJECT_DIR$/RechteDB/rapp/admin.py" />
         <option value="$PROJECT_DIR$/RechteDB/templates/rapp/panel_user_rolle_af.html" />
+        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.html" />
+        <option value="$PROJECT_DIR$/RechteDB/rapp/models.py" />
+        <option value="$PROJECT_DIR$/RechteDB/rapp/tests.py" />
       </list>
     </option>
   </component>
@@ -360,12 +371,6 @@
               <item name="RechteDB" type="b2602c69:ProjectViewProjectNode" />
               <item name="RechteDB" type="462c0819:PsiDirectoryNode" />
               <item name="RechteDB" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="RechteDB" type="b2602c69:ProjectViewProjectNode" />
-              <item name="RechteDB" type="462c0819:PsiDirectoryNode" />
-              <item name="RechteDB" type="462c0819:PsiDirectoryNode" />
-              <item name="rapp" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="RechteDB" type="b2602c69:ProjectViewProjectNode" />
@@ -530,27 +535,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1530730479029</updated>
-    </task>
-    <task id="LOCAL-00004" summary="set first n:1 inline functions">
-      <created>1531591453937</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1531591453937</updated>
-    </task>
-    <task id="LOCAL-00005" summary="add tblGesamtHistorie">
-      <created>1531601493897</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1531601493897</updated>
-    </task>
-    <task id="LOCAL-00006" summary="add better integrated change/delete/create&#10;&#10;For TblUserIDundName all functions are integrated&#10;and are accessible from within Userliste.">
-      <created>1531861913245</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1531861913245</updated>
     </task>
     <task id="LOCAL-00007" summary="add views for team tabel tblOrga">
       <created>1532176255056</created>
@@ -874,7 +858,28 @@
       <option name="project" value="LOCAL" />
       <updated>1536489181138</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL-00053" summary="convert display of AF-detail view into table">
+      <created>1536603626085</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1536603626086</updated>
+    </task>
+    <task id="LOCAL-00054" summary="convert display of AF-detail view into table">
+      <created>1536603706952</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1536603706952</updated>
+    </task>
+    <task id="LOCAL-00055" summary="add some ToDos">
+      <created>1536603818899</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1536603818899</updated>
+    </task>
+    <option name="localTasksCounter" value="56" />
     <servers />
   </component>
   <component name="TodoView">
@@ -893,7 +898,7 @@
       <window_info id="Favorites" order="0" sideWeight="0.50547266" side_tool="true" weight="0.21213388" />
       <window_info id="Structure" order="1" sideWeight="0.5024582" side_tool="true" weight="0.26969856" />
       <window_info id="Project Explorer" order="2" weight="0.32988626" />
-      <window_info content_ui="combo" id="Project" order="3" sideWeight="0.49452737" visible="true" weight="0.21768355" />
+      <window_info active="true" content_ui="combo" id="Project" order="3" sideWeight="0.49452737" visible="true" weight="0.21768355" />
       <window_info id="Job Explorer" order="4" weight="0.32988626" />
       <window_info id="DB Browser" order="5" weight="0.32988626" />
       <window_info anchor="bottom" id="Python Console" order="0" weight="0.32899022" />
@@ -948,8 +953,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/../.." />
     </ignored-roots>
-    <MESSAGE value="run import SPs without UI" />
-    <MESSAGE value="change index page from table to bootstap4-divs" />
     <MESSAGE value="add search for AF in RolleHatAF and formatting some inlines" />
     <MESSAGE value="create fresh database and tables step 1&#10;&#10;Table tbl_RolleHatAF has still the old index topthe charfield in tbl_AFListe." />
     <MESSAGE value="create fresh database and tables step 2&#10;&#10;rename tblGesamtHistorieNeu back to tblGesamtHistorie" />
@@ -973,7 +976,9 @@
     <MESSAGE value="set correct tabel for userids and impl. better pagination" />
     <MESSAGE value="fix regression test case &quot;No reults&quot;&#10;&#10;zi_organisation is now direct addressable,&#10;not vie userids__zi_organisation." />
     <MESSAGE value="add display of user roles with first error msgs" />
-    <option name="LAST_COMMIT_MESSAGE" value="add display of user roles with first error msgs" />
+    <MESSAGE value="convert display of AF-detail view into table" />
+    <MESSAGE value="add some ToDos" />
+    <option name="LAST_COMMIT_MESSAGE" value="add some ToDos" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/rapp/migrations/0029_auto_20180819_1051.py" />
@@ -1153,35 +1158,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/tests.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="9842">
-          <caret line="525" column="36" selection-start-line="525" selection-start-column="23" selection-end-line="525" selection-end-column="36" />
-          <folding>
-            <element signature="e#28#68#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1634">
-          <caret line="89" column="21" selection-start-line="89" selection-start-column="6" selection-end-line="89" selection-end-column="21" />
-          <folding>
-            <element signature="e#520#559#0" expanded="true" />
-            <element signature="e#6247#8708#0" />
-            <element signature="e#8834#10202#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/admin.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4009">
-          <caret line="230" column="33" selection-start-line="230" selection-start-column="33" selection-end-line="230" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/RechteDB/rapp/forms.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="342">
@@ -1202,17 +1178,63 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/admin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="570">
+          <caret line="316" column="42" selection-start-line="316" selection-start-column="42" selection-end-line="316" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RechteDB/templates/rapp/panel_user_rolle_af.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1192">
+          <caret line="150" column="75" selection-start-line="150" selection-start-column="75" selection-end-line="150" selection-end-column="75" />
+          <folding>
+            <element signature="e#2135#2141#0" expanded="true" />
+            <element signature="e#2141#2147#0" expanded="true" />
+            <element signature="e#2147#2153#0" expanded="true" />
+            <element signature="e#2153#2159#0" expanded="true" />
+            <element signature="e#2159#2165#0" expanded="true" />
+            <element signature="e#2165#2171#0" expanded="true" />
+            <element signature="e#2171#2177#0" expanded="true" />
+            <element signature="e#2177#2183#0" expanded="true" />
+            <element signature="e#2183#2189#0" expanded="true" />
+            <element signature="e#2189#2195#0" expanded="true" />
+            <element signature="e#2195#2201#0" expanded="true" />
+            <element signature="e#2201#2207#0" expanded="true" />
+            <element signature="e#2207#2213#0" expanded="true" />
+            <element signature="e#2213#2219#0" expanded="true" />
+            <element signature="e#2219#2225#0" expanded="true" />
+            <element signature="e#2233#2239#0" expanded="true" />
+            <element signature="e#2239#2245#0" expanded="true" />
+            <element signature="e#2245#2251#0" expanded="true" />
+            <element signature="e#2251#2257#0" expanded="true" />
+            <element signature="e#2257#2263#0" expanded="true" />
+            <element signature="e#2263#2269#0" expanded="true" />
+            <element signature="e#2269#2275#0" expanded="true" />
+            <element signature="e#2275#2281#0" expanded="true" />
+            <element signature="e#2281#2287#0" expanded="true" />
+            <element signature="e#2287#2293#0" expanded="true" />
+            <element signature="e#2293#2299#0" expanded="true" />
+            <element signature="e#2299#2305#0" expanded="true" />
+            <element signature="e#2305#2311#0" expanded="true" />
+            <element signature="e#3747#3772#0" expanded="true" />
+            <element signature="e#5424#5430#1" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="983">
-          <caret line="310" selection-start-line="310" selection-end-line="310" />
+        <state relative-caret-position="1078">
+          <caret line="323" selection-start-line="323" selection-end-line="323" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/RechteDB/rapp/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="19">
-          <caret line="258" column="9" selection-start-line="258" selection-start-column="9" selection-end-line="258" selection-end-column="9" />
+        <state relative-caret-position="786">
+          <caret line="250" column="89" selection-start-line="250" selection-start-column="89" selection-end-line="250" selection-end-column="89" />
           <folding>
             <element signature="e#24#63#0" expanded="true" />
             <element signature="e#5763#6081#1" />
@@ -1221,25 +1243,25 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/RechteDB/templates/rapp/panel_user_rolle_af.html">
+    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="156" column="92" selection-start-line="156" selection-start-column="92" selection-end-line="156" selection-end-column="92" />
+        <state relative-caret-position="319">
+          <caret line="45" column="17" selection-start-line="45" selection-start-column="4" selection-end-line="45" selection-end-column="17" />
           <folding>
-            <element signature="e#2553#2559#0" expanded="true" />
-            <element signature="e#2559#2565#0" expanded="true" />
-            <element signature="e#2565#2571#0" expanded="true" />
-            <element signature="e#2571#2577#0" expanded="true" />
-            <element signature="e#2577#2583#0" expanded="true" />
-            <element signature="e#2583#2589#0" expanded="true" />
-            <element signature="e#2589#2595#0" expanded="true" />
-            <element signature="e#2595#2601#0" expanded="true" />
-            <element signature="e#2601#2607#0" expanded="true" />
-            <element signature="e#2607#2613#0" expanded="true" />
-            <element signature="e#2613#2619#0" expanded="true" />
-            <element signature="e#2619#2625#0" expanded="true" />
-            <element signature="e#2625#2631#0" expanded="true" />
-            <element signature="e#2631#2637#0" expanded="true" />
+            <element signature="e#520#559#0" expanded="true" />
+            <element signature="e#851#1625#0" />
+            <element signature="e#6247#8708#0" />
+            <element signature="e#8834#10202#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/tests.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="513">
+          <caret line="505" column="64" selection-start-line="505" selection-start-column="64" selection-end-line="505" selection-end-column="64" />
+          <folding>
+            <element signature="e#28#68#0" expanded="true" />
           </folding>
         </state>
       </provider>

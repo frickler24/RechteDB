@@ -5,7 +5,8 @@ from django.urls import reverse, resolve
 from django.test import TestCase
 from .views import home, GesamtDetailView
 
-from .models import TblOrga, TblUebersichtAfGfs, TblUserIDundName, TblPlattform, TblGesamt, TblAfliste, TblUserhatrolle, TblRollehataf, TblRollen
+from .models import TblOrga, TblUebersichtAfGfs, TblUserIDundName, TblPlattform, TblGesamt, \
+	TblAfliste, TblUserhatrolle, TblRollehataf, TblRollen
 
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -501,11 +502,8 @@ class user_rolle_afTests(TestCase):
 		)
 
 		TblRollehataf.objects.create (
-			afname = 			'Das Feld wird eigentlich nicht mehr genutzt',
 			mussfeld =			True,
-			nurxv =				False,
-			xabcv =				True,
-			dv =				False,
+			einsatz =			2, # EINSATZ_XABCV aus models.py
 			bemerkung = 		'Irgend eine halbwegs sinnvolle Beschreibung',
 			af = 				TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
 			rollenname = 		TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
