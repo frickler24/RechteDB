@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+{ % load render_table from django_tables2 %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item active">User, Rollen und Arbeitsplatzfunktionen</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	User, Rollen und Arbeitsplatzfunktionen - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+	{% include 'search_few.html' %} {# Lädt die Suchleiste und die Übersicht über die gefundenen User #}
+
+	<div class="container-fluid">
+		{% if userHatRolle_liste %}
+			<div class="col-12 mt-4">
+				{% if form.non_field_errors %}
+					<p>{{ form.non_field_errors }}</p>
+				{% endif %}
+				<h3>Rollen von {{ selektierter_name }}
+					({{ userHatRolle_liste.count }} Rollen)
+				</h3>
+			</div>
+			<div">
+				<table class="table table-striped table-sm">
+				<thead>
+					<tr class="bg-primary text-left">
+						<th>
+							<div class="text-left">
+								<a href="{% url 'user_rolle_af-create' selektierte_userid %}">
+									<img src="{% static 'icons8-neu-erstellen-64.png' %}" width="25 rem" />
+								</a>
+								&nbsp;
+								<button class="btn btn-outline-important btn-sm" type="button"
+										data-toggle="collapse"
+										aria-expanded="false"
+										data-target=".multi-collapse"
+										aria-controls="
+										  {% for rolle in userHatRolle_liste %} rolle_{{ rolle }} {% endfor %}"
+								 >ID
+								</button>
+							</div>
+						</th>
+						<th>Rollenname</th>
+						<th>Zweck</th>
+						<th>Schwerpunkt/Vertretung</th>
+						<th>System</th>
+						<th>Zuordnung ab</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for rolle in userHatRolle_liste %}
+						<tr>
+							<td width="10%" class="text-left">
+								<a href="{{ rolle.get_absolute_delete_url }}">
+									<img src="{% static 'icons8-müll-50.png' %}" width="25rem" />
+								</a>
+								&nbsp;
+								<button class="btn btn-outline-primary btn-sm" type="button"
+										data-toggle="collapse" data-target="#rolle_{{ rolle }}"
+										aria-expanded="false" aria-controls="rolle_{{ rolle }}">
+									{{ rolle }}
+								</button>
+							</td>
+							<td>
+								<input type="text" class="form-control col-12 col-sm-6 col-md-4 col-lg-4 col-xl-12"
+									   placeholder="Rollenname" disabled="disabled"
+									   id="id_rollenname" name="rollenname" maxlength="100"
+									   value="{{ rolle.rollenname }}" />
+							</td>
+							<td>
+								<input type="text" class="form-control col-12 col-sm-6 col-md-4 col-lg-4 col-xl-12"
+									   placeholder="Bemerkung" disabled="disabled"
+									   id="id_bemerkung" name="bemerkung" maxlength="100"
+									   value="{{ rolle.bemerkung }}" />
+							</td>
+							<td>
+								<input type="text" class="form-control col-12 col-sm-6 col-md-4 col-lg-4 col-xl-12"
+									   placeholder="Bemerkung" disabled="disabled"
+									   id="id_schwerpunkt_vertretung" name="schwerpunkt_vertretung" maxlength="50"
+									   value="{{ rolle.schwerpunkt_vertretung }}" />
+							</td>
+							<td>
+								<input type="text" class="form-control" placeholder="System"
+									   id="id_system" name="system" maxlength="150" disabled="disabled"
+									   value="{{ rolle.rollenname.system }}" />
+							</td>
+							<td width="16%">
+								<input type="text" class="form-control" disabled="disabled"
+									   id="id_datum" name="datum"
+									   value="{{ rolle.rollenname.datum|date }}" />
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td colspan="5" >
+								<div class="collapse multi-collapse" id="rolle_{{ rolle }}">
+									<div class="row">
+										<div class="form-control bg-light text-success col-4">AF</div>
+										<div class="form-control bg-light text-success col-5">Anmerkung zur AF allgemein</div>
+										<div class="form-control bg-light text-success col-1 text-center">Muss</div>
+										<div class="form-control bg-light text-success col-1 text-center">Einsatz</div>
+										{% for meinaf in rolle.rollenname.tblrollehataf_set.all %}
+											<div class="form-control col-4">{{ meinaf.af }}</div>
+											<div class="form-control col-5">{{ meinaf.bemerkung }}</div>
+											<div class="form-control col-1 text-center">
+												{% if meinaf.mussfeld %}
+													<img src="{% static 'admin/img/icon-yes.svg' %}">
+												{% else %}
+													<img src="{% static 'admin/img/icon-no.svg' %}">
+												{% endif %}
+											</div>
+										<div class="form-control select col-1 text-center">
+											<small>{{ meinaf.get_einsatz_display }}</small>
+										</div>
+										{% empty %}
+											<div class="form-control bg-danger col-12">Nix gefunden!?</div>
+										{% endfor rolle.rollenname.tblrollehataf_set.all %}
+									</div>
+								</div>
+							</td>
+						</tr>
+					{% endfor userHatRolle_liste %}
+				</tbody>
+			</table>
+		</div>
+		{% else %}
+			{% if selektierter_name %}
+				<div class="col-12 bg-warning">User {{ selektierter_name }} ist noch keine Rolle zugeordnet</div>
+			{% else %}
+				<div class="col-12">
+					Kein User selektiert
+				</div>
+			{% endif %}
+			</div>
+		{% endif %}
+
+			{# Die spezifischen Daten können verändert werden, deshalb als POST-Formular #}
+			<form method="post" novalidate> {# Ab hier kommem die neuen Zeilen - irgendwann #}
+				{% csrf_token %}
+				<button type="submit">Submit</button>
+			</form>
+	{% include "paginator.html" %}
+{% endblock content %}

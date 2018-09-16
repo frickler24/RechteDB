@@ -12,14 +12,15 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils.html import format_html
 from django.urls import reverse		# Used to generate URLs by reversing the URL patterns
+from django.utils import timezone
 
 # Die drei Rollentabellen sowie die AF-Liste hängen inhaltlich zusammen
 # Die Definition der Rollen
 class TblRollen(models.Model):
-	rollenname = 			models.CharField(db_column='rollenname', primary_key=True, max_length=100, verbose_name='Rollen-Name')  # Field name made lowercase.
-	system = 				models.CharField(db_column='system', max_length=150, verbose_name='System', db_index=True)  # Field name made lowercase.
-	rollenbeschreibung = 	models.TextField(db_column='rollenbeschreibung', blank=True, null=True)  # Field name made lowercase.
-	datum = 				models.DateTimeField(db_column='datum')  # Field name made lowercase.
+	rollenname = 			models.CharField(db_column='rollenname', primary_key=True, max_length=100, verbose_name='Rollen-Name')
+	system = 				models.CharField(db_column='system', max_length=150, verbose_name='System', db_index=True)
+	rollenbeschreibung = 	models.TextField(db_column='rollenbeschreibung', blank=True, null=True)
+	datum = 				models.DateTimeField(db_column='datum', default=timezone.now, blank=True)
 
 	class Meta:
 		managed = True
@@ -50,22 +51,15 @@ class TblRollehataf(models.Model):
 		(EINSATZ_NONE,  'nicht zugewiesen'),
 		(EINSATZ_NURDV, 'Nur DV-User'),
 		(EINSATZ_XABCV, 'XV, AV, BV, CV-User'),
-		(EINSATZ_NURXV, 'nur DV-User'),
+		(EINSATZ_NURXV, 'nur XV-User'),
 		(EINSATZ_ABCV,  'AV, BV, CV-User'),
 	)
-
 
 	rollenmappingid = 		models.AutoField(db_column='rollenmappingid', primary_key=True, verbose_name='ID')  # Field name made lowercase.
 	rollenname = 			models.ForeignKey('TblRollen', models.PROTECT, to_field='rollenname', db_column='rollenname')  # Field name made lowercase.
 	af = 					models.ForeignKey('TblAfliste', models.PROTECT, to_field='id', db_column='af', blank=True, null=True, verbose_name='AF')  # Field name made lowercase.
-	# ToDo: Lösche AFName, wenn Migration und das Laden der Daten erledigt sind.
-	# afname = 				models.CharField(db_column='afname', max_length=100, verbose_name='AF Name', )  # Field name made lowercase.
-	#afname = 				models.ForeignKey('TblAfliste', models.PROTECT, to_field='af_name', db_column='AFName', verbose_name='AF-Name')  # Field name made lowercase.
 	mussfeld = 				models.IntegerField(db_column='mussfeld', blank=True, null=True, verbose_name='Muss')  # Field name made lowercase. This field type is a guess.
 	bemerkung = 			models.CharField(db_column='bemerkung', max_length=250, blank=True, null=True)  # Field name made lowercase.
-	# nurxv = 				models.IntegerField(db_column='nurxv', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
-	# xabcv = 				models.IntegerField(db_column='xabcv', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
-	# dv = 					models.IntegerField(db_column='dv', blank=True, null=True)  # Field name made lowercase. This field type is a guess.
 	einsatz = 				models.IntegerField(db_column='einsatz', choices=EINSATZ_CHOICES, default=EINSATZ_NONE)
 
 	class Meta:
@@ -86,28 +80,6 @@ class TblRollehataf(models.Model):
 	get_muss.short_description = 'Muss'
 	mussfeld.boolean = True
 
-	"""
-	def get_nurxv(self):
-		return self.nurxv
-	get_nurxv.boolean = True
-	get_nurxv.admin_order_field = 'nurxv'
-	get_nurxv.short_description = 'Nur XV'
-	nurxv.boolean = True
-
-	def get_xabcv(self):
-		return self.xabcv
-	get_xabcv.boolean = True
-	get_xabcv.admin_order_field = 'xabcv'
-	get_xabcv.short_description = 'Erst+ZweitUID'
-	xabcv.boolean = True
-
-	def get_dv(self):
-		return self.dv
-	get_dv.boolean = True
-	get_dv.admin_order_field = 'dv'
-	get_dv.short_description = 'DV-User'
-	dv.boolean = True
-	"""
 
 # Referenz der User auf die ihnen zur Verfügung stehenden Rollen
 class TblUserhatrolle(models.Model):
@@ -129,7 +101,7 @@ class TblUserhatrolle(models.Model):
 											 db_index=True
 							)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	bemerkung = 			models.TextField(db_column='bemerkung', blank=True, null=True)  # Field name made lowercase.
-	letzte_aenderung = 		models.DateTimeField(db_column='letzte_aenderung', db_index=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+	letzte_aenderung = 		models.DateTimeField(db_column='letzte_aenderung', default=timezone.now, blank=True, db_index=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 
 	class Meta:
 		managed = True
@@ -145,6 +117,24 @@ class TblUserhatrolle(models.Model):
 	def get_rollenbeschreibung (self):
 		return str(self.rollenname.rollenbeschreibung)
 	get_rollenbeschreibung.short_description = 'Rollenbeschreibung'
+
+	def get_absolute_url(self):
+		# Returns the url for the whole list.
+		return reverse('user_rolle_af', args=[])
+
+	def get_absolute_update_url(self):
+		# Returns the url to access a particular instance of the model.
+		return reverse('user_rolle_af-update', args=[str(self.id)])
+
+	def get_absolute_create_url(self):
+		# Returns the url to open the create-instance of the model (no ID given, the element does not exist yet).
+		return reverse('user_rolle_af-create', args=[])
+
+	def get_absolute_delete_url(self):
+		# Returns the url to access a particular instance of the model.
+		return reverse('user_rolle_af-delete', args=[str(self.userundrollenid)])
+
+
 
 # Tabelle enthält die aktuell genehmigten (modellierten und in Modellierung befindlichen) AF + GF-Kombinationen
 class TblUebersichtAfGfs(models.Model):
@@ -221,7 +211,6 @@ class TblUserIDundName(models.Model):
 	geloescht = 		models.IntegerField(db_column='geloescht', blank=True, null=True, verbose_name='gelöscht', db_index=True)
 	abteilung = 		models.CharField(db_column='abteilung', max_length=64, )  # Field name made lowercase.
 	gruppe = 			models.CharField(db_column='gruppe', max_length=32, db_index=True)  # Field name made lowercase.
-	# rollen = 			models.ManyToManyField(TblRollen, through = 'TblUserhatrolle')
 
 	class Meta:
 		managed = True

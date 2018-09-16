@@ -1,9 +1,6 @@
 from django.contrib.auth.models import User, Group
 from .models import TblGesamt, TblUserIDundName, TblUserhatrolle
-
 import django_filters
-from django import forms
-
 
 class PanelFilter(django_filters.FilterSet):
 	tf = 							django_filters.CharFilter(lookup_expr='icontains')
@@ -19,7 +16,6 @@ class PanelFilter(django_filters.FilterSet):
 
 	plattform_id__tf_technische_plattform =\
 									django_filters.ChoiceFilter()
-
 
 	class Meta:
 		model = TblGesamt
@@ -44,7 +40,6 @@ class UseridRollenFilter(django_filters.FilterSet):
 	userid__geloescht = 		django_filters.BooleanFilter()
 	userid__abteilung = 		django_filters.CharFilter(lookup_expr='icontains')
 	userid__gruppe = 			django_filters.CharFilter(lookup_expr='icontains')
-
 	userid__zi_organisation = 	django_filters.CharFilter(lookup_expr='icontains')
 
 
@@ -75,3 +70,5 @@ class UseridFilter(django_filters.FilterSet):
 			'gruppe',
 			'orga',
 		]
+
+# ToDo Wahrscheinlich fehlt hier noch ein RolleHatAF-Filter, deshalb die eingeschränkten Suchmöglichkeiten auf der Admin-Page

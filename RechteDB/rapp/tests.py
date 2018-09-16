@@ -233,7 +233,6 @@ class GesamtlisteTests(TestCase):
 	# Kann das zweite Element direkt adressiert werden?
 	def test_gesamtliste_view_success_status_code(self):
 		url = reverse('gesamt-detail', kwargs={'pk': TblGesamt.objects.get(tf = 'Die superlange schnuckelige TF2').id})
-		print (url)
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
 
@@ -470,7 +469,7 @@ class PanelTests(TestCase):
 		self.assertEquals(response.status_code, 200)
 		self.assertContains(response, "User_xv10099")
 
-
+import re
 # User / Rolle / AF : Das wird mal die Hauptseite für Aktualisierungen * Ergänzungen / Löschungen von Rollen und Verbindungen
 class user_rolle_afTests(TestCase):
 	def setUp(self):
@@ -497,22 +496,19 @@ class user_rolle_afTests(TestCase):
 		TblRollen.objects.create (
 			rollenname = 		'Erste Neue Rolle',
 			system =			'Testsystem',
-			rollenbeschreibung = 'Das ist eine Testrolle für das Gesamtsystem',
-			datum =				timezone.now(),
+			rollenbeschreibung = 'Das ist eine Testrolle',
 		)
 
 		TblRollehataf.objects.create (
 			mussfeld =			True,
-			einsatz =			2, # EINSATZ_XABCV aus models.py
+			einsatz =			TblRollehataf.EINSATZ_XABCV,
 			bemerkung = 		'Irgend eine halbwegs sinnvolle Beschreibung',
 			af = 				TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
 			rollenname = 		TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
-
 		)
 
 		TblUserhatrolle.objects.create (
 			userid = 			TblUserIDundName.objects.get(userid = 'xv10099'),
-			# rollenname = 		TblRollen.objects.get(rollenname = 'Erste Neue Rolle'),
 			rollenname = 		TblRollen.objects.first(),
 			schwerpunkt_vertretung = 'Schwerpunkt',
 			bemerkung = 		'Das ist eine Testrolle für ZI-AI-BA-PS',
@@ -544,4 +540,50 @@ class user_rolle_afTests(TestCase):
 		userlist_url = reverse('home')
 		response = self.client.get(new_user_url)
 		self.assertContains(response, 'href="{0}"'.format(userlist_url))
+
+	# Suche nach der dem User und ob seiner UserID mindestens eine Rolle zugeodnet ist.
+	# Fall ja, suche weiter nach der List der AFen zu der Rolle (Auszug)
+	# Im Detail: Wir suchen über /.../user_rolle_af/<Nummer des Eintrags UserHatRolle>
+	# nach einem dem konkretren Eintrag (die Nummer variiert über die Anzahl der ausgeführten Testfälle,
+	# deshalb das etwas umständliche Gesuche unten).
+	def test_panel_view_with_valid_selection_find_UserHatRolle_id(self):
+		url = '{0}{1}'.format(reverse('user_rolle_af'), '?name=&orga=1&gruppe=&pagesize=100')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+		self.assertContains(response, "User_xv10099")  # Die UserID gibt es schon mal
+
+		suchstr = "Wir haben in der ReST-Schreibweise keinen Treffer gelandet!"
+		for k in response:
+			foo = re.search('/user_rolle_af/(\d+)/', str(k))
+			if foo != None:
+				suchstr = re.split('/', str(foo))
+				suchstr = ("/{}/{}/".format(suchstr[1], suchstr[2]))
+		self.assertContains(response, suchstr)  # Die UserIDhatRolle-Zeile wurde in der ReST-Schreibweise gefunden
+
+	def test_panel_view_with_valid_selection_find_accordeon_link(self):
+		url = '{0}{1}'.format(reverse('user_rolle_af'), '?name=&orga=1&gruppe=&pagesize=100')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+
+		for k in response:
+			foo = re.search('/user_rolle_af/(\d+)/', str(k))
+			if foo != None:
+				suchstr = re.split('/', str(foo))
+				url = '{0}{1}/{2}'.format(reverse('user_rolle_af'),
+										   suchstr[2],
+										   '?name=&orga=1&gruppe=&pagesize=100')
+				# print ()
+				# print ('suche nach folgender URL: {}'.format (url))
+				response = self.client.get(url)
+				self.assertEquals(response.status_code, 200)
+			else:
+				self.assertFalse(True)	# Das war nix - offensichtlich die URL nicht korrekt
+		self.assertContains(response, 'Erste Neue Rolle') # Rollenname
+		self.assertContains(response, 'Testsystem') # System
+		self.assertContains(response, 'Das ist eine Testrolle') # Beschreibung in TblRollen
+		self.assertContains(response, 'rva_01219_beta91_job_abst') # Die gesuchte AF eine Stufe tiefer
+		self.assertContains(response, 'Das ist eine Testrolle für ZI-AI-BA-PS') # Beschreibung in TblUserHatRolle
+		self.assertContains(response, 'Schwerpunkt') # Wertigkeit in der Verantwortungsmatrix
+
+
 

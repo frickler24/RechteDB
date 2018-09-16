@@ -24,7 +24,7 @@ from rapp.models import TblUebersichtAfGfs, TblUserIDundName, TblOrga, TblPlattf
 # Inline function to show all Instances in other view
 class UserhatrolleInline(admin.TabularInline):
 	model = TblUserhatrolle
-	extra = 0
+	extra = 1
 
 	fields = ['userundrollenid', 'userid', 'rollenname', 'schwerpunkt_vertretung', 'bemerkung', ]
 
@@ -44,24 +44,24 @@ class GesamtInline(admin.TabularInline):
 
 class UserIDundNameInline(admin.TabularInline):
 	model = TblUserIDundName
-	extra = 0
+	extra = 1
 
 class RollehatafInline(admin.TabularInline):
 	model = TblRollehataf
-	extra = 0
-	fields = ['af', 'bemerkung', 'mussfeld', 'nurxv', 'xabcv', 'dv', ]
+	extra = 1
+	fields = ['af', 'bemerkung', 'mussfeld', 'einsatz', ]
 
 class UebersichtAfGfsInline(admin.TabularInline):
 	model = TblUebersichtAfGfs
-	extra = 0
+	extra = 1
 
 class AflisteInline(admin.TabularInline):
 	model = TblAfliste
-	extra = 0
+	extra = 1
 
 class RollenInline(admin.TabularInline):
 	model = TblRollen
-	extra = 0
+	extra = 1
 
 
 
@@ -71,8 +71,8 @@ class RollenInline(admin.TabularInline):
 
 @admin.register(TblGesamt)
 class Gesamt(admin.ModelAdmin):
-	actions_on_top = True
-	actions_on_bottom = True
+	actions_on_top = False
+	actions_on_bottom = False
 
 	fieldsets = [
 		('Standard-Informationen', {'fields': ['userid_name', 'tf', 'tf_beschreibung', 'enthalten_in_af', 'modell',
@@ -119,7 +119,7 @@ class UserIDundNameAdmin(admin.ModelAdmin):
 	actions_on_bottom = True
 
 	inlines = [UserhatrolleInline]
-	# Nice idea, but VERY slow
+	# Nette Idee, grottig lahm
 	# inlines += [GesamtInline]
 
 	list_per_page = 25
@@ -201,8 +201,8 @@ class UebersichtAfGfs(admin.ModelAdmin):
 
 @admin.register(TblGesamtHistorie)
 class TblGesamtHistorie(admin.ModelAdmin):
-	actions_on_top = True
-	actions_on_bottom = True
+	actions_on_top = False
+	actions_on_bottom = False
 
 	list_display = ('id', 'id_alt', 'userid_name', 'tf', 'tf_beschreibung', 'enthalten_in_af', 'gf',
 					'modell', 'tf_kritikalitaet', 'tf_eigentuemer_org', 'plattform',
@@ -241,6 +241,7 @@ class Userhatrolle(admin.ModelAdmin):
 	search_fields = [ 'schwerpunkt_vertretung', 'rollenname__rollenname', 'bemerkung', 'userid__name', 'userid__userid', ]
 
 	list_per_page = 25 # sys.maxsize
+	extra = 1
 
 
 # ######################################################################################################
@@ -269,6 +270,7 @@ class Rollen(admin.ModelAdmin):
 	search_fields = ['rollenname', 'system', 'rollenbeschreibung', ]
 
 	inlines = [RollehatafInline, UserhatrolleInline, ]
+	extra = 1
 
 
 # ######################################################################################################
@@ -312,11 +314,11 @@ class Rollehataf(admin.ModelAdmin):
 
 	list_display = ('rollenmappingid', 'rollenname', 'af', 'get_muss', 'einsatz', 'bemerkung', )
 	list_display_links = ('rollenname', )
-	list_editable = ('af', 'bemerkung', )		# ToDo die vier Kreuzfelder muss..dv als klickable implementieren
+	list_editable = ('af', 'bemerkung', )
 	search_fields = ['rollenname__rollenname', 'af__af_name', 'bemerkung', ]
 	list_filter = ('mussfeld', 'einsatz', )
 
-	list_per_page = 20 # sys.maxsize
+	list_per_page = 25 # sys.maxsize
 
 # ######################################################################################################
 # Eine Reihe von Hilfstabellen, alle nach dem selben Schema. Keine Foreign Keys

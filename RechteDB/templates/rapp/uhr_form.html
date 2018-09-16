@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item"><a href="{% url 'user_rolle_af' %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}">
+         User, Rollen und Arbeitsplatzfunktionen
+    </a></li>
+    <li class="breadcrumb-item active">Rolle hinzufügen</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Rollen ergänzen - {{ block.super }}
+{% endblock %}
+
+{% load static %}
+{% block content %}
+    <h1>
+        {% if unser_user %}
+            Rollen-Eintrag ergänzen für <strong>{{ unser_user }}</strong>
+        {% endif %}
+    </h1>
+    <p>&nbsp;</p>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <table>
+        {{ form.as_table }}
+        </table>
+        <p>&nbsp;</p>
+        <table style="width: 50%;">
+            <tr>
+                <td>
+                    <input type="submit" value="Submit" />
+                </td>
+                {% if object.name %}
+                    <td>
+                       <a href="{{ object.get_absolute_delete_url }}" > Eintrag löschen
+                            <img src="{% static 'delete.svg' %}" width="15" />
+                        </a>
+                    </td>
+                {% endif %}
+                <td>
+                    <a href="{% url 'userliste' %}">Bearbeitung abbrechen!</a>
+                </td>
+            </tr>
+        </table>
+    </form>
+{% endblock content %}

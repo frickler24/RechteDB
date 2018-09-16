@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item"><a href="{% url 'user_rolle_af' %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}">
+         User, Rollen und Arbeitsplatzfunktionen
+    </a></li>
+    <li class="breadcrumb-item active">Rolle löschen</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Rolle löschen - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+    <h1>Rolleneintrag für User {{ user }} löschen</h1>
+
+    <p>Sie löschen gerade den folgenden Rollen-Eintrag:</p>
+    <p>"{{ object.rollenname }}":</p> <p>&nbsp;</p>
+
+    <form action="" method="POST">
+        {% csrf_token %}
+        <input type="submit" action="" value="Ja, bitte löschen." />
+        <div>
+            <p>&nbsp;</p>
+            <a href="{% url 'user_rolle_af' %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}">
+                Nein, abbrechen!
+            </a>
+        </div>
+    </form>
+
+{% endblock %}
