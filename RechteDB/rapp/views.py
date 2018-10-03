@@ -20,13 +20,11 @@ from django.urls import reverse_lazy
 from .forms import ShowUhRForm
 
 # Zum Einlesen der csv
-# import tablib
-# from tablib import Dataset
-# from import_export import resources
-# from .resources import MyCSVImporterModel
+from tablib import Dataset
+from import_export import resources
+from .resources import MeinCSVImporterModel
 
-from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, Tblrechteneuvonimport, \
-						TblRollen, TblUserhatrolle, TblRollehataf
+from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, TblUserhatrolle
 
 ###################################################################
 # RApp - erforderliche Sichten und Reports
@@ -63,6 +61,9 @@ from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, Tblrecht
 # ToDo: Kompakte Liste für Rolle und AF mit Filtermöglichkeit und PDF Generierung
 
 # ToDo: Die gesamten Modellnamen können mal überarbeitet werden (kein TBL am Anfang etc.)
+
+# ToDo: in UserHatRollen ist in der Anzeige die "aktiv"-Anzeige für eine AF noch nicht auf die einzelnen UserIDs der Identität bezogen, sondern gilt "generell"
+# ToDo: Die tables alternierend einfärben
 
 
 # Der Direkteinsteig für die gesamte Anwendung
@@ -158,33 +159,24 @@ class TblOrgaDelete(DeleteView):
 ###################################################################
 # Zuordnungen der Rollen zu den Usern (TblUserHatRolle ==> UhR)
 class UhRCreate(CreateView):
+	# Erzeugt einen neue Rolle für einen User.
+	# Die Rolle kann eine bestehende oder eine neu definierte Rolle sein.
 	model = TblUserhatrolle
 	template_name = 'rapp/uhr_form.html'
 	fields = ['userid', 'rollenname', 'schwerpunkt_vertretung', 'bemerkung']
 	context_object_name = 'unser_user'
 
 class UhRUpdate(UpdateView):
+	# Ändert die Zuordnung von Rollen zu einem User.
 	model = TblUserhatrolle
 	fields = '__all__'
 
 class UhRDelete(DeleteView):
+	# Löscht die Zuordnung einer Rollen zu einem User.
 	model = TblUserhatrolle
 	template_name = 'rapp/uhr_confirm_delete.html'
 	success_url = reverse_lazy('user_rolle_af') # ToDo Die Rücksprungadresse bei Success parametrisieren (wie?)
 
-
-###################################################################
-# Die Ab hier kommen die Views für das Panel
-
-"""
-###################################################################
-# Nur zum Zeigen, wie das mit den Panels gehen könnte....
-
-def search(request):
-	user_list = User.objects.all()
-	user_filter = UserFilter(request.GET, queryset=user_list)
-	return render(request, 'rapp/user_list.html', {'filter': user_filter})
-"""
 
 ###################################################################
 # Panel geht direkt auf die Gesamt-Datentabelle
@@ -213,23 +205,22 @@ def panel(request):
 	args = {'paginator': paginator, 'filter': panel_filter, 'pages': pages, 'meineTabelle': panel_list, 'pagesize': pagesize}
 	return render(request, 'rapp/panel_list.html', args)
 
-###################################################################
-# Finde alle relevanten Informationen zur aktuellen Selektion:
-#
-# Ausgangspunkt ist TblUseridUndName.
-# Hierfür gibt es einen Filter, der per GET abgefragt wird.
-# Geliefert werden nur die XV-Nummern zu den Namen (diese muss es je Namen zwingend geben)
-#
-# Die dort gefundene Treffermenge wird angereichert um die relevanten Daten aus TblUserHatRolle.
-# Hier werden allerdings alle UserIDen zurückgeliefert je Name.
-# Von dort aus gibt eine ForeignKey-Verbindung zu TblRollen.
-#
-# Problematisch ist noch die Verbindung zwischen TblRollen und TblRollaHatAf,
-# Weil hier der Foreign Key Definition in TblRolleHatAf liegt.
-# Das kann aber aufgelöst werden,
-# sobald ein konkreter User betrachtet wird und nicht mehr eine Menge an Usern.
-
 def panel_UhR(request, id = 0):
+	# Finde alle relevanten Informationen zur aktuellen Selektion:
+	#
+	# Ausgangspunkt ist TblUseridUndName.
+	# Hierfür gibt es einen Filter, der per GET abgefragt wird.
+	# Geliefert werden nur die XV-Nummern zu den Namen (diese muss es je Namen zwingend geben)
+	#
+	# Die dort gefundene Treffermenge wird angereichert um die relevanten Daten aus TblUserHatRolle.
+	# Hier werden allerdings alle UserIDen zurückgeliefert je Name.
+	# Von dort aus gibt eine ForeignKey-Verbindung zu TblRollen.
+	#
+	# Problematisch ist noch die Verbindung zwischen TblRollen und TblRollaHatAf,
+	# Weil hier der Foreign Key Definition in TblRolleHatAf liegt.
+	# Das kann aber aufgelöst werden,
+	# sobald ein konkreter User betrachtet wird und nicht mehr eine Menge an Usern.
+
 	panel_liste = TblUserIDundName.objects.filter(geloescht=False).order_by('name')
 	panel_filter = UseridFilter(request.GET, queryset=panel_liste)
 	namen_liste = panel_filter.qs.filter(userid__istartswith="xv")
@@ -245,7 +236,10 @@ def panel_UhR(request, id = 0):
     #               TblRolleHatAF hat ebenfalls einen ForeignKey 'rollennname' auf TblRollen
     #               -> rollenname.tblrollehataf_set.all liefert für eine konkrete Rolle die Liste der zugehörigen AF-Detailinformationen
 	#
-	
+	#		TblGesamt hat FK 'userid_name' auf TblUserIDundName
+	#		-> .tblgesamt_set.filter(geloescht = False) liefert die akiven Arbeitsplatzfunktionen
+	#
+
 	user = TblUserIDundName.objects.filter(userid = 'XV13254')[0]
 	print ('1:', user)
 	foo = user.tbluserhatrolle_set.all()
@@ -256,12 +250,22 @@ def panel_UhR(request, id = 0):
 		foo2 = x.rollenname.tblrollehataf_set.all()
 		for y in foo2:
 			print ('4:', y, ', AF=', y.af, ', Muss:', y.mussfeld, ', Einsatz:', y.einsatz)
-		print ()
+	af_aktiv = user.tblgesamt_set.filter(geloescht = False)
+	af_geloescht = user.tblgesamt_set.filter(geloescht = True)
+	print ("5: aktive AF-Liste:", af_aktiv, "geloescht-Liste:", af_geloescht)
+	for x in af_aktiv:
+		print ('5a:', x.enthalten_in_af, x.tf, x.tf_beschreibung, sep = ', ')
+	print
+	for x in af_geloescht:
+		print ('5b:', x.enthalten_in_af, x.tf, x.tf_beschreibung, sep = ', ')
+	print
+	af_liste = TblUserIDundName.objects.get(id=id).enthalten_in_af
+	print ('6:', af_liste)
 	"""
 
 	if request.method == 'POST':
 		form = ShowUhRForm(request.POST)
-		print ('Irgendwas ist angekommen')
+		print ('Irgendwas ist angekommen')	# ToDo Hä?
 
 		if form.is_valid():
 			return redirect('home')  # TODO: redirect ordentlich machen
@@ -274,34 +278,36 @@ def panel_UhR(request, id = 0):
 		# Hintergrund ist die Festlegung, dass die Rollen am UserNAMEN un dnicht an der UserID hängen.
 		# Dennoch gibt es Rollen, die nur zu bestimmten Userid-Typen (also bspw. nur für XV-Nummer) sinnvoll
 		# und gültig sind.
-		usernamen = []
-		userids = []
+		#
+		# Die af_menge wird benutzt zur Anzeige, welcche der rollenbezogenen AFen bereits im IST vorliegt
+		#
+		usernamen = set()
+		userids = set()
 		for row in panel_liste:
-			x = row.name
-			try:
-				usernamen.index(x)
-			except ValueError:
-				usernamen.append(x)
-
-			x = row.userid
-			try:
-				userids.index(x)
-			except ValueError:
-				userids.append(x)
+			usernamen.add (row.name)	# Ist Menge, also keine Doppeleinträge möglich
+			userids.add (row.userid)
 
 		if (id != 0):	# Dann wurde der ReST-Parameter 'id' mitgegeben
+
 			userHatRolle_liste = TblUserhatrolle.objects.filter(userid__id=id).order_by('rollenname')
 			selektierter_name = TblUserIDundName.objects.get(id=id).name
 			selektierte_userid = TblUserIDundName.objects.get(id=id).userid
+
+			# Selektiere alle Arbeitsplatzfunktionen, die derzeit mit dem User verknüpft sind.
+			afliste = TblUserIDundName.objects.get(id=id).tblgesamt_set.all()	# Das QuerySet
+			afmenge = set()
+			for e in afliste:
+				afmenge.add(e.enthalten_in_af)	# Filtern der AFen aus der Treffermenge
 		else:
 			userHatRolle_liste = []
 			selektierter_name = -1
 			selektierte_userid = 'keine_userID'
+			afmenge = set()
 
 		# Paginierung nach Tutorial
 		pagesize = request.GET.get('pagesize')
 		if type(pagesize) == type(None) or pagesize == '' or int(pagesize) < 1:
-			pagesize = 100	# Eigentlich sollte hier nie gepaget werden, dient nur dem Schutz vor Fehlabfragen
+			pagesize = 100	# Eigentlich sollte hier nie gepaged werden, dient nur dem Schutz vor Fehlabfragen
 		else:
 			pagesize = int(pagesize)
 		paginator = Paginator(namen_liste, pagesize)
@@ -317,14 +323,45 @@ def panel_UhR(request, id = 0):
 	args = {
 		'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
 		'filter': panel_filter,
-		'userids': userids, 'usernamen': usernamen,
+		'userids': userids, 'usernamen': usernamen, 'afmenge': afmenge,
 		'userHatRolle_liste': userHatRolle_liste,
 		'id': id,
 		'form': form,
+		'selektierter_name': selektierter_name,
+		'selektierte_userid': selektierte_userid,
 	}
 
-	if id != 0:
-		args['selektierter_name'] = selektierter_name
-		args['selektierte_userid'] = selektierte_userid
-
 	return render(request, 'rapp/panel_UhR.html', args)
+
+
+###################################################################
+# Dialogsteuerung für den Import einer neuen IIQ-Datenliste (csv-Format)
+
+def import_csv(request):
+	# Importiere neue CSV-Datei mit IIQ-Daten
+	if request.method == 'POST':
+		datei = request.FILES['myfile']
+
+		inhalt = datei.read().decode("utf-8")
+		zeilen = inhalt.splitlines()
+
+		dialect = csv.Sniffer().sniff(zeilen[0])
+		dialect.escapechar = '\\'
+
+		reader = csv.DictReader(zeilen, dialect = dialect)
+		for line in reader:
+			for e in line: print (e, ':\t', line[e])
+
+	return render(request, 'rapp/import.html')
+
+
+
+
+
+
+
+
+
+
+
+

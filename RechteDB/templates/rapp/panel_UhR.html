@@ -103,20 +103,29 @@
 									<div class="row">
 										<div class="form-control bg-light text-success col-4">AF</div>
 										<div class="form-control bg-light text-success col-5">Anmerkung zur AF allgemein</div>
+										<div class="form-control bg-light text-success col-1 text-center">Aktiv</div>
 										<div class="form-control bg-light text-success col-1 text-center">Muss</div>
 										<div class="form-control bg-light text-success col-1 text-center">Einsatz</div>
-										{% for meinaf in rolle.rollenname.tblrollehataf_set.all %}
-											<div class="form-control col-4">{{ meinaf.af }}</div>
-											<div class="form-control col-5">{{ meinaf.bemerkung }}</div>
+										{% for meineaf in rolle.rollenname.tblrollehataf_set.all %}
+											<div class="form-control col-4">{{ meineaf.af }}</div>
+											<div class="form-control col-5">{{ meineaf.bemerkung }}</div>
 											<div class="form-control col-1 text-center">
-												{% if meinaf.mussfeld %}
+												{# Aus dem QueryElement meineaf.af muss ein String zur Suche in der Menge gemacht werden #}
+												{% if meineaf.af|stringformat:"s" in afmenge %}
+													<img src="{% static 'admin/img/icon-yes.svg' %}">
+												{% else %}
+													<img src="{% static 'admin/img/icon-no.svg' %}">
+												{% endif %}
+											</div>
+											<div class="form-control col-1 text-center">
+												{% if meineaf.mussfeld %}
 													<img src="{% static 'admin/img/icon-yes.svg' %}">
 												{% else %}
 													<img src="{% static 'admin/img/icon-no.svg' %}">
 												{% endif %}
 											</div>
 										<div class="form-control select col-1 text-center">
-											<small>{{ meinaf.get_einsatz_display }}</small>
+											<small>{{ meineaf.get_einsatz_display }}</small>
 										</div>
 										{% empty %}
 											<div class="form-control bg-danger col-12">Nix gefunden!?</div>
@@ -139,11 +148,5 @@
 			{% endif %}
 			</div>
 		{% endif %}
-
-			{# Die spezifischen Daten können verändert werden, deshalb als POST-Formular #}
-			<form method="post" novalidate> {# Ab hier kommem die neuen Zeilen - irgendwann #}
-				{% csrf_token %}
-				<button type="submit">Submit</button>
-			</form>
 	{% include "paginator.html" %}
 {% endblock content %}

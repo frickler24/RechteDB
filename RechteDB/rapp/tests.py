@@ -484,8 +484,8 @@ class user_rolle_afTests(TestCase):
 		)
 
 		TblUserIDundName.objects.create (
-			userid = 			'xv10099',
-			name = 				'User_xv10099',
+			userid = 			'xv13254',
+			name = 				'User_xv13254',
 			orga = 				TblOrga.objects.get(team = 'Django-Team-01'),
 			zi_organisation =	'AI-BA',
 			geloescht = 		False,
@@ -507,13 +507,59 @@ class user_rolle_afTests(TestCase):
 			rollenname = 		TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
 		)
 
-		TblUserhatrolle.objects.create (
-			userid = 			TblUserIDundName.objects.get(userid = 'xv10099'),
+		TblUserhatrolle.objects.create(
+			userid =	 		TblUserIDundName.objects.get(userid = 'xv13254'),
 			rollenname = 		TblRollen.objects.first(),
 			schwerpunkt_vertretung = 'Schwerpunkt',
 			bemerkung = 		'Das ist eine Testrolle für ZI-AI-BA-PS',
 			letzte_aenderung= 	timezone.now(),
+
 		)
+
+		# Die nächsten beiden Objekte werden wür tblGesamt als ForeignKey benötigt
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu = 		"GF-foo in tblÜbersichtAFGF",
+			name_af_neu =		"AF-foo in tblÜbersichtAFGF",
+			zielperson = 		'Fester BesterTester'
+		)
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu = 		"GF-foo-gelöscht in tblÜbersichtAFGF",
+			name_af_neu =		"AF-foo-gelöscht in tblÜbersichtAFGF",
+			zielperson = 		'Fester BesterTester'
+		)
+		TblPlattform.objects.create(
+			tf_technische_plattform = 'Test-Plattform'
+		)
+
+		# Getestet werden soll die Möglichkeit,
+		# für einen bestimmten User festzustellen, ob er über iene definierte AF verfügt
+		# und diese auch auf aktiv gesetzt ist
+		TblGesamt.objects.create(
+			userid_name = 		TblUserIDundName.objects.get(userid = 'xv13254'),
+			tf = 				'foo-TF',
+			tf_beschreibung = 	'TF-Beschreibung für foo-TF',
+			enthalten_in_af = 	'Sollte die AF rva_01219_beta91_job_abst sein',
+			modell =			TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+			plattform = 		TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+			gf = 				'GF-foo',
+			datum = 			timezone.now(),
+			geloescht = 		False,
+		)
+
+		# und hier noch ein bereits gelöschtes Recht auf TF-Ebene.
+		# ToDo Noch eine komplette AF mit allen GFs als gelöscht markiert vorbereiten
+		TblGesamt.objects.create(
+			userid_name = 		TblUserIDundName.objects.get(userid = 'xv13254'),
+			tf = 				'foo-TF-gelöscht',
+			tf_beschreibung = 	'TF-Beschreibung für foo-TF-gelöscht',
+			enthalten_in_af = 	'Sollte die AF rva_01219_beta91_job_abst sein',
+			modell =			TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+			plattform = 		TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+			gf = 				'GF-foo',
+			datum = 			timezone.now() - timedelta(days=365),
+			geloescht = 		True,
+		)
+
 
 	# Ist die Seite da?
 	def test_panel_view_status_code(self):
@@ -524,7 +570,7 @@ class user_rolle_afTests(TestCase):
 		url = '{0}{1}'.format(reverse('user_rolle_af'), '?geloescht=3&userid_name__zi_organisation=ai-ba')
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
-		self.assertContains(response, "User_xv10099")
+		self.assertContains(response, "xv13254")
 	def test_panel_view_with_invalid_selection_status_code(self):
 		url = '{0}{1}'.format(reverse('user_rolle_af'), '?geloescht=99&zi_organisation=ZZ-XX')
 		response = self.client.get(url)
@@ -534,7 +580,7 @@ class user_rolle_afTests(TestCase):
 		url = '{0}{1}'.format(reverse('user_rolle_af'), '?DAS_FELD_GIBTS_NICHT=1')
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
-		self.assertContains(response, "User_xv10099")
+		self.assertContains(response, "User_xv13254")
 	def test_panel_view_contains_link_back_to_home_view(self):
 		new_user_url = reverse('user_rolle_af')
 		userlist_url = reverse('home')
@@ -550,7 +596,7 @@ class user_rolle_afTests(TestCase):
 		url = '{0}{1}'.format(reverse('user_rolle_af'), '?name=&orga=1&gruppe=&pagesize=100')
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
-		self.assertContains(response, "User_xv10099")  # Die UserID gibt es schon mal
+		self.assertContains(response, "User_xv13254")  # Die UserID gibt es schon mal
 
 		suchstr = "Wir haben in der ReST-Schreibweise keinen Treffer gelandet!"
 		for k in response:

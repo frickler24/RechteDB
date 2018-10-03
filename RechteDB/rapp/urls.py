@@ -79,3 +79,8 @@ urlpatterns += [
 	path('user_rolle_af/', views.panel_UhR, name='user_rolle_af'),
 ]
 
+# URl zum Importieren neuer Daten aus IIQ (csv-File)
+urlpatterns += [
+	path('import/', views.import_csv, name='import'),
+]
+

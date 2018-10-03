@@ -359,12 +359,12 @@ class TblrechteneuvonimportResource(resources.ModelResource):
 		model = Tblrechteneuvonimport
 
 
-from rapp.resources import MyCSVImporterModel
+from rapp.resources import MeinCSVImporterModel
 
 @admin.register(Tblrechteneuvonimport)
 class Tblrechteneuvonimport(ImportExportModelAdmin):
 	import_template_name = 'admin/admin_import.html'
-	resource_class = MyCSVImporterModel
+	resource_class = MeinCSVImporterModel
 	alle = ['identitaet', 'nachname', 'vorname', 'tf_name', 'af_anzeigename', 'gf_name', ]
 	search_fields = alle
 	alle.insert(0, 'id')
