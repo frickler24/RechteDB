@@ -10,8 +10,12 @@
 	</head>
 	<body>
 		<nav class="navbar sticky-top navbar-expand-lg navbar-expand-xl navbar-dark bg-primary">
-			<a class="navbar-brand" href="{% url 'home' %}" style="font-size: xx-large;" >RechteDB</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+			<a class="navbar-brand" href="{% url 'home' %}">
+				<img src="{% static 'RechteDB-Logo.png' %}" height="80rem">
+			</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse"
+					data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup"
+					aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
@@ -23,6 +27,7 @@
                     {% endcomment %}
 					<a class="nav-item nav-link" href="{% url 'user_rolle_af' %}?userid__geloescht=3&userid__name=eichler, lutz">User und Rollen</a>
                     <a class="nav-item nav-link" href="/admin">Admin-Sichten</a>
+                    <a class="nav-item nav-link" href="{% url 'import' %}">Import IIQ-Daten</a>
                     <a class="nav-item nav-link" href="{% url 'userliste' %}">UserID-Liste</a>
                     <a class="nav-item nav-link" href="{% url 'teamliste' %}">Team-Liste</a>
                     {% comment %}

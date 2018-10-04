@@ -1,18 +1,17 @@
 
-# Create your tests here.
-
 from django.urls import reverse, resolve
 from django.test import TestCase
 from .views import home, GesamtDetailView
 
 from .models import TblOrga, TblUebersichtAfGfs, TblUserIDundName, TblPlattform, TblGesamt, \
-	TblAfliste, TblUserhatrolle, TblRollehataf, TblRollen
+	TblAfliste, TblUserhatrolle, TblRollehataf, TblRollen, Tblrechteneuvonimport
 
 from datetime import datetime, timedelta
 from django.utils import timezone
+import re
 
-# Sind die einzelnen Hsuptseiten erreichbar?
 class HomeTests(TestCase):
+	# Sind die einzelnen Hsuptseiten erreichbar?
 	# Generell: Funktioniert irgend etwas?
 	def test_something_is_running(self):
 		self.assertTrue(True)
@@ -109,8 +108,8 @@ class HomeTests(TestCase):
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 301)
 
-# Funktioniert die Gesamtliste?
 class GesamtlisteTests(TestCase):
+	# Funktioniert die Gesamtliste?
 	def setUp(self):
 		for i in range (100):
 			TblOrga.objects.create(
@@ -236,15 +235,8 @@ class GesamtlisteTests(TestCase):
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
 
-"""
-	def test_gesamtliste_url_resolves_view(self):
-		url= reverse('gesamt-detail', kwargs={'pk': TblGesamt.objects.get(tf = 'Die superlange schnuckelige TF').id})
-		view = resolve(url)
-		self.assertEquals(view.func, GesamtListView.as_view)
-"""
-
-# Geht die Team-Liste?
 class TeamListTests(TestCase):
+	# Geht die Team-Liste?
 	# Ist die Seite da?
 	# ToDo: Beim Test der Teamliste fehlen noch die drei subpanels. Aber evtl. fällt die gesamte Liste weg
 	def test_teamlist_view_status_code(self):
@@ -252,6 +244,7 @@ class TeamListTests(TestCase):
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
 class CreateTeamTests(TestCase):
+	# Geht die Team-Liste inhaltlich?
 	def setUp(self):
 		TblOrga.objects.create(team='MeinTeam', themeneigentuemer='Icke')
 
@@ -271,9 +264,8 @@ class CreateTeamTests(TestCase):
 		response = self.client.get(new_team_url)
 		self.assertContains(response, 'href="{0}"'.format(teamlist_url))
 
-
-# Geht die User-Liste?
 class UserListTests(TestCase):
+	# Geht die User-Liste?
 	# Ist die Seite da?
 	# ToDo: Beim Test der Userliste fehlen noch die drei subpanels. Aber evtl. fällt die gesamte Liste weg
 	def test_userlist_view_status_code(self):
@@ -281,6 +273,7 @@ class UserListTests(TestCase):
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
 class CreateUserTests(TestCase):
+	# Geht die User-Liste inhaltlich?
 	def setUp(self):
 		TblOrga.objects.create(team = 'Django-Team', themeneigentuemer = 'Ihmchen')
 
@@ -336,9 +329,8 @@ class CreateUserTests(TestCase):
 		response = self.client.get(new_user_url)
 		self.assertContains(response, 'href="{0}"'.format(userlist_url))
 
-
-# Suche-/Filterpanel. Das wird mal die Hauptseite für Reports
 class PanelTests(TestCase):
+	# Suche-/Filterpanel. Das wird mal die Hauptseite für Reports
 	def setUp(self):
 		TblOrga.objects.create(
 			team = 'Django-Team-01',
@@ -469,9 +461,8 @@ class PanelTests(TestCase):
 		self.assertEquals(response.status_code, 200)
 		self.assertContains(response, "User_xv10099")
 
-import re
-# User / Rolle / AF : Das wird mal die Hauptseite für Aktualisierungen * Ergänzungen / Löschungen von Rollen und Verbindungen
 class user_rolle_afTests(TestCase):
+	# User / Rolle / AF : Das wird mal die Hauptseite für Aktualisierungen * Ergänzungen / Löschungen von Rollen und Verbindungen
 	def setUp(self):
 		TblOrga.objects.create (
 			team = 'Django-Team-01',
@@ -532,7 +523,7 @@ class user_rolle_afTests(TestCase):
 		)
 
 		# Getestet werden soll die Möglichkeit,
-		# für einen bestimmten User festzustellen, ob er über iene definierte AF verfügt
+		# für einen bestimmten User festzustellen, ob er über eine definierte AF verfügt
 		# und diese auch auf aktiv gesetzt ist
 		TblGesamt.objects.create(
 			userid_name = 		TblUserIDundName.objects.get(userid = 'xv13254'),
@@ -632,4 +623,36 @@ class user_rolle_afTests(TestCase):
 		self.assertContains(response, 'Schwerpunkt') # Wertigkeit in der Verantwortungsmatrix
 
 
+class import_new_csv(TestCase):
+	# Tests für den Import neuer CSV-Listen und der zugehörigen Tabellen
+	def setUp(self):
+		Tblrechteneuvonimport.objects.create(
+			identitaet = 			'xv13254',
+			nachname = 				'Bestertester',
+			vorname = 				'Fester',
+			tf_name = 				'supergeheime_TF',
+			tf_beschreibung = 		'Die Beschreibung der supergeheimen TF',
+			af_anzeigename = 		'rva_12345_geheime_AF',
+			af_beschreibung = 		'Beschreibung der Geheim-AF',
+			hoechste_kritikalitaet_tf_in_af = 'k',
+			tf_eigentuemer_org = 	'ZI-AI-BA',
+			tf_applikation = 		'RUVDE',
+			tf_kritikalitaet = 		'u',
+			gf_name = 				'rvg_12345_geheime_AF',
+			gf_beschreibung = 		'Beschreibung der Geheim-GF',
+			direct_connect = 		False,
+			af_zugewiesen_an_account_name = 'av13254',
+			af_gueltig_ab = 		timezone.now() - timedelta(days=364),
+			af_gueltig_bis = 		timezone.now() + timedelta(days=365),
+			af_zuweisungsdatum = 	timezone.now() - timedelta(days=366),
+		)
+
+	def test_importpage_table_entry(self):
+		num = Tblrechteneuvonimport.objects.filter(vorname = 'Fester').count()
+		self.assertEquals(num, 1)
+
+	def test_importpage_view_status_code(self):
+		url = reverse('import')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
 
