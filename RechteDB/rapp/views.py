@@ -25,6 +25,9 @@ import csv, textwrap
 from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, TblUserhatrolle, \
 	Tblrechteneuvonimport, Tblrechteamneu
 
+# An dieser stelle stehen diverse Tools zum Aufsetzen der Datenbank mit SPs
+from .stored_procedures import *
+
 ###################################################################
 # RApp - erforderliche Sichten und Reports
 
@@ -357,12 +360,14 @@ def import_csv(request):
 		if len (datum) != 3:
 			return deutsches_datum		# Dann passt das Datumsformat nicht
 		return  datum[2] + '-' + datum[1] + '-' + datum[0] + ' 00:00+0100'
+
 	def leere_importtabelle():
 		# Löscht alle Einträge aus der Importtabelle sowie der Übertragungstabelle
 		zeiten['leere_start'] = timezone.now()
 		Tblrechteneuvonimport.objects.all().delete()
 		Tblrechteamneu.objects.all().delete()
 		zeiten['leere_ende'] = timezone.now()
+
 	def schreibe_zeilen(reader):
 		# Für jeder Zeile der EIngabedatei sollte genau eine Zeile in der Importtabelle erzeugt werden
 		zeiten['schreibe_start'] = timezone.now()
@@ -394,52 +399,44 @@ def import_csv(request):
 			)
 			neuerRecord.save()
 		zeiten['schreibe_ende'] = timezone.now()
+
 	def hole_datei():
 		# Über die HTTP-Verbindung kommt eine Datei, die auf CSV-Inhalte geprüft werden muss
-		datei = request.FILES['myfile']
+		datei = request.FILES['datei']
 		inhalt = datei.read().decode("ISO-8859-1")	# Warum das kein UTF-8 ist, weiß ich auch nicht
 		zeilen = inhalt.splitlines()
 		dialect = csv.Sniffer().sniff(zeilen[0])
 		dialect.escapechar = '\\'
 		return (zeilen, dialect)
-	def hole_organisationen():
-		return ['AI-BA', 'AI', 'SE', 'AI-XA', 'AI-ZA', 'AI-HA']
 
-	form = ImportForm(request.GET)
+	def bearbeite_datei(ausgabe):
+		if ausgabe: print('Organisation =', form.cleaned_data['organisation'])
+		zeilen, dialect = hole_datei()
+		reader = csv.DictReader(zeilen, dialect=dialect)
+
+		# Wenn das bis hierhin ohne Fehler gelaufen ist, müsste der Rest auch funktionieren.
+		# Deshalb werden jetzt erst mal die verschiedenen Importtabellen geleert
+		leere_importtabelle()
+		schreibe_zeilen(reader)
+
+		zeiten['import_ende'] = timezone.now()
+		if ausgabe:
+			print('Laufzeit:', str(zeiten['import_ende'] - zeiten['import_start']))
+			print('Leeren:', str(zeiten['leere_ende'] - zeiten['leere_start']))
+			print('Schreiben:', str(zeiten['schreibe_ende'] - zeiten['schreibe_start']))
+
 	if request.method == 'POST':
-		form = ImportForm(request.POST)
-		# Hier müsste eigentlich noch ein bisschen was zum Request hin
-		print ('Dateiname =', request.FILES['datei'])
-		print ('bound?', form.is_bound)
-
+		form = ImportForm(request.POST, request.FILES)
 		if form.is_valid():
-			print ('Organisation =', form.cleaned_data['organisation'])
-
-			zeilen, dialect = hole_datei()
-			reader = csv.DictReader(zeilen, dialect = dialect)
-
-			# Wenn das bis hierhin ohne Fehler gelaufen ist, müsste der Rest auch funktionieren.
-			# Deshalb werden jetzt erst mal die verschiedenen Importtabellen geleert
-			leere_importtabelle()
-			schreibe_zeilen(reader)
-
-			zeiten['import_ende'] = timezone.now()
-			print ('Laufzeit:', str (zeiten['import_ende'] - zeiten['import_start']))
-			print ('Leeren:', str (zeiten['leere_ende'] - zeiten['leere_start']))
-			print ('Schreiben:', str (zeiten['schreibe_ende'] - zeiten['schreibe_start']))
-			# ToDo hier muss noch ein Abschluss kommen, wie es mit der Seite weitergeht (Schritt 3)
+			bearbeite_datei(True)
+			# ToDo hier muss noch ein Abschluss kommen, wie es mit der Seite weitergeht (Schritt 2)
 		else:
 			print ('Form war nicht valide')
+	else:
+		form = ImportForm(initial={'organisation': 'AI-BA'}, auto_id=False)
 
 	context = {
 		'form': form,
-		'orgas': hole_organisationen(),
 	}
-
 	return render(request, 'rapp/import.html', context)
-
-
-
-
-
 

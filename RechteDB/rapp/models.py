@@ -13,6 +13,7 @@ from django.db import models
 from django.utils.html import format_html
 from django.urls import reverse		# Used to generate URLs by reversing the URL patterns
 from django.utils import timezone
+from django.db import connection
 
 # Die drei Rollentabellen sowie die AF-Liste hängen inhaltlich zusammen
 # Die Definition der Rollen
@@ -264,6 +265,14 @@ class TblUserIDundName(models.Model):
 	def get_absolute_create_url(self):
 		# Returns the url to open the create-instance of the model (no ID given, the element does not exist yet).
 		return reverse('user-create', args=[])
+
+# Diese Funktion gehört inhaltlich zu tblUserIDundName, aber nicht in die Klasse (wird in form.py genutzt)
+def hole_organisationen():
+	# Liefert eine Liste an Tupeln mit Choices für die Orga-Auswahl zurück. Die Liste stammt aus tblUserIDundName.
+	with connection.cursor() as cursor:
+		cursor.execute("SELECT DISTINCT zi_organisation FROM tblUserIDundName")
+		rows = cursor.fetchall()
+		return [('Bitte Organisation wählen', 'Bitte Organisation wählen')] + [(r[0], r[0]) for r in rows]
 
 # Die verschiedenen technischne Plattformen (RACF, CICS, Unix, Win, AD, LDAP, test/Prod usw.)
 class TblPlattform(models.Model):
