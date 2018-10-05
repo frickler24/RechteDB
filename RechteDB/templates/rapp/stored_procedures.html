@@ -4,7 +4,7 @@
 
 {% block breadcrumb %}
 	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
-	<li class="breadcrumb-item active">Import neuer Daten</li>
+	<li class="breadcrumb-item active">Aufsetzen der Datenbank</li>
 {% endblock breadcrumb %}
 
 {% block title %}
@@ -18,7 +18,18 @@
             Aufsetzen der Datenbank mit <em>Stored Procedures</em>
         </h2>
         <p>
-            {% lorem %}
+            <strong>ACHTUNG!
+        </p>
+        <p>
+            Diese Funktion sollte nur angewandt werden, wenn einer der folgenden Fälle zutrifft:
+        </p>
+        <ul>
+            <li>Die Datenbank wird komplett neu aufgesetzt</li>
+            <li>Das Importieren neuer CSV-Listen führt nachweislich in den Stored Procedures zu harten Fehlern (z.B. fehlende SP)</li>
+            <li>Die Quellen der Stored Procedures wurden in 'stored_procedures.py' geändert</li>
+        </ul></strong>
+        <p>
+            Ansonsten: Finger weg, das bringt hier nichts!
         </p>
 
         {% if form.non_field_errors %}
@@ -29,41 +40,19 @@
 
         <form method="post" name="import" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
-
-            <div class="container alert-primary py-3">
-                <h4>Auswahl der Organisation und Hochladen der Datei</h4><hr />
-   				<div class="form-group form-group-sm col-12">
-                    {% for field in form %}
-                        <div class="form-group">
-                            {{ field.label_tag }}
-
-                            {% if form.is_bound %}
-                                {% if field.errors %}
-                                    {% render_field field class="form-control is-invalid" %}
-                                    {% for error in field.errors %}
-                                        <div class="invalid-feedback">
-                                            {{ error }}
-                                        </div>
-                                    {% endfor %}
-                                {% else %}
-                                    {% render_field field class="form-control is-valid" %}
-                                {% endif %}
-                            {% else %}
-                                {% render_field field class="form-control" %}
-                            {% endif %}
-
-                            {% if field.help_text %}
-                                <small class="form-text text-muted">
-                                    {{ field.help_text }}
-                                </small>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
+            {% for zeile in daten %}
+                <div class="form-group form-group-sm col-12 {% if not test123 %}bg-success{% else %}bg-danger{% endif %}">
+                    <ul>
+                        <li>
+                            {{ zeile }} war {% if test123 %}nicht {% endif %}erfolgreich.
+                            {% if test123 %}{{ test123 }}{% endif %}
+                        </li>
+                    </ul>
                 </div>
-            </div>
-            <div class="container bg-light py-3 mt-3">
-                <button class="btn btn-outline-success" type="submit" name="hochladen" value="submit">Hochladen</button>
-            </div>
-        </form>
+            {% endfor %}
+                <div class="container bg-light py-3 mt-3">
+                    <button class="btn btn-outline-success" type="submit" name="hochladen" value="submit">Hochladen</button>
+                </div>
+            </form>
 	</div>
 {% endblock %}

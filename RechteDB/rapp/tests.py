@@ -1,7 +1,7 @@
 
 from django.urls import reverse, resolve
 from django.test import TestCase
-from .views import home, GesamtDetailView
+from .views import home
 
 from .models import TblOrga, TblUebersichtAfGfs, TblUserIDundName, TblPlattform, TblGesamt, \
 	TblAfliste, TblUserhatrolle, TblRollehataf, TblRollen, Tblrechteneuvonimport

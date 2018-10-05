@@ -599,8 +599,8 @@ class Tblrechteamneu(models.Model):
 	tf_technische_plattform =\
 							models.CharField(db_column='tf_technische_plattform', max_length=64, blank=True, null=True, db_index=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	gf = 					models.CharField(db_column='gf', max_length=100, blank=True, null=True, db_index=True)  # Field name made lowercase.
-	vip_kennzeichen = 		models.CharField(db_column='vip', max_length=8, blank=True, null=True, db_index=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-	zufallsgenerator = 		models.CharField(db_column='zufallsgenerator', max_length=8, blank=True, null=True, db_index=True)  # Field name made lowercase.
+	vip_kennzeichen = 		models.CharField(db_column='vip', max_length=32, blank=True, null=True, db_index=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+	zufallsgenerator = 		models.CharField(db_column='zufallsgenerator', max_length=32, blank=True, null=True, db_index=True)  # Field name made lowercase.
 	af_gueltig_ab = 		models.DateTimeField(db_column='af_gueltig_ab', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	af_gueltig_bis = 		models.DateTimeField(db_column='af_gueltig_bis', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	direct_connect = 		models.CharField(db_column='direct_connect', max_length=50, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.

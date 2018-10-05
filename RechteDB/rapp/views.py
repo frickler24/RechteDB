@@ -16,6 +16,7 @@ from .filters import PanelFilter, UseridFilter
 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.utils import timezone
 
 from .forms import ShowUhRForm, ImportForm
 
@@ -345,8 +346,6 @@ def panel_UhR(request, id = 0):
 
 ###################################################################
 # Dialogsteuerung für den Import einer neuen IIQ-Datenliste (csv-Datei)
-from datetime import datetime, timedelta
-from django.utils import timezone
 
 def import_csv(request):
 	# Importiere neue CSV-Datei mit IIQ-Daten
@@ -420,16 +419,49 @@ def import_csv(request):
 		schreibe_zeilen(reader)
 
 		zeiten['import_ende'] = timezone.now()
+		laufzeiten = {
+			'Laufzeit':		str(zeiten['import_ende'] - zeiten['import_start']),
+			'Leeren':		str(zeiten['leere_ende'] - zeiten['leere_start']),
+			'Schreiben':	str(zeiten['schreibe_ende'] - zeiten['schreibe_start']),
+		}
 		if ausgabe:
-			print('Laufzeit:', str(zeiten['import_ende'] - zeiten['import_start']))
-			print('Leeren:', str(zeiten['leere_ende'] - zeiten['leere_start']))
-			print('Schreiben:', str(zeiten['schreibe_ende'] - zeiten['schreibe_start']))
+			for line in laufzeiten:
+				print (line)
+		return laufzeiten
+
+	def import_schritt1():
+		# Führt die beiden ersten Stored Procedures vorbereitung() und neueUser() zum Datenimport aus
+		statistik = {}
+		with connection.cursor() as cursor:
+			try:
+				cursor.callproc ("vorbereitung")
+				#neu = geloeschte = gelesene = neuInAM = 0
+				retval = cursor.execute ("CALL neueUser(@neu, @geloeschte, @gelesene, @neuInAM)")
+				print (retval)
+				for _ in range(retval):
+					line = cursor.fetchone()
+					print (line)
+					statistik[line[0]] = line[1]
+			except:
+				e = sys.exc_info()[0]
+				statistik = format("Error: %s" % e)
+
+			cursor.close()
+			return statistik
+
 
 	if request.method == 'POST':
 		form = ImportForm(request.POST, request.FILES)
 		if form.is_valid():
-			bearbeite_datei(True)
-			# ToDo hier muss noch ein Abschluss kommen, wie es mit der Seite weitergeht (Schritt 2)
+			laufzeiten = bearbeite_datei(True)
+			statistik = import_schritt1()
+			context = {
+				'statistik': statistik,
+				'zeiten': zeiten,
+				'laufzeiten': laufzeiten,
+			}
+			return render (request, 'rapp/import2.html', context)
+
 		else:
 			print ('Form war nicht valide')
 	else:
@@ -438,5 +470,9 @@ def import_csv(request):
 	context = {
 		'form': form,
 	}
-	return render(request, 'rapp/import.html', context)
+	return render (request, 'rapp/import.html', context)
 
+def import2(request):
+	context = {
+	}
+	return render (request, 'rapp/import2.html', context)

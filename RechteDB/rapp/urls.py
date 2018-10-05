@@ -82,6 +82,7 @@ urlpatterns += [
 # URl zum Importieren neuer Daten aus IIQ (csv-File)
 urlpatterns += [
 	path('import/', views.import_csv, name='import'),
+	path('import2/', views.import2, name='import2'),
 ]
 
 # URl zum Bestücken der verschiedenen Stored Procedures in das DBMS

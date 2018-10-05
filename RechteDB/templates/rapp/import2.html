@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item active">Import neuer Daten</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Import neuer Datem - {{ block.super }}
+{% endblock %}
+
+
+{% block content %}
+	<div class="container">
+        <h2>
+          Datenimport
+        </h2>
+        <p>
+            Der Import einer CSV-Datei erfolgt in vier Schritten:
+        </p>
+        <ol class="alert bg-dark text-white" >
+            <li class="ml-4">Wählen der Organisation, zu der die Daten hochgeladen werden
+                und Hochladen der Datei zum Server</li>
+            <li class="ml-4">Bearbeiten neuer User oder von Usern, die ihre Organisation gewechselt haben oder die wieder aktiviert werden</li>
+            <li class="ml-4">Bestätigen des Löschens nicht mehr erkannter User</li>
+            <li class="ml-4">Einarbeiten der einzelnen Berechtigungen in die Datenbanken</li>
+        </ol>
+
+        {% if form.non_field_errors %}
+            <div class="container alert-danger bp-3">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <form method="post" name="import" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <div class="container alert-secondary py-3">
+                <h3>Auswahl der Organisation und Hochladen der Datei</h3>
+                <h6>Ein bisschen Statistik:</h6>
+                <p>
+                    {% if statistik %}
+                        {% for k, v in statistik.items %}
+                            {{ k }}: {{ v }}<br />
+                        {% endfor %}
+                    {% else %}
+                        <strong>Oops, keine Statistik vorhanden !?!</strong>
+                    {% endif %}
+                </p>
+                <p>
+                    {% if laufzeiten %}
+                        {% for k, v in laufzeiten.items %}
+                            {{ k }}: {{ v }}<br />
+                        {% endfor %}
+                    {% else %}
+                        <strong>Oops, keine Zeiten vorhanden !?!</strong>
+                    {% endif %}
+                </p>
+            </div>
+
+            <div class="container alert-primary py-3">
+   				<div class="form-group form-group-sm col-12">
+                    {% for field in form %}
+                        <div class="form-group">
+                            {{ field.label_tag }}
+
+                            {% if form.is_bound %}
+                                {% if field.errors %}
+                                    {% render_field field class="form-control is-invalid" %}
+                                    {% for error in field.errors %}
+                                        <div class="invalid-feedback">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    {% render_field field class="form-control is-valid" %}
+                                {% endif %}
+                            {% else %}
+                                {% render_field field class="form-control" %}
+                            {% endif %}
+
+                            {% if field.help_text %}
+                                <small class="form-text text-muted">
+                                    {{ field.help_text }}
+                                </small>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="container bg-light py-3 mt-3">
+                <button class="btn btn-outline-success" type="submit" name="hochladen" value="submit">Hochladen</button>
+            </div>
+        </form>
+	</div>
+{% endblock %}
