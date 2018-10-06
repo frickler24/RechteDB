@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+	<li class="breadcrumb-item active">Import neuer Daten - Schritt 2</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Import neuer Datem - {{ block.super }}
+{% endblock %}
+
+
+{% block content %}
+	<div class="container">
+        {% include 'rapp/import_anleitung.html' %}
+        <p>&nbsp;</p>
+
+        {% if fehler %}
+            <div class="container bg-danger py-3 mt-1">
+                ACHTUNG! <br />
+                Aufruf der Stored Procedure 'bearbeiteUser' lieferte folgende Meldung:<br />
+                {{ fehler }}
+            </div>
+            <p>&nbsp;</p>
+        {% else  %}
+            <h4>Fertig.</h4>
+        {% endif %}
+	</div>
+{% endblock %}

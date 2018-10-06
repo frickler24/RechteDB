@@ -656,3 +656,10 @@ class import_new_csv(TestCase):
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
 
+class setup_database(TestCase):
+	# Tests für den Import der Stored Procedures in die Datenbank
+	def test_setup_database_view_status_code(self):
+		url = reverse('stored_procedures')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+

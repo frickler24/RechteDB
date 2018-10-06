@@ -28,9 +28,9 @@
             <li>Das Importieren neuer CSV-Listen führt nachweislich in den Stored Procedures zu harten Fehlern (z.B. fehlende SP)</li>
             <li>Die Quellen der Stored Procedures wurden in 'stored_procedures.py' geändert</li>
         </ul></strong>
-        <p>
+        <h4 class="mt-5">
             Ansonsten: Finger weg, das bringt hier nichts!
-        </p>
+        </h4>
 
         {% if form.non_field_errors %}
             <div class="container alert-danger bp-3">
@@ -51,7 +51,7 @@
                 </div>
             {% endfor %}
                 <div class="container bg-light py-3 mt-3">
-                    <button class="btn btn-outline-success" type="submit" name="hochladen" value="submit">Hochladen</button>
+                    <button class="btn btn-outline-danger" type="submit" name="hochladen" value="submit">Hochladen</button>
                 </div>
             </form>
 	</div>

@@ -4,7 +4,7 @@
 
 {% block breadcrumb %}
 	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
-	<li class="breadcrumb-item active">Import neuer Daten</li>
+	<li class="breadcrumb-item active">Import neuer Daten - Schritt 2</li>
 {% endblock breadcrumb %}
 
 {% block title %}
@@ -14,84 +14,79 @@
 
 {% block content %}
 	<div class="container">
-        <h2>
-          Datenimport
-        </h2>
-        <p>
-            Der Import einer CSV-Datei erfolgt in vier Schritten:
-        </p>
-        <ol class="alert bg-dark text-white" >
-            <li class="ml-4">Wählen der Organisation, zu der die Daten hochgeladen werden
-                und Hochladen der Datei zum Server</li>
-            <li class="ml-4">Bearbeiten neuer User oder von Usern, die ihre Organisation gewechselt haben oder die wieder aktiviert werden</li>
-            <li class="ml-4">Bestätigen des Löschens nicht mehr erkannter User</li>
-            <li class="ml-4">Einarbeiten der einzelnen Berechtigungen in die Datenbanken</li>
-        </ol>
+        {% include 'rapp/import_ergebnis1.html' %}
 
-        {% if form.non_field_errors %}
-            <div class="container alert-danger bp-3">
-                {{ form.non_field_errors }}
+        <p>&nbsp;</p>
+        <div class="container alert-secondary">
+            <h5>Liste neuer oder wiedergefundener User</h5>
+            <div class="row">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">UserID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Team-#</th>
+                            <th scope="col">Orga</th>
+                            <th scope="col">UserID alt</th>
+                            <th scope="col">Name alt</th>
+                            <th scope="col">gelöscht</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in neueUser %}
+                            <tr>
+                                {% for elem in user %}
+                                    <td>{{ elem }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% empty %}
+                            <tr><td>Keine neuen User gefunden</td></tr>
+                        {% endfor neueUser %}
+                    </tbody>
+                </table>
             </div>
-        {% endif %}
+        </div>
+        <p>&nbsp;</p>
+        <div class="container alert-secondary">
+            <h5>Liste nicht mehr gefundener, zu löschender User</h5>
+            <div class="row">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">UserID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Orga</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in geloeschteUser %}
+                            <tr>
+                                {% for elem in user %}
+                                    <td>{{ elem }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% empty %}
+                            <tr><td>Keine zu löschenden User gefunden</td></tr>
+                        {% endfor neueUser %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p>&nbsp;</p>
 
         <form method="post" name="import" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
-
-            <div class="container alert-secondary py-3">
-                <h3>Auswahl der Organisation und Hochladen der Datei</h3>
-                <h6>Ein bisschen Statistik:</h6>
-                <p>
-                    {% if statistik %}
-                        {% for k, v in statistik.items %}
-                            {{ k }}: {{ v }}<br />
-                        {% endfor %}
-                    {% else %}
-                        <strong>Oops, keine Statistik vorhanden !?!</strong>
-                    {% endif %}
-                </p>
-                <p>
-                    {% if laufzeiten %}
-                        {% for k, v in laufzeiten.items %}
-                            {{ k }}: {{ v }}<br />
-                        {% endfor %}
-                    {% else %}
-                        <strong>Oops, keine Zeiten vorhanden !?!</strong>
-                    {% endif %}
-                </p>
-            </div>
-
-            <div class="container alert-primary py-3">
-   				<div class="form-group form-group-sm col-12">
-                    {% for field in form %}
-                        <div class="form-group">
-                            {{ field.label_tag }}
-
-                            {% if form.is_bound %}
-                                {% if field.errors %}
-                                    {% render_field field class="form-control is-invalid" %}
-                                    {% for error in field.errors %}
-                                        <div class="invalid-feedback">
-                                            {{ error }}
-                                        </div>
-                                    {% endfor %}
-                                {% else %}
-                                    {% render_field field class="form-control is-valid" %}
-                                {% endif %}
-                            {% else %}
-                                {% render_field field class="form-control" %}
-                            {% endif %}
-
-                            {% if field.help_text %}
-                                <small class="form-text text-muted">
-                                    {{ field.help_text }}
-                                </small>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="container bg-light py-3 mt-3">
-                <button class="btn btn-outline-success" type="submit" name="hochladen" value="submit">Hochladen</button>
+           <div class="container bg-light py-3 mt-1">
+               <div class="row">
+                   <div class="col py-3 col-xs-12 col-sm-4 col-md-4 col-lg-4 col-xl-3">
+                        <button class="btn btn-outline-danger" type="submit"
+                                name="hochladen" value="submit">User-Tabelle aktualisieren!</button>
+                   </div>
+                   <div class="col py-2 col-xs-12 col-sm-8 col-md-8 col-lg-8 col-xl-9 bg-warning">
+                       Achtung - Dieser Schritt kann nicht rückgängig gemacht werden.<br />
+                       Bitte vorher die User-Einträge prüfen.
+                   </div>
+               </div>
             </div>
         </form>
 	</div>

@@ -14,19 +14,7 @@
 
 {% block content %}
 	<div class="container">
-        <h2>
-          Datenimport
-        </h2>
-        <p>
-            Der Import einer CSV-Datei erfolgt in vier Schritten:
-        </p>
-        <ol class="alert bg-dark text-white" >
-            <li class="ml-4">Wählen der Organisation, zu der die Daten hochgeladen werden
-                und Hochladen der Datei zum Server</li>
-            <li class="ml-4">Bearbeiten neuer User oder von Usern, die ihre Organisation gewechselt haben oder die wieder aktiviert werden</li>
-            <li class="ml-4">Bestätigen des Löschens nicht mehr erkannter User</li>
-            <li class="ml-4">Einarbeiten der einzelnen Berechtigungen in die Datenbanken</li>
-        </ol>
+        {% include 'rapp/import_anleitung.html' %}
 
         {% if form.non_field_errors %}
             <div class="container alert-danger bp-3">
@@ -39,6 +27,13 @@
 
             <div class="container alert-primary py-3">
                 <h4>Auswahl der Organisation und Hochladen der Datei</h4><hr />
+                <p>
+                    Vor dem Import müssen die folgenden, bekannten Schwächen der Importfiles behoben werden:
+                </p>
+                <ul>
+                    <li>Suchen nach "der Protokolle" und drei Zeilenteile joinen</li>
+                    <li>Suchen nach \Transfer\; und die einzelnen Backslashes gegen doppelte tauschen</li>
+                </ul><hr />
    				<div class="form-group form-group-sm col-12">
                     {% for field in form %}
                         <div class="form-group">
