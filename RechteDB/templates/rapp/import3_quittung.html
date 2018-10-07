@@ -24,8 +24,12 @@
                 {{ fehler }}
             </div>
             <p>&nbsp;</p>
-        {% else  %}
-            <h4>Fertig.</h4>
         {% endif %}
+        <h4>Fertig.</h4>
+        <p>
+            Es wurden {{ request.session.ergebnis }} Zeilen
+            für die Organisation {{ request.session.organisation }}
+            eingearbeitet.
+        </p>
 	</div>
 {% endblock %}

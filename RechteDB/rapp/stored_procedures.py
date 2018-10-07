@@ -128,12 +128,7 @@ BEGIN
         Einschließlich Herausfiltern der doppelten Zeilen
         (> 1% der Zeilen werden aus IIQ doppelt geliefert)
     */
-    truncate table qryF3_RechteNeuVonImportDuplikatfrei;
-    insert into qryF3_RechteNeuVonImportDuplikatfrei (userid, name, tf, `tf_beschreibung`, 
-    			`enthalten_in_af`, `tf_kritikalitaet`,
-                `tf_eigentuemer_org`, `tf_technische_plattform`, GF, `vip`, zufallsgenerator,
-                `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
-                `gf_beschreibung`, `af_zuweisungsdatum`)
+    create temporary table qryF3_RechteNeuVonImportDuplikatfrei as
         SELECT `AF zugewiesen an Account-name` 		AS userid,
                CONCAT(`Nachname`,', ',`Vorname`) 	AS name,
                `tf name` 							AS tf,
@@ -249,10 +244,7 @@ END
 
 def push_sp_neueUser():
 	sp = """
-create procedure neueUser (OUT anzahlNeueUser integer(11),
-                           OUT anzahlGeloeschteUser integer(11),
-                           OUT anzahlGeleseneRechte integer(11),
-                           OUT anzahlRechteInAMneu integer(11))
+create procedure neueUser (IN orga char(32))
 BEGIN
 
     /*
@@ -287,7 +279,7 @@ BEGIN
         SELECT DISTINCT tblRechteAMNeu.userid as userid1,
                         tblRechteAMNeu.name as name1,
                         '35' AS Ausdr1,
-                        'AI-BA' AS Ausdr2,
+                        orga AS Ausdr2,
                         tblUserIDundName.userid as userid2,
                         tblUserIDundName.name as name2,
                         tblUserIDundName.geloescht
@@ -304,14 +296,14 @@ BEGIN
         Sichtung der nicht mehr vorhandenen User, deren Einträge im weiteren Verlauf geloescht werden sollen
         Erst einmal werden die Rechte der als zu löschen markierten User in die Historientabelle verschoben.
 
-        ToDo: Mal checken, ob wir die Tabelle wirkjlich materialisiert benötigen oder nicht (evtl. zur Ansicht?)
+        ToDo: Mal checken, ob wir die Tabelle wirklich materialisiert benötigen oder nicht (evtl. zur Ansicht?)
     */
 
     drop table if exists qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a;
     create table qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a as
     SELECT A.userid, A.name, A.`zi_organisation`
         FROM tblUserIDundName A
-        WHERE   A.`zi_organisation` = 'ai-ba'
+        WHERE   A.`zi_organisation` = orga
             AND COALESCE(A.geloescht, FALSE) = FALSE
             AND A.userid not in (select distinct userid from tblRechteAMNeu)
         GROUP BY
@@ -323,10 +315,11 @@ BEGIN
     -- SELECT * from qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a;
 
     -- Ein bisschen Statistik für den Anwender
-    select count(*) INTO anzahlNeueUser from qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a;
-    select count(*) INTO anzahlGeloeschteUser from qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a;
-    select count(*) INTO anzahlGeleseneRechte from tblRechteNeuVonImport;
-    select count(*) INTO anzahlRechteInAMneu from tblRechteAMNeu;
+    
+    -- select count(*) INTO anzahlNeueUser from qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a;
+    -- select count(*) INTO anzahlGeloeschteUser from qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a;
+    -- select count(*) INTO anzahlGeleseneRechte from tblRechteNeuVonImport;
+    -- select count(*) INTO anzahlRechteInAMneu from tblRechteAMNeu;
 
     select 'Anzahl neuer User' as name, count(*) as wert from qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a 
     UNION
@@ -334,8 +327,11 @@ BEGIN
     UNION
     select 'Anzahl gelesener Rechte' as name, count(*) as wert from tblRechteNeuVonImport
     UNION
-    select 'Anzahl Rechte in AM_neu' as name, count(*) as wert from tblRechteAMNeu;
+    select 'Anzahl Rechte in AM_neu' as name, count(*) as wert from tblRechteAMNeu
+    UNION
+    select 'orga' as name, cast(orga as char) as wert
     
+    ;
 END
 """
 	return push_sp ('neueUser', sp)
@@ -453,7 +449,7 @@ END
 
 def push_sp_behandleRechte():
 	sp = """
-create procedure behandleRechte ()
+create procedure behandleRechte (IN orga char(32))
 BEGIN
 
     /*
@@ -504,7 +500,8 @@ BEGIN
 
     /*
         Nun wird die "flache" Tabelle "tbl_Gesamt_komplett" erzeugt.
-        Dort sind die Referenzen zu den User- und Berechtigungs- und Orga-Tabellen aufgelöst,
+        Dort sind die Referenzen zu den derzeit existierenden, aktiven 
+        User-, Berechtigungs- und Orga-Tabellen aufgelöst,
         allerdings in dieser Implementierung ausschließlich für die benötigten UserIDen
         (früher wirklich komplett).
 
@@ -512,8 +509,11 @@ BEGIN
     */
 
     drop table if exists tbl_Gesamt_komplett;
+	create temporary table uids as
+		select distinct userid as uid from tblRechteAMNeu;
+
     create table tbl_Gesamt_komplett as
-        SELECT tblGesamt.id,
+		SELECT tblGesamt.id,
                tblUserIDundName.userid,
                tblUserIDundName.name,
                tblGesamt.tf,
@@ -549,18 +549,19 @@ BEGIN
             ON tblGesamt.`userid_und_name_id` = tblUserIDundName.id
 
         WHERE COALESCE(tblGesamt.`geloescht`, FALSE) = FALSE
-            AND tblUserIDundName.userid in (select distinct userid from tblRechteAMNeu)
+            AND tblUserIDundName.userid in (select uid from uids)
         ORDER BY tblGesamt.tf,
                  tblUserIDundName.userid;
 
     /*
         Markieren der Flags Gefunden in tblRechteAMNeu sowie tblGesamt.
-        In letzterer wird auch das datum eingetragen, wann das Recht wiedergefunden wurde.
+        In letzterer wird auch das wiedergefunden-Datum eingetragen, wann das Recht wiedergefunden wurde.
 
         Zusätzlich werden alle Felder, die hier nicht zum Vergleich der Rechte-Gleichheit
         genutzt wurden, in der Gesamttabelle aktualisiert.
 
-        Das hat früher mal zu Problemen geführt, in letzter Zeit aber eher nicht mehr.
+        Das hat früher mal zu Problemen geführt (Umbenennung ovn Rechten und -Eigentümern), 
+        in letzter Zeit aber eher nicht mehr.
 
     */
 
@@ -660,7 +661,7 @@ BEGIN
         ON tblUserIDundName.id = tblGesamt.`userid_und_name_id`
 
     WHERE tblGesamt.`geaendert` = TRUE
-           AND tblUserIDundName.`zi_organisation` LIKE 'AI-BA';      -- ToDo: Wird die Einschränkung wirklich benötigt?
+           AND tblUserIDundName.`zi_organisation` LIKE orga;      -- ToDo: Wird die Einschränkung wirklich benötigt?
            -- ToDo: Es sollte ja nicht kopiert, sondern verschoben werden. Es fehlt hier also das Löschen.
 
 
@@ -680,7 +681,7 @@ BEGIN
     SET tblGesamt.`enthalten_in_af` = `neueaf`
 
     WHERE tblGesamt.`geaendert` = TRUE
-        AND tblUserIDundName.`zi_organisation` = 'AI-BA';
+        AND tblUserIDundName.`zi_organisation` = orga;
 
 
     /*
@@ -699,7 +700,7 @@ BEGIN
         Beim Einfügen der neuen tf-AF-Kombinationen wird in der Gesamttabelle "gefunden" gesetzt,
         damit das Recht später nicht gleich wieder geloescht wird.
 
-        ToDo: Eigentlich müssten hierbei auch die GF berüchsichtigt werden - da gab es aber noch keine Auffälligkeiten
+        ToDo: Eigentlich müssten hierbei auch die GF berücksichtigt werden - da gab es aber noch keine Auffälligkeiten
 
         qryF5_FlaggetfmitNeuenAFinImportTabelle
     */
@@ -744,7 +745,7 @@ BEGIN
     INSERT INTO tblGesamt (tf, `tf_beschreibung`, `enthalten_in_af`, datum, modell, `userid_und_name_id`,
                 plattform_id, Gefunden, `geaendert`, `tf_kritikalitaet`, `tf_eigentuemer_org`, GF, `vip`,
                 zufallsgenerator, `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
-                `gf_beschreibung`, `af_zuweisungsdatum`)
+                `gf_beschreibung`, `af_zuweisungsdatum`, letzte_aenderung)
     SELECT  tblRechteAMNeu.tf,
             tblRechteAMNeu.`tf_beschreibung`,
             tblRechteAMNeu.`enthalten_in_af`,
@@ -777,7 +778,8 @@ BEGIN
             tblRechteAMNeu.`direct_connect`,
             tblRechteAMNeu.`hk_tf_in_af`,
             tblRechteAMNeu.`gf_beschreibung`,
-            tblRechteAMNeu.`af_zuweisungsdatum`
+            tblRechteAMNeu.`af_zuweisungsdatum`,
+            now() as letzte_aenderung
 
     FROM tblRechteAMNeu
     WHERE tblRechteAMNeu.Gefunden = FALSE
@@ -794,17 +796,22 @@ BEGIN
     */
 
 
+    /*
+    select * from tblRechteAMNeu
+    WHERE COALESCE(Gefunden, FALSE) = FALSE
+        AND COALESCE(geaendert, FALSE) = FALSE
+        AND COALESCE(angehaengt_bekannt, FALSE) = FALSE;
+    */
+
     UPDATE tblRechteAMNeu
     SET `angehaengt_sonst` = TRUE
-    WHERE Gefunden = FALSE
-        AND `geaendert` = FALSE
-        AND `angehaengt_bekannt` = FALSE;
+    WHERE COALESCE(Gefunden, FALSE) = FALSE
+        AND COALESCE(geaendert, FALSE) = FALSE
+        AND COALESCE(angehaengt_bekannt, FALSE) = FALSE;
 
     /*
     select * from tblRechteAMNeu
-    WHERE Gefunden = FALSE
-        AND `geaendert` = FALSE
-        AND `angehaengt_bekannt` = FALSE;
+    WHERE angehaengt_sonst = TRUE;
     */
 
     /*
@@ -922,6 +929,86 @@ BEGIN
         AND tblUEbersichtAF_GFs.`name_gf_neu` = "Bleibt (Control-SA)"
         AND COALESCE(tblGesamt.`geloescht`, FALSE) = FALSE;
 
+    /*
+        Jetzt müssen zum Abschluss noch in denjenigen importierten Zeilen,
+        bei denen die tfs unbekannt sind, das modell auf "neues Recht" gesetzt werden.
+        Die sind daran zu erkennen, dass das modell NULL ist.
+    */
+
+    UPDATE tblGesamt,
+           tblUEbersichtAF_GFs
+    SET tblGesamt.modell = `tblUEbersichtAF_GFs`.`id`
+    WHERE tblUEbersichtAF_GFs.`name_gf_neu` = "Neues Recht noch nicht eingruppiert"
+       AND tblGesamt.modell IS NULL;
+
+
+/*
+    Und fertig wir sind.
+*/
+END
+"""
+	return push_sp ('behandleRechte', sp)
+
+def push_sp_loescheDoppelteRechte():
+	sp = """
+create procedure loescheDoppelteRechte (IN nurLesen bool)
+BEGIN
+    /*
+        Prozedur zum Finden und Löschen doppelt vorhandener Einträge in der Gesamttabelle.
+        Auch wenn das eigentlich ie vorkommen dürfte, passiert das dennoch ab und an.
+        Hauptgruind sind falsch formatierte Eingatelisten.
+    */
+
+    CREATE temporary table qryF3_DoppelteElementeFilterAusGesamtTabelle as
+        SELECT DISTINCT b.id,
+            b.tf,
+            a.geloescht as RechtGeloescht,
+            b.geloescht as UserGeloescht,
+            tblUserIDundName.userid,
+            tblUserIDundName.name,
+            a.GF,
+            a.vip,
+            a.zufallsgenerator
+
+            FROM tblGesamt AS b,
+                tblUserIDundName
+                INNER JOIN tblGesamt AS a
+                    ON tblUserIDundName.id = a.userid_und_name_id
+            WHERE a.id < b.id
+                AND COALESCE(a.geloescht, FALSE) = FALSE
+                AND COALESCE(a.geloescht, FALSE) = FALSE
+                AND a.GF = b.gf
+                AND a.vip = b.vip
+                AND a.zufallsgenerator = b.zufallsgenerator
+                AND a.userid_und_name_id =b.userid_und_name_id
+                AND a.tf = b.tf
+                AND a.enthalten_in_af = b.enthalten_in_af
+                AND a.tf_beschreibung = b.tf_beschreibung
+                AND a.plattform_id = b.plattform_id
+                AND a.tf_kritikalitaet = b.tf_kritikalitaet
+                AND a.tf_eigentuemer_org = b.tf_eigentuemer_org;
+
+    IF (COALESCE(nurlesen, false) = True)
+    THEN
+        select count(*) from qryF3_DoppelteElementeFilterAusGesamtTabelle;
+    ELSE
+        UPDATE tblGesamt
+        	INNER JOIN qryF3_DoppelteElementeFilterAusGesamtTabelle
+            ON tblGesamt.id = qryF3_DoppelteElementeFilterAusGesamtTabelle.id
+            
+            SET tblGesamt.geloescht = True,
+	            tblGesamt.patchdatum = Now()
+			WHERE COALESCE(tblGesamt.geloescht, FALSE) = False;
+    END IF;
+END
+"""
+	return push_sp ('loescheDoppelteRechte', sp)
+
+
+def push_sp_nichtai():
+	sp = """
+create procedure setzeNichtAIFlag()
+BEGIN
 
     /*
         Das Flag, ob ein Recht sich auf einen AI-User bezieht, wird korrigiert
@@ -953,8 +1040,8 @@ BEGIN
         Dazu werden die folgenden temporären Queries erzeugt:
 
         qryF7_GesamtNachtfunduserid:   Enthält "eigentlich" alle Daten zur ordentlichen Anzeige.
-            Dem namen nach müssten die Daten genau so sortiert sein wie angegeben,
-            aber in unserem Fall hier kostet das nur Laufzeit und wird hier nicht benötigt.
+            Dem Namen nach müssten die Daten genau so sortiert sein wie angegeben,
+            aber in unserem Fall hier kostet das nur Laufzeit und wird nicht benötigt.
 
         ToDo: Ein paar Daten-Fehler hierbei...
 
@@ -1079,27 +1166,9 @@ BEGIN
         ON `tblZZF8_SE-RechtesucheVorbereiten0a`.id = tblGesamt.id
     SET tblGesamt.`nicht_ai` = TRUE;
 
-
-    /*
-        Jetzt müssen zum Abschluss noch in denjenigen importierten Zeilen,
-        bei denen die tfs unbekannt sind, das modell auf "neues Recht" gesetzt werden.
-        Die sind daran zu erkennen, dass das modell NULL ist.
-    */
-
-    UPDATE tblGesamt,
-           tblUEbersichtAF_GFs
-    SET tblGesamt.modell = `tblUEbersichtAF_GFs`.`id`
-    WHERE tblUEbersichtAF_GFs.`name_gf_neu` = "Neues Recht noch nicht eingruppiert"
-       AND tblGesamt.modell IS NULL;
-
-
-/*
-    Und fertig wir sind.
-*/
 END
 """
-	return push_sp ('behandleRechte', sp)
-
+	return push_sp ('setzeNichtAIFlag', sp)
 
 
 def handle_stored_procedures(request):
@@ -1113,8 +1182,9 @@ def handle_stored_procedures(request):
 		daten['neueUser'] = push_sp_neueUser()
 		daten['behandleUser'] = push_sp_behandleUser()
 		daten['behandleRechte'] = push_sp_behandleRechte()
+		daten['loescheDoppelteRechte'] = push_sp_loescheDoppelteRechte()
+		daten['setzeNichtAIFlag'] = push_sp_nichtai() # Nur, falls die Funktion jemals wieder benötigt wird
 
-	print (daten)
 	context = {
 		'daten': daten,
 	}

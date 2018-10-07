@@ -85,6 +85,7 @@ urlpatterns += [
 	path('import2/', views.import2, name='import2'),
 	path('import2_quittung/', views.import2_quittung, name='import2_quittung'),
 	path('import3_quittung/', views.import3_quittung, name='import3_quittung'),
+	path('import_status/', views.import_status, name='import_status'),
 ]
 
 # URl zum Bestücken der verschiedenen Stored Procedures in das DBMS

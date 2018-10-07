@@ -17,8 +17,9 @@ from .filters import PanelFilter, UseridFilter
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.utils import timezone
+from django import forms
 
-from .forms import ShowUhRForm, ImportForm, ImportForm_schritt2, ImportForm_schritt3
+from .forms import ShowUhRForm, ImportForm, ImportForm_schritt3
 
 # Zum Einlesen der csv
 import csv, textwrap
@@ -59,6 +60,7 @@ from .stored_procedures import *
 # ToDo: Welche Rechte sind redundant, weil sie neu modelliert wurden und was ist die Alternativempfehlung?
 # ToDo: Zu welchen Orgabereichen (Importfunktion dafür!) gehören die identifizierten User (Vorbereitung Mail an FK zum Prüfen und eventuellem Löschen
 
+# ToDo: Suche-Panel: Die Links bei den beiden Lösch-Buttons rechts sind defekt
 # ToDo: Links auf die change- create- und delete-Seiten ausprobieren. Sind eigene Seiten im Frontend besser?
 # ToDo: Filter-Panel mit excel Export versorgen
 # ToDo: Kompakte Liste für Rolle und AF mit Filtermöglichkeit und PDF Generierung
@@ -69,6 +71,8 @@ from .stored_procedures import *
 # ToDo: Die tables alternierend einfärben
 # ToDo: Prüfen, warum so viele Plattvorm_id in der Gesamttabelle 0 sind
 # ToDo: Checken, ob tbl_Gesamt_komplett irgendwo noch als Gesamttabelle aller userids benötigt wird, sonst in SP löschen nach Nutzung
+# ToDO: Längenbegrenzungen checken in Modell für UserHatRolle
+# ToDo Mechismus für die progress-bar geht überhaupt noch nicht (kein Update, kein Löschen usw.)
 
 # Der Direkteinsteig für die gesamte Anwendung
 def home(request):
@@ -369,8 +373,9 @@ def import_csv(request):
 		zeiten['leere_ende'] = timezone.now()
 
 	def schreibe_zeilen(reader):
-		# Für jeder Zeile der EIngabedatei sollte genau eine Zeile in der Importtabelle erzeugt werden
+		# Für jede Zeile der Eingabedatei soll genau eine Zeile in der Importtabelle erzeugt werden
 		zeiten['schreibe_start'] = timezone.now()
+
 		for line in reader:
 			# Sicherheitshalber werden alle eingelesenen Daten auf Maximallänge reduziert.
 			# Derzeit gibt es bereits Einträge in 'TF Name' und 'TF Beschreibung',
@@ -398,13 +403,18 @@ def import_csv(request):
 				af_zuweisungsdatum = 	patch_datum (line['AF Zuweisungsdatum']),
 			)
 			neuerRecord.save()
+			request.session['geschafft'] = request.session.get('geschafft', 0) + 1 # Zeilenzähler
 		zeiten['schreibe_ende'] = timezone.now()
+		del request.session['geschafft']
+		del request.session['Anzahl Zeilen']
 
 	def hole_datei():
 		# Über die HTTP-Verbindung kommt eine Datei, die auf CSV-Inhalte geprüft werden muss
 		datei = request.FILES['datei']
 		inhalt = datei.read().decode("ISO-8859-1")	# Warum das kein UTF-8 ist, weiß ich auch nicht
 		zeilen = inhalt.splitlines()
+		request.session['Anzahl Zeilen'] = len(zeilen) - 1	# Merken für Fortschrittsbalken, 1. Zeile ist Header
+
 		dialect = csv.Sniffer().sniff(zeilen[0])
 		dialect.escapechar = '\\'
 		return (zeilen, dialect)
@@ -435,31 +445,42 @@ def import_csv(request):
 				print (line)
 		return laufzeiten
 
-	def import_schritt1():
+	def import_schritt1(orga):
 		# Führt die beiden ersten Stored Procedures vorbereitung() und neueUser() zum Datenimport aus
 		fehler = False
 		statistik = {}
 		with connection.cursor() as cursor:
 			try:
+				s = 1
 				cursor.callproc ("vorbereitung")
-				retval = cursor.execute ("CALL neueUser(@neu, @geloeschte, @gelesene, @neuInAM)")
-				for _ in range(retval):
-					line = cursor.fetchone()
+				s = 2
+				cursor.callproc ("neueUser", [orga, ])
+				tmp = cursor.fetchall()
+				print (tmp)
+				for line in tmp:
 					statistik[line[0]] = line[1]
 			except:
 				e = sys.exc_info()[0]
 				fehler = format("Error: %s" % e)
+				if s == 1:
+					print ('Fehler in import_schritt1, StoredProc "vorbereitung"', fehler)
+				elif s == 2:
+					print ('Fehler in import_schritt1, StoredProc "neueUser"', fehler)
+				else:
+					print('Fehler in import_schritt1, aber wo?', fehler, 's =', s)
 
 			cursor.close()
 			return statistik, fehler
 
-	__DUMMY__ = False #or True	# Das 'or True' auskommentieren, wenn die Funktion unten realiter genutzt werden sol
+	__DUMMY__ = False #or True	# Das 'or True' auskommentieren, wenn die Funktion unten genutzt werden sol
 	if request.method == 'POST':
 		form = ImportForm(request.POST, request.FILES)
 		if form.is_valid():
 			if not __DUMMY__:
+				orga = request.POST.get('organisation', 'Keine Orga!') # Auf dem Panel wurde die Ziel-Orga übergeben
+				request.session['organisation'] = orga	# und merken in der Session für Schritt 3
 				laufzeiten = bearbeite_datei(False)
-				statistik, fehler = import_schritt1()
+				statistik, fehler = import_schritt1(orga)
 				request.session['import_statistik'] = statistik
 				request.session['import_laufzeiten'] = laufzeiten
 				request.session['fehler1'] = fehler
@@ -477,14 +498,17 @@ def import_csv(request):
 
 
 def import2(request):
-	# Der zweite Schritt zeigt zunächst die statistischen Ergebnisse von Schritt 1, dann die neuen User.
-	# Beim Bestätigen des Schrittes werden die neuen User der UserIDundName-Tabelle hinzugefügt.
+	# Der zweite Schritt zeigt zunächst die statistischen Ergebnisse von Schritt 1, dann die neuen User
+	# Soewie die zu löschenden User.
+	# Beim Bestätigen des Schrittes werden die neuen User der UserIDundName-Tabelle hinzugefügt
+	# und die zu löschenden markiert sowie deren Rechte historisiert
+	# (warum eigentlich, die können doch bei der Reinkaranation wieder verwendet werden?).
 
 	def hole_alles(db):
 		# Lesen aller Werte aus eienr übergebenen Datenbank
 		# Das wird benötigt für Datenbanken, die nicht als Django-Modell hinterlegt sind (bspw. temp.-Tabellen)
 		fehler = False
-		retval = 'Nix geladen'
+		retval = [['Nix geladen']]
 		with connection.cursor() as cursor:
 			try:
 				sql = "SELECT * FROM {}".format(db)
@@ -505,18 +529,22 @@ def import2(request):
 
 	def import_schritt2():
 		# Führt die Stored Procedure behandleUser() zum Aktualisieren der UserIDundName-Tabelle aus
+		# Als Seiteneffekt werden die Tabellen qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
+		# und qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a gefüllt, die weiter unten in die Session übernommen werden.
 		fehler = False
 		with connection.cursor() as cursor:
 			try:
-				cursor.callproc ("behandleUser")
+				cursor.callproc ("behandleUser") # diese SProc benötigt die Orga nicht als Parameter
 			except:
 				e = sys.exc_info()[0]
 				fehler = format("Error: %s" % e)
+				print('Fehler in import_schritt2, StoredProc behandleUser', fehler)
+
 			cursor.close()
 			return fehler
 
 	if request.method == 'POST':
-		form = ImportForm_schritt2(request.POST)
+		form = forms.Form(request.POST) # Kein Eintrag in forms.py erfordelrich, da keine Modell-Anbindung oder Felder
 		if form.is_valid():
 			fehler = import_schritt2()
 			request.session['fehler2'] = fehler
@@ -524,20 +552,19 @@ def import2(request):
 		else:
 			print ('Form war nicht valide')
 	else:
-		form = ImportForm_schritt2()
+		form = forms.Form()
 
+	# Der Context wird beim ersten Aufruf (dem ersten Anzeigen) des Templates geüllt.
+	# Bei eventuellen weiteren GET-Lieferunngen wird der Context erneut gesetzt.
+	# ToDO:_ Nopchmal überlegen, was in die Session gehört und was nicht. Session-Vars direkt im Template behandeln!
 	context = {
 		'form': form,
 		'fehler': request.session.get('fehler1', None),
 		'statistik': request.session.get('import_statistik', 'Keine Statistik vorhanden'),
 		'laufzeiten': request.session.get('import_laufzeiten', 'Keine Laufzeiten vorhanden'),
-		'neueUser': hole_neueUser()[0], # Nur die Daten, ohne den Returncode der Funktion
-		'geloeschteUser': hole_geloeschteUser()[0], # Nur die Daten, ohne den Returncode der Funktion
 	}
-
-	request.session['neueUser'] = context['neueUser']
-	request.session['geloeschteUser'] = context['geloeschteUser']
-
+	request.session['neueUser'] = hole_neueUser()[0]  # Nur die Daten, ohne den Returncode der Funktion
+	request.session['geloeschteUser'] = hole_geloeschteUser()[0]  # Nur die Daten, ohne den Returncode der Funktion
 	return render(request, 'rapp/import2.html', context)
 
 
@@ -546,17 +573,21 @@ def import2_quittung(request):
 	# Es wird ein Link angeboten auf eine geeignete Seite, um die User-Tabelle manuell anzupassen.
 	# Buttons werden angeboten, um den nächsten Schritt anzustoßen oder das Ganze abzubrechen.
 
-	def import_schritt3():
-		# Führt die letzten definitiv erforderliche Stored Procedures behandle_Rechte() aus.
+	def import_schritt3(orga, dopp):
+		# Führt die letzte definitiv erforderliche Stored Procedures behandle_Rechte() aus.
 		# Optional kann dann noch das Löschen doppelt angelegeter Rechte erfolgen (loescheDoppelteRechte)
 		fehler = False
 		with connection.cursor() as cursor:
 			try:
-				retval = cursor.callproc ("behandleRechte")
+				retval = cursor.callproc ("behandleRechte", [orga, ])
 				print (retval)
+				if dopp:
+					retval += cursor.callproc ("loescheDoppelteRechte", [False, ]) # False = Nicht nur lesen
+
 			except:
 				e = sys.exc_info()[0]
 				fehler = format("Error: %s" % e)
+				print ('Fehler in import_schritt2, StoredProc behandleUser oder loescheDoppelteRechte', fehler)
 
 			cursor.close()
 			return fehler
@@ -564,13 +595,22 @@ def import2_quittung(request):
 	if request.method == 'POST':
 		form = ImportForm_schritt3(request.POST)
 		if form.is_valid():
-			fehler = import_schritt3()
+			orga = request.session.get('organisation', 'keine-Orga')
+			dopp = request.POST.get('doppelte_suchen', False)
+
+			print (orga, dopp)
+			fehler = import_schritt3(orga, dopp)
+
 			request.session['fehler3'] = fehler
-			return redirect('import3_quittung') # ToDo: Flag für Suche nach Doppeleinträgen
+			ergebnis = TblGesamt.objects.filter(geloescht = False,
+										 userid_name__zi_organisation = orga,
+										 userid_name__geloescht = False).count()
+			request.session['ergebnis'] = ergebnis
+			return redirect('import3_quittung')
 		else:
 			print ('Form war nicht valide')
 	else:
-		form = ImportForm_schritt3()
+		form = ImportForm_schritt3(initial={'doppelte_suchen': False})
 
 	context = {
 		'form': form,
@@ -585,3 +625,10 @@ def import3_quittung(request):
 		#'fehler': request.session.get('fehler3', None),
 	}
 	return render(request, 'rapp/import3_quittung.html', context)
+
+def import_status(request):
+	zeilen = request.session.get ('Anzahl Zeilen', 1)
+	aktuell = request.session.get ('geschafft', 0)
+	proz = int(aktuell) * 100 // int(zeilen)
+	print (zeilen, aktuell, proz)
+	return render (request, 'rapp/import_status.html', {'proz': proz})

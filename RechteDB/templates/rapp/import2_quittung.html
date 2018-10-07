@@ -4,7 +4,8 @@
 
 {% block breadcrumb %}
 	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
-	<li class="breadcrumb-item active">Import neuer Daten - Schritt 2</li>
+	<li class="breadcrumb-item">Import neuer Daten - Schritt 2</li>
+	<li class="breadcrumb-item active">Schritt 2 - manuelle Sichtung</li>
 {% endblock breadcrumb %}
 
 {% block title %}
@@ -39,15 +40,36 @@
                 müssen die Abteilung, die Gruppe und das Team kontrolliert und gegebenenfalls angepasst werden
             </li>
         </ol>
-        <p>Die Einstellungen erfolgen idealerweise direkt über die Links in der Tabelle.</p>
+        <p>
+            Die Einstellungen erfolgen idealerweise direkt über die Links in der Tabelle
+            (soweit Daten vorhanden sind).
+        </p>
+        <p>
+            Bitte wählen Sie noch die Suche nach Doppeleinträgen aus,
+            falls der Eindruck besteht,
+            dass solche existieren könnten
+            (bspw. nach Fehlimporten oder Importen fehlerhafter Daten).
+        </p>
+
         <p>Anschließend kann die weitere Verarbeitung über den roten Button unten angestoßen
             oder der Vorgang abgebrochen werden. </p>
 
         <form method="post" name="import" novalidate>
             {% csrf_token %}
+            <div class="container bg-light">
+                <div class="row">
+                    <div class="col col-xs-9 col-sm-7 col-md-6 col-lg-5 col-xl-4 mt-2">
+                        {{ form.doppelte_suchen.label_tag }}
+                    </div>
+                    <div class="col col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xl-1 mt-2">
+                        {% render_field form.doppelte_suchen class="form-control" %}
+                    </div>
+                </div>
+            </div>
+            <hr />
            <div class="container bg-light py-3 mt-1 alert-danger">
                <div class="row">
-                   <div class="col py-3 col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3">
+                   <div class="col py-3 col-xs-8 col-sm-8 col-md-4 col-lg-3 col-xl-3">
                         <button class="btn btn-outline-danger" type="submit"
                                 name="hochladen" value="submit">Inhalte aktualisieren!</button>
                    </div>
@@ -66,34 +88,36 @@
         <div class="container alert-secondary">
             <h5>Liste neuer oder wiedergefundener User</h5>
             <div class="row">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th scope="col">UserID</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Team-#</th>
-                            <th scope="col">Orga</th>
-                            <th scope="col">UserID alt</th>
-                            <th scope="col">Name alt</th>
-                            <th scope="col">gelöscht</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in neueUser %}
+                {% if request.session.neueUser %}
+                    <table class="table table-striped">
+                        <thead>
                             <tr>
-                                {% for elem in user %}
-                                    <td>
-                                        <a href="/adminrapp/tbluseridundname?name={{ user.1 }}" target="_blank">
-                                            {{ elem }}
-                                        </a>
-                                    </td>
-                                {% endfor %}
+                                <th scope="col">UserID</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Team-#</th>
+                                <th scope="col">Orga</th>
+                                <th scope="col">UserID alt</th>
+                                <th scope="col">Name alt</th>
+                                <th scope="col">gelöscht</th>
                             </tr>
-                        {% empty %}
-                            <tr><td>Keine neuen User gefunden</td></tr>
-                        {% endfor neueUser %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for user in request.session.neueUser %}
+                                <tr>
+                                    {% for elem in user %}
+                                        <td>
+                                            <a href="/adminrapp/tbluseridundname?name={{ user.1 }}" target="_blank">
+                                                {{ elem }}
+                                            </a>
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor neueUser %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="ml-5">Keine neuen User gefunden</p>
+                {% endif %}
             </div>
         </div>
         <p>&nbsp;</p>

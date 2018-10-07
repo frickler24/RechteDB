@@ -8,7 +8,7 @@
 {% endblock breadcrumb %}
 
 {% block title %}
-	Import neuer Datem - {{ block.super }}
+	Import neuer Daten - {{ block.super }}
 {% endblock %}
 
 
@@ -33,7 +33,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for user in neueUser %}
+                        {% for user in request.session.neueUser %}
                             <tr>
                                 {% for elem in user %}
                                     <td>{{ elem }}</td>
@@ -59,7 +59,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for user in geloeschteUser %}
+                        {% for user in request.session.geloeschteUser %}
                             <tr>
                                 {% for elem in user %}
                                     <td>{{ elem }}</td>
@@ -72,19 +72,24 @@
                 </table>
             </div>
         </div>
-        <p>&nbsp;</p>
 
         <form method="post" name="import" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
            <div class="container bg-light py-3 mt-1">
                <div class="row">
-                   <div class="col py-3 col-xs-12 col-sm-4 col-md-4 col-lg-4 col-xl-3">
-                        <button class="btn btn-outline-danger" type="submit"
-                                name="hochladen" value="submit">User-Tabelle aktualisieren!</button>
+                   <div class="col py-3 col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3">
+                        <button class="btn btn-outline-danger " type="submit"
+                                name="hochladen" value="submit">Inhalte aktualisieren!</button>
                    </div>
-                   <div class="col py-2 col-xs-12 col-sm-8 col-md-8 col-lg-8 col-xl-9 bg-warning">
-                       Achtung - Dieser Schritt kann nicht rückgängig gemacht werden.<br />
-                       Bitte vorher die User-Einträge prüfen.
+                   <div class="col pt-3 col-xs-12 col-sm-12 col-md-4 col-lg-6 col-xl-6 alert alert-warning">
+                        Wenn die angezeigten Daten plausibel sind, weiter mit dem Button "User-Tabelle aktualisieren!",
+                        sonst abbrechen.<br />
+                       Bisher sind keine Daten in den Zieltabellen verändert worden.<br />
+                       <b>Achtung - dieser Schritt kann nicht rückgängig gemacht werden.</b>
+                   </div>
+                   <div class="col py-3 col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3">
+                       <button onclick="location.href = '{% url 'import' %}';" type="reset"
+                               class="btn btn-outline-success expand " >Abbrechen</button>
                    </div>
                </div>
             </div>

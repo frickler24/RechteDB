@@ -301,8 +301,8 @@ class TblGesamt(models.Model):
 	tf_eigentuemer_org = 	models.CharField(db_column='tf_eigentuemer_org', max_length=64, blank=True, null=True, verbose_name='TF-Eigentümer-orga', db_index=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	plattform = 			models.ForeignKey('TblPlattform', db_column='plattform_id', on_delete=models.CASCADE, verbose_name='Plattform', db_index=True)  # Field name made lowercase.
 	gf = 					models.CharField(db_column='gf', max_length=100, blank=True, null=True, verbose_name='GF', db_index=True)  # Field name made lowercase.
-	vip_kennzeichen = 		models.CharField(db_column='vip', max_length=8, blank=True, null=True, verbose_name='VIP')  # Field name made lowercase. Field renamed to remove unsuitable characters.
-	zufallsgenerator = 		models.CharField(db_column='zufallsgenerator', max_length=8, blank=True, null=True, verbose_name='Zufallsgenerator')  # Field name made lowercase.
+	vip_kennzeichen = 		models.CharField(db_column='vip', max_length=32, blank=True, null=True, verbose_name='VIP')  # Field name made lowercase. Field renamed to remove unsuitable characters.
+	zufallsgenerator = 		models.CharField(db_column='zufallsgenerator', max_length=32, blank=True, null=True, verbose_name='Zufallsgenerator')  # Field name made lowercase.
 	af_gueltig_ab = 		models.DateTimeField(db_column='af_gueltig_ab', blank=True, null=True, verbose_name='AF gültig ab')  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	af_gueltig_bis = 		models.DateTimeField(db_column='af_gueltig_bis', blank=True, null=True, verbose_name='AF gültig bis')  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	direct_connect = 		models.CharField(db_column='direct_connect', max_length=100, blank=True, null=True, verbose_name='Direktverbindung')  # Field name made lowercase. Field renamed to remove unsuitable characters.
@@ -375,8 +375,8 @@ class TblGesamtHistorie(models.Model):
 	tf_eigentuemer_org = 	models.CharField(db_column='tf_eigentuemer_org', max_length=64, blank=True, null=True, verbose_name='TF-Eigentümer-orga')  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	plattform = 			models.ForeignKey('TblPlattform', db_column='plattform_id', on_delete=models.CASCADE, verbose_name='Plattform')  # Field name made lowercase.
 	gf = 					models.CharField(db_column='gf', max_length=100, blank=True, null=True, verbose_name='GF')  # Field name made lowercase.
-	vip_kennzeichen = 		models.CharField(db_column='vip', max_length=8, blank=True, null=True, verbose_name='VIP')  # Field name made lowercase. Field renamed to remove unsuitable characters.
-	zufallsgenerator = 		models.CharField(db_column='zufallsgenerator', max_length=8, blank=True, null=True, verbose_name='Zufallsgenerator')  # Field name made lowercase.
+	vip_kennzeichen = 		models.CharField(db_column='vip', max_length=32, blank=True, null=True, verbose_name='VIP')  # Field name made lowercase. Field renamed to remove unsuitable characters.
+	zufallsgenerator = 		models.CharField(db_column='zufallsgenerator', max_length=32, blank=True, null=True, verbose_name='Zufallsgenerator')  # Field name made lowercase.
 
 	datum = 				models.DateTimeField(db_column='datum', verbose_name='Recht gefunden am')  # Field name made lowercase.
 	geloescht = 			models.IntegerField(db_column='geloescht', blank=True, null=True, verbose_name='gelöscht')
