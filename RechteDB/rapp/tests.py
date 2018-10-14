@@ -8,6 +8,7 @@ from .models import TblOrga, TblUebersichtAfGfs, TblUserIDundName, TblPlattform,
 
 from datetime import datetime, timedelta
 from django.utils import timezone
+from django.core.files.base import ContentFile
 import re
 
 class HomeTests(TestCase):
@@ -578,6 +579,7 @@ class user_rolle_afTests(TestCase):
 		response = self.client.get(new_user_url)
 		self.assertContains(response, 'href="{0}"'.format(userlist_url))
 
+
 	# Suche nach der dem User und ob seiner UserID mindestens eine Rolle zugeodnet ist.
 	# Fall ja, suche weiter nach der List der AFen zu der Rolle (Auszug)
 	# Im Detail: Wir suchen über /.../user_rolle_af/<Nummer des Eintrags UserHatRolle>
@@ -623,9 +625,12 @@ class user_rolle_afTests(TestCase):
 		self.assertContains(response, 'Schwerpunkt') # Wertigkeit in der Verantwortungsmatrix
 
 
-class import_new_csv(TestCase):
+class import_new_csv_single_record(TestCase):
 	# Tests für den Import neuer CSV-Listen und der zugehörigen Tabellen
 	def setUp(self):
+		url = reverse('import')
+		self.response = self.client.get(url)
+
 		Tblrechteneuvonimport.objects.create(
 			identitaet = 			'xv13254',
 			nachname = 				'Bestertester',
@@ -654,12 +659,213 @@ class import_new_csv(TestCase):
 	def test_importpage_view_status_code(self):
 		url = reverse('import')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEquals(self.response.status_code, 200)
+
+	def test_importpage_csrf(self):
+		self.assertContains(self.response, 'csrfmiddlewaretoken')
+
 
 class setup_database(TestCase):
 	# Tests für den Import der Stored Procedures in die Datenbank
-	def test_setup_database_view_status_code(self):
+	# Tests für den Import der Stored Procedures in die Datenbank
+	def setUp(self):
 		url = reverse('stored_procedures')
-		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.response = self.client.get(url)
 
+	def test_setup_database_view_status_code(self):
+		self.assertEquals(self.response.status_code, 200)
+
+	def test_setup_database_search_context(self):
+		self.assertContains(self.response, 'Ansonsten: Finger weg, das bringt hier nichts!')
+
+
+	def test_setup_database_csrf(self):
+		self.assertContains(self.response, 'csrfmiddlewaretoken')
+
+	def test_setup_setup_database_load_stored_proc(self):
+		url = reverse('stored_procedures')
+		data = {}
+		self.response = self.client.post(url, data)
+		self.assertContains(self.response, 'anzahl_import_elemente war erfolgreich.')
+		self.assertContains(self.response, 'call_anzahl_import_elemente war erfolgreich.')
+		self.assertContains(self.response, 'vorbereitung war erfolgreich.')
+		self.assertContains(self.response, 'neueUser war erfolgreich.')
+		self.assertContains(self.response, 'behandleUser war erfolgreich.')
+		self.assertContains(self.response, 'behandleRechte war erfolgreich.')
+		self.assertContains(self.response, 'loescheDoppelteRechte war erfolgreich.')
+		self.assertContains(self.response, 'setzeNichtAIFlag war erfolgreich.')
+
+
+class import_new_csv_single_record(TestCase):
+	# Tests für den Import neuer CSV-Listen und der zugehörigen Tabellen
+	def setUp(self):
+		url = reverse('import')
+		self.response = self.client.get(url)
+		# Lösche alle Einträge in der Importtabelle
+		Tblrechteneuvonimport.objects.all().delete()
+
+		# Zunächst: Behandeln eines einzelnen Records
+		Tblrechteneuvonimport.objects.create(
+			identitaet = 			'Test_xv13254',
+			nachname = 				'Bestertester',
+			vorname = 				'Fester',
+			tf_name = 				'supergeheime_TF',
+			tf_beschreibung = 		'Die Beschreibung der supergeheimen TF',
+			af_anzeigename = 		'rva_12345_geheime_AF',
+			af_beschreibung = 		'Beschreibung der Geheim-AF',
+			hoechste_kritikalitaet_tf_in_af = 'k',
+			tf_eigentuemer_org = 	'ZI-AI-BA',
+			tf_applikation = 		'RUVDE',
+			tf_kritikalitaet = 		'u',
+			gf_name = 				'rvg_12345_geheime_AF',
+			gf_beschreibung = 		'Beschreibung der Geheim-GF',
+			direct_connect = 		False,
+			af_zugewiesen_an_account_name = 'Test_av13254',
+			af_gueltig_ab = 		timezone.now() - timedelta(days=364),
+			af_gueltig_bis = 		timezone.now() + timedelta(days=365),
+			af_zuweisungsdatum = 	timezone.now() - timedelta(days=366),
+		)
+
+	def test_importpage_view_status_code(self):
+		self.assertEquals(self.response.status_code, 200)
+
+	def test_importpage_csrf(self):
+		self.assertContains(self.response, 'csrfmiddlewaretoken')
+
+	# hier wird nur ein einzelner Datensatz in die Importtabelle übernommen.
+	# Im späteren Testverlauf wird die Tabelle wieder gelöscht.
+	def test_importpage_table_entry(self):
+		num = Tblrechteneuvonimport.objects.filter(vorname = 'Fester').count()
+		self.assertEquals(num, 1)
+
+class import_new_csv_files_no_input(TestCase):
+	# Und nun Test des Imports dreier Dateien.
+	# Die erste Datei erstellt zwei User mit Rechten
+	# Die zweite Datei fügt einen User hinzu, ändert einen zweiten und löscht einen dritten
+	# Datei 3 löscht alle User und deren Rechte für die Organisation wieder.
+	def setUp(self):
+		url = reverse('import')
+		self.response = self.client.post(url, {})
+
+	def test_import_no_imput_correct_page(self):
+		self.assertContains(self.response, 'Auswahl der Organisation und Hochladen der Datei')
+
+	def test_import_no_imput_correct_following_page(self):
+		# Wir landen wieder auf derselben Seite
+		self.assertEquals(self.response.status_code, 200)
+		self.assertContains(self.response, 'Auswahl der Organisation und Hochladen der Datei')
+
+	def test_import_no_imput_form_error(self):
+		# Es muss ein Formfehler erkannt werden
+		form = self.response.context.get('form')
+		self.assertTrue(form.errors)
+
+
+class import_new_csv_files_wrong_input(TestCase):
+	# Und nun Test des Imports dreier Dateien.
+	# Die erste Datei erstellt zwei User mit Rechten
+	# Die zweite Datei fügt einen User hinzu, ändert einen zweiten und löscht einen dritten
+	# Datei 3 löscht alle User und deren Rechte für die Organisation wieder.
+	def setUp(self):
+		data = {
+			'organisation': 'foo blabla',
+		}
+		url = reverse('import')
+		self.response = self.client.post(url, data)
+
+	def test_import_wrong_imput_correct_page(self):
+		self.assertContains(self.response, 'Auswahl der Organisation und Hochladen der Datei')
+
+	def test_import_wrong_imput_correct_following_page(self):
+		# Wir landen wieder auf derselben Seite
+		self.assertEquals(self.response.status_code, 200)
+		self.assertContains(self.response, 'Auswahl der Organisation und Hochladen der Datei')
+
+	def test_import_wrong_imput_form_error(self):
+		# Es muss ein Formfehler erkannt werden
+		form = self.response.context.get('form')
+		self.assertTrue(form.errors)
+
+"""
+	# Das funktioniert nur mit direkter Nutzung der Oberfläche
+class import_new_csv_files_first_input(TestCase):
+	# Und nun Test des Imports dreier Dateien.
+	# Die erste Datei erstellt zwei User mit Rechten
+	# Die zweite Datei fügt einen User hinzu, ändert einen zweiten und löscht einen dritten
+	# Datei 3 löscht alle User und deren Rechte für die Organisation wieder.
+	def setUp(self):
+
+		# erst mal eine Organisation herstellen: Das geht nur über einen User (mit aktivem Recht?).
+		TblOrga.objects.create (
+			team = 'Django-Team-01',
+			themeneigentuemer = 'Ihmchen_01',
+		)
+
+		TblAfliste.objects.create (
+			af_name = 			'rva_01219_beta91_job_abst',
+			neu_ab = 			timezone.now(),
+		)
+
+		TblUserIDundName.objects.create (
+			userid = 			'xv13254',
+			name = 				'User_xv13254',
+			orga = 				TblOrga.objects.get(team = 'Django-Team-01'),
+			zi_organisation =	'AI-CS',
+			geloescht = 		False,
+			abteilung = 		'ZI-AI-CS',
+			gruppe = 			'ZI-AI-CS-XY',
+		)
+
+		# Die nächsten beiden Objekte werden für tblGesamt als ForeignKey benötigt
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu = 		"GF-foo in tblÜbersichtAFGF",
+			name_af_neu =		"AF-foo in tblÜbersichtAFGF",
+			zielperson = 		'Fester BesterTester'
+		)
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu = 		"GF-foo-gelöscht in tblÜbersichtAFGF",
+			name_af_neu =		"AF-foo-gelöscht in tblÜbersichtAFGF",
+			zielperson = 		'Fester BesterTester'
+		)
+		TblPlattform.objects.create(
+			tf_technische_plattform = 'Test-Plattform'
+		)
+
+		TblGesamt.objects.create(
+			userid_name = 		TblUserIDundName.objects.get(userid = 'xv13254'),
+			tf = 				'foo-TF',
+			tf_beschreibung = 	'TF-Beschreibung für foo-TF',
+			enthalten_in_af = 	'Sollte die AF rva_01219_beta91_job_abst sein',
+			modell =			TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+			plattform = 		TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+			gf = 				'GF-foo',
+			datum = 			timezone.now(),
+			geloescht = 		False,
+		)
+
+		# Nun kommt die Datei, die normalerweise über die Oberfläche geholt wird
+		fake_file = ContentFile(b'''abc''')
+		fake_file.name = 'myfile.csv'
+
+		data = {
+			'organisation': {'AI-CS', 'AI-CS'},
+			'datei': fake_file,
+		}
+		url = reverse('import')
+		self.response = self.client.post(url, data)
+
+	def test_import_first_imput_correct_page(self):
+		self.assertContains(self.response, 'Auswahl der Organisation und Hochladen der Datei')
+
+	def test_import_first_imput_correct_following_page(self):
+		# Wir landen wieder auf derselben Seite
+		self.assertEquals(self.response.status_code, 200)
+		self.assertContains(self.response, 'Auswahl der Organisation und Hochladen der Datei')
+
+	def test_import_first_imput_form_error(self):
+		# Es muss ein Formfehler erkannt werden
+		form = self.response.context.get('form')
+		self.assertTrue(form.errors)
+		print (form.errors)
+
+"""

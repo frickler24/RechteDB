@@ -11,4 +11,5 @@ class MeinCSVImporterModel(resources.ModelResource):
 		model = Tblrechteneuvonimport
 		#encoding = "utf-8"
 		delimiter = ";"
+		sortable_by = ['nachname', '-identitaet', ]
 

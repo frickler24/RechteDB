@@ -376,6 +376,7 @@ def import_csv(request):
 		# Für jede Zeile der Eingabedatei soll genau eine Zeile in der Importtabelle erzeugt werden
 		zeiten['schreibe_start'] = timezone.now()
 
+		request.session['geschafft'] = 0  # Das darf man nicht abkürzen wegen leerer Dateien!
 		for line in reader:
 			# Sicherheitshalber werden alle eingelesenen Daten auf Maximallänge reduziert.
 			# Derzeit gibt es bereits Einträge in 'TF Name' und 'TF Beschreibung',
@@ -485,9 +486,6 @@ def import_csv(request):
 				request.session['import_laufzeiten'] = laufzeiten
 				request.session['fehler1'] = fehler
 			return redirect('import2')
-
-		else:
-			print ('Form war nicht valide')
 	else:
 		form = ImportForm(initial={'organisation': 'AI-BA'}, auto_id=False)
 

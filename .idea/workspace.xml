@@ -1,24 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9041f750-6594-46a9-8f9c-6349ba68a303" name="Default" comment="Make Feierabend&#10;&#10;Import sets all rights to &quot;deleted&quot;...">
-      <change afterPath="$PROJECT_DIR$/RechteDB/templates/rapp/import_status.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Testfabrik_init.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Testfabrik_run.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mariadbconf.d/my.cnf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dbnavigator.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dbnavigator.xml" afterDir="false" />
+    <list default="true" id="9041f750-6594-46a9-8f9c-6349ba68a303" name="Default" comment="Add import functions and test-data&#10;&#10;Fix some bugs, importing is running well now.&#10;Two testfiles (Testfabrik_init.csv and Testfabrik.run.csv)&#10;can be used to test the import function in&#10;alternating use (select 'AI-CS' as the organisation).">
+      <change afterPath="$PROJECT_DIR$/Testfabrik_clear.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RechteDB/RechteDB/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/RechteDB/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RechteDB/rapp/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/rapp/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RechteDB/rapp/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/rapp/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RechteDB/rapp/stored_procedures.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/rapp/stored_procedures.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RechteDB/rapp/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/rapp/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RechteDB/rapp/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/rapp/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RechteDB/rapp/resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/rapp/resources.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RechteDB/rapp/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/rapp/tests.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RechteDB/rapp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/rapp/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RechteDB/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/templates/base.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RechteDB/templates/rapp/import2.html" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/templates/rapp/import2.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RechteDB/templates/rapp/import2_quittung.html" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/templates/rapp/import2_quittung.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RechteDB/templates/rapp/import3_quittung.html" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/templates/rapp/import3_quittung.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RechteDB/templates/rapp/panel_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/RechteDB/templates/rapp/panel_list.html" afterDir="false" />
     </list>
     <ignored path="db.sqlite3" />
     <ignored path=".directory" />
@@ -32,51 +25,52 @@
     <session id="-68445925">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="20" />
+          <entry key="project.closed" value="21" />
           <entry key="project.open.time.18" value="1" />
           <entry key="project.open.time.5" value="1" />
-          <entry key="project.open.time.6" value="6" />
+          <entry key="project.open.time.6" value="7" />
           <entry key="project.open.time.7" value="12" />
           <entry key="project.open.time.8" value="4" />
-          <entry key="project.opened" value="24" />
+          <entry key="project.open.time.9" value="1" />
+          <entry key="project.opened" value="26" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="gitignore" value="9" />
-          <entry key="html" value="17869" />
-          <entry key="py" value="33314" />
+          <entry key="gitignore" value="10" />
+          <entry key="html" value="18057" />
+          <entry key="py" value="35272" />
           <entry key="sql" value="675" />
-          <entry key="txt" value="1329" />
+          <entry key="txt" value="1598" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="HTML" value="17766" />
-          <entry key="PLAIN_TEXT" value="1338" />
-          <entry key="Python" value="33222" />
+          <entry key="HTML" value="17954" />
+          <entry key="PLAIN_TEXT" value="1608" />
+          <entry key="Python" value="35180" />
           <entry key="Scratch" value="870" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="env" value="1" />
-          <entry key="gitignore" value="1" />
-          <entry key="html" value="111" />
+          <entry key="gitignore" value="2" />
+          <entry key="html" value="113" />
           <entry key="js" value="1" />
           <entry key="png" value="6" />
-          <entry key="py" value="59" />
+          <entry key="py" value="62" />
           <entry key="rnc" value="1" />
           <entry key="sql" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="HTML" value="95" />
+          <entry key="HTML" value="97" />
           <entry key="Image" value="6" />
           <entry key="JavaScript" value="1" />
-          <entry key="PLAIN_TEXT" value="2" />
-          <entry key="Python" value="53" />
+          <entry key="PLAIN_TEXT" value="3" />
+          <entry key="Python" value="56" />
           <entry key="RNG Compact" value="1" />
           <entry key="Scratch" value="25" />
         </counts>
@@ -92,30 +86,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RechteDB/rapp/tests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1002">
-              <caret line="660" column="19" selection-start-line="660" selection-start-column="19" selection-end-line="660" selection-end-column="27" />
+            <state relative-caret-position="133">
+              <caret line="731" column="35" selection-start-line="731" selection-start-column="35" selection-end-line="731" selection-end-column="35" />
               <folding>
                 <element signature="e#1#41#0" expanded="true" />
-                <marker date="1538841782419" expanded="true" signature="26389:26493" ph="..." />
-                <marker date="1538841782419" expanded="true" signature="26536:26539" ph="..." />
-                <marker date="1538841782419" expanded="false" signature="26676:26678" ph="..." />
-                <marker date="1538841782419" expanded="true" signature="26788:26791" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/RechteDB/rapp/stored_procedures.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="95">
-              <caret line="109" column="6" lean-forward="true" selection-start-line="109" selection-start-column="6" selection-end-line="109" selection-end-column="6" />
-              <folding>
-                <element signature="e#893#1084#0" />
-                <element signature="e#1107#1370#0" />
-                <marker date="1538945889766" expanded="true" signature="10189:48869" ph="..." />
-                <marker date="1538945889766" expanded="true" signature="40167:40178" ph="..." />
-                <marker date="1538945889766" expanded="true" signature="42222:48869" ph="..." />
+                <marker date="1539503646235" expanded="true" signature="26517:26621" ph="..." />
+                <marker date="1539503646235" expanded="true" signature="26664:26667" ph="..." />
+                <marker date="1539503646235" expanded="true" signature="26810:26812" ph="..." />
+                <marker date="1539503646235" expanded="false" signature="26904:26906" ph="..." />
+                <marker date="1539503646235" expanded="true" signature="27174:27175" ph="..." />
+                <marker date="1539503646235" expanded="true" signature="27516:27556" ph="..." />
+                <marker date="1539503646235" expanded="true" signature="29901:29903" ph="..." />
               </folding>
             </state>
           </provider>
@@ -124,63 +105,80 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RechteDB/rapp/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="964">
+            <state relative-caret-position="1596">
               <caret line="87" column="69" selection-start-line="87" selection-start-column="69" selection-end-line="87" selection-end-column="69" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RechteDB/rapp/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="515">
-              <caret line="407" column="8" selection-start-line="407" selection-start-column="8" selection-end-line="407" selection-end-column="8" />
+            <state relative-caret-position="8721">
+              <caret line="488" selection-start-line="488" selection-end-line="488" />
               <folding>
                 <element signature="e#24#63#0" expanded="true" />
-                <element signature="e#14048#14389#0" />
-                <element signature="e#14421#14663#0" />
-                <element signature="e#20111#22982#0" />
-                <element signature="e#20313#20380#0" />
-                <element signature="e#20412#20484#0" />
-                <element signature="e#21738#22928#0" />
-                <element signature="e#22963#23108#0" />
-                <marker date="1538949407807" expanded="true" signature="23622:23623" ph="..." />
-                <marker date="1538949407807" expanded="true" signature="25462:25463" ph="..." />
+                <marker date="1539451238509" expanded="true" signature="23763:23764" ph="..." />
+                <marker date="1539451238509" expanded="true" signature="25603:25604" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/RechteDB/templates/rapp/import2_quittung.html">
+        <entry file="file://$PROJECT_DIR$/RechteDB/rapp/forms.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="246">
-              <caret line="68" column="18" selection-start-line="68" selection-start-column="18" selection-end-line="68" selection-end-column="18" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/RechteDB/templates/rapp/import2.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1729">
-              <caret line="91" column="69" selection-start-line="91" selection-start-column="69" selection-end-line="91" selection-end-column="69" />
+            <state relative-caret-position="209">
+              <caret line="11" column="36" selection-start-line="11" selection-start-column="25" selection-end-line="11" selection-end-column="36" />
               <folding>
-                <element signature="e#446#452#1" expanded="true" />
+                <element signature="e#0#24#0" expanded="true" />
+                <marker date="1538919908863" expanded="true" signature="149:152" ph="..." />
+                <marker date="1538919908863" expanded="true" signature="358:359" ph="..." />
+                <marker date="1538919908863" expanded="true" signature="499:502" ph="..." />
+                <marker date="1538919908863" expanded="true" signature="654:656" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/RechteDB/templates/rapp/import3_quittung.html">
+        <entry file="file://$PROJECT_DIR$/RechteDB/rapp/admin.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="608">
-              <caret line="32" column="12" selection-start-line="32" selection-start-column="12" selection-end-line="32" selection-end-column="12" />
+            <state relative-caret-position="242">
+              <caret line="329" column="23" lean-forward="true" selection-start-line="329" selection-start-column="23" selection-end-line="329" selection-end-column="23" />
               <folding>
-                <element signature="e#445#451#1" expanded="true" />
-                <element signature="e#725#731#1" expanded="true" />
+                <element signature="e#24#63#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="190">
+              <caret line="10" column="40" selection-start-line="10" selection-start-column="40" selection-end-line="10" selection-end-column="40" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/RechteDB/rapp/resources.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="285">
+              <caret line="15" selection-start-line="15" selection-end-line="15" />
+              <folding>
+                <element signature="e#60#95#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/RechteDB/templates/rapp/import.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="133">
+              <caret line="7" selection-start-line="6" selection-end-line="7" />
             </state>
           </provider>
         </entry>
@@ -197,10 +195,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>beschreibung'</find>
-      <find>unique_together</find>
-      <find>300</find>
-      <find>_field</find>
       <find>ROOT</find>
       <find>index</find>
       <find>team</find>
@@ -227,6 +221,10 @@
       <find>orga</find>
       <find>ai-cs</find>
       <find>Nix</find>
+      <find>csrf</find>
+      <find>eschaff</find>
+      <find>geschafft</find>
+      <find>Form war ni</find>
     </findStrings>
     <replaceStrings>
       <replace>', '</replace>
@@ -290,18 +288,13 @@
         <option value="$PROJECT_DIR$/RechteDB/templates/rapp/panel_user_rolle_af.html" />
         <option value="$PROJECT_DIR$/RechteDB/rapp/filters.py" />
         <option value="$PROJECT_DIR$/RechteDB/templates/rapp/panel_UhR.html" />
-        <option value="$PROJECT_DIR$/RechteDB/rapp/admin.py" />
-        <option value="$PROJECT_DIR$/RechteDB/rapp/resources.py" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.html" />
-        <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/RechteDB/templates/rapp/import_ergebnis1.html" />
         <option value="$PROJECT_DIR$/RechteDB/templates/rapp/import_anleitung.html" />
-        <option value="$PROJECT_DIR$/RechteDB/rapp/tests.py" />
         <option value="$PROJECT_DIR$/RechteDB/templates/rapp/stored_procedures.html" />
         <option value="$PROJECT_DIR$/RechteDB/templates/rapp/import.html" />
         <option value="$PROJECT_DIR$/RechteDB/rapp/models.py" />
         <option value="$PROJECT_DIR$/RechteDB/rapp/forms.py" />
-        <option value="$PROJECT_DIR$/RechteDB/templates/rapp/import2_quittung.html" />
         <option value="$PROJECT_DIR$/RechteDB/RechteDB/settings.py" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.sql" />
         <option value="$PROJECT_DIR$/RechteDB/rapp/stored_procedures.py" />
@@ -309,9 +302,14 @@
         <option value="$PROJECT_DIR$/RechteDB/templates/rapp/panel_list.html" />
         <option value="$PROJECT_DIR$/RechteDB/rapp/urls.py" />
         <option value="$PROJECT_DIR$/RechteDB/templates/rapp/import_status.html" />
-        <option value="$PROJECT_DIR$/RechteDB/templates/rapp/import3_quittung.html" />
-        <option value="$PROJECT_DIR$/RechteDB/templates/rapp/import2.html" />
         <option value="$PROJECT_DIR$/RechteDB/rapp/views.py" />
+        <option value="$PROJECT_DIR$/RechteDB/rapp/tests.py" />
+        <option value="$PROJECT_DIR$/RechteDB/templates/rapp/import2.html" />
+        <option value="$PROJECT_DIR$/RechteDB/templates/rapp/import2_quittung.html" />
+        <option value="$PROJECT_DIR$/RechteDB/templates/rapp/import3_quittung.html" />
+        <option value="$PROJECT_DIR$/RechteDB/rapp/resources.py" />
+        <option value="$PROJECT_DIR$/RechteDB/rapp/admin.py" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -361,7 +359,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -412,6 +409,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -553,20 +551,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1530730479029</updated>
-    </task>
-    <task id="LOCAL-00014" summary="set widgets and first use of table2&#10;&#10;The widgets for panel_lilst.html look kind of pretty.&#10;In this version two result tables are generatet via panel_list.html:&#10;- manual generated table&#10;- automatically generated table2 &#10;&#10;Next step ist the customization of table2-classes for the panel view.">
-      <created>1533051634488</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1533051634488</updated>
-    </task>
-    <task id="LOCAL-00015" summary="use table2 for diplaying panel search results&#10;&#10;But this is too slow (even ms-access has better response-time...)&#10;&#10;Revert this - maybe for small standard-tables ok">
-      <created>1533061626836</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1533061626836</updated>
     </task>
     <task id="LOCAL-00016" summary="Revert Usage of table2 for panel">
       <created>1533062895574</created>
@@ -897,7 +881,21 @@
       <option name="project" value="LOCAL" />
       <updated>1538862138605</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <task id="LOCAL-00063" summary="Add import functions and test-data&#10;&#10;Fix some bugs, importing is running well now.&#10;Two testfiles (Testfabrik_init.csv and Testfabrik.run.csv)&#10;can be used to test the import function in&#10;alternating use (select 'AI-CS' as the organisation).">
+      <created>1538949679995</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1538949679995</updated>
+    </task>
+    <task id="LOCAL-00064" summary="Add import functions and test-data&#10;&#10;Fix some bugs, importing is running well now.&#10;Two testfiles (Testfabrik_init.csv and Testfabrik.run.csv)&#10;can be used to test the import function in&#10;alternating use (select 'AI-CS' as the organisation).">
+      <created>1538949740524</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1538949740524</updated>
+    </task>
+    <option name="localTasksCounter" value="65" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -971,7 +969,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/../.." />
     </ignored-roots>
-    <MESSAGE value="run &quot;call testeImport();&quot; for importing new Data&#10;&#10;Manually installed stored procedures" />
     <MESSAGE value="add first panels to import file&#10;&#10;very slow, missing pagination" />
     <MESSAGE value="create the last commit for this branch.&#10;&#10;This branch will now be switched from master to first_try.&#10;Then a new master will start from scratch with&#10;- database reorganized without special chars in table- or rownames&#10;- clean setup for the app (paths etc.)&#10;- clean setup for navigation&#10;- and a lot of other stuff, regarding the hints in &#10;  https://simpleisbetterthancomplex.com/tutorial/2018/08/13/how-to-use-bootstrap-4-forms-with-django.html" />
     <MESSAGE value="create deploy-able setup for standard django demo app&#10;&#10;All sensitive infos (SECRET, DB-Infos) are in a separate .env file,&#10;which is excluded from git. &#10;&#10;So no sensitive info is blown into the world..." />
@@ -996,7 +993,8 @@
     <MESSAGE value="fix csv import&#10;&#10;Update template and forms with bootstrap design" />
     <MESSAGE value="create import2 as panel for next import step&#10;&#10;first the statistics and results from step 1 are shown" />
     <MESSAGE value="Make Feierabend&#10;&#10;Import sets all rights to &quot;deleted&quot;..." />
-    <option name="LAST_COMMIT_MESSAGE" value="Make Feierabend&#10;&#10;Import sets all rights to &quot;deleted&quot;..." />
+    <MESSAGE value="Add import functions and test-data&#10;&#10;Fix some bugs, importing is running well now.&#10;Two testfiles (Testfabrik_init.csv and Testfabrik.run.csv)&#10;can be used to test the import function in&#10;alternating use (select 'AI-CS' as the organisation)." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add import functions and test-data&#10;&#10;Fix some bugs, importing is running well now.&#10;Two testfiles (Testfabrik_init.csv and Testfabrik.run.csv)&#10;can be used to test the import function in&#10;alternating use (select 'AI-CS' as the organisation)." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/RechteDB/static/css/style.css">
@@ -1085,13 +1083,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/RechteDB/static/icons8-plus-50.png" />
     <entry file="file://$PROJECT_DIR$/RechteDB/static/icons8-plus-64.png" />
-    <entry file="file://$PROJECT_DIR$/RechteDB/templates/rapp/uhr_form.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="18" column="61" selection-start-line="18" selection-start-column="61" selection-end-line="18" selection-end-column="61" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/RechteDB/templates/rapp/tblgesamt_list.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="209">
@@ -1106,24 +1097,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/resources.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="228">
-          <caret line="12" lean-forward="true" selection-start-line="11" selection-end-line="12" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1078">
           <caret line="345" selection-start-line="345" selection-end-line="345" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
         </state>
       </provider>
     </entry>
@@ -1176,94 +1153,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/tests.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1002">
-          <caret line="660" column="19" selection-start-line="660" selection-start-column="19" selection-end-line="660" selection-end-column="27" />
-          <folding>
-            <element signature="e#1#41#0" expanded="true" />
-            <marker date="1538841782419" expanded="true" signature="26389:26493" ph="..." />
-            <marker date="1538841782419" expanded="true" signature="26536:26539" ph="..." />
-            <marker date="1538841782419" expanded="false" signature="26676:26678" ph="..." />
-            <marker date="1538841782419" expanded="true" signature="26788:26791" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/admin.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1313">
-          <caret line="218" column="31" selection-start-line="218" selection-start-column="16" selection-end-line="218" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/RechteDB/rapp/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="38">
           <caret line="87" column="27" selection-start-line="87" selection-start-column="27" selection-end-line="87" selection-end-column="27" />
-          <folding>
-            <element signature="n#!!doc" />
-            <element signature="e#786#857#0" />
-            <element signature="e#918#1606#0" />
-            <element signature="e#1340#1548#0" />
-            <element signature="e#1579#1606#0" />
-            <element signature="e#1608#1698#0" />
-            <element signature="e#2037#3693#0" />
-            <element signature="e#2154#2328#0" />
-            <element signature="e#3174#3462#0" />
-            <element signature="e#3493#3520#0" />
-            <element signature="e#3545#3565#0" />
-            <element signature="e#5593#5673#0" />
-            <element signature="e#5713#5838#0" />
-            <element signature="e#5878#6033#0" />
-            <element signature="e#6073#6211#0" />
-            <element signature="e#6368#8829#0" />
-            <element signature="e#8404#8697#0" />
-            <element signature="e#8728#8778#0" />
-            <element signature="e#8955#10323#0" />
-            <element signature="e#9407#9565#0" />
-            <element signature="e#9596#9612#0" />
-            <element signature="e#9645#9715#0" />
-            <element signature="e#9755#9926#0" />
-            <element signature="e#9755#9818#0" />
-            <element signature="e#9966#10137#0" />
-            <element signature="e#9966#10029#0" />
-            <element signature="e#10177#10323#0" />
-            <element signature="e#10475#13281#0" />
-            <element signature="e#11474#11821#0" />
-            <element signature="e#11852#11895#0" />
-            <element signature="e#11922#11947#0" />
-            <element signature="e#12114#12243#0" />
-            <element signature="e#12366#12442#0" />
-            <element signature="e#12482#12653#0" />
-            <element signature="e#12482#12545#0" />
-            <element signature="e#12703#12884#0" />
-            <element signature="e#12703#12766#0" />
-            <element signature="e#12924#13095#0" />
-            <element signature="e#12924#12987#0" />
-            <element signature="e#13135#13281#0" />
-            <element signature="e#13418#13767#0" />
-            <element signature="e#13898#14476#0" />
-            <element signature="e#14234#14410#0" />
-            <element signature="e#14441#14476#0" />
-            <element signature="e#14596#20459#0" />
-            <element signature="e#20631#25906#0" />
-            <marker date="1538903616961" expanded="false" signature="5411:5412" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/forms.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="437">
-          <caret line="23" column="19" selection-start-line="23" selection-start-column="4" selection-end-line="23" selection-end-column="19" />
-          <folding>
-            <element signature="e#0#24#0" expanded="true" />
-            <marker date="1538919908863" expanded="true" signature="149:152" ph="..." />
-            <marker date="1538919908863" expanded="true" signature="358:359" ph="..." />
-            <marker date="1538919908863" expanded="true" signature="499:502" ph="..." />
-            <marker date="1538919908863" expanded="true" signature="654:656" ph="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1302,34 +1195,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/stored_procedures.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="95">
-          <caret line="109" column="6" lean-forward="true" selection-start-line="109" selection-start-column="6" selection-end-line="109" selection-end-column="6" />
-          <folding>
-            <element signature="e#893#1084#0" />
-            <element signature="e#1107#1370#0" />
-            <marker date="1538945889766" expanded="true" signature="10189:48869" ph="..." />
-            <marker date="1538945889766" expanded="true" signature="40167:40178" ph="..." />
-            <marker date="1538945889766" expanded="true" signature="42222:48869" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="964">
-          <caret line="87" column="69" selection-start-line="87" selection-start-column="69" selection-end-line="87" selection-end-column="69" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/RechteDB/templates/base.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1121">
           <caret line="110" lean-forward="true" selection-end-line="110" />
-          <folding>
-            <element signature="n#script#3;n#body#0;n#html#0;n#!!top" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1337,23 +1206,80 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="304">
           <caret line="16" column="25" selection-start-line="16" selection-start-column="25" selection-end-line="16" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/stored_procedures.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1425">
+          <caret line="109" column="6" selection-start-line="109" selection-start-column="6" selection-end-line="109" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/tests.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="133">
+          <caret line="731" column="35" selection-start-line="731" selection-start-column="35" selection-end-line="731" selection-end-column="35" />
           <folding>
-            <element signature="n#style#0;n#div#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="e#1#41#0" expanded="true" />
+            <marker date="1539503646235" expanded="true" signature="26517:26621" ph="..." />
+            <marker date="1539503646235" expanded="true" signature="26664:26667" ph="..." />
+            <marker date="1539503646235" expanded="true" signature="26810:26812" ph="..." />
+            <marker date="1539503646235" expanded="false" signature="26904:26906" ph="..." />
+            <marker date="1539503646235" expanded="true" signature="27174:27175" ph="..." />
+            <marker date="1539503646235" expanded="true" signature="27516:27556" ph="..." />
+            <marker date="1539503646235" expanded="true" signature="29901:29903" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1596">
+          <caret line="87" column="69" selection-start-line="87" selection-start-column="69" selection-end-line="87" selection-end-column="69" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="8721">
+          <caret line="488" selection-start-line="488" selection-end-line="488" />
+          <folding>
+            <element signature="e#24#63#0" expanded="true" />
+            <marker date="1539451238509" expanded="true" signature="23763:23764" ph="..." />
+            <marker date="1539451238509" expanded="true" signature="25603:25604" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/RechteDB/templates/rapp/import.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="13" lean-forward="true" selection-end-line="13" />
+        <state relative-caret-position="133">
+          <caret line="7" selection-start-line="6" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RechteDB/templates/rapp/import2.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="114">
+          <caret line="6" column="61" selection-start-line="6" selection-start-column="61" selection-end-line="6" selection-end-column="61" />
+          <folding>
+            <element signature="e#446#452#1" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RechteDB/templates/rapp/import2_quittung.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="114">
+          <caret line="6" column="61" selection-start-line="6" selection-start-column="61" selection-end-line="6" selection-end-column="61" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/RechteDB/templates/rapp/import3_quittung.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="608">
-          <caret line="32" column="12" selection-start-line="32" selection-start-column="12" selection-end-line="32" selection-end-column="12" />
+        <state relative-caret-position="114">
+          <caret line="6" column="61" selection-start-line="6" selection-start-column="61" selection-end-line="6" selection-end-column="61" />
           <folding>
             <element signature="e#445#451#1" expanded="true" />
             <element signature="e#725#731#1" expanded="true" />
@@ -1361,39 +1287,51 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/RechteDB/templates/rapp/import2_quittung.html">
+    <entry file="file://$PROJECT_DIR$/RechteDB/templates/rapp/uhr_form.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="246">
-          <caret line="68" column="18" selection-start-line="68" selection-start-column="18" selection-end-line="68" selection-end-column="18" />
+        <state relative-caret-position="342">
+          <caret line="18" column="61" selection-start-line="18" selection-start-column="61" selection-end-line="18" selection-end-column="61" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/RechteDB/templates/rapp/import2.html">
+    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/forms.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1729">
-          <caret line="91" column="69" selection-start-line="91" selection-start-column="69" selection-end-line="91" selection-end-column="69" />
+        <state relative-caret-position="209">
+          <caret line="11" column="36" selection-start-line="11" selection-start-column="25" selection-end-line="11" selection-end-column="36" />
           <folding>
-            <element signature="e#446#452#1" expanded="true" />
+            <element signature="e#0#24#0" expanded="true" />
+            <marker date="1538919908863" expanded="true" signature="149:152" ph="..." />
+            <marker date="1538919908863" expanded="true" signature="358:359" ph="..." />
+            <marker date="1538919908863" expanded="true" signature="499:502" ph="..." />
+            <marker date="1538919908863" expanded="true" signature="654:656" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/views.py">
+    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/resources.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="515">
-          <caret line="407" column="8" selection-start-line="407" selection-start-column="8" selection-end-line="407" selection-end-column="8" />
+        <state relative-caret-position="285">
+          <caret line="15" selection-start-line="15" selection-end-line="15" />
+          <folding>
+            <element signature="e#60#95#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RechteDB/rapp/admin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="242">
+          <caret line="329" column="23" lean-forward="true" selection-start-line="329" selection-start-column="23" selection-end-line="329" selection-end-column="23" />
           <folding>
             <element signature="e#24#63#0" expanded="true" />
-            <element signature="e#14048#14389#0" />
-            <element signature="e#14421#14663#0" />
-            <element signature="e#20111#22982#0" />
-            <element signature="e#20313#20380#0" />
-            <element signature="e#20412#20484#0" />
-            <element signature="e#21738#22928#0" />
-            <element signature="e#22963#23108#0" />
-            <marker date="1538949407807" expanded="true" signature="23622:23623" ph="..." />
-            <marker date="1538949407807" expanded="true" signature="25462:25463" ph="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190">
+          <caret line="10" column="40" selection-start-line="10" selection-start-column="40" selection-end-line="10" selection-end-column="40" />
         </state>
       </provider>
     </entry>

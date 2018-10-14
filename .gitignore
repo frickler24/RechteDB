@@ -8,7 +8,7 @@ __pycache__
 my3.6venv
 .idea/workspace.xml
 .idea/*
-01\ Mitarbeiterberechtigungen\ ZI-AI-BA.csv
+01\ Mitarbeiterberechtigungen\ ZI-AI-BA*.csv
 .env
 *.xmi
 *.mdj

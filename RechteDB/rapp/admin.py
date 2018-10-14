@@ -11,8 +11,7 @@ from django.contrib import admin
 from django.db import models
 from django.forms import Textarea
 
-# Für den Maxwert zum Paginieren
-import sys
+from import_export import resources
 
 # Die Datenbanken / Models
 from rapp.models import TblUebersichtAfGfs, TblUserIDundName, TblOrga, TblPlattform, \
@@ -361,13 +360,16 @@ class TblrechteneuvonimportResource(resources.ModelResource):
 
 from rapp.resources import MeinCSVImporterModel
 
+
 @admin.register(Tblrechteneuvonimport)
 class Tblrechteneuvonimport(ImportExportModelAdmin):
-	import_template_name = 'admin/admin_import.html'
 	resource_class = MeinCSVImporterModel
 	alle = ['identitaet', 'nachname', 'vorname', 'tf_name', 'af_anzeigename', 'gf_name', ]
 	search_fields = alle
-	alle.insert(0, 'id')
 	list_display = alle
-	list_per_page = 10
+	list_per_page = 100
 
+	def foo(self):
+		dataset = self.export()
+		print(dataset.csv)
+		print(dataset.xlsx)
