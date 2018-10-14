@@ -11,13 +11,15 @@ from django.contrib import admin
 from django.db import models
 from django.forms import Textarea
 
-from import_export import resources
-
 # Die Datenbanken / Models
 from rapp.models import TblUebersichtAfGfs, TblUserIDundName, TblOrga, TblPlattform, \
 						TblGesamt, TblGesamtHistorie, Tblrechteneuvonimport, \
 						TblRollen, TblAfliste, TblUserhatrolle, TblRollehataf, \
 						Tblsubsysteme, Tblsachgebiete, TblDb2, TblRacfGruppen
+
+# Für den Im- und Export
+from import_export.admin import ImportExportModelAdmin
+from rapp.resources import MeinCSVImporterModel, GesamtExporterModel
 
 # Vorwärtsreferenzen gehen nicht in python :-(
 # Inline function to show all Instances in other view
@@ -69,18 +71,25 @@ class RollenInline(admin.TabularInline):
 # ######################################################################################################
 
 @admin.register(TblGesamt)
-class Gesamt(admin.ModelAdmin):
-	actions_on_top = False
+class GesamtAdmin(ImportExportModelAdmin):
+	actions_on_top = False		# Keine Actions, weil diese Tabelle nie manuell geändert wird
 	actions_on_bottom = False
 
+	list_select_related = ('modell', 'userid_name', 'plattform', )
+
+	# Diese Fieldsets greifen bei Detailsichten zu Änderungen und Neuanlagen von Einträgen.
+	# Braucht so eigentlich niemand...
 	fieldsets = [
-		('Standard-Informationen', {'fields': ['userid_name', 'tf', 'tf_beschreibung', 'enthalten_in_af', 'modell',
+		('Standard-Informationen', {'fields': ['userid_name', 'tf', 'tf_beschreibung',
+											   	'enthalten_in_af', 'modell',
 												'plattform', 'gf', 'af_gueltig_bis', 'direct_connect',
-												'af_zuweisungsdatum', 'datum', 'geloescht',]}),
-		('Detail-Informationen  ', {'fields': ['tf_kritikalitaet', 'tf_eigentuemer_org', 'vip_kennzeichen', 'zufallsgenerator',
+												'af_zuweisungsdatum', 'datum', 'geloescht', ]}),
+		('Detail-Informationen  ', {'fields': ['tf_kritikalitaet', 'tf_eigentuemer_org',
+											   	'vip_kennzeichen', 'zufallsgenerator',
 												'af_gueltig_ab', 'hoechste_kritikalitaet_tf_in_af', 'gf_beschreibung',
 												'gefunden', 'wiedergefunden', 'geaendert', 'neueaf', 'nicht_ai',
-												'patchdatum', 'wertmodellvorpatch', 'loeschdatum'], 'classes': ['collapse']}),
+												'patchdatum', 'wertmodellvorpatch', 'loeschdatum', ],
+												'classes': ['collapse']}),
 	]
 	list_display = ('id', 'userid_name', 'tf', 'tf_beschreibung', 'enthalten_in_af', 'gf',
 		'plattform', 'get_direct_connect', 'get_active',
@@ -92,7 +101,11 @@ class Gesamt(admin.ModelAdmin):
 					 # 'tf_beschreibung', 'enthalten_in_af', 'plattform', 'gf',
 	]
 
-	list_per_page = 25
+	list_per_page = 10
+
+	# Parameter für import/export
+	resource_class = GesamtExporterModel
+	sortable_by = ['userid_name']
 
 # ######################################################################################################
 # tbl UserIDundName
@@ -348,28 +361,20 @@ class RacfGruppen(admin.ModelAdmin):
 	search_fields = alle
 	list_display = alle
 
+# ######################################################################################################
+# Import-Export-Tabelle - der erste Versuch des Imports. Der Export kann helfen bei Importproblemen
+# ######################################################################################################
 
-# Versuch des Im- und Exports via CSV / XLSX / JSON und den Browser
-# https://django-import-export.readthedocs.io/en/latest/getting_started.html#admin-integration
-from import_export import resources
-from import_export.admin import ImportExportActionModelAdmin, ImportExportModelAdmin
-class TblrechteneuvonimportResource(resources.ModelResource):
-	class Meta:
-		model = Tblrechteneuvonimport
-
-
-from rapp.resources import MeinCSVImporterModel
-
-
-@admin.register(Tblrechteneuvonimport)
+#@admin.register(Tblrechteneuvonimport) # ToDo: Komplett ausbauen, wenn wirklich nicht mehr benötigt für Export-Checks
 class Tblrechteneuvonimport(ImportExportModelAdmin):
+	"""
+	Versuch des Im- und Exports via CSV / XLSX / JSON und den Browser
+	https://django-import-export.readthedocs.io/en/latest/getting_started.html#admin-integration
+	"""
 	resource_class = MeinCSVImporterModel
 	alle = ['identitaet', 'nachname', 'vorname', 'tf_name', 'af_anzeigename', 'gf_name', ]
 	search_fields = alle
 	list_display = alle
 	list_per_page = 100
+	sortable_by = []
 
-	def foo(self):
-		dataset = self.export()
-		print(dataset.csv)
-		print(dataset.xlsx)

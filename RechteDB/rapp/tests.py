@@ -104,10 +104,16 @@ class HomeTests(TestCase):
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 301)
 
+	"""
+	Der Test kann im Moment nicht funktionieren, 
+	weil die Admin-Sicht der Gesamttabelle momentan abgeschaltet ist.
+		
 	def test_adminrapp_l15_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tblrechteneuvonimport'
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 301)
+	"""
+	# ToDo: Test reaktivieren, wenn die Admin-Sicht auf die Gesamttabelle wieder eingeschaltet werden sollte
 
 class GesamtlisteTests(TestCase):
 	# Funktioniert die Gesamtliste?

@@ -22,11 +22,12 @@ body {
     color: #000055;
 }
 
+#header {
+    background-color: #02c304;
+}
 .login {
     color: magenta;
 }
-
-
 
 .knappeTabelle {
     padding-right: 1rem !important;

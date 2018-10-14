@@ -19,7 +19,14 @@ from django.urls import reverse_lazy
 
 
 def push_sp(name, sp):
-	# Speichere eine als PArameter übergebene Stored Procedure
+	"""
+	Speichere eine als Parameter übergebene Stored Procedure
+
+	:param name: Name der zu löschenden Stored_Procedure
+	:param sp: Die Stored Procedure, die gespeichert werden soll (SQL-Mengen-String)
+	:return: Fehler (False = kein Fehler)
+	"""
+	# ToDo Das Löschen wirft Warnings im MySQL-Treiber, wenn die SP gar nicht existiert. -> Liste lesen und checken
 	fehler = False
 	loeschstring = format ("DROP PROCEDURE IF EXISTS %s" % name)
 	with connection.cursor() as cursor:

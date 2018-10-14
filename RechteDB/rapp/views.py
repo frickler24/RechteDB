@@ -76,8 +76,12 @@ from .stored_procedures import *
 
 # Der Direkteinsteig für die gesamte Anwendung
 def home(request):
-	# Zeige ein paar Statistik-Infos über die RechteDB.
-	# Das stellt sicher, dass die Anbidnung an die Datenbank funzt
+	"""
+	Zeige ein paar Statistik-Infos über die RechteDB.
+	Das stellt sicher, dass die Anbidnung an die Datenbank funzt
+	:param request: GET oder POST Request vom Browser
+	:return: Gerendertes HTML
+	"""
 	num_rights = TblGesamt.objects.all().count()
 	num_userids = TblUserIDundName.objects.all().count
 	num_active_userids = TblUserIDundName.objects.filter(geloescht=False).count
@@ -108,36 +112,41 @@ def home(request):
 ###################################################################
 # Gesamtliste
 class GesamtListView(generic.ListView):
-	# Die Gesamtliste der Rechte ungefiltert
+	"""Die Gesamtliste der Rechte ungefiltert"""
 	model = TblGesamt
 	paginate_by = 50
 class GesamtDetailView(generic.DetailView):
-	# Die Detailsicht eines einzelnen Rechts
+	"""Die Detailsicht eines einzelnen Rechts"""
 	model = TblGesamt
 
 ###################################################################
 # Rechte-User (Gemeint sind nicht die Anwender der RechteDB!)
 class UserIDundNameListView(generic.ListView):
-	# Die Gesamtliste der User ungefiltert
+	"""Die Gesamtliste der User ungefiltert"""
 	model = TblUserIDundName
 	paginate_by = 50
 class TblUserIDundNameCreate(CreateView):
-	# Erstellen eines neuen Users
+	"""Erstellen eines neuen Users"""
 	model = TblUserIDundName
 	fields = '__all__'
 	initial = {'geloscht' : 'False',}
 class TblUserIDundNameUpdate(UpdateView):
-	# Ändern eines Users
+	"""Ändern eines Users"""
 	model = TblUserIDundName
 	fields = '__all__'
 class TblUserIDundNameDelete(DeleteView):
-	# Löschen eines Users
+	"""Löschen eines Users"""
 	model = TblUserIDundName
 	success_url = reverse_lazy('userliste')
 def userToggleGeloescht(request, pk):
-	# View function zum Togglen des Gelöscht-Flags in der DB für eine konkrete Instanz.
-	# Dieser Aufruf wird nicht in zwei Schritten als GET / POST-Kombination durchgeführt.
-	# sondern ausschließlich als GET.
+	"""
+	View function zum Togglen des Gelöscht-Flags in der DB für eine konkrete Instanz.
+	Dieser Aufruf wird nicht in zwei Schritten als GET / POST-Kombination durchgeführt.
+	sondern ausschließlich als GET.
+	:param request: GET oder POST Request vom Browser
+	:param pk: ID des zu löschenden UserID-Eintrags
+	:return: Gerendertes HTML
+	"""
 	user_inst = get_object_or_404(TblUserIDundName, pk = pk)
 
 	user_inst.geloescht = not user_inst.geloescht
@@ -150,19 +159,19 @@ def userToggleGeloescht(request, pk):
 ###################################################################
 # Die Gesamtliste der Teams (TblOrga)
 class TeamListView(generic.ListView):
-	# Die Gesamtliste der Teams (TblOrga)
+	"""Die Gesamtliste der Teams (TblOrga)"""
 	model = TblOrga
 class TblOrgaCreate(CreateView):
-	# Neues Team erstellen
+	"""Neues Team erstellen"""
 	model = TblOrga
 	fields = '__all__'
 	initial = {'geloscht' : 'False',}
 class TblOrgaUpdate(UpdateView):
-	# Team ändern
+	"""Team ändern"""
 	model = TblOrga
 	fields = '__all__'
 class TblOrgaDelete(DeleteView):
-	# Team löschen
+	"""Team löschen"""
 	model = TblOrga
 	success_url = reverse_lazy('teamliste')
 
@@ -170,18 +179,20 @@ class TblOrgaDelete(DeleteView):
 ###################################################################
 # Zuordnungen der Rollen zu den Usern (TblUserHatRolle ==> UhR)
 class UhRCreate(CreateView):
-	# Erzeugt einen neue Rolle für einen User.
-	# Die Rolle kann eine bestehende oder eine neu definierte Rolle sein.
+	"""
+	Erzeugt einen neue Rolle für einen User.
+	Die Rolle kann eine bestehende oder eine neu definierte Rolle sein.
+	"""
 	model = TblUserhatrolle
 	template_name = 'rapp/uhr_form.html'
 	fields = ['userid', 'rollenname', 'schwerpunkt_vertretung', 'bemerkung']
 	context_object_name = 'unser_user'
 class UhRUpdate(UpdateView):
-	# Ändert die Zuordnung von Rollen zu einem User.
+	"""Ändert die Zuordnung von Rollen zu einem User."""
 	model = TblUserhatrolle
 	fields = '__all__'
 class UhRDelete(DeleteView):
-	# Löscht die Zuordnung einer Rollen zu einem User.
+	"""Löscht die Zuordnung einer Rollen zu einem User."""
 	model = TblUserhatrolle
 	template_name = 'rapp/uhr_confirm_delete.html'
 	success_url = reverse_lazy('user_rolle_af') # ToDo Die Rücksprungadresse bei Success parametrisieren (wie?)
@@ -191,8 +202,12 @@ class UhRDelete(DeleteView):
 # Panel geht direkt auf die Gesamt-Datentabelle
 
 def panel(request):
+	"""
 	# Filter-Panel zum Selektieren aus der Gesamttabelle nach allen möglichen Kriterien
 	# Beachtet werden die relevanten Foreign Keys
+	:param request: GET oder POST Request vom Browser
+	:return: Gerendertes HTML
+	"""
 	panel_list = TblGesamt.objects.all()
 	panel_filter = PanelFilter(request.GET, queryset=panel_list)
 	panel_list = panel_filter.qs
@@ -221,21 +236,26 @@ def panel(request):
 # Panel_UhR betrachtet den Soll-Zustand über UserHatRolle
 
 def panel_UhR(request, id = 0):
-	# Finde alle relevanten Informationen zur aktuellen Selektion:
-	#
-	# Ausgangspunkt ist TblUseridUndName.
-	# Hierfür gibt es einen Filter, der per GET abgefragt wird.
-	# Geliefert werden nur die XV-Nummern zu den Namen (diese muss es je Namen zwingend geben)
-	#
-	# Die dort gefundene Treffermenge wird angereichert um die relevanten Daten aus TblUserHatRolle.
-	# Hier werden allerdings alle UserIDen zurückgeliefert je Name.
-	# Von dort aus gibt eine ForeignKey-Verbindung zu TblRollen.
-	#
-	# Problematisch ist noch die Verbindung zwischen TblRollen und TblRollaHatAf,
-	# Weil hier der Foreign Key Definition in TblRolleHatAf liegt.
-	# Das kann aber aufgelöst werden,
-	# sobald ein konkreter User betrachtet wird und nicht mehr eine Menge an Usern.
+	"""
+	Finde alle relevanten Informationen zur aktuellen Selektion:
 
+	Ausgangspunkt ist TblUseridUndName.
+	Hierfür gibt es einen Filter, der per GET abgefragt wird.
+	Geliefert werden nur die XV-Nummern zu den Namen (diese muss es je Namen zwingend geben)
+
+	Die dort gefundene Treffermenge wird angereichert um die relevanten Daten aus TblUserHatRolle.
+	Hier werden allerdings alle UserIDen zurückgeliefert je Name.
+	Von dort aus gibt eine ForeignKey-Verbindung zu TblRollen.
+
+	Problematisch ist noch die Verbindung zwischen TblRollen und TblRollaHatAf,
+	Weil hier der Foreign Key Definition in TblRolleHatAf liegt.
+	Das kann aber aufgelöst werden,
+	sobald ein konkreter User betrachtet wird und nicht mehr eine Menge an Usern.
+
+	:param request: GET oder POST Request vom Browser
+	:param pk: ID des XV-UserID-Eintrags, zu dem die Detaildaten geliefert werden sollen
+	:return: Gerendertes HTML
+	"""
 	panel_liste = TblUserIDundName.objects.filter(geloescht=False).order_by('name')
 	panel_filter = UseridFilter(request.GET, queryset=panel_liste)
 	namen_liste = panel_filter.qs.filter(userid__istartswith="xv")
@@ -286,16 +306,18 @@ def panel_UhR(request, id = 0):
 			return redirect('home')  # TODO: redirect ordentlich machen
 
 	else:
-		# Selektiere alle Userids und alle Namen in TblUserHatRolle, die auch in der Selektion vorkommen
-		# Hier könnte man mal einen reverse lookup einbauen von TblUserUndName zu TblUserHatRolle
-		#
-		# Die Liste der disjunkten UserIDs wird später in der Anzeige benötigt (Welche UserID gehören zu einem Namen).
-		# Hintergrund ist die Festlegung, dass die Rollen am UserNAMEN un dnicht an der UserID hängen.
-		# Dennoch gibt es Rollen, die nur zu bestimmten Userid-Typen (also bspw. nur für XV-Nummer) sinnvoll
-		# und gültig sind.
-		#
-		# Die af_menge wird benutzt zur Anzeige, welcche der rollenbezogenen AFen bereits im IST vorliegt
-		#
+		"""
+		Selektiere alle Userids und alle Namen in TblUserHatRolle, die auch in der Selektion vorkommen
+		Hier könnte man mal einen reverse lookup einbauen von TblUserUndName zu TblUserHatRolle
+		
+		Die Liste der disjunkten UserIDs wird später in der Anzeige benötigt (Welche UserID gehören zu einem Namen).
+		Hintergrund ist die Festlegung, dass die Rollen am UserNAMEN un dnicht an der UserID hängen.
+		Dennoch gibt es Rollen, die nur zu bestimmten Userid-Typen (also bspw. nur für XV-Nummer) sinnvoll
+		und gültig sind.
+		
+		Die af_menge wird benutzt zur Anzeige, welcche der rollenbezogenen AFen bereits im IST vorliegt
+		
+		"""
 		usernamen = set()
 		userids = set()
 		for row in panel_liste:
@@ -319,7 +341,7 @@ def panel_UhR(request, id = 0):
 			selektierte_userid = 'keine_userID'
 			afmenge = set()
 
-		# Paginierung nach Tutorial
+		"""Paginierung nach Tutorial"""
 		pagesize = request.GET.get('pagesize')
 		if type(pagesize) == type(None) or pagesize == '' or int(pagesize) < 1:
 			pagesize = 100	# Eigentlich sollte hier nie gepaged werden, dient nur dem Schutz vor Fehlabfragen
@@ -353,11 +375,25 @@ def panel_UhR(request, id = 0):
 # Dialogsteuerung für den Import einer neuen IIQ-Datenliste (csv-Datei)
 
 def import_csv(request):
-	# Importiere neue CSV-Datei mit IIQ-Daten
+	"""
+	Importiere neue CSV-Datei mit IIQ-Daten
+
+	Das Verfahren geht über mehrere HTML-Seiten,
+	demzufolge befindet sich hier auch die Abbildung als Automat über mehrere Schritte.
+
+	:param request: GET oder POST Request vom Browser
+	:return: Gerendertes HTML
+	"""
+
 	zeiten = { 'import_start': timezone.now(), } # Hier werden Laufzeiten vermerkt
 
 	def patch_datum(deutsches_datum):
+		"""
 		# Drehe das deutsche Datumsformat um in das amerikanische und hänge TZ-Info an
+
+		:param deutsches_datum:
+		:return: Datum im amerikanischen Format einschließlich Zeitzonen-Information für DE
+		"""
 		if deutsches_datum == "" or deutsches_datum == None:
 			return None
 		datum = deutsches_datum.split ('.')
@@ -366,6 +402,11 @@ def import_csv(request):
 		return  datum[2] + '-' + datum[1] + '-' + datum[0] + ' 00:00+0100'
 
 	def leere_importtabelle():
+		"""
+		# Löscht alle Einträge aus der Importtabelle sowie der Übertragungstabelle
+
+		:return: Nichts, außer Einträgen in zeiten[]
+		"""
 		# Löscht alle Einträge aus der Importtabelle sowie der Übertragungstabelle
 		zeiten['leere_start'] = timezone.now()
 		Tblrechteneuvonimport.objects.all().delete()
@@ -373,7 +414,12 @@ def import_csv(request):
 		zeiten['leere_ende'] = timezone.now()
 
 	def schreibe_zeilen(reader):
-		# Für jede Zeile der Eingabedatei soll genau eine Zeile in der Importtabelle erzeugt werden
+		"""
+		Für jede Zeile der Eingabedatei soll genau eine Zeile in der Importtabelle erzeugt werden
+
+		:param reader: Der übergebene Reader mit geöffneter CSV-Datei
+		:return: void; zeiten[]
+		"""
 		zeiten['schreibe_start'] = timezone.now()
 
 		request.session['geschafft'] = 0  # Das darf man nicht abkürzen wegen leerer Dateien!
@@ -410,7 +456,11 @@ def import_csv(request):
 		del request.session['Anzahl Zeilen']
 
 	def hole_datei():
-		# Über die HTTP-Verbindung kommt eine Datei, die auf CSV-Inhalte geprüft werden muss
+		"""
+		Über die HTTP-Verbindung kommt eine Datei, die auf CSV-Inhalte geprüft werden muss
+
+		:return: zeilen_der_Datei, der_Dialekt_der_Datei (CSV, TSV, ...); Dialoect wird durch sniff() ermittelt
+		"""
 		datei = request.FILES['datei']
 		inhalt = datei.read().decode("ISO-8859-1")	# Warum das kein UTF-8 ist, weiß ich auch nicht
 		zeilen = inhalt.splitlines()
@@ -421,14 +471,21 @@ def import_csv(request):
 		return (zeilen, dialect)
 
 	def bearbeite_datei(ausgabe):
-		# Liest die im Web angegebene Datei ein und versucht, sie in der Übergabetabelle zu hinterlegen.
-		# ToDo Die Fehlerbehandlung muss verbessert werden
+		"""
+		Liest die im Web angegebene Datei ein und versucht, sie in der Übergabetabelle zu hinterlegen.
+		ToDo Die Fehlerbehandlung muss verbessert werden
+
+		:param ausgabe: boolean flag, ob die Funktion Textausgaben erzeugen soll (debug)
+		:return: Laufzeiten-Summen der Funktionen zum Einlesen und Bearbeiten
+		"""
 		if ausgabe: print('Organisation =', form.cleaned_data['organisation'])
 		zeilen, dialect = hole_datei()
 		reader = csv.DictReader(zeilen, dialect=dialect)
 
-		# Wenn das bis hierhin ohne Fehler gelaufen ist, müsste der Rest auch funktionieren.
-		# Deshalb werden jetzt erst mal die verschiedenen Importtabellen geleert
+		"""
+		Wenn das bis hierhin ohne Fehler gelaufen ist, müsste der Rest auch funktionieren.
+		Deshalb werden jetzt erst mal die verschiedenen Importtabellen geleert
+		"""
 		leere_importtabelle()
 		schreibe_zeilen(reader)
 
@@ -447,7 +504,12 @@ def import_csv(request):
 		return laufzeiten
 
 	def import_schritt1(orga):
+		"""
 		# Führt die beiden ersten Stored Procedures vorbereitung() und neueUser() zum Datenimport aus
+
+		:param orga: String der Organisation, für die die Daten eingelesen werden sollen (wichtig für User-ID-Match)
+		:return: Statistik: was alles geändert werden soll; Fehlerinformation (False = kein Fehler)
+		"""
 		fehler = False
 		statistik = {}
 		with connection.cursor() as cursor:
@@ -496,15 +558,24 @@ def import_csv(request):
 
 
 def import2(request):
-	# Der zweite Schritt zeigt zunächst die statistischen Ergebnisse von Schritt 1, dann die neuen User
-	# Soewie die zu löschenden User.
-	# Beim Bestätigen des Schrittes werden die neuen User der UserIDundName-Tabelle hinzugefügt
-	# und die zu löschenden markiert sowie deren Rechte historisiert
-	# (warum eigentlich, die können doch bei der Reinkaranation wieder verwendet werden?).
+	"""
+	Der zweite Schritt zeigt zunächst die statistischen Ergebnisse von Schritt 1, dann die neuen User
+	Soewie die zu löschenden User.
+	Beim Bestätigen des Schrittes werden die neuen User der UserIDundName-Tabelle hinzugefügt
+	und die zu löschenden markiert sowie deren Rechte historisiert
+	(warum eigentlich, die können doch bei der Reinkaranation wieder verwendet werden?).
 
+	:param request: Der POST- oder GET-Request vom Browser
+	:return: HTML-Output
+	"""
 	def hole_alles(db):
-		# Lesen aller Werte aus eienr übergebenen Datenbank
-		# Das wird benötigt für Datenbanken, die nicht als Django-Modell hinterlegt sind (bspw. temp.-Tabellen)
+		"""
+		Lesen aller Werte aus einer übergebenen Datenbank
+		Das wird benötigt für Datenbanken, die nicht als Django-Modell hinterlegt sind (bspw. temp.-Tabellen)
+
+		:param db: Welche Datenbank soll gelesen werden?
+		:return: Die gelesenen Zeilen; Fehler-Information (False = kein Fehler)
+		"""
 		fehler = False
 		retval = [['Nix geladen']]
 		with connection.cursor() as cursor:
@@ -520,15 +591,29 @@ def import2(request):
 			return retval, fehler
 
 	def hole_neueUser():
+		"""
+		Lies alle Einträge von DB qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a (temporäre Tabelle beim Import)
+
+		:return: Die Einträge
+		"""
 		return hole_alles('qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a')
 
 	def hole_geloeschteUser():
+		"""
+		Lies alle Einträge von DB qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a (temporäre Tabelle beim Import)
+
+		:return: Die Einträge
+		"""
 		return hole_alles('qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a')
 
 	def import_schritt2():
-		# Führt die Stored Procedure behandleUser() zum Aktualisieren der UserIDundName-Tabelle aus
-		# Als Seiteneffekt werden die Tabellen qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
-		# und qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a gefüllt, die weiter unten in die Session übernommen werden.
+		"""
+		Führt die Stored Procedure behandleUser() zum Aktualisieren der UserIDundName-Tabelle aus
+		Als Seiteneffekt werden die Tabellen qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
+		und qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a gefüllt, die weiter unten in die Session übernommen werden.
+
+		:return: Fehler-Information (False = kein Fehler)
+		"""
 		fehler = False
 		with connection.cursor() as cursor:
 			try:
@@ -552,9 +637,12 @@ def import2(request):
 	else:
 		form = forms.Form()
 
-	# Der Context wird beim ersten Aufruf (dem ersten Anzeigen) des Templates geüllt.
-	# Bei eventuellen weiteren GET-Lieferunngen wird der Context erneut gesetzt.
-	# ToDO:_ Nopchmal überlegen, was in die Session gehört und was nicht. Session-Vars direkt im Template behandeln!
+	"""
+	Der Context wird beim ersten Aufruf (dem ersten Anzeigen) des Templates geüllt.
+	Bei eventuellen weiteren GET-Lieferunngen wird der Context erneut gesetzt.
+	"""
+	# ToDo: Nochmal überlegen, was in die Session gehört und was nicht. Session-Vars direkt im Template behandeln!
+
 	context = {
 		'form': form,
 		'fehler': request.session.get('fehler1', None),
@@ -567,10 +655,14 @@ def import2(request):
 
 
 def import2_quittung(request):
-	# Nun erfolgt eine Ausgabe, ob das Verändern der User-Tabelle geklappt hat.
-	# Es wird ein Link angeboten auf eine geeignete Seite, um die User-Tabelle manuell anzupassen.
-	# Buttons werden angeboten, um den nächsten Schritt anzustoßen oder das Ganze abzubrechen.
+	"""
+	Nun erfolgt eine Ausgabe, ob das Verändern der User-Tabelle geklappt hat.
+	Es wird ein Link angeboten auf eine geeignete Seite, um die User-Tabelle manuell anzupassen.
+	Buttons werden angeboten, um den nächsten Schritt anzustoßen oder das Ganze abzubrechen.
 
+	:param request: GET- oder POST-Request
+	:return: HTML-Output
+	"""
 	def import_schritt3(orga, dopp):
 		# Führt die letzte definitiv erforderliche Stored Procedures behandle_Rechte() aus.
 		# Optional kann dann noch das Löschen doppelt angelegeter Rechte erfolgen (loescheDoppelteRechte)
@@ -618,6 +710,12 @@ def import2_quittung(request):
 
 
 def import3_quittung(request):
+	"""
+	Der dritte Schritt des Imports zeigt nur noch das Ergebnis der Stored Procs an
+
+	:param request: GET- oder POST-Request
+	:return: HTML-Output
+	"""
 	context = {
 		#'form': form,
 		#'fehler': request.session.get('fehler3', None),
@@ -625,6 +723,15 @@ def import3_quittung(request):
 	return render(request, 'rapp/import3_quittung.html', context)
 
 def import_status(request):
+	"""
+	Das wird vielleicht mal die ReST-Datenlieferung für einen Fortschrittsbalken.
+	Dazu muss aber das Einlesen der Daten parallel zu anderen Funktionen laufen können,
+	das ist noch nicht wirklich innerhalb dieser Funktionen gegeben
+	(kein nebenläufiges Update der Session-Information parallel zum Einlesen der Datei).
+
+	:param request: GET- oder POST-Request
+	:return: HTML-Output
+	"""
 	zeilen = request.session.get ('Anzahl Zeilen', 1)
 	aktuell = request.session.get ('geschafft', 0)
 	proz = int(aktuell) * 100 // int(zeilen)

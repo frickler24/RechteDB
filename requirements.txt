@@ -15,7 +15,6 @@ django-filter >= 2.0.0
 django-widget-tweaks >= 1.4.2
 django-tables2 >= 1.21.2
 django-debug-toolbar >= 1.9.1
-django-import-export >= 1.0.1
-#openpyxl >= 2.5.5       # comes with django-import-export >= 1.0.1
+django-import-export >= 1.1.0
 
 # Images are at ${Project}./myvenv/lib/python3.5/site-packages/django/contrib/gis/static/gis/img
