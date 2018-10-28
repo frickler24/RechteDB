@@ -76,4 +76,4 @@ Genutzt werden kann die App in vernünftigen Browsern (nicht IE11, der weiß nic
 Wichtige noch fehlende Aktivitäten oder gute Ideen werden 
 - bei Fehlern als Issue im github vermerkt
 - bei Kleinigkeiten im jeweiligen Programm angelegt (Suche über die jeweilige SEU nach "ToDo:")
-- bei generelleren Themen in der Datei rapp/views.py im ersten Block gesammelt.
+- bei generelleren Themen in der Datei RechteDB/rapp/views.py in einem Block zu Beginn der Datei gesammelt.
