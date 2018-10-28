@@ -71,4 +71,3 @@ class UseridFilter(django_filters.FilterSet):
 			'orga',
 		]
 
-# ToDo Wahrscheinlich fehlt hier noch ein RolleHatAF-Filter, deshalb die eingeschränkten Suchmöglichkeiten auf der Admin-Page

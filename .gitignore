@@ -14,3 +14,4 @@ my3.6venv
 *.mdj
 other_files/RechteDB 20180825 Erster Export der Neuimplementierung.sql.gz
 Test.csv
+rapp_0.0.1.tar*

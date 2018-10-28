@@ -20,9 +20,12 @@ from django.utils import timezone
 from django import forms
 
 from .forms import ShowUhRForm, ImportForm, ImportForm_schritt3
+#from urls import get_version
 
 # Zum Einlesen der csv
-import csv, textwrap
+import csv, textwrap, re, subprocess
+
+import os
 
 from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, TblUserhatrolle, \
 	Tblrechteneuvonimport, Tblrechteamneu
@@ -34,10 +37,9 @@ from .stored_procedures import *
 # RApp - erforderliche Sichten und Reports
 
 # ToDo: Alle Rollen sowie die daran hängenden AF für eine Selektion (gruppiert für PDF)
-
 # ToDo: Alle TF / GF / AF / Rollen für selektierte User - Evtl. gibt es das schon beim jetzigen Filterpanel
 
-# ToDo: Abgleich vorhandener Rechte selektierter User mit Zertifizierungsliste
+# ToDo: Abgleich vorhandener Rechte selektierter User mit Zertifizierungsliste (Importfunktion für die Liste!)
 
 # ToDo: Abgleich vorhandener Rechte mit Rollenvorgaben
 # ToDo: - Was fehlt?
@@ -60,19 +62,31 @@ from .stored_procedures import *
 # ToDo: Welche Rechte sind redundant, weil sie neu modelliert wurden und was ist die Alternativempfehlung?
 # ToDo: Zu welchen Orgabereichen (Importfunktion dafür!) gehören die identifizierten User (Vorbereitung Mail an FK zum Prüfen und eventuellem Löschen
 
-# ToDo: Suche-Panel: Die Links bei den beiden Lösch-Buttons rechts sind defekt
 # ToDo: Links auf die change- create- und delete-Seiten ausprobieren. Sind eigene Seiten im Frontend besser?
 # ToDo: Filter-Panel mit excel Export versorgen
 # ToDo: Kompakte Liste für Rolle und AF mit Filtermöglichkeit und PDF Generierung
 
 # ToDo: Die gesamten Modellnamen können mal überarbeitet werden (kein TBL am Anfang etc.)
 
-# ToDo: in UserHatRollen ist in der Anzeige die "aktiv"-Anzeige für eine AF noch nicht auf die einzelnen UserIDs der Identität bezogen, sondern gilt "generell"
 # ToDo: Die tables alternierend einfärben
-# ToDo: Prüfen, warum so viele Plattvorm_id in der Gesamttabelle 0 sind
 # ToDo: Checken, ob tbl_Gesamt_komplett irgendwo noch als Gesamttabelle aller userids benötigt wird, sonst in SP löschen nach Nutzung
 # ToDO: Längenbegrenzungen checken in Modell für UserHatRolle
-# ToDo Mechismus für die progress-bar geht überhaupt noch nicht (kein Update, kein Löschen usw.)
+
+# ToDo: Neuanlage von Rollen in mehreren Zeilen vorbereiten?
+# ToDo: Suche: Wo kann man die Modelle anpassen? Braucht das Ändern der Modellzugehörigkeit noch jemand, oder ist das mit dem neuen Rollenmodell obsolet?
+# ToDo: Userrolle: Link von der Rollensicht auf tbluseridundname im Admin
+
+def get_version(package):
+	"""
+	Return package version as listed in `__version__` in `init.py`.
+	"""
+	init_py = open(os.path.join(package, '__init__.py')).read()
+	manual = re.match("__version__ = ['\"]([^'\"]+)['\"]", init_py).group(1)
+	git_rev = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
+	return manual + ' - ' + git_rev.decode('utf-8')
+
+version = get_version('rapp')
+
 
 # Der Direkteinsteig für die gesamte Anwendung
 def home(request):
@@ -93,6 +107,7 @@ def home(request):
 	num_teams = TblOrga.objects.all().count
 	num_active_rights = TblGesamt.objects.filter(geloescht=False).count
 
+
 	return render(
 		request,
 		'index.html',
@@ -106,6 +121,7 @@ def home(request):
 			'num_userIDsInDepartment': num_userids_in_department,
 			'num_teams': num_teams,
 			'num_users': User.objects.all().count,
+			'version':	version,
 		},
 	)
 
@@ -187,10 +203,12 @@ class UhRCreate(CreateView):
 	template_name = 'rapp/uhr_form.html'
 	fields = ['userid', 'rollenname', 'schwerpunkt_vertretung', 'bemerkung']
 	context_object_name = 'unser_user'
+
 class UhRUpdate(UpdateView):
 	"""Ändert die Zuordnung von Rollen zu einem User."""
 	model = TblUserhatrolle
 	fields = '__all__'
+
 class UhRDelete(DeleteView):
 	"""Löscht die Zuordnung einer Rollen zu einem User."""
 	model = TblUserhatrolle
@@ -228,8 +246,15 @@ def panel(request):
 	except EmptyPage:
 		pages = paginator.page(paginator.num_pages)
 
-	args = {'paginator': paginator, 'filter': panel_filter, 'pages': pages, 'meineTabelle': panel_list, 'pagesize': pagesize}
-	return render(request, 'rapp/panel_list.html', args)
+	context = {
+		'paginator': paginator,
+		'filter': panel_filter,
+		'pages': pages,
+		'meineTabelle': panel_list,
+		'pagesize': pagesize,
+		'version':	version,
+	}
+	return render(request, 'rapp/panel_list.html', context)
 
 
 ###################################################################
@@ -357,7 +382,7 @@ def panel_UhR(request, id = 0):
 			pages = paginator.page(paginator.num_pages)
 
 	form = ShowUhRForm(request.GET)
-	args = {
+	context = {
 		'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
 		'filter': panel_filter,
 		'userids': userids, 'usernamen': usernamen, 'afmenge': afmenge,
@@ -366,9 +391,10 @@ def panel_UhR(request, id = 0):
 		'form': form,
 		'selektierter_name': selektierter_name,
 		'selektierte_userid': selektierte_userid,
+		'version': version,
 	}
 
-	return render(request, 'rapp/panel_UhR.html', args)
+	return render(request, 'rapp/panel_UhR.html', context)
 
 
 ###################################################################
@@ -553,6 +579,7 @@ def import_csv(request):
 
 	context = {
 		'form': form,
+		'version': version,
 	}
 	return render (request, 'rapp/import.html', context)
 
@@ -648,6 +675,7 @@ def import2(request):
 		'fehler': request.session.get('fehler1', None),
 		'statistik': request.session.get('import_statistik', 'Keine Statistik vorhanden'),
 		'laufzeiten': request.session.get('import_laufzeiten', 'Keine Laufzeiten vorhanden'),
+		'version': version,
 	}
 	request.session['neueUser'] = hole_neueUser()[0]  # Nur die Daten, ohne den Returncode der Funktion
 	request.session['geloeschteUser'] = hole_geloeschteUser()[0]  # Nur die Daten, ohne den Returncode der Funktion
@@ -705,6 +733,7 @@ def import2_quittung(request):
 	context = {
 		'form': form,
 		'fehler': request.session.get('fehler2', None),
+		'version': version,
 	}
 	return render(request, 'rapp/import2_quittung.html', context)
 
@@ -719,6 +748,7 @@ def import3_quittung(request):
 	context = {
 		#'form': form,
 		#'fehler': request.session.get('fehler3', None),
+		'version': version,
 	}
 	return render(request, 'rapp/import3_quittung.html', context)
 
@@ -736,4 +766,4 @@ def import_status(request):
 	aktuell = request.session.get ('geschafft', 0)
 	proz = int(aktuell) * 100 // int(zeilen)
 	print (zeilen, aktuell, proz)
-	return render (request, 'rapp/import_status.html', {'proz': proz})
+	return render (request, 'rapp/import_status.html', {'proz': proz, 'version': version, })

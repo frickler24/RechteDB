@@ -113,7 +113,7 @@ class TblUserhatrolle(models.Model):
 		unique_together = (('userid', 'rollenname'),)
 
 	def __str__(self) -> str:
-		return str(self.userundrollenid)		# ToDo: Stimmt das?
+		return str(self.userundrollenid)
 
 	def get_rollenbeschreibung (self):
 		return str(self.rollenname.rollenbeschreibung)
@@ -424,7 +424,7 @@ class TblGesamtHistorie(models.Model):
 #
 # Sinn der Tabelle ist, eine eindeutige Liste an AFs vorliegen zu haben. Das GROUP- BY kann evtl teuer werden.
 # Aber das probieren wir jetzt mal aus.
-class TblAfliste(models.Model):		# ToDo: Wegwerfen, Tabelle könnte eventuell ersetzt werden durch eine geeignete View (order by auf AF_Name)
+class TblAfliste(models.Model):
 	id = 					models.AutoField(db_column='id', primary_key=True, verbose_name='ID')  # Field name made lowercase.
 	af_name = 				models.CharField(db_column='af_name', unique=True, max_length=150, verbose_name='AF-Name')  # Field name made lowercase. Field renamed to remove unsuitable characters.
 	neu_ab = 				models.DateTimeField(db_column='neu_ab')  # Field renamed to remove unsuitable characters.
