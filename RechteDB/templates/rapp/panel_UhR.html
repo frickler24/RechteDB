@@ -111,7 +111,7 @@
 											<div class="form-control col-5">{{ meineaf.bemerkung }}</div>
 											<div class="form-control col-1 text-center">
 												{# Aus dem QueryElement meineaf.af muss ein String zur Suche in der Menge gemacht werden #}
-												{% if meineaf.af|stringformat:"s" in afmenge %}
+												{% if meineaf.af|stringformat:"s"|lower in afmenge|lower %}
 													<img src="{% static 'admin/img/icon-yes.svg' %}">
 												{% else %}
 													<img src="{% static 'admin/img/icon-no.svg' %}">
