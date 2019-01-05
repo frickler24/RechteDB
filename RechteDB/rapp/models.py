@@ -476,7 +476,6 @@ class Tblsubsysteme(models.Model):
 
 class TblDb2(models.Model):
 	id = models.AutoField(db_column='id', primary_key=True)  # Field name made lowercase.
-	geloescht = models.TextField(db_column='geloescht', blank=True, null=True, )  # This field type is a guess.
 	source = models.CharField(db_column='source', max_length=15, blank=True, null=True)  # Field name made lowercase.
 	grantee = models.ForeignKey('TblRacfGruppen', models.PROTECT, to_field='group', db_column='grantee')  # Field name made lowercase.
 	creator = models.CharField(db_column='CREATOR', max_length=15, blank=True, null=True)  # Field name made lowercase.
@@ -506,10 +505,12 @@ class TblDb2(models.Model):
 	get_grantee.admin_order_field = 'grantee'
 	get_grantee.short_description = 'Grantee'
 
+	""" Falls das mal wieder jemand brauchen sollte...
 	def get_aktiv(self):
 		return not self.geloescht
 	get_aktiv.admin_order_field = 'geloescht'
 	get_aktiv.short_description = 'Aktiv'
+	"""
 
 class TblRacfGruppen(models.Model):
 	group = models.CharField(db_column='Group', primary_key=True, max_length=150)  # Field name made lowercase.
