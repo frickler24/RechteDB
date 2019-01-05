@@ -44,7 +44,7 @@ def push_sp_test():
 	sp = """
 CREATE PROCEDURE anzahl_import_elemente()
 BEGIN
-  SELECT COUNT(*) FROM `tblRechteNeuVonImport` ORDER BY `TF Name`, `Identität`;
+  SELECT COUNT(*) FROM `tblRechteNeuVonImport`;
 END
 """
 	return push_sp ('anzahl_import_elemente', sp)
@@ -231,12 +231,7 @@ BEGIN
         Erzeuge die Liste der erlaubten Arbeitsplatzfunktionen.
         Sie wird später in der Rollenbehandlung benötigt.
     */
-    INSERT INTO tbl_AFListe ( `af_name`, neu_ab )
-        SELECT `tblUEbersichtAF_GFs`.`name_af_neu` AS af_name, now() AS neu_ab
-            FROM tblUEbersichtAF_GFs LEFT JOIN tbl_AFListe ON tblUEbersichtAF_GFs.`name_af_neu` = tbl_AFListe.`af_name`
-            WHERE (((tblUEbersichtAF_GFs.modelliert) Is Not Null) AND ((tbl_AFListe.`af_name`) Is Null))
-        GROUP BY tblUEbersichtAF_GFs.`name_af_neu`;
-
+    CALL erzeuge_af_liste;
 
     /*
         Bis hierhin ging die Vorbereitung.
@@ -1178,6 +1173,25 @@ END
 	return push_sp ('setzeNichtAIFlag', sp)
 
 
+def push_sp_macheAFListe():
+	sp = """
+CREATE PROCEDURE erzeuge_af_liste()
+BEGIN
+    /*
+        Erzeuge die Liste der erlaubten Arbeitsplatzfunktionen.
+        Sie wird später in der Rollenbehandlung benötigt.
+    */
+    INSERT INTO tbl_AFListe ( `af_name`, neu_ab )
+        SELECT `tblUEbersichtAF_GFs`.`name_af_neu` AS af_name, now() AS neu_ab
+            FROM tblUEbersichtAF_GFs LEFT JOIN tbl_AFListe ON tblUEbersichtAF_GFs.`name_af_neu` = tbl_AFListe.`af_name`
+            WHERE (((tblUEbersichtAF_GFs.modelliert) Is Not Null) AND ((tbl_AFListe.`af_name`) Is Null))
+        GROUP BY tblUEbersichtAF_GFs.`name_af_neu`;
+END
+"""
+	return push_sp ('erzeuge_af_liste', sp)
+
+
+
 def handle_stored_procedures(request):
 	# Behandle den Import von Stored-Procedures in die Datenbank
 	daten = {}
@@ -1191,6 +1205,7 @@ def handle_stored_procedures(request):
 		daten['behandleRechte'] = push_sp_behandleRechte()
 		daten['loescheDoppelteRechte'] = push_sp_loescheDoppelteRechte()
 		daten['setzeNichtAIFlag'] = push_sp_nichtai() # Nur, falls die Funktion jemals wieder benötigt wird
+		daten['erzeuge_af_liste'] = push_sp_macheAFListe()
 
 	context = {
 		'daten': daten,
