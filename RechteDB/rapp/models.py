@@ -499,7 +499,7 @@ class TblDb2(models.Model):
 		ordering = [ 'id', ]
 
 	def __str__(self) -> str:
-		return self.id
+		return str(self.id)
 
 	def get_grantee(self):
 		return str(self.grantee.group)
