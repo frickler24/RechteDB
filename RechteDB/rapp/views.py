@@ -107,6 +107,16 @@ def home(request):
 	num_teams = TblOrga.objects.all().count
 	num_active_rights = TblGesamt.objects.filter(geloescht=False).count
 
+	# Sicherheitshalber wird immer bei Aufruf der Startseite die Tabelle tbl_AFListe neu aufgebaut
+	with connection.cursor() as cursor:
+		try:
+			cursor.callproc("erzeuge_af_liste")  # diese SProc benötigt die Orga nicht als Parameter
+		except:
+			e = sys.exc_info()[0]
+			fehler = format("Error: %s" % e)
+			print('Fehler Beim Erstellen der AFListe, StoredProc erzeuge_af_liste', fehler)
+
+		cursor.close()
 
 	return render(
 		request,
