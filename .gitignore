@@ -6,8 +6,7 @@ db.sqlite3
 __pycache__
 .directory
 my3.6venv
-.idea/workspace.xml
-.idea/*
+.idea/
 01\ Mitarbeiterberechtigungen\ ZI-AI-BA*.csv
 .env
 *.xmi
@@ -24,4 +23,3 @@ tbl_Rollen.txt
 tbl_UserHatRolle.sql
 tbl_UserHatRolle.txt
 tbl*bersichtAF_GFs.txt
-
