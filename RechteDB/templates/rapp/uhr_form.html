@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
 
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
@@ -13,13 +15,11 @@
 {% endblock %}
 
 {% load static %}
+
 {% block content %}
-    <h1>
-        {% if unser_user %}
-            Rollen-Eintrag ergänzen für <strong>{{ unser_user }}</strong>
-        {% endif %}
-    </h1>
-    <p>&nbsp;</p>
+    <h4>
+        Rollen-Eintrag ergänzen für <strong>{{ username }}</strong>
+    </h4>
 
     <form action="" method="post">
         {% csrf_token %}

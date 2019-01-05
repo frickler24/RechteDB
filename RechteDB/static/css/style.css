@@ -26,6 +26,10 @@ body {
     color: #000055;
 }
 
+h4 {
+    padding-bottom: 1rem;
+}
+
 #header {
     background-color: #02c304;
 }

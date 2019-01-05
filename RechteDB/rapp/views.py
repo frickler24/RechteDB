@@ -15,11 +15,12 @@ from django.core.paginator import Paginator
 from .filters import PanelFilter, UseridFilter
 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.list import ListView
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django import forms
 
-from .forms import ShowUhRForm, ImportForm, ImportForm_schritt3
+from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportForm_schritt3
 #from urls import get_version
 
 # Zum Einlesen der csv
@@ -137,7 +138,7 @@ def home(request):
 
 ###################################################################
 # Gesamtliste
-class GesamtListView(generic.ListView):
+class GesamtListView(ListView):
 	"""Die Gesamtliste der Rechte ungefiltert"""
 	model = TblGesamt
 	paginate_by = 50
@@ -147,7 +148,7 @@ class GesamtDetailView(generic.DetailView):
 
 ###################################################################
 # Rechte-User (Gemeint sind nicht die Anwender der RechteDB!)
-class UserIDundNameListView(generic.ListView):
+class UserIDundNameListView(ListView):
 	"""Die Gesamtliste der User ungefiltert"""
 	model = TblUserIDundName
 	paginate_by = 50
@@ -211,8 +212,21 @@ class UhRCreate(CreateView):
 	"""
 	model = TblUserhatrolle
 	template_name = 'rapp/uhr_form.html'
-	fields = ['userid', 'rollenname', 'schwerpunkt_vertretung', 'bemerkung']
-	context_object_name = 'unser_user'
+	form_class = CreateUhRForm
+
+	def get_context_data(self, **kwargs):
+		# Call the base implementation first to get a context
+		context = super().get_context_data(**kwargs)
+		# Add in a QuerySet of all the books
+		context['userid'] = self.kwargs['userid']
+		user_entry = TblUserIDundName.objects.filter(userid__istartswith=self. kwargs['userid'])[0]
+		context['username'] = user_entry
+		return context
+
+	def get_form_kwargs(self):
+		kwargs = super(UhRCreate, self).get_form_kwargs()
+		kwargs['userid'] = self. kwargs['userid']
+		return kwargs
 
 class UhRUpdate(UpdateView):
 	"""Ändert die Zuordnung von Rollen zu einem User."""

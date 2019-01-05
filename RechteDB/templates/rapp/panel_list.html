@@ -2,7 +2,6 @@
 
 {% load static %}
 {% load widget_tweaks %}
-{ % load render_table from django_tables2 %}
 
 {% block breadcrumb %}
 	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
@@ -103,7 +102,7 @@
 		</form>
 	</div>
 
-    {% comment %} Die alte Ergebnismenge, manuell zu einer Tabelle zusammengestellt {% endcomment %}
+    {% comment %} Die Ergebnismenge, manuell zu einer Tabelle zusammengestellt {% endcomment %}
 	<table class="table table-bordered vllzulangertext">
 		<thead>
 			<tr class="bg-primary">
