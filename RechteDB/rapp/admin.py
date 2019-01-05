@@ -350,7 +350,7 @@ class Sachgebiete(admin.ModelAdmin):
 
 @admin.register(TblDb2)
 class Db2(admin.ModelAdmin):
-	list_display = ['id', 'get_aktiv', 'source', 'get_grantee', 'creator', 'table',
+	list_display = ['id', 'source', 'get_grantee', 'creator', 'table',
 			'selectauth', 'insertauth', 'updateauth', 'deleteauth',
 			'alterauth', 'indexauth', 'grantor', 'grantedts', 'datum']
 	search_fields = ['table', 'grantee__group', 'grantor']
