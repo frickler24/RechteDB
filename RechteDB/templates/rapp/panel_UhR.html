@@ -26,7 +26,7 @@
 					({{ userHatRolle_liste.count }} Rollen)
 				</h3>
 			</div>
-			<div">
+			<div>
 				<table class="table table-striped table-sm">
 				<thead>
 					<tr class="bg-primary text-left">
@@ -141,6 +141,19 @@
 		{% else %}
 			{% if selektierter_name %}
 				<div class="col-12 bg-warning">User {{ selektierter_name }} ist noch keine Rolle zugeordnet</div>
+					<table class="table table-striped table-sm">
+						<tbody>
+							<tr>
+								<td>
+									<a href="{% url 'user_rolle_af-create' selektierte_userid %}">
+											<img src="{% static 'icons8-neu-erstellen-64.png' %}" width="25 rem" />
+									Hier</a>
+									können Sie neue Rollen für den User vergeben
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			{% else %}
 				<div class="col-12">
 					Kein User selektiert
