@@ -217,27 +217,67 @@ class UhRCreate(CreateView):
 	def get_context_data(self, **kwargs):
 		# Call the base implementation first to get a context
 		context = super().get_context_data(**kwargs)
-		# Add in a QuerySet of all the books
 		context['userid'] = self.kwargs['userid']
-		user_entry = TblUserIDundName.objects.filter(userid__istartswith=self. kwargs['userid'])[0]
+		user_entry = TblUserIDundName.objects.filter(userid__istartswith=self.kwargs['userid'])[0]
 		context['username'] = user_entry
 		return context
 
 	def get_form_kwargs(self):
 		kwargs = super(UhRCreate, self).get_form_kwargs()
-		kwargs['userid'] = self. kwargs['userid']
+		kwargs['userid'] = self.kwargs['userid']
 		return kwargs
 
-class UhRUpdate(UpdateView):
-	"""Ändert die Zuordnung von Rollen zu einem User."""
-	model = TblUserhatrolle
-	fields = '__all__'
+	# Im Erfolgsfall soll die vorherige Selektion im Panel "User und Rollen" wieder aktualisiert gezeigt werden.
+	# Dazu werden nebem dem URL-Stamm die Nummer des anzuzeigenden Users sowie die gesetzte Suchparameter benötigt.
+	def get_success_url(self):
+		usernr = self.request.GET.get('user', 0) # Sicherheitshalber - falls mal kein User angegeben ist
+
+		urlparams = "%s?"
+		for k in self.request.GET.keys():
+			if (k != 'user' and self.request.GET[k] != ''):
+				urlparams += "&" + k + "=" + self.request.GET[k]
+		url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
+		# print (url)
+		return url
+
 
 class UhRDelete(DeleteView):
 	"""Löscht die Zuordnung einer Rollen zu einem User."""
 	model = TblUserhatrolle
 	template_name = 'rapp/uhr_confirm_delete.html'
-	success_url = reverse_lazy('user_rolle_af') # ToDo Die Rücksprungadresse bei Success parametrisieren (wie?)
+
+	# Im Erfolgsfall soll die vorherige Selektion im Panel "User und RolleN" wieder aktualisiert gezeigt werden.
+	# Dazu werden nebem dem URL-Stamm die Nummer des anzuzeigenden Users sowie die gesetzte Suchparameter benötigt.
+	def get_success_url(self):
+		usernr = self.request.GET.get('user', 0) # Sicherheitshalber - falls mal kein User angegeben ist
+
+		urlparams = "%s?"
+		for k in self.request.GET.keys():
+			if (k != 'user' and self.request.GET[k] != ''):
+				urlparams += "&" + k + "=" + self.request.GET[k]
+		url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
+		return url
+
+
+class UhRUpdate(UpdateView):
+	"""Ändert die Zuordnung von Rollen zu einem User."""
+	# ToDo: Hierfür gibt es noch keine Buttons.
+	model = TblUserhatrolle
+	fields = '__all__'
+
+	# Im Erfolgsfall soll die vorherige Selektion im Panel "User und RolleN" wieder aktualisiert gezeigt werden.
+	# Dazu werden nebem dem URL-Stamm die Nummer des anzuzeigenden Users sowie die gesetzte Suchparameter benötigt.
+	def get_success_url(self):
+		usernr = self.request.GET.get('user', 0) # Sicherheitshalber - falls mal kein User angegeben ist
+
+		urlparams = "%s?"
+		for k in self.request.GET.keys():
+			if (k != 'user' and self.request.GET[k] != ''):
+				urlparams += "&" + k + "=" + self.request.GET[k]
+		url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
+		# print (url)
+		return url
+
 
 
 ###################################################################
@@ -357,14 +397,14 @@ def panel_UhR(request, id = 0):
 	else:
 		"""
 		Selektiere alle Userids und alle Namen in TblUserHatRolle, die auch in der Selektion vorkommen
-		Hier könnte man mal einen reverse lookup einbauen von TblUserUndName zu TblUserHatRolle
+		ToDo: Hier könnte man mal einen reverse lookup einbauen von TblUserUndName zu TblUserHatRolle
 		
 		Die Liste der disjunkten UserIDs wird später in der Anzeige benötigt (Welche UserID gehören zu einem Namen).
 		Hintergrund ist die Festlegung, dass die Rollen am UserNAMEN un dnicht an der UserID hängen.
 		Dennoch gibt es Rollen, die nur zu bestimmten Userid-Typen (also bspw. nur für XV-Nummer) sinnvoll
 		und gültig sind.
 		
-		Die af_menge wird benutzt zur Anzeige, welcche der rollenbezogenen AFen bereits im IST vorliegt
+		Die af_menge wird benutzt zur Anzeige, welche der rollenbezogenen AFen bereits im IST vorliegt
 		
 		"""
 		usernamen = set()
@@ -417,7 +457,6 @@ def panel_UhR(request, id = 0):
 		'selektierte_userid': selektierte_userid,
 		'version': version,
 	}
-
 	return render(request, 'rapp/panel_UhR.html', context)
 
 

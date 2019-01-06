@@ -18,6 +18,7 @@ mariadb:
 		--name mariadb \
 		--network mariaNetz \
 		--network-alias maria \
+        --restart unless-stopped \
 		-p 13306:3306 \
 		-e MYSQL_ROOT_PASSWORD=geheim \
 		-v /home/lutz/datadir:/var/lib/mysql \
@@ -30,6 +31,7 @@ phpmyadmin:
 		-p 8080:80 \
 		--name phpmyadmin \
 		--network mariaNetz \
+        --restart unless-stopped \
 		-e PMA_HOST=maria \
 		phpmyadmin/phpmyadmin
 
@@ -38,6 +40,7 @@ phpmyadmin_pma:
 		-p 8088:80 \
 		--name phpmyadmin \
 		--network mariaNetz \
+        --restart unless-stopped \
 		-e PMA_HOST=maria \
 		-e PMA_CONTROLUSER=pma \
 		-e PMA_CONTROLPASS=0oWiPLfdhAcSqy9TnmhKcI222QQIO87BvvjiHX9r57\

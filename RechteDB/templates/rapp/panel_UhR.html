@@ -32,7 +32,7 @@
 					<tr class="bg-primary text-left">
 						<th>
 							<div class="text-left">
-								<a href="{% url 'user_rolle_af-create' selektierte_userid %}">
+								<a href="{% url 'user_rolle_af-create' selektierte_userid %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&user={{ id }}">
 									<img src="{% static 'icons8-neu-erstellen-64.png' %}" width="25 rem" />
 								</a>
 								&nbsp;
@@ -57,10 +57,9 @@
 					{% for rolle in userHatRolle_liste %}
 						<tr>
 							<td width="10%" class="text-left">
-								<a href="{{ rolle.get_absolute_delete_url }}">
+								<a href="{{ rolle.get_absolute_delete_url }}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&user={{ id }}">
 									<img src="{% static 'icons8-müll-50.png' %}" width="25rem" />
 								</a>
-								&nbsp;
 								<button class="btn btn-outline-primary btn-sm" type="button"
 										data-toggle="collapse" data-target="#rolle_{{ rolle }}"
 										aria-expanded="false" aria-controls="rolle_{{ rolle }}">
@@ -140,20 +139,24 @@
 		</div>
 		{% else %}
 			{% if selektierter_name %}
-				<div class="col-12 bg-warning">User {{ selektierter_name }} ist noch keine Rolle zugeordnet</div>
-					<table class="table table-striped table-sm">
-						<tbody>
-							<tr>
-								<td>
-									<a href="{% url 'user_rolle_af-create' selektierte_userid %}">
-											<img src="{% static 'icons8-neu-erstellen-64.png' %}" width="25 rem" />
-									Hier</a>
-									können Sie neue Rollen für den User vergeben
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+				{% if selektierter_name == -1 %}
+					<div class="col-12 bg-warning">Kein User selektiert</div>
+				{% else %}
+					<div class="col-12 bg-warning">User {{ selektierter_name }} ist noch keine Rolle zugeordnet</div>
+						<table class="table table-striped table-sm">
+							<tbody>
+								<tr>
+									<td>
+										<a href="{% url 'user_rolle_af-create' selektierte_userid %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&user={{ id }}">
+												<img src="{% static 'icons8-neu-erstellen-64.png' %}" width="25 rem" />
+										Hier</a>
+										können Sie neue Rollen für den User vergeben
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				{% endif %}
 			{% else %}
 				<div class="col-12">
 					Kein User selektiert

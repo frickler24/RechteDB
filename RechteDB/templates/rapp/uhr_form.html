@@ -4,7 +4,7 @@
 
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
-	<li class="breadcrumb-item"><a href="{% url 'user_rolle_af' %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}">
+	<li class="breadcrumb-item"><a href="{% url 'user_rolle_af' %}{{ request.GET.user }}/?{% for key,value in request.GET.items %}{%if key != 'user' %}&{{ key }}={{ value }}{%endif %}{%endfor %}">
          User, Rollen und Arbeitsplatzfunktionen
     </a></li>
     <li class="breadcrumb-item active">Rolle hinzufügen</li>
@@ -30,17 +30,14 @@
         <table style="width: 50%;">
             <tr>
                 <td>
-                    <input type="submit" value="Submit" />
+                    <input type="submit" value="Ja, bitte anlegen" />
                 </td>
-                {% if object.name %}
-                    <td>
-                       <a href="{{ object.get_absolute_delete_url }}" > Eintrag löschen
-                            <img src="{% static 'delete.svg' %}" width="15" />
-                        </a>
-                    </td>
-                {% endif %}
                 <td>
-                    <a href="{% url 'userliste' %}">Bearbeitung abbrechen!</a>
+                    <a href="{% url 'user_rolle_af' %}{{ request.GET.user }}/?{% for key,value in request.GET.items %}{%if key != 'user' %}&{{ key }}={{ value }}{%endif %}{%endfor %}">
+                        <button class="btn btn-primary btn-sm" type="button">
+                            Nein, bitte abbrechen!
+                        </button>
+                    </a>
                 </td>
             </tr>
         </table>
