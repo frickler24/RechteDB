@@ -60,7 +60,8 @@ image:
 	)
 
 exportableImage:	image
-	docker save rapp | gzip -9 > /tmp/rapp_0.0.2.tar.gz
+	docker save rapp | gzip -9 > /tmp/rapp_$(shell grep "^__version__" RechteDB/rapp/__init__.py | cut -d\' -f 2).tar.gz
+
 
 rapptest:
 	docker run -it --rm \
