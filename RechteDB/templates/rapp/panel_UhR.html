@@ -32,7 +32,7 @@
 					<tr class="bg-primary text-left">
 						<th>
 							<div class="text-left">
-								<a href="{% url 'user_rolle_af-create' selektierte_userid %}">
+								<a href="{% url 'user_rolle_af-create' selektierte_userid %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&user={{ id }}">
 									<img src="{% static 'icons8-neu-erstellen-64.png' %}" width="25 rem" />
 								</a>
 								&nbsp;
@@ -147,7 +147,7 @@
 							<tbody>
 								<tr>
 									<td>
-										<a href="{% url 'user_rolle_af-create' selektierte_userid %}">
+										<a href="{% url 'user_rolle_af-create' selektierte_userid %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&user={{ id }}">
 												<img src="{% static 'icons8-neu-erstellen-64.png' %}" width="25 rem" />
 										Hier</a>
 										können Sie neue Rollen für den User vergeben

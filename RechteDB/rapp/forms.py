@@ -7,6 +7,7 @@ class ShowUhRForm(forms.ModelForm):
 		model = TblUserhatrolle
 		fields = ['userid', 'rollenname', 'schwerpunkt_vertretung', 'bemerkung', ]
 
+
 # Hier ist das anders, weil zwei Methoden zur Klasse hinzugekommen sind
 # Initialisiere das Input Formular für neue Rolleneinträge mit der UserID
 class CreateUhRForm(forms.ModelForm):
@@ -19,10 +20,10 @@ class CreateUhRForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
 		self.userid = kwargs.pop('userid', None)
 		super(CreateUhRForm, self).__init__(*args, **kwargs)
-
 		# assign the default userID to the choice field
 		self.initial['userid'] = self.userid
-		#self.fields['userid'].selection = self.userid
+
+
 
 #Auch hier ist das Thema das Initialisieren des Organisations-Choicefields
 class ImportForm(forms.Form):
