@@ -14,7 +14,7 @@
 
 {% block content %}
 
-    <h1>Rolleneintrag für User {{ user }} löschen</h1>
+    <h1>Rolleneintrag für User {{ context.selektierter_name }} löschen</h1>
 
     <p>Sie löschen gerade den folgenden Rollen-Eintrag:</p>
     <p>"{{ object.rollenname }}":</p> <p>&nbsp;</p>
@@ -24,8 +24,13 @@
         <input type="submit" action="" value="Ja, bitte löschen." />
         <div>
             <p>&nbsp;</p>
-            <a href="{% url 'user_rolle_af' %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}">
-                Nein, abbrechen!
+            <a href="{% url 'user_rolle_af' %}{{ request.GET.user }}/?{% for key,value in request.GET.items %}{%if key != 'user' %}&{{ key }}={{ value }}{%endif %}{%endfor %}" >
+                <button class="btn btn-primary btn-sm" type="button"
+                            data-toggle="collapse" data-target="#rolle_{{ rolle }}"
+                            aria-expanded="false" aria-controls="rolle_{{ rolle }}">
+                    Nein, bitte abbrechen!
+                </button>
+
             </a>
         </div>
     </form>
