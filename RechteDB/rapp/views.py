@@ -407,6 +407,7 @@ def panel_UhR(request, id = 0):
 		Die af_menge wird benutzt zur Anzeige, welche der rollenbezogenen AFen bereits im IST vorliegt
 		
 		"""
+		print ('Wieder in panel_UhR Get')
 		usernamen = set()
 		userids = set()
 		for row in panel_liste:
