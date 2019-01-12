@@ -53,15 +53,28 @@ importfile:
 	change
 	docker cp import.sql mariadb:/tmp
 
-image:	
+tarfile:
 	( \
-		cd /home/lutz/Projekte/RechteDB2MySQL/RechteDB/ \
-		&& docker build -t rapp . \
+		cd /home/lutz/Projekte/RechteDB2MySQL/ \
+			&& rm -f RechteDB/code_* \
+			&& tar cf /tmp/code_file.tar.gz RechteDB \
+			&& mv /tmp/code_file.tar.gz RechteDB/code_$(shell grep "^__version__" RechteDB/rapp/__init__.py | cut -d\' -f 2).tar.gz \
 	)
 
-exportableImage:	image
-	docker save rapp | gzip -9 > /tmp/rapp_$(shell grep "^__version__" RechteDB/rapp/__init__.py | cut -d\' -f 2).tar.gz
+image:
+	( \
+		cd /home/lutz/Projekte/RechteDB2MySQL/RechteDB/ \
+			&& docker build -t rapp . \
+	)
 
+exportableImage:	tarfile image
+	( \
+		cd /home/lutz/Projekte/RechteDB2MySQL/RechteDB/ \
+			&& docker build -t rapp_full -f Dockerfile_full . \
+	)
+
+export:	exportableImage
+	docker save rapp_full | gzip -9 > /tmp/rapp_$(shell grep "^__version__" RechteDB/rapp/__init__.py | cut -d\' -f 2).tar.gz
 
 rapptest:
 	docker run -it --rm \
