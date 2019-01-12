@@ -46,9 +46,15 @@
 					<div class="col-1">
 						<a href="{% url 'user_rolle_af_parm' row.pk %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}"
 							class="btn btn-outline-primary btn-sm"
-							role="button">{{ row.userid|upper }}</a>
+							role="button">
+							{{ row.userid|upper }}
+						</a>
 					</div>
-					<div class="col-4">{{ row.name }}</div>
+					<div class="col-4">
+						<a href="{% url 'user_rolle_af_parm' row.pk %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}">
+						   {{ row.name }}
+						</a>
+					</div>
 				</div>
 			{% empty %}
 				<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">

@@ -15,16 +15,35 @@
 				<img src="{% static 'RechteDB-Logo.png' %}" height="40rem">
 			</a>
 			<div>
-				<a href="https://github.com/frickler24/RechteDB" target="_blank" style="color: rgba(255,255,255,.75);">
-					Version {{ version }}
-				</a>
+				<small>
+					<a href="https://github.com/frickler24/RechteDB" target="_blank" style="color: rgba(255,255,255,.75);">
+						Version
+						{% if request.session.version %}{{ request.session.version }}
+						{% else %}<small style="color: red;">nicht in der Session</small>
+						{% endif %}
+					</a>
+					<br />
+					<a
+						{% if request.user.is_authenticated %}
+							href={% url 'logout' %}?next={% url 'home' %} style="color: rgba(255,255,255,.75);">
+							Benutzer
+							{% if request.user %}{{ request.user }}
+							{% else %}<small style="color: red;">Merkwürdig!</small>
+							{% endif %}
+						{% else %}
+							href="{% url 'login' %}?next={{ request.path | urlencode }}"
+								style="color: rgba(255,255,255,.75);">
+							Benutzer unbekannt
+						{% endif %}
+					</a>
+				</small>
 			</div>
             <button class="navbar-toggler" type="button" data-toggle="collapse"
 					data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup"
 					aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse justify-content-center" id="navbarNavAltMarkup">
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
                     <a class="nav-item nav-link" <a href="{% url 'home' %}">Startseite <span class="sr-only">(current)</span></a>
                     <a class="nav-item nav-link" href="{% url 'panel' %}?geloescht=3&userid_name__geloescht=3&userid_name__zi_organisation=ai-ba">Suche</a>

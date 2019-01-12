@@ -19,6 +19,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls import include
 
+
 admin.site.site_header = 'RechteDB - Adminseiten'
 admin.site.site_title = 'RechteDB - Administration'
 admin.site.index_title = 'RechteDB - Übersicht'
@@ -36,6 +37,7 @@ if settings.DEBUG:
 from django.conf.urls import include
 # Use include() to add paths from the rapp application
 urlpatterns += [
+	path('accounts/', include('django.contrib.auth.urls')),
 	path('rapp/', include('rapp.urls')),
 ]
 
