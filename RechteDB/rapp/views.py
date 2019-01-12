@@ -20,6 +20,9 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django import forms
 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportForm_schritt3
 #from urls import get_version
 
@@ -90,6 +93,7 @@ version = get_version('rapp')
 
 
 # Der Direkteinsteig für die gesamte Anwendung
+# Dies ist die Einstiegsseite, sie ist ohne Login erreichbar.
 def home(request):
 	"""
 	Zeige ein paar Statistik-Infos über die RechteDB.
@@ -119,6 +123,8 @@ def home(request):
 
 		cursor.close()
 
+	request.session['version'] = version
+
 	return render(
 		request,
 		'index.html',
@@ -132,39 +138,40 @@ def home(request):
 			'num_userIDsInDepartment': num_userids_in_department,
 			'num_teams': num_teams,
 			'num_users': User.objects.all().count,
-			'version':	version,
 		},
 	)
 
 ###################################################################
 # Gesamtliste
-class GesamtListView(ListView):
+class GesamtListView(LoginRequiredMixin, ListView):
 	"""Die Gesamtliste der Rechte ungefiltert"""
 	model = TblGesamt
 	paginate_by = 50
-class GesamtDetailView(generic.DetailView):
+class GesamtDetailView(LoginRequiredMixin, generic.DetailView):
 	"""Die Detailsicht eines einzelnen Rechts"""
 	model = TblGesamt
 
 ###################################################################
 # Rechte-User (Gemeint sind nicht die Anwender der RechteDB!)
-class UserIDundNameListView(ListView):
+class UserIDundNameListView(LoginRequiredMixin, ListView):
 	"""Die Gesamtliste der User ungefiltert"""
 	model = TblUserIDundName
 	paginate_by = 50
-class TblUserIDundNameCreate(CreateView):
+class TblUserIDundNameCreate(LoginRequiredMixin, CreateView):
 	"""Erstellen eines neuen Users"""
 	model = TblUserIDundName
 	fields = '__all__'
 	initial = {'geloscht' : 'False',}
-class TblUserIDundNameUpdate(UpdateView):
+class TblUserIDundNameUpdate(LoginRequiredMixin, UpdateView):
 	"""Ändern eines Users"""
 	model = TblUserIDundName
 	fields = '__all__'
-class TblUserIDundNameDelete(DeleteView):
+class TblUserIDundNameDelete(LoginRequiredMixin, DeleteView):
 	"""Löschen eines Users"""
 	model = TblUserIDundName
 	success_url = reverse_lazy('userliste')
+
+@login_required
 def userToggleGeloescht(request, pk):
 	"""
 	View function zum Togglen des Gelöscht-Flags in der DB für eine konkrete Instanz.
@@ -185,19 +192,19 @@ def userToggleGeloescht(request, pk):
 
 ###################################################################
 # Die Gesamtliste der Teams (TblOrga)
-class TeamListView(generic.ListView):
+class TeamListView(LoginRequiredMixin, generic.ListView):
 	"""Die Gesamtliste der Teams (TblOrga)"""
 	model = TblOrga
-class TblOrgaCreate(CreateView):
+class TblOrgaCreate(LoginRequiredMixin, CreateView):
 	"""Neues Team erstellen"""
 	model = TblOrga
 	fields = '__all__'
 	initial = {'geloscht' : 'False',}
-class TblOrgaUpdate(UpdateView):
+class TblOrgaUpdate(LoginRequiredMixin, UpdateView):
 	"""Team ändern"""
 	model = TblOrga
 	fields = '__all__'
-class TblOrgaDelete(DeleteView):
+class TblOrgaDelete(LoginRequiredMixin, DeleteView):
 	"""Team löschen"""
 	model = TblOrga
 	success_url = reverse_lazy('teamliste')
@@ -205,7 +212,7 @@ class TblOrgaDelete(DeleteView):
 
 ###################################################################
 # Zuordnungen der Rollen zu den Usern (TblUserHatRolle ==> UhR)
-class UhRCreate(CreateView):
+class UhRCreate(LoginRequiredMixin, CreateView):
 	"""
 	Erzeugt einen neue Rolle für einen User.
 	Die Rolle kann eine bestehende oder eine neu definierte Rolle sein.
@@ -241,7 +248,7 @@ class UhRCreate(CreateView):
 		return url
 
 
-class UhRDelete(DeleteView):
+class UhRDelete(LoginRequiredMixin, DeleteView):
 	"""Löscht die Zuordnung einer Rollen zu einem User."""
 	model = TblUserhatrolle
 	template_name = 'rapp/uhr_confirm_delete.html'
@@ -259,7 +266,7 @@ class UhRDelete(DeleteView):
 		return url
 
 
-class UhRUpdate(UpdateView):
+class UhRUpdate(LoginRequiredMixin, UpdateView):
 	"""Ändert die Zuordnung von Rollen zu einem User."""
 	# ToDo: Hierfür gibt es noch keine Buttons.
 	model = TblUserhatrolle
@@ -283,6 +290,7 @@ class UhRUpdate(UpdateView):
 ###################################################################
 # Panel geht direkt auf die Gesamt-Datentabelle
 
+@login_required
 def panel(request):
 	"""
 	# Filter-Panel zum Selektieren aus der Gesamttabelle nach allen möglichen Kriterien
@@ -324,6 +332,7 @@ def panel(request):
 ###################################################################
 # Panel_UhR betrachtet den Soll-Zustand über UserHatRolle
 
+@login_required
 def panel_UhR(request, id = 0):
 	"""
 	Finde alle relevanten Informationen zur aktuellen Selektion:
@@ -463,6 +472,7 @@ def panel_UhR(request, id = 0):
 ###################################################################
 # Dialogsteuerung für den Import einer neuen IIQ-Datenliste (csv-Datei)
 
+@login_required
 def import_csv(request):
 	"""
 	Importiere neue CSV-Datei mit IIQ-Daten
@@ -647,6 +657,7 @@ def import_csv(request):
 	return render (request, 'rapp/import.html', context)
 
 
+@login_required
 def import2(request):
 	"""
 	Der zweite Schritt zeigt zunächst die statistischen Ergebnisse von Schritt 1, dann die neuen User
@@ -745,6 +756,7 @@ def import2(request):
 	return render(request, 'rapp/import2.html', context)
 
 
+@login_required
 def import2_quittung(request):
 	"""
 	Nun erfolgt eine Ausgabe, ob das Verändern der User-Tabelle geklappt hat.
@@ -801,6 +813,7 @@ def import2_quittung(request):
 	return render(request, 'rapp/import2_quittung.html', context)
 
 
+@login_required
 def import3_quittung(request):
 	"""
 	Der dritte Schritt des Imports zeigt nur noch das Ergebnis der Stored Procs an
@@ -815,6 +828,7 @@ def import3_quittung(request):
 	}
 	return render(request, 'rapp/import3_quittung.html', context)
 
+@login_required
 def import_status(request):
 	"""
 	Das wird vielleicht mal die ReST-Datenlieferung für einen Fortschrittsbalken.
