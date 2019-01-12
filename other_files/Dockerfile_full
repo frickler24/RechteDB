@@ -1,0 +1,21 @@
+FROM python:3.6.6-stretch
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       mysql-client \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --upgrade pip
+
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
+
+COPY code_* /tmp/.
+RUN tar xf /tmp/code_* 
+RUN rm /tmp/code_*
+
+WORKDIR /RechteDB/RechteDB
+EXPOSE 8000
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
