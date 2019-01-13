@@ -1,9 +1,9 @@
-from django.contrib.auth.models import User, Group
 from .models import TblGesamt, TblUserIDundName, TblUserhatrolle
 import django_filters
 
 class PanelFilter(django_filters.FilterSet):
 	tf = 							django_filters.CharFilter(lookup_expr='icontains')
+	tf_beschreibung =				django_filters.CharFilter(lookup_expr='icontains')
 	enthalten_in_af = 				django_filters.CharFilter(lookup_expr='icontains')
 	userid_name__name = 			django_filters.CharFilter(lookup_expr='istartswith')
 	userid_name__userid = 			django_filters.CharFilter(lookup_expr='istartswith')

@@ -67,6 +67,7 @@ urlpatterns += [
 
 # Der Link auf das Eingabepanel zur freien Selektion direkt auf der Gesamttabelle
 urlpatterns += [
+	path('panel/download', views.panelDownload, name='panel_download'),
 	path('panel/', views.panel, name='panel'),
 ]
 

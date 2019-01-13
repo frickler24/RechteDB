@@ -147,9 +147,11 @@ class GesamtListView(LoginRequiredMixin, ListView):
 	"""Die Gesamtliste der Rechte ungefiltert"""
 	model = TblGesamt
 	paginate_by = 50
+
 class GesamtDetailView(LoginRequiredMixin, generic.DetailView):
 	"""Die Detailsicht eines einzelnen Rechts"""
 	model = TblGesamt
+
 
 ###################################################################
 # Rechte-User (Gemeint sind nicht die Anwender der RechteDB!)
@@ -303,8 +305,7 @@ def panel(request):
 	panel_list = panel_filter.qs
 
 	pagesize = request.GET.get('pagesize')
-
-	if type(pagesize) == type(None) or int(pagesize) < 1:
+	if pagesize is None or pagesize == "" or int(pagesize) < 1:
 		pagesize = 20
 	else:
 		pagesize = int(pagesize)
@@ -324,13 +325,71 @@ def panel(request):
 		'pages': pages,
 		'meineTabelle': panel_list,
 		'pagesize': pagesize,
-		'version':	version,
+		'gesamtzahl': panel_list.count()
 	}
 	return render(request, 'rapp/panel_list.html', context)
 
 
 ###################################################################
 # Panel_UhR betrachtet den Soll-Zustand über UserHatRolle
+
+@login_required
+def panelDownload(request):
+	"""
+	Exportfunktion für das Filter-Panel zum Selektieren aus der Gesamttabelle (s. panel()).
+	:param request: GET oder POST Request vom Browser
+	:return: Gerendertes HTML
+	"""
+	panel_list = TblGesamt.objects.all()
+	panel_filter = PanelFilter(request.GET, queryset=panel_list)
+	panel_list = panel_filter.qs
+
+	pagesize = request.GET.get('pagesize')
+	if pagesize is None or pagesize == "" or int(pagesize) < 1:
+		pagesize = 20
+	else:
+		pagesize = int(pagesize)
+
+	paginator = Paginator(panel_list, 100000)
+	page = request.GET.get('page', 1)
+	try:
+		pages = paginator.page(page)
+	except PageNotAnInteger:
+		pages = paginator.page(1)
+	except EmptyPage:
+		pages = paginator.page(paginator.num_pages)
+
+	context = {
+		'paginator': paginator,
+		'filter': panel_filter,
+		'pages': pages,
+		'meineTabelle': panel_list,
+		'pagesize': pagesize,
+	}
+	f = PanelFilter(request.GET, queryset=TblGesamt.objects.all())
+	print('Anzahl Elemete in panel_list:', panel_list.count())
+
+	response = HttpResponse(content_type="text/csv")
+	response['Content-Distribution'] = 'attachment; filename="gesamt.csv"' # ToDo Hänge Datum an Dateinamen an
+
+	writer = csv.writer(response, delimiter = ',')
+	writer.writerow([
+		'tf', 'tf_beschreibung',
+		'enthalten_in_af',
+		'name', 'userid', 'team',
+		'name_af_neu', 'name_gf_neu'
+	])
+
+	for obj in pages:
+		writer.writerow([
+			obj.tf, obj.tf_beschreibung,
+			obj.enthalten_in_af,
+			obj.userid_name.name, obj.userid_name.userid, obj.userid_name.zi_organisation,
+			obj.modell.name_af_neu, obj.modell.name_gf_neu
+		])
+
+	return response
+
 
 @login_required
 def panel_UhR(request, id = 0):
