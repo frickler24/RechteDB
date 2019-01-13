@@ -32,7 +32,7 @@
                     {% else %}
                         {% if not form.errors %}
                             <p>
-                                <div class="d-block p-2 bg-dark text-white">Anmeldung</div>
+                                <div class="d-block p-2 bg-dark text-white text-center" style="font-size: 2rem;">Login</div>
                             </p>
                             <p>&nbsp;</p>
                         {% endif %}
@@ -54,7 +54,7 @@
                         </tr>
                     </table>
                     <input type="submit" value="Anmelden"
-                           class="btn btn-primary pull-right mt-5" />
+                           class="btn btn-primary btn-block mt-5" />
                     <input type="hidden" name="next" value="{{ next }}" />
                 </form>
 
