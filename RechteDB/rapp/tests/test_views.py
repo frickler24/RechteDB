@@ -1,15 +1,15 @@
-
 from django.urls import reverse, resolve
 from django.test import TestCase
-from .views import home
+from ..views import home
 
-from .models import TblOrga, TblUebersichtAfGfs, TblUserIDundName, TblPlattform, TblGesamt, \
+from ..models import TblOrga, TblUebersichtAfGfs, TblUserIDundName, TblPlattform, TblGesamt, \
 	TblAfliste, TblUserhatrolle, TblRollehataf, TblRollen, Tblrechteneuvonimport
 
 from datetime import datetime, timedelta
 from django.utils import timezone
-from django.core.files.base import ContentFile
+# from django.core.files.base import ContentFile
 import re
+from ..anmeldung import Anmeldung
 
 class HomeTests(TestCase):
 	# Sind die einzelnen Hsuptseiten erreichbar?
@@ -104,20 +104,11 @@ class HomeTests(TestCase):
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 301)
 
-	"""
-	Der Test kann im Moment nicht funktionieren, 
-	weil die Admin-Sicht der Gesamttabelle momentan abgeschaltet ist.
-		
-	def test_adminrapp_l15_view_status_code(self):
-		url = reverse('home')[:-5] + 'adminrapp/tblrechteneuvonimport'
-		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
-	"""
-	# ToDo: Test reaktivieren, wenn die Admin-Sicht auf die Gesamttabelle wieder eingeschaltet werden sollte
-
 class GesamtlisteTests(TestCase):
 	# Funktioniert die Gesamtliste?
 	def setUp(self):
+		Anmeldung(self.client.login)
+
 		for i in range (100):
 			TblOrga.objects.create(
 				team = 'Django-Team-{}'.format(i),
@@ -243,6 +234,8 @@ class GesamtlisteTests(TestCase):
 		self.assertEquals(response.status_code, 200)
 
 class TeamListTests(TestCase):
+	def setUp(self):
+		Anmeldung(self.client.login)
 	# Geht die Team-Liste?
 	# Ist die Seite da?
 	# ToDo: Beim Test der Teamliste fehlen noch die drei subpanels. Aber evtl. fällt die gesamte Liste weg
@@ -253,6 +246,7 @@ class TeamListTests(TestCase):
 class CreateTeamTests(TestCase):
 	# Geht die Team-Liste inhaltlich?
 	def setUp(self):
+		Anmeldung(self.client.login)
 		TblOrga.objects.create(team='MeinTeam', themeneigentuemer='Icke')
 
 	def test_create_team_view_success_status_code(self):
@@ -272,9 +266,10 @@ class CreateTeamTests(TestCase):
 		self.assertContains(response, 'href="{0}"'.format(teamlist_url))
 
 class UserListTests(TestCase):
+	def setUp(self):
+		Anmeldung(self.client.login)
 	# Geht die User-Liste?
 	# Ist die Seite da?
-	# ToDo: Beim Test der Userliste fehlen noch die drei subpanels. Aber evtl. fällt die gesamte Liste weg
 	def test_userlist_view_status_code(self):
 		url = reverse('userliste')
 		response = self.client.get(url)
@@ -282,6 +277,7 @@ class UserListTests(TestCase):
 class CreateUserTests(TestCase):
 	# Geht die User-Liste inhaltlich?
 	def setUp(self):
+		Anmeldung(self.client.login)
 		TblOrga.objects.create(team = 'Django-Team', themeneigentuemer = 'Ihmchen')
 
 		TblUebersichtAfGfs.objects.create(
@@ -323,13 +319,6 @@ class CreateUserTests(TestCase):
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
 
-	"""
-	def test_create_user_url_resolves_new_topic_view(self):
-		view = resolve('/userliste/create/')
-		self.assertEquals(view.func, TblOrgaCreate.as_view)
-
-	"""
-
 	def test_create_user_view_contains_link_back_to_board_topics_view(self):
 		new_user_url = reverse('user-create')
 		userlist_url = reverse('userliste')
@@ -339,6 +328,8 @@ class CreateUserTests(TestCase):
 class PanelTests(TestCase):
 	# Suche-/Filterpanel. Das wird mal die Hauptseite für Reports
 	def setUp(self):
+		Anmeldung(self.client.login)
+
 		TblOrga.objects.create(
 			team = 'Django-Team-01',
 			themeneigentuemer = 'Ihmchen_01'
@@ -469,8 +460,10 @@ class PanelTests(TestCase):
 		self.assertContains(response, "User_xv10099")
 
 class user_rolle_afTests(TestCase):
-	# User / Rolle / AF : Das wird mal die Hauptseite für Aktualisierungen * Ergänzungen / Löschungen von Rollen und Verbindungen
+	# User / Rolle / AF : Das wird mal die Hauptseite für
+	# Aktualisierungen / Ergänzungen / Löschungen von Rollen und Verbindungen
 	def setUp(self):
+		Anmeldung(self.client.login)
 		TblOrga.objects.create (
 			team = 'Django-Team-01',
 			themeneigentuemer = 'Ihmchen_01',
@@ -586,10 +579,10 @@ class user_rolle_afTests(TestCase):
 		self.assertContains(response, 'href="{0}"'.format(userlist_url))
 
 
-	# Suche nach der dem User und ob seiner UserID mindestens eine Rolle zugeodnet ist.
-	# Fall ja, suche weiter nach der List der AFen zu der Rolle (Auszug)
+	# Suche nach dem User und ob seiner UserID mindestens eine Rolle zugeodnet ist.
+	# Falls ja, suche weiter nach der Liste der AFen zu der Rolle (Auszug).
 	# Im Detail: Wir suchen über /.../user_rolle_af/<Nummer des Eintrags UserHatRolle>
-	# nach einem dem konkretren Eintrag (die Nummer variiert über die Anzahl der ausgeführten Testfälle,
+	# nach dem konkreten Eintrag (die Nummer variiert über die Anzahl der ausgeführten Testfälle,
 	# deshalb das etwas umständliche Gesuche unten).
 	def test_panel_view_with_valid_selection_find_UserHatRolle_id(self):
 		url = '{0}{1}'.format(reverse('user_rolle_af'), '?name=&orga=1&gruppe=&pagesize=100')
@@ -634,6 +627,7 @@ class user_rolle_afTests(TestCase):
 class import_new_csv_single_record(TestCase):
 	# Tests für den Import neuer CSV-Listen und der zugehörigen Tabellen
 	def setUp(self):
+		Anmeldung(self.client.login)
 		url = reverse('import')
 		self.response = self.client.get(url)
 
@@ -675,6 +669,7 @@ class setup_database(TestCase):
 	# Tests für den Import der Stored Procedures in die Datenbank
 	# Tests für den Import der Stored Procedures in die Datenbank
 	def setUp(self):
+		Anmeldung(self.client.login)
 		url = reverse('stored_procedures')
 		self.response = self.client.get(url)
 
@@ -705,6 +700,7 @@ class setup_database(TestCase):
 class import_new_csv_single_record(TestCase):
 	# Tests für den Import neuer CSV-Listen und der zugehörigen Tabellen
 	def setUp(self):
+		Anmeldung(self.client.login)
 		url = reverse('import')
 		self.response = self.client.get(url)
 		# Lösche alle Einträge in der Importtabelle
@@ -750,6 +746,7 @@ class import_new_csv_files_no_input(TestCase):
 	# Die zweite Datei fügt einen User hinzu, ändert einen zweiten und löscht einen dritten
 	# Datei 3 löscht alle User und deren Rechte für die Organisation wieder.
 	def setUp(self):
+		Anmeldung(self.client.login)
 		url = reverse('import')
 		self.response = self.client.post(url, {})
 
@@ -773,6 +770,7 @@ class import_new_csv_files_wrong_input(TestCase):
 	# Die zweite Datei fügt einen User hinzu, ändert einen zweiten und löscht einen dritten
 	# Datei 3 löscht alle User und deren Rechte für die Organisation wieder.
 	def setUp(self):
+		Anmeldung(self.client.login)
 		data = {
 			'organisation': 'foo blabla',
 		}
@@ -875,3 +873,4 @@ class import_new_csv_files_first_input(TestCase):
 		print (form.errors)
 
 """
+
