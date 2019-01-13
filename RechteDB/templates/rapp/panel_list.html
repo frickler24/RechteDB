@@ -38,9 +38,13 @@
 						<label for="{{ filter.form.userid_name__name.id_for_label }}">Name beginnt mit:</label>
 						{% render_field filter.form.userid_name__name class="form-control" %}
 					</div>
-					<div class="form-group col-12 col-sm-6 col-md-6 col-lg-6 col-xl-5">
+					<div class="form-group col-12 col-sm-6 col-md-6 col-lg-6 col-xl-3">
 						<label for="{{ filter.form.userid_name__orga.id_for_label }}">Team:</label>
 						{% render_field filter.form.userid_name__orga class="form-control" %}
+					</div>
+					<div class="form-group col-12 col-sm-6 col-md-6 col-lg-6 col-xl-2">
+						<label for="{{ filter.form.tf_beschreibung.id_for_label }}">TF-Beschreibung</label>
+						{% render_field filter.form.tf_beschreibung class="form-control" %}
 					</div>
 					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-3 col-xl-2">
 						<label for="{{ filter.form.userid_name__gruppe_for_label }}">Gruppe:</label>
@@ -90,13 +94,31 @@
 					</div>
 				</div>
 
-				{% comment %} Suche und Abbruch-Buttons {% endcomment %}
+				{% comment %} Suche, Export- und Abbruch-Buttons {% endcomment %}
 
-				<div class="form-group marin-top-3">
-						<button type="submit" class="btn btn-primary">
-								<span class="glyphicon glyphicon-search"></span> Suche
-						</button>
-						<a href="{% url 'home' %}" class="btn btn-default">Abbruch</a>
+				<div class="form-group margin-top-3">
+						<button type="submit" class="btn btn-primary btn-sm">Suche</button>
+						<a href="{% url 'panel_download' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
+							class="btn btn-outline-primary btn-sm"
+							role="button">
+							Daten herunterladen
+							{% if gesamtzahl <= 500 %}
+								<span class="badge badge-success">
+							{% elif gesamtzahl <= 2000 %}
+								<span class="badge badge-primary">
+							{% elif gesamtzahl <= 10000 %}
+								<span class="badge badge-warning">
+							{% else %}
+								<span class="badge badge-danger">
+							{% endif %}
+								{{ gesamtzahl }}</span>
+						</a>
+						<a href="{% url 'home' %}"
+							class="btn btn-secondary btn-sm"
+							role="button">
+							Abbrechen
+						</a>
+						<p></p>
 				</div>
 			</div>
 		</form>
@@ -165,13 +187,5 @@
 			{% endfor %}
 		</tbody>
 	</table>
-
-    {% comment %} Ergebnismenge über table.py eigen-konfigurierbar { % endcomment %}
-        <div class="breiteTabelle" style="white-space: nowrap;">
-            { % comment %} render_table meineTabelle { % endcomment %}
-            {% render_table table %}
-        </div>
-    {% endcomment %}
-
-    {% include "paginator.html" %}
+	{% include "paginator.html" %}
 {% endblock content %}
