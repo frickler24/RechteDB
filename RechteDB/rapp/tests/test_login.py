@@ -8,6 +8,8 @@ from ..models import TblOrga, TblUebersichtAfGfs, TblUserIDundName, TblPlattform
 from datetime import datetime, timedelta
 from django.utils import timezone
 
+from ..tests.test_views import Setup_database
+
 
 # Ist das Login.-Panel verfügbar?
 class LoginTests(TestCase):
@@ -683,6 +685,7 @@ class LoginRequiredImportStatusTests(TestCase):
 class LoginRequiredAndExistingGesamtTests(TestCase):
 	def setUp(self):
 		Anmeldung(self.client.login)
+		Setup_database()
 		self.url = reverse('gesamtliste')
 		self.response = self.client.get(self.url)
 

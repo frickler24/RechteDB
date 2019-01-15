@@ -11,7 +11,11 @@ from django.utils import timezone
 import re
 from ..anmeldung import Anmeldung
 
+
 class HomeTests(TestCase):
+	def setup(self):
+		Setup_database()
+
 	# Sind die einzelnen Hsuptseiten erreichbar?
 	# Generell: Funktioniert irgend etwas?
 	def test_something_is_running(self):
@@ -108,6 +112,7 @@ class GesamtlisteTests(TestCase):
 	# Funktioniert die Gesamtliste?
 	def setUp(self):
 		Anmeldung(self.client.login)
+		Setup_database()
 
 		for i in range (100):
 			TblOrga.objects.create(
@@ -236,6 +241,7 @@ class GesamtlisteTests(TestCase):
 class TeamListTests(TestCase):
 	def setUp(self):
 		Anmeldung(self.client.login)
+		Setup_database()
 	# Geht die Team-Liste?
 	# Ist die Seite da?
 	# ToDo: Beim Test der Teamliste fehlen noch die drei subpanels. Aber evtl. fällt die gesamte Liste weg
@@ -247,6 +253,7 @@ class CreateTeamTests(TestCase):
 	# Geht die Team-Liste inhaltlich?
 	def setUp(self):
 		Anmeldung(self.client.login)
+		Setup_database()
 		TblOrga.objects.create(team='MeinTeam', themeneigentuemer='Icke')
 
 	def test_create_team_view_success_status_code(self):
@@ -268,6 +275,7 @@ class CreateTeamTests(TestCase):
 class UserListTests(TestCase):
 	def setUp(self):
 		Anmeldung(self.client.login)
+		Setup_database()
 	# Geht die User-Liste?
 	# Ist die Seite da?
 	def test_userlist_view_status_code(self):
@@ -278,6 +286,7 @@ class CreateUserTests(TestCase):
 	# Geht die User-Liste inhaltlich?
 	def setUp(self):
 		Anmeldung(self.client.login)
+		Setup_database()
 		TblOrga.objects.create(team = 'Django-Team', themeneigentuemer = 'Ihmchen')
 
 		TblUebersichtAfGfs.objects.create(
@@ -329,6 +338,7 @@ class PanelTests(TestCase):
 	# Suche-/Filterpanel. Das wird mal die Hauptseite für Reports
 	def setUp(self):
 		Anmeldung(self.client.login)
+		Setup_database()
 
 		TblOrga.objects.create(
 			team = 'Django-Team-01',
@@ -459,11 +469,12 @@ class PanelTests(TestCase):
 		self.assertEquals(response.status_code, 200)
 		self.assertContains(response, "User_xv10099")
 
-class user_rolle_afTests(TestCase):
+class User_rolle_afTests(TestCase):
 	# User / Rolle / AF : Das wird mal die Hauptseite für
 	# Aktualisierungen / Ergänzungen / Löschungen von Rollen und Verbindungen
 	def setUp(self):
 		Anmeldung(self.client.login)
+		Setup_database()
 		TblOrga.objects.create (
 			team = 'Django-Team-01',
 			themeneigentuemer = 'Ihmchen_01',
@@ -624,10 +635,11 @@ class user_rolle_afTests(TestCase):
 		self.assertContains(response, 'Schwerpunkt') # Wertigkeit in der Verantwortungsmatrix
 
 
-class import_new_csv_single_record(TestCase):
+class Import_new_csv_single_record(TestCase):
 	# Tests für den Import neuer CSV-Listen und der zugehörigen Tabellen
 	def setUp(self):
 		Anmeldung(self.client.login)
+		Setup_database()
 		url = reverse('import')
 		self.response = self.client.get(url)
 
@@ -665,7 +677,7 @@ class import_new_csv_single_record(TestCase):
 		self.assertContains(self.response, 'csrfmiddlewaretoken')
 
 
-class setup_database(TestCase):
+class Setup_database(TestCase):
 	# Tests für den Import der Stored Procedures in die Datenbank
 	# Tests für den Import der Stored Procedures in die Datenbank
 	def setUp(self):
@@ -697,10 +709,11 @@ class setup_database(TestCase):
 		self.assertContains(self.response, 'setzeNichtAIFlag war erfolgreich.')
 
 
-class import_new_csv_single_record(TestCase):
+class Import_new_csv_single_record(TestCase):
 	# Tests für den Import neuer CSV-Listen und der zugehörigen Tabellen
 	def setUp(self):
 		Anmeldung(self.client.login)
+		Setup_database()
 		url = reverse('import')
 		self.response = self.client.get(url)
 		# Lösche alle Einträge in der Importtabelle
@@ -740,13 +753,14 @@ class import_new_csv_single_record(TestCase):
 		num = Tblrechteneuvonimport.objects.filter(vorname = 'Fester').count()
 		self.assertEquals(num, 1)
 
-class import_new_csv_files_no_input(TestCase):
+class Import_new_csv_files_no_input(TestCase):
 	# Und nun Test des Imports dreier Dateien.
 	# Die erste Datei erstellt zwei User mit Rechten
 	# Die zweite Datei fügt einen User hinzu, ändert einen zweiten und löscht einen dritten
 	# Datei 3 löscht alle User und deren Rechte für die Organisation wieder.
 	def setUp(self):
 		Anmeldung(self.client.login)
+		Setup_database()
 		url = reverse('import')
 		self.response = self.client.post(url, {})
 
@@ -764,13 +778,14 @@ class import_new_csv_files_no_input(TestCase):
 		self.assertTrue(form.errors)
 
 
-class import_new_csv_files_wrong_input(TestCase):
+class Import_new_csv_files_wrong_input(TestCase):
 	# Und nun Test des Imports dreier Dateien.
 	# Die erste Datei erstellt zwei User mit Rechten
 	# Die zweite Datei fügt einen User hinzu, ändert einen zweiten und löscht einen dritten
 	# Datei 3 löscht alle User und deren Rechte für die Organisation wieder.
 	def setUp(self):
 		Anmeldung(self.client.login)
+		Setup_database()
 		data = {
 			'organisation': 'foo blabla',
 		}

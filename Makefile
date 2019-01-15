@@ -25,7 +25,6 @@ mariadb:
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/mariadbconf.d:/etc/mysql/conf.d \
 		mariadb:10.2
 
-
 phpmyadmin:
 	docker run -d \
 		-p 8080:80 \
@@ -82,13 +81,14 @@ rapptest:
 		--network mariaNetz \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB:/RechteDB \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB:/RechteDB/code \
-		rapp:latest /RechteDB/code/manage.py test -v2
+		rapp:latest sh -c "echo yes | /RechteDB/code/manage.py test -v2"
 
 rappprod:
 	docker run -d \
 		--name rapp \
 		-p 8089:8000 \
 		--network mariaNetz \
+        --restart unless-stopped \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB:/RechteDB \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB:/RechteDB/code \
 		rapp:latest

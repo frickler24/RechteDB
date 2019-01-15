@@ -191,12 +191,12 @@ def userToggleGeloescht(request, pk):
 	# redirect to a new URL:
 	return HttpResponseRedirect(reverse('userliste') )
 
-
 ###################################################################
 # Die Gesamtliste der Teams (TblOrga)
 class TeamListView(LoginRequiredMixin, generic.ListView):
 	"""Die Gesamtliste der Teams (TblOrga)"""
 	model = TblOrga
+
 class TblOrgaCreate(LoginRequiredMixin, CreateView):
 	"""Neues Team erstellen"""
 	model = TblOrga
@@ -210,7 +210,6 @@ class TblOrgaDelete(LoginRequiredMixin, DeleteView):
 	"""Team löschen"""
 	model = TblOrga
 	success_url = reverse_lazy('teamliste')
-
 
 ###################################################################
 # Zuordnungen der Rollen zu den Usern (TblUserHatRolle ==> UhR)
@@ -248,8 +247,6 @@ class UhRCreate(LoginRequiredMixin, CreateView):
 		url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
 		# print (url)
 		return url
-
-
 class UhRDelete(LoginRequiredMixin, DeleteView):
 	"""Löscht die Zuordnung einer Rollen zu einem User."""
 	model = TblUserhatrolle
@@ -266,8 +263,6 @@ class UhRDelete(LoginRequiredMixin, DeleteView):
 				urlparams += "&" + k + "=" + self.request.GET[k]
 		url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
 		return url
-
-
 class UhRUpdate(LoginRequiredMixin, UpdateView):
 	"""Ändert die Zuordnung von Rollen zu einem User."""
 	# ToDo: Hierfür gibt es noch keine Buttons.
