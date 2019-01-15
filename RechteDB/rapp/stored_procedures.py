@@ -18,7 +18,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 
 
-def push_sp(name, sp):
+def push_sp(name, sp, procs_schon_geladen):
 	"""
 	Speichere eine als Parameter übergebene Stored Procedure
 
@@ -31,7 +31,8 @@ def push_sp(name, sp):
 	loeschstring = format ("DROP PROCEDURE IF EXISTS %s" % name)
 	with connection.cursor() as cursor:
 		try:
-			cursor.execute (loeschstring)
+			if procs_schon_geladen:
+				cursor.execute (loeschstring)
 			cursor.execute (sp)
 		except:
 			e = sys.exc_info()[0]
@@ -40,14 +41,14 @@ def push_sp(name, sp):
 		cursor.close()
 		return fehler
 
-def push_sp_test():
+def push_sp_test(procs_schon_geladen):
 	sp = """
 CREATE PROCEDURE anzahl_import_elemente()
 BEGIN
   SELECT COUNT(*) FROM `tblRechteNeuVonImport`;
 END
 """
-	return push_sp ('anzahl_import_elemente', sp)
+	return push_sp ('anzahl_import_elemente', sp, procs_schon_geladen)
 
 def call_sp_test():
 	fehler = False
@@ -62,7 +63,7 @@ def call_sp_test():
 		cursor.close()
 		return fehler or not liste[0] >= 0
 
-def push_sp_vorbereitung():
+def push_sp_vorbereitung(procs_schon_geladen):
 	sp = """
 create procedure vorbereitung()
 BEGIN
@@ -242,9 +243,9 @@ BEGIN
     */
 END
 """
-	return push_sp ('vorbereitung', sp)
+	return push_sp ('vorbereitung', sp, procs_schon_geladen)
 
-def push_sp_neueUser():
+def push_sp_neueUser(procs_schon_geladen):
 	sp = """
 create procedure neueUser (IN orga char(32))
 BEGIN
@@ -336,9 +337,9 @@ BEGIN
     ;
 END
 """
-	return push_sp ('neueUser', sp)
+	return push_sp ('neueUser', sp, procs_schon_geladen)
 
-def push_sp_behandleUser():
+def push_sp_behandleUser(procs_schon_geladen):
 	sp = """
 create procedure behandleUser ()
 BEGIN
@@ -447,9 +448,9 @@ BEGIN
 
 END
 """
-	return push_sp ('behandleUser', sp)
+	return push_sp ('behandleUser', sp, procs_schon_geladen)
 
-def push_sp_behandleRechte():
+def push_sp_behandleRechte(procs_schon_geladen):
 	sp = """
 create procedure behandleRechte (IN orga char(32))
 BEGIN
@@ -949,9 +950,9 @@ BEGIN
 */
 END
 """
-	return push_sp ('behandleRechte', sp)
+	return push_sp ('behandleRechte', sp, procs_schon_geladen)
 
-def push_sp_loescheDoppelteRechte():
+def push_sp_loescheDoppelteRechte(procs_schon_geladen):
 	sp = """
 create procedure loescheDoppelteRechte (IN nurLesen bool)
 BEGIN
@@ -1004,10 +1005,9 @@ BEGIN
     END IF;
 END
 """
-	return push_sp ('loescheDoppelteRechte', sp)
+	return push_sp ('loescheDoppelteRechte', sp, procs_schon_geladen)
 
-
-def push_sp_nichtai():
+def push_sp_nichtai(procs_schon_geladen):
 	sp = """
 create procedure setzeNichtAIFlag()
 BEGIN
@@ -1170,10 +1170,9 @@ BEGIN
 
 END
 """
-	return push_sp ('setzeNichtAIFlag', sp)
+	return push_sp ('setzeNichtAIFlag', sp, procs_schon_geladen)
 
-
-def push_sp_macheAFListe():
+def push_sp_macheAFListe(procs_schon_geladen):
 	sp = """
 CREATE PROCEDURE erzeuge_af_liste()
 BEGIN
@@ -1188,8 +1187,20 @@ BEGIN
         GROUP BY tblUEbersichtAF_GFs.`name_af_neu`;
 END
 """
-	return push_sp ('erzeuge_af_liste', sp)
+	return push_sp ('erzeuge_af_liste', sp, procs_schon_geladen)
 
+def finde_procs():
+	with connection.cursor() as cursor:
+		anzahl = 0 # Wenn die Zahl der Einträge bei SHOW > 0 ist, müssen die Procs jeweils gelöscht werden
+		try:
+			cursor.execute ("show procedure status where db like (select DATABASE())")
+			anzahl = cursor.rowcount()
+		except:
+			e = sys.exc_info()[0]
+			format("Error: %s" % e)
+
+		cursor.close()
+		return anzahl > 0
 
 
 def handle_stored_procedures(request):
@@ -1197,15 +1208,16 @@ def handle_stored_procedures(request):
 	daten = {}
 
 	if request.method == 'POST':
-		daten['anzahl_import_elemente'] = push_sp_test()
+		procs_schon_geladen = finde_procs()
+		daten['anzahl_import_elemente'] = push_sp_test(procs_schon_geladen)
 		daten['call_anzahl_import_elemente'] = call_sp_test()
-		daten['vorbereitung'] = push_sp_vorbereitung()
-		daten['neueUser'] = push_sp_neueUser()
-		daten['behandleUser'] = push_sp_behandleUser()
-		daten['behandleRechte'] = push_sp_behandleRechte()
-		daten['loescheDoppelteRechte'] = push_sp_loescheDoppelteRechte()
-		daten['setzeNichtAIFlag'] = push_sp_nichtai() # Nur, falls die Funktion jemals wieder benötigt wird
-		daten['erzeuge_af_liste'] = push_sp_macheAFListe()
+		daten['vorbereitung'] = push_sp_vorbereitung(procs_schon_geladen)
+		daten['neueUser'] = push_sp_neueUser(procs_schon_geladen)
+		daten['behandleUser'] = push_sp_behandleUser(procs_schon_geladen)
+		daten['behandleRechte'] = push_sp_behandleRechte(procs_schon_geladen)
+		daten['loescheDoppelteRechte'] = push_sp_loescheDoppelteRechte(procs_schon_geladen)
+		daten['setzeNichtAIFlag'] = push_sp_nichtai(procs_schon_geladen) # Falls die Funktion jemals wieder benötigt wird
+		daten['erzeuge_af_liste'] = push_sp_macheAFListe(procs_schon_geladen)
 
 	context = {
 		'daten': daten,
