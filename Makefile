@@ -18,7 +18,7 @@ mariadb:
 		--name mariadb \
 		--network mariaNetz \
 		--network-alias maria \
-        --restart unless-stopped \
+		--restart unless-stopped \
 		-p 13306:3306 \
 		-e MYSQL_ROOT_PASSWORD=geheim \
 		-v /home/lutz/datadir:/var/lib/mysql \
@@ -30,7 +30,7 @@ phpmyadmin:
 		-p 8080:80 \
 		--name phpmyadmin \
 		--network mariaNetz \
-        --restart unless-stopped \
+		--restart unless-stopped \
 		-e PMA_HOST=maria \
 		phpmyadmin/phpmyadmin
 
@@ -39,7 +39,7 @@ phpmyadmin_pma:
 		-p 8088:80 \
 		--name phpmyadmin \
 		--network mariaNetz \
-        --restart unless-stopped \
+		--restart unless-stopped \
 		-e PMA_HOST=maria \
 		-e PMA_CONTROLUSER=pma \
 		-e PMA_CONTROLPASS=0oWiPLfdhAcSqy9TnmhKcI222QQIO87BvvjiHX9r57\
@@ -71,6 +71,14 @@ exportableImage:	tarfile image
 		cd /home/lutz/Projekte/RechteDB2MySQL/RechteDB/ \
 			&& docker build -t rapp_full -f Dockerfile_full . \
 	)
+
+datafile:
+	( \
+		cd /home/lutz \
+			&& sudo tar czf datadir_Mainfrix_$(shell date +"%Y%m%d").tar.gz datadir \
+			&& sudo chown lutz:lutz datadir_Mainfrix_$(shell date +"%Y%m%d") \
+	)
+
 
 export:	exportableImage
 	docker save rapp_full | gzip -9 > /tmp/rapp_$(shell grep "^__version__" RechteDB/rapp/__init__.py | cut -d\' -f 2).tar.gz
