@@ -476,9 +476,10 @@ class Tblsubsysteme(models.Model):
 
 class TblDb2(models.Model):
 	id = models.AutoField(db_column='id', primary_key=True)  # Field name made lowercase.
-	source = models.CharField(db_column='source', max_length=15, blank=True, null=True)  # Field name made lowercase.
-	grantee = models.ForeignKey('TblRacfGruppen', models.PROTECT, to_field='group', db_column='grantee')  # Field name made lowercase.
-	creator = models.CharField(db_column='CREATOR', max_length=15, blank=True, null=True)  # Field name made lowercase.
+	source = models.CharField(db_column='source', max_length=8, default='none')  # Field name made lowercase.
+	# grantee = models.ForeignKey('TblRacfGruppen', models.PROTECT, to_field='group', db_column='grantee')  # Field name made lowercase.
+	grantee = models.CharField(db_column='grantee', max_length=15, default='none')  # Field name made lowercase.
+	creator = models.CharField(db_column='CREATOR', max_length=15, default='none')  # Field name made lowercase.
 	table = models.CharField(db_column='TABLE', max_length=31, db_index=True)  # Field name made lowercase.
 	selectauth = models.CharField(db_column='SELECTAUTH', max_length=3, blank=True, null=True)  # Field name made lowercase.
 	insertauth = models.CharField(db_column='INSERTAUTH', max_length=3, blank=True, null=True)  # Field name made lowercase.
@@ -486,9 +487,9 @@ class TblDb2(models.Model):
 	deleteauth = models.CharField(db_column='DELETEAUTH', max_length=3, blank=True, null=True)  # Field name made lowercase.
 	alterauth = models.CharField(db_column='ALTERAUTH', max_length=3, blank=True, null=True)  # Field name made lowercase.
 	indexauth = models.CharField(db_column='INDEXAUTH', max_length=3, blank=True, null=True)  # Field name made lowercase.
-	grantor = models.CharField(db_column='GRANTOR', max_length=15, db_index=True)  # Field name made lowercase.
+	grantor = models.CharField(db_column='GRANTOR', max_length=15)  # Field name made lowercase.
 	grantedts = models.CharField(db_column='GRANTEDTS', max_length=63)  # Field name made lowercase.
-	datum = models.DateTimeField()
+	datum = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
 		managed = True
