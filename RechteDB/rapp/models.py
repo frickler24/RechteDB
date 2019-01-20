@@ -501,17 +501,13 @@ class TblDb2(models.Model):
 	def __str__(self) -> str:
 		return str(self.id)
 
+	"""
 	def get_grantee(self):
 		return str(self.grantee.group)
 	get_grantee.admin_order_field = 'grantee'
 	get_grantee.short_description = 'Grantee'
-
-	""" Falls das mal wieder jemand brauchen sollte...
-	def get_aktiv(self):
-		return not self.geloescht
-	get_aktiv.admin_order_field = 'geloescht'
-	get_aktiv.short_description = 'Aktiv'
 	"""
+
 
 class TblRacfGruppen(models.Model):
 	group = models.CharField(db_column='Group', primary_key=True, max_length=150)  # Field name made lowercase.
