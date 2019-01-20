@@ -37,7 +37,7 @@ rapptest:
 		--network mariaNetz \
 		-v /home/xv13254/config_RechteDB/mariadbconf.d/my.cnf.x86:/RechteDB/mariadbconf.d/my.cnf \
 		-v /home/xv13254/config_RechteDB/.env.x86:/RechteDB/RechteDB/.env \
-		rapp_full:0.0.6 /RechteDB/RechteDB/manage.py test -v2
+		rapp_full /RechteDB/RechteDB/manage.py test -v2
 
 
 rappprod:
@@ -47,7 +47,7 @@ rappprod:
 		--network mariaNetz \
 		-v /home/xv13254/config_RechteDB/mariadbconf.d/my.cnf.x86:/RechteDB/mariadbconf.d/my.cnf \
 		-v /home/xv13254/config_RechteDB/.env.x86:/RechteDB/RechteDB/.env \
-		rapp_full:0.0.6
+		rapp_full
 	sleep 3
 	curl -sL localhost | grep -A 2 'Aktuelle TFen in' | grep class
 
