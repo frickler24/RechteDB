@@ -351,9 +351,8 @@ class Sachgebiete(admin.ModelAdmin):
 @admin.register(TblDb2)
 class Db2(admin.ModelAdmin):
 	list_display = ['id', 'source', 'grantee', 'creator', 'table',
-			'selectauth', 'insertauth', 'updateauth', 'deleteauth',
+			'selectauth', 'insertauth', 'updateauth', 'deleteauth', 'alterauth', 'indexauth',
 			'grantor', 'grantedts', 'datum']
-	# Aktuell sind 'alterauth', 'indexauth', nicht in der Liste, um Fehlinterpretationen zu vermeiden
 	search_fields = ['table', 'grantee', 'grantor']
 	list_filter = ('source', 'datum')
 
