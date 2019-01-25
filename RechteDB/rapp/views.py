@@ -672,7 +672,7 @@ def import_csv(request):
 				s = 2
 				cursor.callproc ("neueUser", [orga, ])
 				tmp = cursor.fetchall()
-				print (tmp)
+				# print (tmp)
 				for line in tmp:
 					statistik[line[0]] = line[1]
 			except:
@@ -827,14 +827,15 @@ def import2_quittung(request):
 		with connection.cursor() as cursor:
 			try:
 				retval = cursor.callproc ("behandleRechte", [orga, ])
-				print (retval)
 				if dopp:
 					retval += cursor.callproc ("loescheDoppelteRechte", [False, ]) # False = Nicht nur lesen
+				retval += cursor.callproc ("ueberschreibeModelle")
 
 			except:
-				e = sys.exc_info()[0]
-				fehler = format("Error: %s" % e)
-				print ('Fehler in import_schritt2, StoredProc behandleUser oder loescheDoppelteRechte', fehler)
+				e1 = sys.exc_info()[0]
+				e2 = sys.exc_info()[1]
+				fehler = format("Error: %s %s" % e1, e2)
+				print ('Fehler in import_schritt2, StoredProc behandleUser oder loescheDoppelteRechte oder ueberschreibeModelle', fehler)
 
 			cursor.close()
 			return fehler
@@ -845,7 +846,6 @@ def import2_quittung(request):
 			orga = request.session.get('organisation', 'keine-Orga')
 			dopp = request.POST.get('doppelte_suchen', False)
 
-			print (orga, dopp)
 			fehler = import_schritt3(orga, dopp)
 
 			request.session['fehler3'] = fehler
