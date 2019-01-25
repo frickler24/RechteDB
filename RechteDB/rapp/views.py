@@ -827,9 +827,9 @@ def import2_quittung(request):
 		with connection.cursor() as cursor:
 			try:
 				retval = cursor.callproc ("behandleRechte", [orga, ])
-				print (retval)
 				if dopp:
 					retval += cursor.callproc ("loescheDoppelteRechte", [False, ]) # False = Nicht nur lesen
+				retval += cursor.callproc ("ueberschreibeModelle") # False = Nicht nur lesen
 
 			except:
 				e = sys.exc_info()[0]

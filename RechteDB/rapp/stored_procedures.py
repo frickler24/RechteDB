@@ -1189,6 +1189,42 @@ END
 """
 	return push_sp ('erzeuge_af_liste', sp, procs_schon_geladen)
 
+def push_sp_ueberschreibeModelle(procs_schon_geladen):
+	sp = """
+CREATE PROCEDURE ueberschreibeModelle()
+BEGIN
+    /*
+        Finde alle Einträge, bei denen ein manuell gesetztes Modell
+        nicht zu den aktuell bereits freigegebenen Modell passt.
+        Der Fall tritt ein, wenn
+        - eine GF/AF-Kombination neut freigegeben wird 
+          und diese Kombination ehemals mit einem manuellen Modell versehen worden ist
+        - wenn eine Rechteliste neeu eingelesen wird und der Importer versucht, unnötig intelligent zu sein
+
+		In Access heißt die Query qryModellNichtGF_AF.
+    */
+	CREATE TEMPORARY TABLE bloed
+	  SELECT 	tblGesamt.id as diffID,
+			tblGesamt.modell as gewaehltes_Modell,
+			tblUEbersichtAF_GFs.id as freigegebenes_Modell
+	  FROM `tblGesamt`
+		INNER JOIN tblUEbersichtAF_GFs
+		ON (
+		  tblUEbersichtAF_GFs.name_af_neu = tblGesamt.enthalten_in_af
+			AND tblUEbersichtAF_GFs.name_gf_neu = tblGesamt.gf
+		)
+	  WHERE tblGesamt.modell <> tblUEbersichtAF_GFs.id
+	;
+	
+	UPDATE 	tblGesamt
+		INNER JOIN bloed
+		ON tblGesamt.id = bloed.diffID
+	SET tblGesamt.modell = bloed.freigegebenes_Modell
+	;
+END
+"""
+	return push_sp ('ueberschreibeModelle', sp, procs_schon_geladen)
+
 def finde_procs():
 	with connection.cursor() as cursor:
 		anzahl = 0 # Wenn die Zahl der Einträge bei SHOW > 0 ist, müssen die Procs jeweils gelöscht werden
@@ -1218,6 +1254,7 @@ def handle_stored_procedures(request):
 		daten['loescheDoppelteRechte'] = push_sp_loescheDoppelteRechte(procs_schon_geladen)
 		daten['setzeNichtAIFlag'] = push_sp_nichtai(procs_schon_geladen) # Falls die Funktion jemals wieder benötigt wird
 		daten['erzeuge_af_liste'] = push_sp_macheAFListe(procs_schon_geladen)
+		daten['ueberschreibeModelle'] = push_sp_ueberschreibeModelle(procs_schon_geladen)
 
 	context = {
 		'daten': daten,
