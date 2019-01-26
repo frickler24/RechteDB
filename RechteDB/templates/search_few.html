@@ -4,11 +4,11 @@
 	<form method="get" action="{% url 'user_rolle_af' %}">
 		<div >
 			<div class="row">
-				<div class="form-group form-group-sm col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
+				<div class="form-group form-group-sm col-12 col-sm-6 col-md-3 col-lg-3 col-xl-2">
 					<label class="control-label" for="{{ filter.form.name.id_for_label }}">Name beginnt mit</label>
 					{% render_field filter.form.name class="form-control" %}
 				</div>
-				<div class="form-group form-group-sm col-12 col-sm-6 col-md-3 col-lg-3 col-xl-3">
+				<div class="form-group form-group-sm col-12 col-sm-6 col-md-3 col-lg-3 col-xl-2">
 					<label class="control-label" for="{{ filter.form.orga.id_for_label }}">Team</label>
 					{% render_field filter.form.orga class="form-control" %}
 				</div>
@@ -19,7 +19,7 @@
 				</div>
 				{% endcomment %}
 				<div class="form-group form-group-sm col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
-					<label class="control-label" for="{{ filter.form.gruppe.id_for_label }}">Abteilung/Gruppe</label>
+					<label class="control-label" for="{{ filter.form.gruppe.id_for_label }}">Gruppe endet mit</label>
 					{% render_field filter.form.gruppe class="form-control" %}
 				</div>
 
@@ -29,14 +29,44 @@
 						   id="pagesize" name="pagesize" type="text" maxlength="5"
 						   {% if pagesize %} value="{{ pagesize }}" {% endif %} />
 				</div>
-				<div class="form-group-sm col-12 col-sm-6 col-md-3 col-lg-2 col-xl-2">
-					<label class="control-label" for="suche">
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-					<button type="submit" class="btn btn-primary" id="suche">
-						<span class="glyphicon glyphicon-search"></span> Suche
-					</button>
-					<a href="{% url 'home' %}" class="btn btn-default">Abbruch</a>
+				<div class="form-group-sm col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 mt-3 pt-3">
+					<button type="submit" class="btn btn-primary btn-sm">Suche</button>
+					<a href="{% url 'panel_download' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
+						class="btn btn-outline-primary btn-sm"
+						role="button">
+						Modelle
+						{% if gesamtzahl <= 500 %}
+							<span class="badge badge-success">
+						{% elif gesamtzahl <= 2000 %}
+							<span class="badge badge-primary">
+						{% elif gesamtzahl <= 10000 %}
+							<span class="badge badge-warning">
+						{% else %}
+							<span class="badge badge-danger">
+						{% endif %}
+							{{ gesamtzahl }}</span>
+					</a>
+					<a href="{% url 'panel_download' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
+						class="btn btn-outline-primary btn-sm"
+						role="button">
+						Abgleich
+						{% if gesamtzahl <= 500 %}
+							<span class="badge badge-success">
+						{% elif gesamtzahl <= 2000 %}
+							<span class="badge badge-primary">
+						{% elif gesamtzahl <= 10000 %}
+							<span class="badge badge-warning">
+						{% else %}
+							<span class="badge badge-danger">
+						{% endif %}
+							{{ gesamtzahl }}</span>
+					</a>
+					<a href="{% url 'home' %}"
+						class="btn btn-secondary btn-sm"
+						role="button">
+						Abbrechen
+					</a>
+
 				</div>
 			</div>
 

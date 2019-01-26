@@ -97,28 +97,28 @@
 				{% comment %} Suche, Export- und Abbruch-Buttons {% endcomment %}
 
 				<div class="form-group margin-top-3">
-						<button type="submit" class="btn btn-primary btn-sm">Suche</button>
-						<a href="{% url 'panel_download' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
-							class="btn btn-outline-primary btn-sm"
-							role="button">
-							Daten herunterladen
-							{% if gesamtzahl <= 500 %}
-								<span class="badge badge-success">
-							{% elif gesamtzahl <= 2000 %}
-								<span class="badge badge-primary">
-							{% elif gesamtzahl <= 10000 %}
-								<span class="badge badge-warning">
-							{% else %}
-								<span class="badge badge-danger">
-							{% endif %}
-								{{ gesamtzahl }}</span>
-						</a>
-						<a href="{% url 'home' %}"
-							class="btn btn-secondary btn-sm"
-							role="button">
-							Abbrechen
-						</a>
-						<p></p>
+					<button type="submit" class="btn btn-primary btn-sm">Suche</button>
+					<a href="{% url 'panel_download' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
+						class="btn btn-outline-primary btn-sm"
+						role="button">
+						Daten herunterladen
+						{% if gesamtzahl <= 500 %}
+							<span class="badge badge-success">
+						{% elif gesamtzahl <= 2000 %}
+							<span class="badge badge-primary">
+						{% elif gesamtzahl <= 10000 %}
+							<span class="badge badge-warning">
+						{% else %}
+							<span class="badge badge-danger">
+						{% endif %}
+							{{ gesamtzahl }}</span>
+					</a>
+					<a href="{% url 'home' %}"
+						class="btn btn-secondary btn-sm"
+						role="button">
+						Abbrechen
+					</a>
+					<p></p>
 				</div>
 			</div>
 		</form>
