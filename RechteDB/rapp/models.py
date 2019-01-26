@@ -27,7 +27,7 @@ class TblRollen(models.Model):
 		managed = True
 		db_table = 'tbl_Rollen'
 		verbose_name = "Rollenliste"
-		verbose_name_plural = "03 Rollen-Übersicht (tbl_Rollen)"
+		verbose_name_plural = "03_Rollen-Übersicht (tbl_Rollen)"
 		ordering = [ 'rollenname' ]
 		unique_together = (('rollenname', 'system'),)
 
@@ -68,7 +68,7 @@ class TblRollehataf(models.Model):
 		db_table = 'tbl_RolleHatAF'
 		unique_together = (('rollenname', 'af'),)
 		verbose_name = "Rolle und ihre Arbeitsplatzfunktionen"
-		verbose_name_plural = "02 Rollen und ihre Arbeitsplatzfunktionen (tbl_RolleHatAF)"
+		verbose_name_plural = "02_Rollen und ihre Arbeitsplatzfunktionen (tbl_RolleHatAF)"
 		ordering = [ 'rollenname__rollenname', 'af__af_name', ]
 
 	def __str__(self) -> str:
@@ -108,7 +108,7 @@ class TblUserhatrolle(models.Model):
 		managed = True
 		db_table = 'tbl_UserHatRolle'
 		verbose_name = "User und Ihre Rollen"
-		verbose_name_plural = "01 User und Ihre Rollen (tbl_UserHatRolle)"
+		verbose_name_plural = "01_User und Ihre Rollen (tbl_UserHatRolle)"
 		ordering = [ 'userid__name', '-userid__userid', 'schwerpunkt_vertretung', 'rollenname', ]
 		unique_together = (('userid', 'rollenname'),)
 
@@ -159,7 +159,7 @@ class TblUebersichtAfGfs(models.Model):
 		db_table = 'tblUEbersichtAF_GFs'
 		unique_together = (('name_af_neu', 'name_gf_neu'), ('name_gf_neu', 'name_af_neu'), )
 		verbose_name = "Erlaubte AF/GF-Kombination"
-		verbose_name_plural = "04 Erlaubte AF/GF-Kombinationen-Übersicht (tblUebersichtAF_GFs)"
+		verbose_name_plural = "04_Erlaubte AF/GF-Kombinationen-Übersicht (tblUebersichtAF_GFs)"
 		ordering = ['-id']
 
 	def __str__(self) -> str:
@@ -178,7 +178,7 @@ class TblOrga(models.Model):
 		managed = True
 		db_table = 'tblOrga'
 		verbose_name = "Orga-Information"
-		verbose_name_plural = "06 Organisations-Übersicht (tblOrga)"
+		verbose_name_plural = "06_Organisations-Übersicht (tblOrga)"
 		ordering = ['team']
 
 	def __str__(self) -> str:
@@ -218,7 +218,7 @@ class TblUserIDundName(models.Model):
 		db_table = 'tblUserIDundName'
 		index_together = (('gruppe', 'geloescht'),)
 		verbose_name = "UserID-Name-Kombination"
-		verbose_name_plural = "05 UserID-Name-Übersicht (tblUserIDundName)"
+		verbose_name_plural = "05_UserID-Name-Übersicht (tblUserIDundName)"
 		ordering = ['geloescht', 'name', '-userid']
 		unique_together = (('userid', 'name'),)
 		index_together = (('geloescht', 'name', 'userid'),)
@@ -283,7 +283,7 @@ class TblPlattform(models.Model):
 		managed = True
 		db_table = 'tblPlattform'
 		verbose_name = "Plattform"
-		verbose_name_plural = "07 Plattform-Übersicht (tblPlattform)"
+		verbose_name_plural = "07_Plattform-Übersicht (tblPlattform)"
 		ordering = ['tf_technische_plattform']
 
 	def __str__(self) -> str:
@@ -326,7 +326,7 @@ class TblGesamt(models.Model):
 		managed = True
 		db_table = 'tblGesamt'
 		verbose_name = "Eintrag der Gesamttabelle (tblGesamt)"
-		verbose_name_plural = "08 Gesamttabelle Übersicht (tblGesamt)"
+		verbose_name_plural = "08_Gesamttabelle Übersicht (tblGesamt)"
 		index_together = (('userid_name', 'tf', 'enthalten_in_af', 'plattform', 'gf', 'vip_kennzeichen', 'zufallsgenerator'),)
 		ordering = ['id']
 
@@ -406,7 +406,7 @@ class TblGesamtHistorie(models.Model):
 		managed = True
 		db_table = 'tblGesamtHistorie'
 		verbose_name = "Historisierter Eintrag der Gesamttabelle (tblGesamtHistorie)"
-		verbose_name_plural = "99 Historisierte Einträge der Gesamttabelle (tblGesamtHistorie)"
+		verbose_name_plural = "99_Historisierte Einträge der Gesamttabelle (tblGesamtHistorie)"
 
 	def __str__(self) -> str:
 		return str(self.id)
@@ -433,7 +433,7 @@ class TblAfliste(models.Model):
 		managed = True
 		db_table = 'tbl_AFListe'
 		verbose_name = "Gültige AF"
-		verbose_name_plural = "98 Übersicht gültiger AFen (tbl_AFListe)"
+		verbose_name_plural = "98_Übersicht gültiger AFen (tbl_AFListe)"
 		ordering = [ 'af_name' ]
 
 	def __str__(self) -> str:
@@ -456,7 +456,7 @@ class Tblsachgebiete(models.Model):
 		managed = True
 		db_table = 'tblSachgebiete'
 		verbose_name = "Sachgebiet"
-		verbose_name_plural = "51 Übersicht Sachgebiete (tbl_Sachgebiete)"
+		verbose_name_plural = "97_Übersicht Sachgebiete (tbl_Sachgebiete)"
 		ordering = ['sachgebiet']
 
 class Tblsubsysteme(models.Model):
@@ -471,7 +471,7 @@ class Tblsubsysteme(models.Model):
 		managed = True
 		db_table = 'tblSubsysteme'
 		verbose_name = "Subsystem"
-		verbose_name_plural = "50 Übersicht Subsysteme (tbl_Subsysteme)"
+		verbose_name_plural = "96_Übersicht Subsysteme (tbl_Subsysteme)"
 		ordering = [ 'sgss' ]
 
 class TblDb2(models.Model):
@@ -495,18 +495,11 @@ class TblDb2(models.Model):
 		managed = True
 		db_table = 'tbl_DB2'
 		verbose_name = 'DB2-Berechtigung'
-		verbose_name_plural = '52 DB2 - Berechtigungen (Tbl_DB2)'
+		verbose_name_plural = '30_DB2 - Berechtigungen (Tbl_DB2)'
 		ordering = [ 'id', ]
 
 	def __str__(self) -> str:
 		return str(self.id)
-
-	"""
-	def get_grantee(self):
-		return str(self.grantee.group)
-	get_grantee.admin_order_field = 'grantee'
-	get_grantee.short_description = 'Grantee'
-	"""
 
 
 class TblRacfGruppen(models.Model):
@@ -524,7 +517,7 @@ class TblRacfGruppen(models.Model):
 		managed = True
 		db_table = 'tbl_RACF_Gruppen'
 		verbose_name = 'RACF-Berechtigung'
-		verbose_name_plural = '53 RACF - Berechtigungen (tbl_DB2)'
+		verbose_name_plural = '40_RACF - Berechtigungen (tbl_DB2)'
 		ordering = [ 'group', ]
 
 	def get_test(self):
@@ -642,3 +635,55 @@ class Qryf3Rechteneuvonimportduplikatfrei(models.Model):
 		managed = True
 		db_table = 'qryF3_RechteNeuVonImportDuplikatfrei'
 		unique_together = (('userid', 'tf', 'enthalten_in_af', 'tf_technische_plattform', 'gf'),)
+
+class RACF_Rechte(models.Model):
+	id = 					models.AutoField(db_column='id', primary_key=True)
+	type = 					models.CharField(max_length=4, null=True)
+	group = 				models.CharField(max_length=10, db_index=True)
+	ressource_class = 		models.CharField(max_length=16, db_column='class', null=True)
+	profil =		 		models.CharField(max_length=128, db_index=True, null=True)
+	access = 				models.CharField(max_length=16, null=True)
+	test = 					models.IntegerField()
+	produktion = 			models.IntegerField()
+	alter_control_update =	models.IntegerField()
+	datum = 				models.DateTimeField(default=timezone.now, null=True)
+
+	class Meta:
+		managed = True
+		verbose_name = 'RACF-Rechte'
+		verbose_name_plural = '40_RACF - Berechtigungen'
+		ordering = [ 'id', 'profil', ]
+
+	def __str__(self) -> str:
+		return str(self.id)
+
+# Technische Abteilungsnummer;Organisation;Organisationsbezeichnung;Wirkende FK;Kostenstelle (wirkend);Org ID;
+# Parent Organization;Parent Organization ID;Organization Type;FK-Name;Org Delegation Eigentümer-Genehmiger;Delegation FK-Genehmiger
+# rv00458;ZI-AI-BA;Bestands-Anwendungen;XV13254;1001288;140329;ZI-AI;61901;OS0;Lutz Eichler;;
+
+class Orga_details(models.Model):
+	id = 					models.AutoField(primary_key=True)
+	abteilungsnummer = 		models.CharField(max_length=32, null=True, db_index=True)
+	organisation = 			models.CharField(max_length=100, db_index=True)
+	orgaBezeichnung =		models.CharField(max_length=100, null=True, db_index=True)
+	fk = 					models.CharField(max_length=32, null=True, db_index=True)
+	kostenstelle =			models.CharField(max_length=32, null=True)
+	orgID =					models.IntegerField(null=True, db_index=True)
+	parentOrga =			models.CharField(max_length=32, null=True, db_index=True)
+	parentOrgID =			models.IntegerField(null=True)
+	orgaTyp =				models.CharField(max_length=32, null=True)
+	fkName =				models.CharField(max_length=32, null=True)
+	delegationEigentuemer =	models.CharField(max_length=32, null=True)
+	delegationFK =			models.CharField(max_length=32, null=True)
+	datum = 				models.DateTimeField(default=timezone.now, null=True)
+
+	class Meta:
+		managed = True
+		verbose_name = 'Orga-Details'
+		verbose_name_plural = '50_Orga - Details'
+		ordering = [ 'id', 'organisation', 'orgID', 'parentOrga', 'fkName', ]
+
+	def __str__(self) -> str:
+		return str(self.id)
+
+

@@ -15,7 +15,8 @@ from django.forms import Textarea
 from rapp.models import TblUebersichtAfGfs, TblUserIDundName, TblOrga, TblPlattform, \
 						TblGesamt, TblGesamtHistorie, Tblrechteneuvonimport, \
 						TblRollen, TblAfliste, TblUserhatrolle, TblRollehataf, \
-						Tblsubsysteme, Tblsachgebiete, TblDb2, TblRacfGruppen
+						Tblsubsysteme, Tblsachgebiete, TblDb2, TblRacfGruppen, \
+						RACF_Rechte, Orga_details
 
 # Für den Im- und Export
 from import_export.admin import ImportExportModelAdmin
@@ -356,26 +357,28 @@ class Db2(admin.ModelAdmin):
 	search_fields = ['table', 'grantee', 'grantor']
 	list_filter = ('source', 'datum')
 
-@admin.register(TblRacfGruppen)
+# Wahrscheinlich kann die DB mal entsorgt werden.
+# Sie war ursprünglich entwickelt worden, um die Frage der SE zu beantworten,
+# welche Rechte in Produktion Schreibrechte sind.
+# ToDo Tabelle RacfGruppen entsorgen, wenn sie bis Jahresmitte 2019 nicht mehr benötigt wurde
+#@admin.register(TblRacfGruppen)
 class RacfGruppen(admin.ModelAdmin):
 	alle = ['group', 'test', 'get_produktion', 'get_readonly', 'get_db2_only', 'stempel', ]
 	search_fields = alle
 	list_display = alle
 
-# ######################################################################################################
-# Import-Export-Tabelle - der erste Versuch des Imports. Der Export kann helfen bei Importproblemen
-# ######################################################################################################
-
-#@admin.register(Tblrechteneuvonimport) # ToDo: Komplett ausbauen, wenn wirklich nicht mehr benötigt für Export-Checks
-class Tblrechteneuvonimport(ImportExportModelAdmin):
-	"""
-	Versuch des Im- und Exports via CSV / XLSX / JSON und den Browser
-	https://django-import-export.readthedocs.io/en/latest/getting_started.html#admin-integration
-	"""
-	resource_class = MeinCSVImporterModel
-	alle = ['identitaet', 'nachname', 'vorname', 'tf_name', 'af_anzeigename', 'gf_name', ]
+@admin.register(RACF_Rechte)
+class RACF_Rechte(admin.ModelAdmin):
+	alle = ['id', 'type', 'group', 'ressource_class', 'profil', 'access',
+			'test', 'produktion', 'alter_control_update', 'datum', ]
 	search_fields = alle
 	list_display = alle
-	list_per_page = 100
-	sortable_by = []
 
+@admin.register(Orga_details)
+class Orga_details(admin.ModelAdmin):
+	alle = ['id', 'abteilungsnummer', 'organisation', 'orgaBezeichnung',
+			'fk', 'kostenstelle', 'orgID', 'parentOrga', 'parentOrgID',
+			'orgaTyp', 'fkName', 'delegationEigentuemer', 'delegationFK',
+			'datum', ]
+	search_fields = alle
+	list_display = alle
