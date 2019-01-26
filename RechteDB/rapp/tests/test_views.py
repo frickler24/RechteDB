@@ -93,10 +93,12 @@ class HomeTests(TestCase):
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 301)
 
+	""" Diese Admin-Seite ist derzeit nicht aktiv
 	def test_adminrapp_l12_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tblracfgruppen'
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 301)
+	"""
 
 	def test_adminrapp_l13_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tblafliste'
@@ -107,6 +109,19 @@ class HomeTests(TestCase):
 		url = reverse('home')[:-5] + 'adminrapp/tblgesamthistorie'
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 301)
+
+
+	def test_adminrapp_l15_view_status_code(self):
+		url = reverse('home')[:-5] + 'adminrapp/racf_rechte'
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 301)
+
+
+	def test_adminrapp_l16_view_status_code(self):
+		url = reverse('home')[:-5] + 'adminrapp/orga_details'
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 301)
+
 
 class GesamtlisteTests(TestCase):
 	# Funktioniert die Gesamtliste?

@@ -45,15 +45,40 @@
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                    <a class="nav-item nav-link" <a href="{% url 'home' %}">Startseite <span class="sr-only">(current)</span></a>
-                    <a class="nav-item nav-link" href="{% url 'panel' %}?geloescht=3&userid_name__geloescht=3&userid_name__zi_organisation=ai-ba">Suche</a>
-					<a class="nav-item nav-link" href="{% url 'user_rolle_af' %}">User und Rollen</a>
-                    <a class="nav-item nav-link" href="{% url 'import' %}">Import IIQ-Daten</a>
-                    <a class="nav-item nav-link" href="{% url 'userliste' %}">UserID-Liste</a>
-                    <a class="nav-item nav-link" href="{% url 'teamliste' %}">Team-Liste</a>
-                    <a class="nav-item nav-link" href="/admin">Admin-Sichten</a>
-
-                    <a class="nav-item nav-link" href="{% url 'stored_procedures' %}">DB Aufsetzen</a>
+					<ul class="navbar-nav">
+						<li class="nav-item">
+							<a class="nav-item nav-link" <a href="{% url 'home' %}">Startseite</a>
+						</li>
+						<li class="nav-item">
+						  	<a class="nav-item nav-link"
+								href="{% url 'panel' %}?geloescht=3&userid_name__geloescht=3&userid_name__zi_organisation=ai-ba">Suche</a>
+						</li>
+						<li class="nav-item">
+						  <a class="nav-item nav-link" href="{% url 'user_rolle_af' %}">User und Rollen</a>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownLists" role="button"
+							   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Listen</a>
+							<div class="dropdown-menu" aria-labelledby="navbarDropdownLists">
+								<a class="dropdown-item" href="{% url 'userliste' %}">UserID-Liste</a>
+								<a class="dropdown-item" href="{% url 'teamliste' %}">Team-Liste</a>
+							</div>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMagic" role="button"
+							   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Magie</a>
+							<div class="dropdown-menu" aria-labelledby="navbarDropdownMagic">
+								<a class="dropdown-item" href="{% url 'import' %}">Import IIQ-Daten</a>
+			                    <a class="dropdown-item" href="{% url 'stored_procedures' %}">DB Aufsetzen</a>
+							</div>
+						</li>
+						<li class="nav-item">
+		                    <a class="nav-item nav-link" href="/admin">Admin-Sichten</a>
+						</li>
+						<li class="nav-item">
+		                    <a class="nav-item nav-link" href=#>&nbsp;</a>
+						</li>
+					</ul>
                 </div>
             </div>
 

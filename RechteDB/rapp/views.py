@@ -452,7 +452,7 @@ def panel_UhR(request, id = 0):
 
 	if request.method == 'POST':
 		form = ShowUhRForm(request.POST)
-		print ('Irgendwas ist angekommen')	# ToDo Hä?
+		print ('Irgendwas ist im panel_UhR über POST angekommen')
 
 		if form.is_valid():
 			return redirect('home')  # TODO: redirect ordentlich machen
