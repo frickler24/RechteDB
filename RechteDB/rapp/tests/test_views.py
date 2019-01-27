@@ -584,7 +584,7 @@ class User_rolle_afTests(TestCase):
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
 	def test_panel_view_with_valid_selection_status_code(self):
-		url = '{0}{1}'.format(reverse('user_rolle_af'), '?geloescht=3&userid_name__zi_organisation=ai-ba')
+		url = '{0}{1}'.format(reverse('user_rolle_af'), '?name=UseR&gruppe=BA-ps')
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
 		self.assertContains(response, "xv13254")

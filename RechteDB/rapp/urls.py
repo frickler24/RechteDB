@@ -73,6 +73,7 @@ urlpatterns += [
 	path('user_rolle_af/<int:pk>/delete/', views.UhRDelete.as_view(), name='user_rolle_af-delete'),
 	path('user_rolle_af/<int:id>/', views.panel_UhR, name='user_rolle_af_parm'),
 	path('user_rolle_af/create/<str:userid>/', views.UhRCreate.as_view(), name='user_rolle_af-create' ),
+	path('user_rolle_af/konzept/', views.panel_UhR_konzept, name='uhr_konzept'),
 	path('user_rolle_af/', views.panel_UhR, name='user_rolle_af'),
 ]
 

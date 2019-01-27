@@ -7,6 +7,11 @@ class ShowUhRForm(forms.ModelForm):
 		model = TblUserhatrolle
 		fields = ['userid', 'rollenname', 'schwerpunkt_vertretung', 'bemerkung', ]
 
+class ShowUhRKonzept(forms.ModelForm):
+	class Meta:
+		model = TblUserhatrolle
+		fields = ['rollenname', 'schwerpunkt_vertretung', 'bemerkung', ]
+
 
 # Hier ist das anders, weil zwei Methoden zur Klasse hinzugekommen sind
 # Initialisiere das Input Formular für neue Rolleneinträge mit der UserID

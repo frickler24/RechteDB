@@ -31,38 +31,11 @@
 				</div>
 				<div class="form-group-sm col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 mt-3 pt-3">
 					<button type="submit" class="btn btn-primary btn-sm">Suche</button>
-					<a href="{% url 'panel_download' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
-						class="btn btn-outline-primary btn-sm"
-						role="button">
-						Modelle
-						{% if gesamtzahl <= 500 %}
-							<span class="badge badge-success">
-						{% elif gesamtzahl <= 2000 %}
-							<span class="badge badge-primary">
-						{% elif gesamtzahl <= 10000 %}
-							<span class="badge badge-warning">
-						{% else %}
-							<span class="badge badge-danger">
-						{% endif %}
-							{{ gesamtzahl }}</span>
-					</a>
-					<a href="{% url 'panel_download' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
-						class="btn btn-outline-primary btn-sm"
-						role="button">
-						Abgleich
-						{% if gesamtzahl <= 500 %}
-							<span class="badge badge-success">
-						{% elif gesamtzahl <= 2000 %}
-							<span class="badge badge-primary">
-						{% elif gesamtzahl <= 10000 %}
-							<span class="badge badge-warning">
-						{% else %}
-							<span class="badge badge-danger">
-						{% endif %}
-							{{ gesamtzahl }}</span>
+					<a href="{% url 'uhr_konzept' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
+						class="btn btn-outline-success btn-sm" role="button">Konzept
 					</a>
 					<a href="{% url 'home' %}"
-						class="btn btn-secondary btn-sm"
+						class="btn btn-outline-secondary btn-sm"
 						role="button">
 						Abbrechen
 					</a>
