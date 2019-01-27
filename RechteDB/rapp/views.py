@@ -12,7 +12,6 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
-from .filters import PanelFilter, UseridFilter
 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
@@ -23,17 +22,14 @@ from django import forms
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .forms import ShowUhRForm, ShowUhRKonzept, CreateUhRForm, \
-				   ImportForm, ImportForm_schritt3
-#from urls import get_version
-
 # Zum Einlesen der csv
-import csv, textwrap, re, subprocess
+import csv, textwrap, re, subprocess, os
 
-import os
-
+from .filters import PanelFilter, UseridFilter
+from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportForm_schritt3
 from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, TblUserhatrolle, \
-	Tblrechteneuvonimport, Tblrechteamneu
+					Tblrechteneuvonimport, Tblrechteamneu
+from .xhtml2 import render_to_pdf
 
 # An dieser stelle stehen diverse Tools zum Aufsetzen der Datenbank mit SPs
 from .stored_procedures import *
@@ -571,6 +567,7 @@ def UhR_verdichte_daten(panel_liste):
 
 @login_required
 def panel_UhR_konzept(request):
+
 	"""
 	Erzege das Berechtigungskonzept für eine Menge an selektierten Identitäten.
 
@@ -598,15 +595,24 @@ def panel_UhR_konzept(request):
 			for a in usernamen:
 				print(a)
 
-	form = ShowUhRKonzept(request.GET)
 	context = {
 		'filter': panel_filter,
 		'rollenMenge': rollenMenge,
-		'form': form,
 		'version': version,
 	}
-	return render(request, 'rapp/panel_UhR_konzept.html', context)
+	html = render(request, 'rapp/panel_UhR_konzept.html', context)
+	pdf = render_to_pdf('rapp/panel_UhR_konzept_pdf.html', context)
 
+	if pdf:
+		response = HttpResponse(pdf, content_type='application/pdf')
+		filename = "Berechtigungskonzept_%s.pdf" % ("erstmalnurtest_123")
+		content = "inline; filename='%s'" % (filename)
+		download = request.GET.get("download")
+		if download:
+			content = "attachment; filename='%s'" % (filename)
+		response['Content-Disposition'] = content
+		return response
+	return html
 
 ###################################################################
 # Dialogsteuerung für den Import einer neuen IIQ-Datenliste (csv-Datei)
