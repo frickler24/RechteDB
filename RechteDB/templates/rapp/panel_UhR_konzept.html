@@ -58,12 +58,11 @@
 								<td colspan="4">
 									<div class="row">
 										<div class="form-control bg-light text-success col-4">AF</div>
-										<div class="form-control bg-light text-success col-5">Anmerkung zur AF allgemein</div>
 										<div class="form-control bg-light text-success col-1 text-center">Muss</div>
 										<div class="form-control bg-light text-success col-1 text-center">Einsatz</div>
+										<div class="form-control bg-light text-success col-5">Anmerkung zur AF</div>
 										{% for meineaf in rolle.tblrollehataf_set.all %}
 											<div class="form-control col-4">{{ meineaf.af }}</div>
-											<div class="form-control col-5">{{ meineaf.bemerkung }}</div>
 											<div class="form-control col-1 text-center">
 												{% if meineaf.mussfeld %}
 													<img src="{% static 'checkbox-checked.png' %}"
@@ -73,9 +72,10 @@
 														 alt="checkbox checked" height="15" width="15">
 												{% endif %}
 											</div>
-										<div class="form-control select col-1 text-center">
-											<small>{{ meineaf.get_einsatz_display }}</small>
-										</div>
+											<div class="form-control select col-1 text-center">
+												<small>{{ meineaf.get_einsatz_display }}</small>
+											</div>
+											<div class="form-control col-5">{{ meineaf.bemerkung }}</div>
 										{% empty %}
 											<div class="form-control text-danger col-12">Rolle ist keine AF zugeordnet</div>
 										{% endfor rolle.tblrollehataf_set.all %}

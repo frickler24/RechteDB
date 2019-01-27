@@ -566,8 +566,13 @@ def UhR_verdichte_daten(panel_liste):
 	return (sorted(list(rollenMenge), key=order), userids, usernamen)
 
 @login_required
-def panel_UhR_konzept(request):
+def panel_UhR_konzept_pdf(request):
+	return UhR_konzept(request, False)
 
+def panel_UhR_konzept_ansicht(request):
+	return UhR_konzept(request, True)
+
+def	UhR_konzept(request, ansicht):
 	"""
 	Erzege das Berechtigungskonzept für eine Menge an selektierten Identitäten.
 
@@ -600,9 +605,10 @@ def panel_UhR_konzept(request):
 		'rollenMenge': rollenMenge,
 		'version': version,
 	}
-	html = render(request, 'rapp/panel_UhR_konzept.html', context)
-	pdf = render_to_pdf('rapp/panel_UhR_konzept_pdf.html', context)
+	if (ansicht):
+		return render(request, 'rapp/panel_UhR_konzept.html', context)
 
+	pdf = render_to_pdf('rapp/panel_UhR_konzept_pdf.html', context)
 	if pdf:
 		response = HttpResponse(pdf, content_type='application/pdf')
 		filename = "Berechtigungskonzept_%s.pdf" % ("erstmalnurtest_123")
@@ -612,7 +618,7 @@ def panel_UhR_konzept(request):
 			content = "attachment; filename='%s'" % (filename)
 		response['Content-Disposition'] = content
 		return response
-	return html
+	return HttpResponse("Fehlerhafte PDF-Generierung")
 
 ###################################################################
 # Dialogsteuerung für den Import einer neuen IIQ-Datenliste (csv-Datei)
