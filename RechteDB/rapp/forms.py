@@ -1,5 +1,5 @@
 from django import forms
-from .models import TblUserIDundName, TblUserhatrolle, hole_organisationen
+from .models import TblUserhatrolle, hole_organisationen
 
 # Das hätte man auch einfacher haben können, indem die relevanten Infos in views.py eingetragen worden wären
 class ShowUhRForm(forms.ModelForm):

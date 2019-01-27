@@ -12,7 +12,6 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
-from .filters import PanelFilter, UseridFilter
 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
@@ -23,16 +22,14 @@ from django import forms
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportForm_schritt3
-#from urls import get_version
-
 # Zum Einlesen der csv
-import csv, textwrap, re, subprocess
+import csv, textwrap, re, subprocess, os
 
-import os
-
+from .filters import PanelFilter, UseridFilter
+from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportForm_schritt3
 from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, TblUserhatrolle, \
-	Tblrechteneuvonimport, Tblrechteamneu
+					Tblrechteneuvonimport, Tblrechteamneu
+from .xhtml2 import render_to_pdf
 
 # An dieser stelle stehen diverse Tools zum Aufsetzen der Datenbank mit SPs
 from .stored_procedures import *
@@ -385,9 +382,7 @@ def panelDownload(request):
 
 	return response
 
-
-@login_required
-def panel_UhR(request, id = 0):
+def UhR_erzeuge_listen(request):
 	"""
 	Finde alle relevanten Informationen zur aktuellen Selektion:
 
@@ -405,8 +400,8 @@ def panel_UhR(request, id = 0):
 	sobald ein konkreter User betrachtet wird und nicht mehr eine Menge an Usern.
 
 	:param request: GET oder POST Request vom Browser
-	:param pk: ID des XV-UserID-Eintrags, zu dem die Detaildaten geliefert werden sollen
-	:return: Gerendertes HTML
+	:param pk: optional: ID des XV-UserID-Eintrags, zu dem die Detaildaten geliefert werden sollen
+	:return: name_liste, panel_liste, panel_filter
 	"""
 	panel_liste = TblUserIDundName.objects.filter(geloescht=False).order_by('name')
 	panel_filter = UseridFilter(request.GET, queryset=panel_liste)
@@ -416,12 +411,12 @@ def panel_UhR(request, id = 0):
 	"""
 	# Ein paar Testzugriffe über das komplette Modell
 	#   Hier ist die korrekte Hierarchie abgebildet von UserID bis AF:
-    #   TblUserIDundName ethält Userid
-    #       TblUserHatRolle hat FK 'userid' auf TblUserIDundName
-    #       -> tbluserhatrolle_set.all auf eine aktuelle UserID-row liefert die Menge der relevanten Rollen
-    #           Rolle hat ForeignKey 'rollenname' auf TblRolle und erhält damit die nicht-User-spezifischen Rollen-Parameter
-    #               TblRolleHatAF hat ebenfalls einen ForeignKey 'rollennname' auf TblRollen
-    #               -> rollenname.tblrollehataf_set.all liefert für eine konkrete Rolle die Liste der zugehörigen AF-Detailinformationen
+	#   TblUserIDundName ethält Userid
+	#       TblUserHatRolle hat FK 'userid' auf TblUserIDundName
+	#       -> tbluserhatrolle_set.all auf eine aktuelle UserID-row liefert die Menge der relevanten Rollen
+	#           Rolle hat ForeignKey 'rollenname' auf TblRolle und erhält damit die nicht-User-spezifischen Rollen-Parameter
+	#               TblRolleHatAF hat ebenfalls einen ForeignKey 'rollennname' auf TblRollen
+	#               -> rollenname.tblrollehataf_set.all liefert für eine konkrete Rolle die Liste der zugehörigen AF-Detailinformationen
 	#
 	#		TblGesamt hat FK 'userid_name' auf TblUserIDundName
 	#		-> .tblgesamt_set.filter(geloescht = False) liefert die akiven Arbeitsplatzfunktionen
@@ -450,69 +445,87 @@ def panel_UhR(request, id = 0):
 	print ('6:', af_liste)
 	"""
 
-	if request.method == 'POST':
-		form = ShowUhRForm(request.POST)
-		print ('Irgendwas ist angekommen')	# ToDo Hä?
+	return (namen_liste, panel_liste, panel_filter)
 
-		if form.is_valid():
-			return redirect('home')  # TODO: redirect ordentlich machen
+def Uhr_hole_daten(panel_liste, id):
+	"""
+	Selektiere alle Userids und alle Namen in TblUserHatRolle, die auch in der Selektion vorkommen
+
+	Die Liste der disjunkten UserIDs wird später in der Anzeige benötigt (Welche UserID gehören zu einem Namen).
+	Hintergrund ist die Festlegung, dass die Rollen am UserNAMEN un dnicht an der UserID hängen.
+	Dennoch gibt es Rollen, die nur zu bestimmten Userid-Typen (also bspw. nur für XV-Nummer) sinnvoll
+	und gültig sind.
+
+	Die af_menge wird benutzt zur Anzeige, welche der rollenbezogenen AFen bereits im IST vorliegt
+
+	"""
+	usernamen = set()
+	userids = set()
+	for row in panel_liste:
+		usernamen.add(row.name)  # Ist Menge, also keine Doppeleinträge möglich
+		userids.add(row.userid)
+
+	if (id != 0):  # Dann wurde der ReST-Parameter 'id' mitgegeben
+
+		userHatRolle_liste = TblUserhatrolle.objects.filter(userid__id=id).order_by('rollenname')
+		selektierter_name = TblUserIDundName.objects.get(id=id).name
+		selektierte_userid = TblUserIDundName.objects.get(id=id).userid
 
 	else:
-		"""
-		Selektiere alle Userids und alle Namen in TblUserHatRolle, die auch in der Selektion vorkommen
-		ToDo: Hier könnte man mal einen reverse lookup einbauen von TblUserUndName zu TblUserHatRolle
-		
-		Die Liste der disjunkten UserIDs wird später in der Anzeige benötigt (Welche UserID gehören zu einem Namen).
-		Hintergrund ist die Festlegung, dass die Rollen am UserNAMEN un dnicht an der UserID hängen.
-		Dennoch gibt es Rollen, die nur zu bestimmten Userid-Typen (also bspw. nur für XV-Nummer) sinnvoll
-		und gültig sind.
-		
-		Die af_menge wird benutzt zur Anzeige, welche der rollenbezogenen AFen bereits im IST vorliegt
-		
-		"""
-		usernamen = set()
-		userids = set()
-		for row in panel_liste:
-			usernamen.add (row.name)	# Ist Menge, also keine Doppeleinträge möglich
-			userids.add (row.userid)
+		userHatRolle_liste = []
+		selektierter_name = -1
+		selektierte_userid = 'keine_userID'
 
-		if (id != 0):	# Dann wurde der ReST-Parameter 'id' mitgegeben
+	return (userHatRolle_liste, selektierter_name, userids, usernamen, selektierte_userid)
 
-			userHatRolle_liste = TblUserhatrolle.objects.filter(userid__id=id).order_by('rollenname')
-			selektierter_name = TblUserIDundName.objects.get(id=id).name
-			selektierte_userid = TblUserIDundName.objects.get(id=id).userid
+def pagination(request, namen_liste):
+	"""Paginierung nach Tutorial"""
+	pagesize = request.GET.get('pagesize')
+	if type(pagesize) == type(None) or pagesize == '' or int(pagesize) < 1:
+		pagesize = 100  # Eigentlich sollte hier nie gepaged werden, dient nur dem Schutz vor Fehlabfragen
+	else:
+		pagesize = int(pagesize)
+	paginator = Paginator(namen_liste, pagesize)
+	page = request.GET.get('page', 1)
+	try:
+		pages = paginator.page(page)
+	except PageNotAnInteger:
+		pages = paginator.page(1)
+	except EmptyPage:
+		pages = paginator.page(paginator.num_pages)
 
-			# Selektiere alle Arbeitsplatzfunktionen, die derzeit mit dem User verknüpft sind.
-			afliste = TblUserIDundName.objects.get(id=id).tblgesamt_set.all()	# Das QuerySet
-			afmenge = set()
-			for e in afliste:
-				afmenge.add(e.enthalten_in_af)	# Filtern der AFen aus der Treffermenge
-		else:
-			userHatRolle_liste = []
-			selektierter_name = -1
-			selektierte_userid = 'keine_userID'
-			afmenge = set()
+	return (paginator, pages, pagesize)
 
-		"""Paginierung nach Tutorial"""
-		pagesize = request.GET.get('pagesize')
-		if type(pagesize) == type(None) or pagesize == '' or int(pagesize) < 1:
-			pagesize = 100	# Eigentlich sollte hier nie gepaged werden, dient nur dem Schutz vor Fehlabfragen
-		else:
-			pagesize = int(pagesize)
-		paginator = Paginator(namen_liste, pagesize)
-		page = request.GET.get('page', 1)
-		try:
-			pages = paginator.page(page)
-		except PageNotAnInteger:
-			pages = paginator.page(1)
-		except EmptyPage:
-			pages = paginator.page(paginator.num_pages)
+
+@login_required
+def panel_UhR(request, id = 0):
+	"""
+	Finde alle relevanten Informationen zur aktuellen Selektion:
+
+	:param request: GET oder POST Request vom Browser
+	:param pk: ID des XV-UserID-Eintrags, zu dem die Detaildaten geliefert werden sollen
+	:return: Gerendertes HTML
+	"""
+
+	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
+
+	if request.method == 'POST':
+		form = ShowUhRForm(request.POST)
+		print ('Irgendwas ist im panel_UhR über POST angekommen')
+
+		if form.is_valid():
+			return redirect('home')  # TODO: redirect ordentlich machen oder POST-Teil entfernen
+	else:
+		(userHatRolle_liste, selektierter_name, userids, usernamen, selektierte_userid) \
+			= Uhr_hole_daten(panel_liste, id)
+
+		(paginator, pages, pagesize) = pagination(request, namen_liste)
 
 	form = ShowUhRForm(request.GET)
 	context = {
 		'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
 		'filter': panel_filter,
-		'userids': userids, 'usernamen': usernamen, 'afmenge': afmenge,
+		'userids': userids, 'usernamen': usernamen,
 		'userHatRolle_liste': userHatRolle_liste,
 		'id': id,
 		'form': form,
@@ -522,10 +535,87 @@ def panel_UhR(request, id = 0):
 	}
 	return render(request, 'rapp/panel_UhR.html', context)
 
+# Funktionenzum Erstellen des Berechtigungskonzepts
+def UhR_verdichte_daten(panel_liste):
+	"""
+	Ausgehend von den Userids der Selektion zeige
+	  für jeden User (nur die XV-User zeigen auf Rollen, deshalb nehmen wir nur diese)
+	    alle Rollen mit allen Details
+	      einschließlich aller darin befindlicher AFen mit ihren formalen Zuweiseungen (Soll-Bild)
+	        verdichtet auf Mengenbasis
+			  (keine Doppelnennungen von Rollen,
+			  aber ggfs. Mehrfachnennungen von AFen,
+			  wenn sie in Rollen mehrfach enthalten sind)
+
+	Ergebnis ist Liste von
+
+	"""
+	usernamen = set()
+	userids = set()
+	rollenMenge = set()
+
+	for row in panel_liste:
+		if row.userid[:2].lower() == "xv":
+			usernamen.add(row.name)  # Ist Menge, also keine Doppeleinträge möglich
+			userids.add(row.userid)
+			userHatRollen = TblUserhatrolle.objects.filter(userid__userid=row.userid).order_by('rollenname')
+			for e in userHatRollen:
+				rollenMenge.add(e.rollenname)
+
+	def order(a): return a.rollenname.lower() 	# Liefert das kleingeschriebene Element, nach dem sortiert werden soll
+	return (sorted(list(rollenMenge), key=order), userids, usernamen)
+
+@login_required
+def panel_UhR_konzept(request):
+
+	"""
+	Erzege das Berechtigungskonzept für eine Menge an selektierten Identitäten.
+
+	:param request: GET Request vom Browser
+	:return: Gerendertes HTML
+	"""
+
+	# Erst mal die relevanten User-Listen holen - sie sind abhängig von Filtereinstellungen
+	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
+
+	if request.method == 'GET':
+		(rollenMenge, userids, usernamen) = UhR_verdichte_daten(panel_liste)
+	else:
+		(rollenMenge, userids, usernamen) = (set(), set(), set())
+
+	if request.GET.get('display') == '1':
+			print('rollenMenge')
+			print(rollenMenge)
+
+			print('userids')
+			for a in userids:
+				print(a)
+
+			print('usernamen')
+			for a in usernamen:
+				print(a)
+
+	context = {
+		'filter': panel_filter,
+		'rollenMenge': rollenMenge,
+		'version': version,
+	}
+	html = render(request, 'rapp/panel_UhR_konzept.html', context)
+	pdf = render_to_pdf('rapp/panel_UhR_konzept_pdf.html', context)
+
+	if pdf:
+		response = HttpResponse(pdf, content_type='application/pdf')
+		filename = "Berechtigungskonzept_%s.pdf" % ("erstmalnurtest_123")
+		content = "inline; filename='%s'" % (filename)
+		download = request.GET.get("download")
+		if download:
+			content = "attachment; filename='%s'" % (filename)
+		response['Content-Disposition'] = content
+		return response
+	return html
 
 ###################################################################
 # Dialogsteuerung für den Import einer neuen IIQ-Datenliste (csv-Datei)
-
 @login_required
 def import_csv(request):
 	"""
