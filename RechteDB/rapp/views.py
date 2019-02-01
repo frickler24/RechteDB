@@ -461,6 +461,8 @@ def Uhr_hole_daten(panel_liste, id):
 	"""
 	usernamen = set()
 	userids = set()
+	afmenge = set()
+
 	for row in panel_liste:
 		usernamen.add(row.name)  # Ist Menge, also keine Doppeleinträge möglich
 		userids.add(row.userid)
@@ -471,12 +473,17 @@ def Uhr_hole_daten(panel_liste, id):
 		selektierter_name = TblUserIDundName.objects.get(id=id).name
 		selektierte_userid = TblUserIDundName.objects.get(id=id).userid
 
+		# Selektiere alle Arbeitsplatzfunktionen, die derzeit mit dem User verknüpft sind.
+		afliste = TblUserIDundName.objects.get(id=id).tblgesamt_set.all()  # Das QuerySet
+		for e in afliste:
+			afmenge.add(e.enthalten_in_af)  # Filtern der AFen aus der Treffermenge
+
 	else:
 		userHatRolle_liste = []
 		selektierter_name = -1
 		selektierte_userid = 'keine_userID'
 
-	return (userHatRolle_liste, selektierter_name, userids, usernamen, selektierte_userid)
+	return (userHatRolle_liste, selektierter_name, userids, usernamen, selektierte_userid, afmenge)
 
 def pagination(request, namen_liste):
 	"""Paginierung nach Tutorial"""
@@ -516,7 +523,7 @@ def panel_UhR(request, id = 0):
 		if form.is_valid():
 			return redirect('home')  # TODO: redirect ordentlich machen oder POST-Teil entfernen
 	else:
-		(userHatRolle_liste, selektierter_name, userids, usernamen, selektierte_userid) \
+		(userHatRolle_liste, selektierter_name, userids, usernamen, selektierte_userid, afmenge) \
 			= Uhr_hole_daten(panel_liste, id)
 
 		(paginator, pages, pagesize) = pagination(request, namen_liste)
@@ -525,7 +532,7 @@ def panel_UhR(request, id = 0):
 	context = {
 		'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
 		'filter': panel_filter,
-		'userids': userids, 'usernamen': usernamen,
+		'userids': userids, 'usernamen': usernamen, 'afmenge': afmenge,
 		'userHatRolle_liste': userHatRolle_liste,
 		'id': id,
 		'form': form,
