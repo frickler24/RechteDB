@@ -1,5 +1,6 @@
 from django.urls import reverse, resolve
 from django.test import TestCase
+
 from ..views import home
 
 from ..models import TblOrga, TblUebersichtAfGfs, TblUserIDundName, TblPlattform, TblGesamt, \
@@ -500,6 +501,12 @@ class User_rolle_afTests(TestCase):
 			neu_ab = 			timezone.now(),
 		)
 
+		TblAfliste.objects.create (
+			af_name = 			'rva_01219_beta91_job_abst_nicht_zugewiesen',
+			neu_ab = 			timezone.now(),
+		)
+
+		# Drei User: XV und DV aktiv, AV gelöscht
 		TblUserIDundName.objects.create (
 			userid = 			'xv13254',
 			name = 				'User_xv13254',
@@ -509,13 +516,38 @@ class User_rolle_afTests(TestCase):
 			abteilung = 		'ZI-AI-BA',
 			gruppe = 			'ZI-AI-BA-PS',
 		)
+		TblUserIDundName.objects.create (
+			userid = 			'dv13254',
+			name = 				'User_xv13254',
+			orga = 				TblOrga.objects.get(team = 'Django-Team-01'),
+			zi_organisation =	'AI-BA',
+			geloescht = 		False,
+			abteilung = 		'ZI-AI-BA',
+			gruppe = 			'ZI-AI-BA-PS',
+		)
+		TblUserIDundName.objects.create (
+			userid = 			'av13254',
+			name = 				'User_xv13254',
+			orga = 				TblOrga.objects.get(team = 'Django-Team-01'),
+			zi_organisation =	'AI-BA',
+			geloescht = 		True,
+			abteilung = 		'ZI-AI-BA',
+			gruppe = 			'ZI-AI-BA-PS',
+		)
 
+		# Zwei Rollen, die auf den XV-User vergeben werden
 		TblRollen.objects.create (
 			rollenname = 		'Erste Neue Rolle',
 			system =			'Testsystem',
 			rollenbeschreibung = 'Das ist eine Testrolle',
 		)
+		TblRollen.objects.create (
+			rollenname = 		'Zweite Neue Rolle',
+			system =			'Irgendein System',
+			rollenbeschreibung = 'Das ist auch eine Testrolle',
+		)
 
+		# Drei AF-Zuordnungen
 		TblRollehataf.objects.create (
 			mussfeld =			True,
 			einsatz =			TblRollehataf.EINSATZ_XABCV,
@@ -523,17 +555,38 @@ class User_rolle_afTests(TestCase):
 			af = 				TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
 			rollenname = 		TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
 		)
+		TblRollehataf.objects.create (
+			mussfeld =			True,
+			einsatz =			TblRollehataf.EINSATZ_XABCV,
+			bemerkung = 		'Irgend eine halbwegs sinnvolle Beschreibung',
+			af = 				TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen'),
+			rollenname = 		TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
+		)
+		TblRollehataf.objects.create (
+			mussfeld =			False,
+			einsatz =			TblRollehataf.EINSATZ_XABCV,
+			bemerkung = 		'Auch irgend eine halbwegs sinnvolle Beschreibung',
+			af = 				TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
+			rollenname = 		TblRollen.objects.get(rollenname= 'Zweite Neue Rolle'),
+		)
 
+		# Dem XV-User werden zwei Rollen zugewiesen, dem AV- und DV-User keine
 		TblUserhatrolle.objects.create(
 			userid =	 		TblUserIDundName.objects.get(userid = 'xv13254'),
 			rollenname = 		TblRollen.objects.first(),
 			schwerpunkt_vertretung = 'Schwerpunkt',
 			bemerkung = 		'Das ist eine Testrolle für ZI-AI-BA-PS',
 			letzte_aenderung= 	timezone.now(),
-
+		)
+		TblUserhatrolle.objects.create(
+			userid =	 		TblUserIDundName.objects.get(userid = 'xv13254'),
+			rollenname = 		TblRollen.objects.get(rollenname = 'Zweite Neue Rolle'),
+			schwerpunkt_vertretung = 'Vertretung',
+			bemerkung = 		'Das ist auch eine Testrolle für ZI-AI-BA-PS',
+			letzte_aenderung= 	timezone.now(),
 		)
 
-		# Die nächsten beiden Objekte werden wür tblGesamt als ForeignKey benötigt
+		# Die nächsten beiden Objekte werden für tblGesamt als ForeignKey benötigt
 		TblUebersichtAfGfs.objects.create(
 			name_gf_neu = 		"GF-foo in tblÜbersichtAFGF",
 			name_af_neu =		"AF-foo in tblÜbersichtAFGF",
@@ -588,6 +641,34 @@ class User_rolle_afTests(TestCase):
 		response = self.client.get(url)
 		self.assertEquals(response.status_code, 200)
 		self.assertContains(response, "xv13254")
+	# Hat der User zwei Rollen?
+	def test_panel_view_num_userids(self):
+		id = TblUserIDundName.objects.get(userid='xv13254').id
+		url = '{0}{1}/{2}'.format(reverse('user_rolle_af'), id, '?name=UseR&gruppe=BA-ps')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+		self.assertContains(response, "xv13254")
+		self.assertContains(response, "dv13254")
+	def test_panel_view_num_roles(self):
+		id = TblUserIDundName.objects.get(userid='xv13254').id
+		url = '{0}{1}/{2}'.format(reverse('user_rolle_af'), id, '?name=UseR&gruppe=BA-ps')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+		self.assertContains(response, "User_xv13254")
+		#print('_____________')
+		#print (response.content)
+		self.assertContains(response, '(2 Rollen,')
+	# Sind bei einer der Rollen ein Recht nicht vergeben und zwei Rechte vergeben und insgesamt 3 Rechte behandelt?
+	def test_panel_view_with_deep_insight(self):
+		id = TblUserIDundName.objects.get(userid='xv13254').id
+		url = '{0}{1}/{2}'.format(reverse('user_rolle_af'), id, '?name=UseR&gruppe=BA-ps')
+		response = self.client.get(url)
+		self.assertEquals(response.status_code, 200)
+		self.assertContains(response, "User_xv13254")
+		self.assertContains(response, 'icon-yes', 4)
+		self.assertContains(response, 'icon-no', 2)
+
+
 	def test_panel_view_with_invalid_selection_status_code(self):
 		url = '{0}{1}'.format(reverse('user_rolle_af'), '?geloescht=99&zi_organisation=ZZ-XX')
 		response = self.client.get(url)
