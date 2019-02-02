@@ -459,9 +459,11 @@ def Uhr_hole_daten(panel_liste, id):
 	Die af_menge wird benutzt zur Anzeige, welche der rollenbezogenen AFen bereits im IST vorliegt
 
 	"""
-	usernamen = set()
-	userids = set()
-	afmenge = set()
+	usernamen = set()	# Die Namen aller User,  die in der Selektion erfasst werden
+	userids = set()		# Die UserIDs aller User,  die in der Selektion erfasst werden
+	afmenge = set()		# Die Menge aller AFs aller mit ID spezifizierten User (für Berechtigungskonzept)
+	selektierte_userids = set()	# Die Liste der UserIDs, die an Identität ID hängen
+	afmenge_je_userID = {}	# Menge mit USERID-spezifischen AF-Listen
 
 	for row in panel_liste:
 		usernamen.add(row.name)  # Ist Menge, also keine Doppeleinträge möglich
@@ -470,20 +472,45 @@ def Uhr_hole_daten(panel_liste, id):
 	if (id != 0):  # Dann wurde der ReST-Parameter 'id' mitgegeben
 
 		userHatRolle_liste = TblUserhatrolle.objects.filter(userid__id=id).order_by('rollenname')
-		selektierter_name = TblUserIDundName.objects.get(id=id).name
-		selektierte_userid = TblUserIDundName.objects.get(id=id).userid
+		selektierter_name = TblUserIDundName.objects.get(id = id).name
+
+		# Wahrscheinlich werden verschiedene Panels auf die Haupt-UserID referenzieren (die XV-Nummer)
+		selektierte_haupt_userid = TblUserIDundName.objects.get(id = id).userid
+
+		# Hole alle UserIDs, die zu dem ausgesuchten User passen.
+		# Dies funktioniert nur, weil der Name ein unique Key in der Tabelle ist.
+		# Wichtig: Filtere gelöschte User heraus, sonst gibt es falsche Anzeigen
+		number_of_userids = TblUserIDundName.objects\
+			.filter(name = selektierter_name)\
+			.filter(geloescht = False)\
+			.count()
+		for num in range(number_of_userids):
+			selektierte_userids.add (TblUserIDundName.objects
+									 .filter(name = selektierter_name)
+									 .order_by('-userid') \
+									 .filter(geloescht=False)[num].userid)
 
 		# Selektiere alle Arbeitsplatzfunktionen, die derzeit mit dem User verknüpft sind.
 		afliste = TblUserIDundName.objects.get(id=id).tblgesamt_set.all()  # Das QuerySet
 		for e in afliste:
 			afmenge.add(e.enthalten_in_af)  # Filtern der AFen aus der Treffermenge
 
+		# Erzeuge zunächst die Hashes für die UserIDs. daran werden nachher die Listen der Rechte gehängt
+		for uid in selektierte_userids:
+			afmenge_je_userID[uid] = set()
+
+		# Selektiere alle Arbeitsplatzfunktionen, die derzeit mit den konkreten UserIDs verknüpft sind.
+		for uid in selektierte_userids:
+			tmp_afliste = TblUserIDundName.objects.get(userid = uid).tblgesamt_set.all()  # Das QuerySet
+			for e in tmp_afliste:
+				afmenge_je_userID[uid].add(e.enthalten_in_af)  # Element and die UserID-spezifische Liste hängen
 	else:
 		userHatRolle_liste = []
 		selektierter_name = -1
-		selektierte_userid = 'keine_userID'
+		selektierte_haupt_userid = 'keine_userID'
 
-	return (userHatRolle_liste, selektierter_name, userids, usernamen, selektierte_userid, afmenge)
+	return (userHatRolle_liste, selektierter_name, userids, usernamen,
+			selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID)
 
 def pagination(request, namen_liste):
 	"""Paginierung nach Tutorial"""
@@ -502,7 +529,6 @@ def pagination(request, namen_liste):
 		pages = paginator.page(paginator.num_pages)
 
 	return (paginator, pages, pagesize)
-
 
 @login_required
 def panel_UhR(request, id = 0):
@@ -523,9 +549,9 @@ def panel_UhR(request, id = 0):
 		if form.is_valid():
 			return redirect('home')  # TODO: redirect ordentlich machen oder POST-Teil entfernen
 	else:
-		(userHatRolle_liste, selektierter_name, userids, usernamen, selektierte_userid, afmenge) \
+		(userHatRolle_liste, selektierter_name, userids, usernamen,
+		 selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID) \
 			= Uhr_hole_daten(panel_liste, id)
-
 		(paginator, pages, pagesize) = pagination(request, namen_liste)
 
 	form = ShowUhRForm(request.GET)
@@ -537,7 +563,9 @@ def panel_UhR(request, id = 0):
 		'id': id,
 		'form': form,
 		'selektierter_name': selektierter_name,
-		'selektierte_userid': selektierte_userid,
+		'selektierte_userid': selektierte_haupt_userid,
+		'selektierte_userids': selektierte_userids,
+		'afmenge_je_userID': afmenge_je_userID,
 		'version': version,
 	}
 	return render(request, 'rapp/panel_UhR.html', context)
