@@ -24,6 +24,14 @@
 				{% endif %}
 			</div>
 			<div>
+				<a href="{% url 'uhr_konzept_pdf' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
+				   class="btn btn-success btn-sm" role="button"
+				   target="_blank" style="width:100%">
+					<i class="fa fa-download"></i>Erzeuge PDF
+				</a>
+			</div>
+
+			<div>
 				<table class="table table-striped table-sm">
 					<thead>
 						<tr>
