@@ -47,12 +47,14 @@
 				{% endif %}
 			</div>
 			<div class="container">
+				{% comment %}
 				<div class="row justify-content-md-center">
 					<a href="{% url 'uhr_matrix_pdf' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
 					   class="btn btn-outline-primary btn-sm" role="button"
 					   target="_blank">Erzeuge PDF
 					</a>
 				</div>
+				{% endcomment %}
 			</div>
 
 			<div>
