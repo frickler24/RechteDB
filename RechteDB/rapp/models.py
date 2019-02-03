@@ -125,7 +125,7 @@ class TblUserhatrolle(models.Model):
 
 	def get_absolute_update_url(self):
 		# Returns the url to access a particular instance of the model.
-		return reverse('user_rolle_af-update', args=[str(self.id)])
+		return reverse('user_rolle_af-update', args=[str(self.userundrollenid)])
 
 	def get_absolute_create_url(self):
 		# Returns the url to open the create-instance of the model (no ID given, the element does not exist yet).

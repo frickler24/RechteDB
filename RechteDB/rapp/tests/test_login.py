@@ -3,7 +3,7 @@ from django.test import TestCase
 from ..anmeldung import Anmeldung
 
 from ..models import TblOrga, TblUebersichtAfGfs, TblUserIDundName, TblPlattform, TblGesamt, \
-	TblAfliste, TblUserhatrolle, TblRollehataf, TblRollen, Tblrechteneuvonimport
+	TblAfliste, TblUserhatrolle, TblRollehataf, TblRollen
 
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -352,7 +352,6 @@ class LoginRequiredUhRPanelTests(TestCase):
 	def setUp(self):
 		self.url = reverse('user_rolle_af')
 		self.response = self.client.get(self.url)
-
 	def test_redirection(self):
 		login_url = reverse('login')
 		self.assertRedirects(self.response, '{login_url}?next={url}'.format(login_url=login_url, url=self.url))

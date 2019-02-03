@@ -644,6 +644,11 @@ class User_rolle_afTests(TestCase):
 			themeneigentuemer = 'Ihmchen_01',
 		)
 
+		TblOrga.objects.create (
+			team = 'Django-Team-02',
+			themeneigentuemer = 'Ihmchen_02',
+		)
+
 		TblAfliste.objects.create (
 			af_name = 			'rva_01219_beta91_job_abst',
 			neu_ab = 			timezone.now(),
@@ -835,16 +840,20 @@ class User_rolle_afTests(TestCase):
 	# Gibt es den "Konzept" Button?
 	def test_panel_view_contains_link_to_konzept_view(self):
 		url = reverse('user_rolle_af')
-		konzept_url = reverse('uhr_konzept_ansicht')
+		konzept_url = reverse('uhr_konzept')
+		response = self.client.get(url)
+		self.assertContains(response, 'href="{0}?"'.format(konzept_url))
+	def test_panel_view_contains_link_to_matrix_view(self):
+		url = reverse('user_rolle_af')
+		konzept_url = reverse('uhr_matrix')
 		response = self.client.get(url)
 		self.assertContains(response, 'href="{0}?"'.format(konzept_url))
 	def test_panel_view_contains_no_user_first(self):
 		url = reverse('user_rolle_af')
-		konzept_url = reverse('uhr_konzept_ansicht')
 		response = self.client.get(url)
 		self.assertContains(response, 'Kein User selektiert', 1)
 	def test_panel_view_use_konzept_view(self):
-		url = reverse('uhr_konzept_ansicht')
+		url = reverse('uhr_konzept')
 		pdf_url = reverse('uhr_konzept_pdf')
 		response = self.client.get(url)
 		self.assertContains(response, 'href="{0}?"'.format(pdf_url))
@@ -855,6 +864,16 @@ class User_rolle_afTests(TestCase):
 		self.assertContains(response, 'Das ist auch eine Testrolle', 1)
 		self.assertContains(response, 'Testsystem', 1)
 		self.assertContains(response, 'Irgendein System', 1)
+	def test_panel_view_use_matrix_view(self):
+		url = reverse('uhr_matrix')
+		pdf_url = reverse('uhr_matrix_pdf')
+		response = self.client.get(url)
+		#self.assertContains(response, 'href="{0}?"'.format(pdf_url))
+		self.assertContains(response, '<small>Erste Neue Rolle</small>', 1)
+		self.assertContains(response, '<small>Zweite Neue Rolle</small>', 1)
+		self.assertContains(response, 'User_xv13254', 2)
+		self.assertContains(response, 'Schwerpunkt', 1)
+		self.assertContains(response, 'Vertretung', 1)
 
 	# Suche nach dem User und ob seiner UserID mindestens eine Rolle zugeodnet ist.
 	# Falls ja, suche weiter nach der Liste der AFen zu der Rolle (Auszug).

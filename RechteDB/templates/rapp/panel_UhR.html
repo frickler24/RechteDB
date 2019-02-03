@@ -78,6 +78,10 @@
 										aria-expanded="false" aria-controls="rolle_{{ rolle }}">
 									{{ rolle }}
 								</button>
+								<a target="_blank"
+										href="/adminrapp/tbluserhatrolle/{{ rolle }}/change/?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&user={{ id }}">
+									<img src="{% static 'icons8-neu-erstellen-64.png' %}" width="25rem" />
+								</a>
 							</td>
 							<td>
 								<input type="text" class="form-control col-12 col-sm-6 col-md-4 col-lg-4 col-xl-12"
