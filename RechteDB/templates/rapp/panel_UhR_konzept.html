@@ -23,12 +23,13 @@
 					<p>{{ form.non_field_errors }}</p>
 				{% endif %}
 			</div>
-			<div>
-				<a href="{% url 'uhr_konzept_pdf' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
-				   class="btn btn-success btn-sm" role="button"
-				   target="_blank" style="width:100%">
-					<i class="fa fa-download"></i>Erzeuge PDF
-				</a>
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<a href="{% url 'uhr_konzept_pdf' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
+					   class="btn btn-outline-primary btn-sm" role="button"
+					   target="_blank">Erzeuge PDF
+					</a>
+				</div>
 			</div>
 
 			<div>
