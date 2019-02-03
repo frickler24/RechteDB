@@ -208,11 +208,98 @@ class TblOrgaDelete(LoginRequiredMixin, DeleteView):
 	model = TblOrga
 	success_url = reverse_lazy('teamliste')
 
+###################################################################
+# Zuordnungen der Rollen zu den Usern (TblUserHatRolle ==> UhR)
+class UhRCreate(LoginRequiredMixin, CreateView):
+	"""
+	Erzeugt einen neue Rolle für einen User.
+	Die Rolle kann eine bestehende oder eine neu definierte Rolle sein.
+	"""
+	model = TblUserhatrolle
+	template_name = 'rapp/uhr_form.html'
+	form_class = CreateUhRForm
+
+	def get_context_data(self, **kwargs):
+		# Call the base implementation first to get a context
+		context = super().get_context_data(**kwargs)
+		context['userid'] = self.kwargs['userid']
+		user_entry = TblUserIDundName.objects.filter(userid__istartswith=self.kwargs['userid'])[0]
+		context['username'] = user_entry
+		return context
+
+	def get_form_kwargs(self):
+		kwargs = super(UhRCreate, self).get_form_kwargs()
+		kwargs['userid'] = self.kwargs['userid']
+		return kwargs
+
+	# Im Erfolgsfall soll die vorherige Selektion im Panel "User und Rollen" wieder aktualisiert gezeigt werden.
+	# Dazu werden nebem dem URL-Stamm die Nummer des anzuzeigenden Users sowie die gesetzte Suchparameter benötigt.
+	def get_success_url(self):
+		usernr = self.request.GET.get('user', 0) # Sicherheitshalber - falls mal kein User angegeben ist
+
+		urlparams = "%s?"
+		for k in self.request.GET.keys():
+			if (k != 'user' and self.request.GET[k] != ''):
+				urlparams += "&" + k + "=" + self.request.GET[k]
+		url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
+		# print (url)
+		return url
+class UhRDelete(LoginRequiredMixin, DeleteView):
+	"""Löscht die Zuordnung einer Rollen zu einem User."""
+	model = TblUserhatrolle
+	template_name = 'rapp/uhr_confirm_delete.html'
+
+	# Im Erfolgsfall soll die vorherige Selektion im Panel "User und RolleN" wieder aktualisiert gezeigt werden.
+	# Dazu werden nebem dem URL-Stamm die Nummer des anzuzeigenden Users sowie die gesetzte Suchparameter benötigt.
+	def get_success_url(self):
+		usernr = self.request.GET.get('user', 0) # Sicherheitshalber - falls mal kein User angegeben ist
+
+		urlparams = "%s?"
+		for k in self.request.GET.keys():
+			if (k != 'user' and self.request.GET[k] != ''):
+				urlparams += "&" + k + "=" + self.request.GET[k]
+		url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
+		return url
+class UhRUpdate(LoginRequiredMixin, UpdateView):
+	"""Ändert die Zuordnung von Rollen zu einem User."""
+	# ToDo: Hierfür gibt es noch keine Buttons.
+	model = TblUserhatrolle
+	fields = '__all__'
+
+	# Im Erfolgsfall soll die vorherige Selektion im Panel "User und RolleN" wieder aktualisiert gezeigt werden.
+	# Dazu werden nebem dem URL-Stamm die Nummer des anzuzeigenden Users sowie die gesetzte Suchparameter benötigt.
+	def get_success_url(self):
+		usernr = self.request.GET.get('user', 0) # Sicherheitshalber - falls mal kein User angegeben ist
+
+		urlparams = "%s?"
+		for k in self.request.GET.keys():
+			if (k != 'user' and self.request.GET[k] != ''):
+				urlparams += "&" + k + "=" + self.request.GET[k]
+		url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
+		# print (url)
+		return url
+
+# Paginierung nach Tutorial - Aufteilung langer Seiten in mehrere
+def pagination(request, liste, psize=20):
+	pagesize = request.GET.get('pagesize')
+	if type(pagesize) == type(None) or pagesize == '' or int(pagesize) < 1:
+		pagesize = psize  # default, kann man von außen übersteuern
+	else:
+		pagesize = int(pagesize)
+	paginator = Paginator(liste, pagesize)
+	page = request.GET.get('page', 1)
+	try:
+		pages = paginator.page(page)
+	except PageNotAnInteger:
+		pages = paginator.page(1)
+	except EmptyPage:
+		pages = paginator.page(paginator.num_pages)
+
+	return (paginator, pages, pagesize)
 
 
 ###################################################################
 # Panel geht direkt auf die Gesamt-Datentabelle
-
 @login_required
 def panel(request):
 	"""
@@ -225,21 +312,7 @@ def panel(request):
 	panel_filter = PanelFilter(request.GET, queryset=panel_list)
 	panel_list = panel_filter.qs
 
-	pagesize = request.GET.get('pagesize')
-	if pagesize is None or pagesize == "" or int(pagesize) < 1:
-		pagesize = 20
-	else:
-		pagesize = int(pagesize)
-
-	paginator = Paginator(panel_list, pagesize)
-	page = request.GET.get('page', 1)
-	try:
-		pages = paginator.page(page)
-	except PageNotAnInteger:
-		pages = paginator.page(1)
-	except EmptyPage:
-		pages = paginator.page(paginator.num_pages)
-
+	(paginator, pages, pagesize) = pagination(request, panel_list)
 	context = {
 		'paginator': paginator,
 		'filter': panel_filter,

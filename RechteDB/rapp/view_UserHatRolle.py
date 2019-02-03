@@ -17,7 +17,6 @@ from django.urls import reverse
 
 # Imports für die Selektions-Views panel, selektion u.a.
 from django.shortcuts import render, redirect
-from django.core.paginator import Paginator
 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
@@ -26,7 +25,7 @@ from django.utils import timezone
 from django import forms
 
 from .filters import PanelFilter, UseridFilter
-from .views import version
+from .views import version, pagination
 from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportForm_schritt3
 from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, TblUserhatrolle, \
 					Tblrechteneuvonimport, Tblrechteamneu
@@ -172,6 +171,7 @@ def UhR_erzeuge_listen(request):
 
 	return (namen_liste, panel_liste, panel_filter)
 
+# Selektiere die erforderlichen User- und Berefchtigungsdaten
 def Uhr_hole_daten(panel_liste, id):
 	"""
 	Selektiere alle Userids und alle Namen in TblUserHatRolle, die auch in der Selektion vorkommen
@@ -237,65 +237,7 @@ def Uhr_hole_daten(panel_liste, id):
 	return (userHatRolle_liste, selektierter_name, userids, usernamen,
 			selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID)
 
-def pagination(request, namen_liste):
-	"""Paginierung nach Tutorial"""
-	pagesize = request.GET.get('pagesize')
-	if type(pagesize) == type(None) or pagesize == '' or int(pagesize) < 1:
-		pagesize = 100  # Eigentlich sollte hier nie gepaged werden, dient nur dem Schutz vor Fehlabfragen
-	else:
-		pagesize = int(pagesize)
-	paginator = Paginator(namen_liste, pagesize)
-	page = request.GET.get('page', 1)
-	try:
-		pages = paginator.page(page)
-	except PageNotAnInteger:
-		pages = paginator.page(1)
-	except EmptyPage:
-		pages = paginator.page(paginator.num_pages)
-
-	return (paginator, pages, pagesize)
-
-@login_required
-def panel_UhR(request, id = 0):
-	"""
-	Finde alle relevanten Informationen zur aktuellen Selektion:
-
-	:param request: GET oder POST Request vom Browser
-	:param pk: ID des XV-UserID-Eintrags, zu dem die Detaildaten geliefert werden sollen
-	:return: Gerendertes HTML
-	"""
-
-	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
-
-	if request.method == 'POST':
-		form = ShowUhRForm(request.POST)
-		print ('Irgendwas ist im panel_UhR über POST angekommen')
-
-		if form.is_valid():
-			return redirect('home')  # TODO: redirect ordentlich machen oder POST-Teil entfernen
-	else:
-		(userHatRolle_liste, selektierter_name, userids, usernamen,
-		 selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID) \
-			= Uhr_hole_daten(panel_liste, id)
-		(paginator, pages, pagesize) = pagination(request, namen_liste)
-
-	form = ShowUhRForm(request.GET)
-	context = {
-		'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
-		'filter': panel_filter,
-		'userids': userids, 'usernamen': usernamen, 'afmenge': afmenge,
-		'userHatRolle_liste': userHatRolle_liste,
-		'id': id,
-		'form': form,
-		'selektierter_name': selektierter_name,
-		'selektierte_userid': selektierte_haupt_userid,
-		'selektierte_userids': selektierte_userids,
-		'afmenge_je_userID': afmenge_je_userID,
-		'version': version,
-	}
-	return render(request, 'rapp/panel_UhR.html', context)
-
-# Funktionenzum Erstellen des Berechtigungskonzepts
+# Funktionen zum Erstellen des Berechtigungskonzepts
 def UhR_verdichte_daten(panel_liste):
 	"""
 	Ausgehend von den Userids der Selektion zeige
@@ -325,13 +267,57 @@ def UhR_verdichte_daten(panel_liste):
 	def order(a): return a.rollenname.lower() 	# Liefert das kleingeschriebene Element, nach dem sortiert werden soll
 	return (sorted(list(rollenMenge), key=order), userids, usernamen)
 
+
+# Die beidnen nachfolgenden Funktionen dienen nur dem Aufruf der eigentlichen Konzept-Funktion
 @login_required
 def panel_UhR_konzept_pdf(request):
 	return UhR_konzept(request, False)
 
+@login_required
 def panel_UhR_konzept_ansicht(request):
 	return UhR_konzept(request, True)
 
+# Zeige das Selektionspanel
+def panel_UhR(request, id = 0):
+	"""
+	Finde alle relevanten Informationen zur aktuellen Selektion:
+
+	:param request: GET oder POST Request vom Browser
+	:param pk: ID des XV-UserID-Eintrags, zu dem die Detaildaten geliefert werden sollen
+	:return: Gerendertes HTML
+	"""
+
+	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
+
+	if request.method == 'POST':
+		form = ShowUhRForm(request.POST)
+		print ('Irgendwas ist im panel_UhR über POST angekommen')
+
+		if form.is_valid():
+			return redirect('home')  # TODO: redirect ordentlich machen oder POST-Teil entfernen
+	else:
+		(userHatRolle_liste, selektierter_name, userids, usernamen,
+		 selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID) \
+			= Uhr_hole_daten(panel_liste, id)
+		(paginator, pages, pagesize) = pagination(request, namen_liste, 10000)
+
+	form = ShowUhRForm(request.GET)
+	context = {
+		'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
+		'filter': panel_filter,
+		'userids': userids, 'usernamen': usernamen, 'afmenge': afmenge,
+		'userHatRolle_liste': userHatRolle_liste,
+		'id': id,
+		'form': form,
+		'selektierter_name': selektierter_name,
+		'selektierte_userid': selektierte_haupt_userid,
+		'selektierte_userids': selektierte_userids,
+		'afmenge_je_userID': afmenge_je_userID,
+		'version': version,
+	}
+	return render(request, 'rapp/panel_UhR.html', context)
+
+# Erzeuge das Berechtiogungskonzept für Anzeige und PDF
 def	UhR_konzept(request, ansicht):
 	"""
 	Erzege das Berechtigungskonzept für eine Menge an selektierten Identitäten.
