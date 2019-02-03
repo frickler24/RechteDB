@@ -623,6 +623,8 @@ def	UhR_konzept(request, ansicht):
 	else:
 		(rollenMenge, userids, usernamen) = (set(), set(), set())
 
+	(paginator, pages, pagesize) = pagination(request, namen_liste)
+
 	if request.GET.get('display') == '1':
 			print('rollenMenge')
 			print(rollenMenge)
@@ -636,6 +638,7 @@ def	UhR_konzept(request, ansicht):
 				print(a)
 
 	context = {
+		'paginator': paginator, 'pages': pages, 'pagesize': 20,
 		'filter': panel_filter,
 		'rollenMenge': rollenMenge,
 		'version': version,

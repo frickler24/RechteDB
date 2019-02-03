@@ -32,10 +32,7 @@
 				<div class="form-group-sm col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4 mt-3 pt-3">
 					<button type="submit" class="btn btn-primary btn-sm">Suche</button>
 					<a href="{% url 'uhr_konzept_ansicht' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
-						class="btn btn-outline-success btn-sm" role="button">Ansicht
-					</a>
-					<a href="{% url 'uhr_konzept_pdf' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
-						class="btn btn-outline-success btn-sm" role="button">PDF
+						class="btn btn-outline-success btn-sm" role="button">Konzept
 					</a>
 					<a href="{% url 'home' %}"
 						class="btn btn-outline-secondary btn-sm"
