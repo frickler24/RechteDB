@@ -188,7 +188,7 @@ def UhR_hole_daten(panel_liste, id):
 	userids = set()		# Die UserIDs aller User,  die in der Selektion erfasst werden
 	afmenge = set()		# Die Menge aller AFs aller mit ID spezifizierten User (für Berechtigungskonzept)
 	selektierte_userids = set()	# Die Liste der UserIDs, die an Identität ID hängen
-	afmenge_je_userID = {}	# Menge mit USERID-spezifischen AF-Listen
+	afmenge_je_userID = {}	# Menge mit UserID-spezifischen AF-Listen
 
 	for row in panel_liste:
 		usernamen.add(row.name)  # Ist Menge, also keine Doppeleinträge möglich
@@ -220,7 +220,8 @@ def UhR_hole_daten(panel_liste, id):
 		for e in afliste:
 			afmenge.add(e.enthalten_in_af)  # Filtern der AFen aus der Treffermenge
 
-		# Erzeuge zunächst die Hashes für die UserIDs. daran werden nachher die Listen der Rechte gehängt
+		# Erzeuge zunächst die Hashes für die UserIDs.
+		# Daran werden nachher die Listen der Rechte gehängt.
 		for uid in selektierte_userids:
 			afmenge_je_userID[uid] = set()
 
@@ -228,7 +229,7 @@ def UhR_hole_daten(panel_liste, id):
 		for uid in selektierte_userids:
 			tmp_afliste = TblUserIDundName.objects.get(userid = uid).tblgesamt_set.all()  # Das QuerySet
 			for e in tmp_afliste:
-				afmenge_je_userID[uid].add(e.enthalten_in_af)  # Element and die UserID-spezifische Liste hängen
+				afmenge_je_userID[uid].add(e.enthalten_in_af)  # Element an die UserID-spezifische Liste hängen
 	else:
 		userHatRolle_liste = []
 		selektierter_name = -1
@@ -266,7 +267,6 @@ def UhR_verdichte_daten(panel_liste):
 
 	def order(a): return a.rollenname.lower() 	# Liefert das kleingeschriebene Element, nach dem sortiert werden soll
 	return (sorted(list(rollenMenge), key=order), userids, usernamen)
-
 
 # Die beidnen nachfolgenden Funktionen dienen nur dem Aufruf der eigentlichen Konzept-Funktion
 @login_required
@@ -321,9 +321,10 @@ def panel_UhR(request, id = 0):
 # Erzeuge das Berechtiogungskonzept für Anzeige und PDF
 def	UhR_konzept(request, ansicht):
 	"""
-	Erzege das Berechtigungskonzept für eine Menge an selektierten Identitäten.
+	Erzeuge das Berechtigungskonzept für eine Menge an selektierten Identitäten.
 
 	:param request: GET Request vom Browser
+	:param ansicht: Flag, ob die Daten als HTML zur Ansicht oder als PDF zum Download geliefert werden sollen
 	:return: Gerendertes HTML
 	"""
 
@@ -350,7 +351,7 @@ def	UhR_konzept(request, ansicht):
 				print(a)
 
 	context = {
-		'paginator': paginator, 'pages': pages, 'pagesize': 20,
+		'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
 		'filter': panel_filter,
 		'rollenMenge': rollenMenge,
 		'version': version,
@@ -361,14 +362,14 @@ def	UhR_konzept(request, ansicht):
 	pdf = render_to_pdf('rapp/panel_UhR_konzept_pdf.html', context)
 	if pdf:
 		response = HttpResponse(pdf, content_type='application/pdf')
-		filename = "Berechtigungskonzept_%s.pdf" % ("erstmalnurtest_123")
+		filename = "Berechtigungskonzept_%s.pdf" % ("hierMussNochEinVernünftigerNameHin")
 		content = "inline; filename='%s'" % (filename)
 		download = request.GET.get("download")
 		if download:
 			content = "attachment; filename='%s'" % (filename)
 		response['Content-Disposition'] = content
 		return response
-	return HttpResponse("Fehlerhafte PDF-Generierung")
+	return HttpResponse("Fehlerhafte PDF-Generierung in UhR_konzept")
 
 # Die beidnen nachfolgenden Funktionen dienen nur dem Aufruf der eigentlichen Matrix-Erstellungs-Funktion
 @login_required
@@ -379,5 +380,91 @@ def panel_UhR_matrix_pdf(request):
 def panel_UhR_matrix(request):
 	return UhR_matrix(request, True)
 
-def UhR_matrix(request, anzeige):
-	pass
+# Funktionen zum Erstellen des Funktionsmatrix
+def UhR_erzeuge_matrixdaten(panel_liste):
+	"""
+	Überschriften-Block:
+		Erste Spaltenüberschrift ist "Name" als String, darunter werden die Usernamen liegen, daneben:
+		Ausgehend von den Userids der Selektion zeige
+			die Liste der Rollen alle nebeneinander als Spaltenüberschriften
+	Zeileninhalte:
+		Für jeden User (nur die XV-User zeigen auf Rollen, deshalb nehmen wir nur diese)
+			zeige den Usernamen sowie in jeder zu dem User passenden Rolle die Art der Verwendung (S/V/A)
+				in Kurz- oder Langversion, je nach Flag
+
+	Zunächst benötigen wir für alle userIDs (sind nur die XV-Nummern) aus dem Panel alle Rollen
+
+	"""
+	usernamen = set()	# Die Namen aller User,  die in der Selektion erfasst werden
+	rollenmenge = set()		# Die Menge aller AFs aller spezifizierten User (aus Auswahl-Panel)
+	rollen_je_username = {} # Die Rollen, die zum Namen gehören
+
+	for row in panel_liste:
+		usernamen.add(row.name)
+
+		# Erzeuge zunächst die Hashes für die UserIDs. Daran werden nachher die Listen der Rechte gehängt.
+		rollen_je_username[row.name] = set()
+
+		# Hole die Liste der Rollen für den User, die XV-UserID steht im Panel
+		rollen = TblUserhatrolle.objects.filter(userid = row.userid).all()
+
+		for rolle in rollen:
+			info = (rolle.rollenname, rolle.schwerpunkt_vertretung)
+			rollen_je_username[row.name].add(info)
+			rollenmenge.add(rolle.rollenname)
+
+	return (usernamen, rollenmenge, rollen_je_username)
+
+def UhR_matrix(request, ansicht):
+	"""
+	Erzeuge eine Verantwortungsmatrix für eine Menge an selektierten Identitäten.
+
+	:param request: GET Request vom Browser
+	:param ansicht: Flag, ob die Daten als HTML zur Ansicht oder als PDF zum Download geliefert werden sollen
+	:return: Gerendertes HTML
+	"""
+
+	# Erst mal die relevanten User-Listen holen - sie sind abhängig von Filtereinstellungen
+	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
+
+	if request.method == 'GET':
+		(usernamen, rollenmenge, rollen_je_username) = UhR_erzeuge_matrixdaten(panel_liste)
+	else:
+		(usernamen, rollenmenge, rollen_je_username) = (set(), set(), set())
+
+	(paginator, pages, pagesize) = pagination(request, namen_liste)
+
+	if request.GET.get('display') == '1':
+			print('usernamen')
+			print(usernamen)
+
+			print('rollenmenge')
+			for a in rollenmenge:
+				print(a)
+
+			print('rollen_je_username')
+			for a in rollen_je_username:
+				print(a, rollen_je_username[a])
+
+	context = {
+		'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
+		'filter': panel_filter,
+		'usernamen': usernamen,
+		'rollenmenge': rollenmenge,
+		'rollen_je_username': rollen_je_username,
+		'version': version,
+	}
+	if (ansicht):
+		return render(request, 'rapp/panel_UhR_matrix.html', context)
+
+	pdf = render_to_pdf('rapp/panel_UhR_matrix_pdf.html', context)
+	if pdf:
+		response = HttpResponse(pdf, content_type='application/pdf')
+		filename = "Berechtigungskonzept_%s.pdf" % ("hierMussNochEinVernünftigerNameHin")
+		content = "inline; filename='%s'" % (filename)
+		download = request.GET.get("download")
+		if download:
+			content = "attachment; filename='%s'" % (filename)
+		response['Content-Disposition'] = content
+		return response
+	return HttpResponse("Fehlerhafte PDF-Generierung in UhR_matrix")

@@ -6,7 +6,8 @@
 
 {% block breadcrumb %}
 	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
-	<li class="breadcrumb-item active">User, Rollen und Arbeitsplatzfunktionen</li>
+	<li class="breadcrumb-item"><a href="{% url 'user_rolle_af' %}">User, Rollen und Arbeitsplatzfunktionen</a></li>
+	<li class="breadcrumb-item active">Berechtigungskonzept - Rollen- und AF-Übersicht</li>
 {% endblock breadcrumb %}
 
 {% block title %}
@@ -35,12 +36,8 @@
 			<div>
 				<table class="table table-striped table-sm">
 					<thead>
-						<tr>
-							<td>&nbsp;</td>
-							<td>&nbsp;</td>
-							<td>&nbsp;</td>
-							<td>&nbsp;</td>
-							<td>&nbsp;</td>
+						<tr> {# Erzeuge die Tabelle mit 5 Spalten, damit wir nachher geschachtelte Sichten erhalten #}
+							<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
 						</tr>
 						<tr class="bg-primary text-left">
 							<th colspan="3">Rollennname</th>
