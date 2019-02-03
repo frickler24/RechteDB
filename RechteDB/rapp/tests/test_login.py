@@ -3,7 +3,7 @@ from django.test import TestCase
 from ..anmeldung import Anmeldung
 
 from ..models import TblOrga, TblUebersichtAfGfs, TblUserIDundName, TblPlattform, TblGesamt, \
-	TblAfliste, TblUserhatrolle, TblRollehataf, TblRollen, Tblrechteneuvonimport
+	TblAfliste, TblUserhatrolle, TblRollehataf, TblRollen
 
 from datetime import datetime, timedelta
 from django.utils import timezone
