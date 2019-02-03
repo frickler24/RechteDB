@@ -835,16 +835,16 @@ class User_rolle_afTests(TestCase):
 	# Gibt es den "Konzept" Button?
 	def test_panel_view_contains_link_to_konzept_view(self):
 		url = reverse('user_rolle_af')
-		konzept_url = reverse('uhr_konzept_ansicht')
+		konzept_url = reverse('uhr_konzept')
 		response = self.client.get(url)
 		self.assertContains(response, 'href="{0}?"'.format(konzept_url))
 	def test_panel_view_contains_no_user_first(self):
 		url = reverse('user_rolle_af')
-		konzept_url = reverse('uhr_konzept_ansicht')
+		konzept_url = reverse('uhr_konzept')
 		response = self.client.get(url)
 		self.assertContains(response, 'Kein User selektiert', 1)
 	def test_panel_view_use_konzept_view(self):
-		url = reverse('uhr_konzept_ansicht')
+		url = reverse('uhr_konzept')
 		pdf_url = reverse('uhr_konzept_pdf')
 		response = self.client.get(url)
 		self.assertContains(response, 'href="{0}?"'.format(pdf_url))

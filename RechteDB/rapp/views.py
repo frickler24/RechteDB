@@ -604,7 +604,7 @@ def UhR_verdichte_daten(panel_liste):
 def panel_UhR_konzept_pdf(request):
 	return UhR_konzept(request, False)
 
-def panel_UhR_konzept_ansicht(request):
+def panel_UhR_konzept(request):
 	return UhR_konzept(request, True)
 
 def	UhR_konzept(request, ansicht):
@@ -657,6 +657,16 @@ def	UhR_konzept(request, ansicht):
 		response['Content-Disposition'] = content
 		return response
 	return HttpResponse("Fehlerhafte PDF-Generierung")
+
+
+def panel_UhR_matrix(request):
+	return UhR_matrix(request, True)
+def UhR_matrix(request):
+	pass
+def panel_UhR_matrix_pdf(request):
+	return UhR_matrix(request, False)
+def UhR_matrix_pdf(request):
+	pass
 
 ###################################################################
 # Dialogsteuerung für den Import einer neuen IIQ-Datenliste (csv-Datei)

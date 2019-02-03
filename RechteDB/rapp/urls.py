@@ -70,12 +70,14 @@ urlpatterns += [
 
 # Der Link auf das Eingabepanel zur freien Selektion auf der Usertabelle mit Änderungslink
 urlpatterns += [
-	path('user_rolle_af/<int:pk>/delete/', views.UhRDelete.as_view(), name='user_rolle_af-delete'),
-	path('user_rolle_af/<int:id>/', views.panel_UhR, name='user_rolle_af_parm'),
-	path('user_rolle_af/create/<str:userid>/', views.UhRCreate.as_view(), name='user_rolle_af-create' ),
-	path('user_rolle_af/konzept_ansicht/', views.panel_UhR_konzept_ansicht, name='uhr_konzept_ansicht'),
-	path('user_rolle_af/konzept_pdf/', views.panel_UhR_konzept_pdf, name='uhr_konzept_pdf'),
-	path('user_rolle_af/', views.panel_UhR, name='user_rolle_af'),
+	path('user_rolle_af/<int:pk>/delete/', 		views.UhRDelete.as_view(), 			name='user_rolle_af-delete'),
+	path('user_rolle_af/<int:id>/', 			views.panel_UhR, 					name='user_rolle_af_parm'),
+	path('user_rolle_af/create/<str:userid>/',	views.UhRCreate.as_view(), 			name='user_rolle_af-create' ),
+	path('user_rolle_af/konzept/', 				views.panel_UhR_konzept,			name='uhr_konzept'),
+	path('user_rolle_af/konzept_pdf/', 			views.panel_UhR_konzept_pdf, 		name='uhr_konzept_pdf'),
+	path('user_rolle_af/matrix/', 				views.panel_UhR_matrix, 			name='uhr_matrix'),
+	path('user_rolle_af/matrix_pdf/', 			views.panel_UhR_matrix_pdf, 		name='uhr_matrix_pdf'),
+	path('user_rolle_af/', 						views.panel_UhR, 					name='user_rolle_af'),
 ]
 
 # URl zum Importieren neuer Daten aus IIQ (csv-File)
