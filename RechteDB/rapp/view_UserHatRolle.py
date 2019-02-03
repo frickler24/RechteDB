@@ -130,7 +130,7 @@ def UhR_erzeuge_listen(request):
 	panel_liste = TblUserIDundName.objects.filter(geloescht=False).order_by('name')
 	panel_filter = UseridFilter(request.GET, queryset=panel_liste)
 	namen_liste = panel_filter.qs.filter(userid__istartswith="xv")
-	panel_liste = panel_filter.qs.select_related("orga")
+	panel_liste = panel_filter.qs.filter(userid__istartswith="xv").select_related("orga")
 
 	"""
 	# Ein paar Testzugriffe über das komplette Modell
@@ -408,12 +408,16 @@ def UhR_erzeuge_matrixdaten(panel_liste):
 		# Hole die Liste der Rollen für den User, die XV-UserID steht im Panel
 		rollen = TblUserhatrolle.objects.filter(userid = row.userid).all()
 
+		# Merke die Rollen je Usernamen (also global für alle UserIDs der Identität)
+		# sowie die Menge aller gefundenen Rollennamen
+		# Achtung: rolle ist nur eine für den User spezifische Linknummer auf das Rollenobjekt.
 		for rolle in rollen:
 			info = (rolle.rollenname, rolle.schwerpunkt_vertretung)
 			rollen_je_username[row.name].add(info)
 			rollenmenge.add(rolle.rollenname)
 
-	return (usernamen, rollenmenge, rollen_je_username)
+	def order(a): return a.rollenname.lower() 	# Liefert das kleingeschriebene Element, nach dem sortiert werden soll
+	return (sorted(usernamen), sorted(list(rollenmenge), key=order), rollen_je_username)
 
 def UhR_matrix(request, ansicht):
 	"""
