@@ -266,21 +266,7 @@ def panelDownload(request):
 	panel_filter = PanelFilter(request.GET, queryset=panel_list)
 	panel_list = panel_filter.qs
 
-	pagesize = request.GET.get('pagesize')
-	if pagesize is None or pagesize == "" or int(pagesize) < 1:
-		pagesize = 20
-	else:
-		pagesize = int(pagesize)
-
-	paginator = Paginator(panel_list, 100000)
-	page = request.GET.get('page', 1)
-	try:
-		pages = paginator.page(page)
-	except PageNotAnInteger:
-		pages = paginator.page(1)
-	except EmptyPage:
-		pages = paginator.page(paginator.num_pages)
-
+	(paginator, pages, pagesize) = pagination(request, panel_list, 100000)
 	context = {
 		'paginator': paginator,
 		'filter': panel_filter,

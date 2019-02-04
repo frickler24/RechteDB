@@ -866,9 +866,9 @@ class User_rolle_afTests(TestCase):
 		self.assertContains(response, 'Irgendein System', 1)
 	def test_panel_view_use_matrix_view(self):
 		url = reverse('uhr_matrix')
-		pdf_url = reverse('uhr_matrix_pdf')
+		pdf_url = reverse('uhr_matrix_csv')
 		response = self.client.get(url)
-		#self.assertContains(response, 'href="{0}?"'.format(pdf_url))
+		self.assertContains(response, 'href="{0}?"'.format(pdf_url))
 		self.assertContains(response, '<small>Erste Neue Rolle</small>', 1)
 		self.assertContains(response, '<small>Zweite Neue Rolle</small>', 1)
 		self.assertContains(response, 'User_xv13254', 2)

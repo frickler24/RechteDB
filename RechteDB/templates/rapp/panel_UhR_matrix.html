@@ -47,14 +47,18 @@
 				{% endif %}
 			</div>
 			<div class="container">
-				{% comment %}
-				<div class="row justify-content-md-center">
-					<a href="{% url 'uhr_matrix_pdf' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
-					   class="btn btn-outline-primary btn-sm" role="button"
-					   target="_blank">Erzeuge PDF
-					</a>
+				<div  class="row justify-content-md-center">
+					<div class="col">
+						<a href="{% url 'uhr_matrix_csv' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
+						   class="btn btn-outline-primary btn-sm" role="button"
+						   target="_blank">Download csv ausführlich
+						</a>
+						<a href="{% url 'uhr_matrix_csv' %}kompakt/?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
+						   class="btn btn-outline-primary btn-sm" role="button"
+						   target="_blank">Download csv kompakt
+						</a>
+					</div>
 				</div>
-				{% endcomment %}
 			</div>
 
 			<div>

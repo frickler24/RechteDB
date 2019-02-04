@@ -77,7 +77,9 @@ urlpatterns += [
 	path('user_rolle_af/konzept/', 				view_UserHatRolle.panel_UhR_konzept,		name='uhr_konzept'),
 	path('user_rolle_af/konzept_pdf/', 			view_UserHatRolle.panel_UhR_konzept_pdf, 	name='uhr_konzept_pdf'),
 	path('user_rolle_af/matrix/', 				view_UserHatRolle.panel_UhR_matrix, 		name='uhr_matrix'),
-	path('user_rolle_af/matrix_pdf/', 			view_UserHatRolle.panel_UhR_matrix_pdf, 	name='uhr_matrix_pdf'),
+	path('user_rolle_af/matrix_csv/', 			view_UserHatRolle.panel_UhR_matrix_csv, 	name='uhr_matrix_csv'),
+	path('user_rolle_af/matrix_csv/<str:flag>/',
+		 										view_UserHatRolle.panel_UhR_matrix_csv, 	name='uhr_matrix_csv'),
 	path('user_rolle_af/', 						view_UserHatRolle.panel_UhR, 				name='user_rolle_af'),
 ]
 

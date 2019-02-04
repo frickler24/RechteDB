@@ -1,16 +1,6 @@
 from __future__ import unicode_literals
 # Create your views here.
 
-from django.http import HttpResponseRedirect, HttpResponse
-
-# Imports für die Selektions-Views panel, selektion u.a.
-from django.shortcuts import render, redirect
-from django.core.paginator import Paginator
-
-from django.contrib.auth.decorators import login_required
-
-from django.shortcuts import get_object_or_404
-from django.views import generic, View
 
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
@@ -19,10 +9,7 @@ from django.urls import reverse
 from django.shortcuts import render, redirect
 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic.list import ListView
-from django.urls import reverse_lazy
-from django.utils import timezone
-from django import forms
+import csv
 
 from .filters import PanelFilter, UseridFilter
 from .views import version, pagination
@@ -33,6 +20,7 @@ from .xhtml2 import render_to_pdf
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from .templatetags.gethash import finde
 
 ###################################################################
 # Zuordnungen der Rollen zu den Usern (TblUserHatRolle ==> UhR)
@@ -371,15 +359,6 @@ def	UhR_konzept(request, ansicht):
 		return response
 	return HttpResponse("Fehlerhafte PDF-Generierung in UhR_konzept")
 
-# Die beidnen nachfolgenden Funktionen dienen nur dem Aufruf der eigentlichen Matrix-Erstellungs-Funktion
-@login_required
-def panel_UhR_matrix_pdf(request):
-	return UhR_matrix(request, False)
-
-@login_required
-def panel_UhR_matrix(request):
-	return UhR_matrix(request, True)
-
 # Funktionen zum Erstellen des Funktionsmatrix
 def UhR_erzeuge_matrixdaten(panel_liste):
 	"""
@@ -419,7 +398,8 @@ def UhR_erzeuge_matrixdaten(panel_liste):
 	def order(a): return a.rollenname.lower() 	# Liefert das kleingeschriebene Element, nach dem sortiert werden soll
 	return (sorted(usernamen), sorted(list(rollenmenge), key=order), rollen_je_username)
 
-def UhR_matrix(request, ansicht):
+@login_required
+def panel_UhR_matrix(request):
 	"""
 	Erzeuge eine Verantwortungsmatrix für eine Menge an selektierten Identitäten.
 
@@ -458,17 +438,43 @@ def UhR_matrix(request, ansicht):
 		'rollen_je_username': rollen_je_username,
 		'version': version,
 	}
-	if (ansicht):
-		return render(request, 'rapp/panel_UhR_matrix.html', context)
+	return render(request, 'rapp/panel_UhR_matrix.html', context)
 
-	pdf = render_to_pdf('rapp/panel_UhR_matrix_pdf.html', context)
-	if pdf:
-		response = HttpResponse(pdf, content_type='application/pdf')
-		filename = "Berechtigungskonzept_%s.pdf" % ("hierMussNochEinVernünftigerNameHin")
-		content = "inline; filename='%s'" % (filename)
-		download = request.GET.get("download")
-		if download:
-			content = "attachment; filename='%s'" % (filename)
-		response['Content-Disposition'] = content
-		return response
-	return HttpResponse("Fehlerhafte PDF-Generierung in UhR_matrix")
+@login_required
+def panel_UhR_matrix_csv(request, flag = False):
+	"""
+	Exportfunktion für das Filter-Panel zum Selektieren aus der "User und Rollen"-Tabelle).
+	:param request: GET oder POST Request vom Browser
+	:param flag: False oder nicht gegeben -> liefere ausführliche Text, 'kommpakt' -> liefere nur Anfangsbuchstaben
+	:return: Gerendertes HTML mit den CSV-Daten oder eine Fehlermeldung
+	"""
+	if request.method != 'GET':
+		return HttpResponse("Fehlerhafte CSV-Generierung in panel_UhR_matrix_csv")
+
+	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
+	(usernamen, rollenmenge, rollen_je_username) = UhR_erzeuge_matrixdaten(panel_liste)
+
+	response = HttpResponse(content_type="text/csv")
+	response['Content-Distribution'] = 'attachment; filename="matrix.csv"' # ToDo Hänge Datum an Dateinamen an
+
+	headline = ['Name']
+	for r in rollenmenge:
+		headline += [r.rollenname]
+
+	writer = csv.writer(response, delimiter = ',', quotechar = "'")
+	writer.writerow(headline)
+
+	for user in usernamen:
+		line = [user]
+		for rolle in rollenmenge:
+			if flag:
+				wert = list(finde(rollen_je_username[user], rolle))
+				if len(wert) > 0:
+					line += [wert[0]]
+				else:
+					line += ['']
+			else:
+				line += [finde(rollen_je_username[user], rolle)]
+		writer.writerow(line)
+
+	return response
