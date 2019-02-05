@@ -20,7 +20,7 @@ def push_sp(name, sp, procs_schon_geladen):
 	"""
 	# ToDo Das Löschen wirft Warnings im MySQL-Treiber, wenn die SP gar nicht existiert. -> Liste lesen und checken
 	fehler = False
-	loeschstring = format ("DROP PROCEDURE IF EXISTS %s" % name)
+	loeschstring = 'DROP PROCEDURE IF EXISTS {}'.format(name)
 	with connection.cursor() as cursor:
 		try:
 			if procs_schon_geladen:
@@ -28,7 +28,7 @@ def push_sp(name, sp, procs_schon_geladen):
 			cursor.execute (sp)
 		except:
 			e = sys.exc_info()[0]
-			fehler = format("Error: %s" % e)
+			fehler = 'Error in push_sp(): {}'.format(e)
 
 		cursor.close()
 		return fehler
@@ -50,7 +50,7 @@ def call_sp_test():
 			liste = cursor.fetchone()
 		except:
 			e = sys.exc_info()[0]
-			fehler = format("Error: %s" % e)
+			fehler = 'Error: {}'.format(e)
 
 		cursor.close()
 		return fehler or not liste[0] >= 0
@@ -1224,7 +1224,7 @@ def finde_procs():
 			anzahl = cursor.rowcount
 		except:
 			e = sys.exc_info()[0]
-			format("Error in finde_procs: %s" % e)
+			print('Error in finde_procs(): {}'.format(e))
 
 		cursor.close()
 		return anzahl > 0

@@ -115,7 +115,7 @@ def home(request):
 			cursor.callproc("erzeuge_af_liste")  # diese SProc benötigt die Orga nicht als Parameter
 		except:
 			e = sys.exc_info()[0]
-			fehler = format("Error: %s" % e)
+			fehler = 'Error in home(): {}'.format(e)
 			print('Fehler Beim Erstellen der AFListe, StoredProc erzeuge_af_liste', fehler)
 
 		cursor.close()
@@ -451,7 +451,7 @@ def import_csv(request):
 					statistik[line[0]] = line[1]
 			except:
 				e = sys.exc_info()[0]
-				fehler = format("Error: %s" % e)
+				fehler = 'Error in import_schritt1(): {}'.format(e)
 				if s == 1:
 					print ('Fehler in import_schritt1, StoredProc "vorbereitung"', fehler)
 				elif s == 2:
@@ -514,7 +514,7 @@ def import2(request):
 				retval = cursor.fetchall()
 			except:
 				e = sys.exc_info()[0]
-				fehler = format("Error: %s" % e)
+				fehler = 'Error in hole_alles(): {}'.format(e)
 
 			cursor.close()
 			return retval, fehler
@@ -549,7 +549,7 @@ def import2(request):
 				cursor.callproc ("behandleUser") # diese SProc benötigt die Orga nicht als Parameter
 			except:
 				e = sys.exc_info()[0]
-				fehler = format("Error: %s" % e)
+				fehler = 'Error in import_schritt2(): {}'.format(e)
 				print('Fehler in import_schritt2, StoredProc behandleUser', fehler)
 
 			cursor.close()
@@ -608,7 +608,7 @@ def import2_quittung(request):
 			except:
 				e1 = sys.exc_info()[0]
 				e2 = sys.exc_info()[1]
-				fehler = format("Error: %s %s" % e1, e2)
+				fehler = 'Error in import_schritt3(): {} {}'.format(e1, e2)
 				print ('Fehler in import_schritt2, StoredProc behandleUser oder loescheDoppelteRechte oder ueberschreibeModelle', fehler)
 
 			cursor.close()

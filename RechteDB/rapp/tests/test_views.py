@@ -820,8 +820,6 @@ class User_rolle_afTests(TestCase):
 		self.assertContains(response, "User_xv13254")
 		self.assertContains(response, 'icon-yes', 4)
 		self.assertContains(response, 'icon-no', 2)
-
-
 	def test_panel_view_with_invalid_selection_status_code(self):
 		url = '{0}{1}'.format(reverse('user_rolle_af'), '?geloescht=99&zi_organisation=ZZ-XX')
 		response = self.client.get(url)
@@ -976,7 +974,6 @@ class Setup_database(TestCase):
 	def test_setup_database_search_context(self):
 		self.assertContains(self.response, 'Ansonsten: Finger weg, das bringt hier nichts!')
 
-
 	def test_setup_database_csrf(self):
 		self.assertContains(self.response, 'csrfmiddlewaretoken')
 
@@ -984,14 +981,16 @@ class Setup_database(TestCase):
 		url = reverse('stored_procedures')
 		data = {}
 		self.response = self.client.post(url, data)
-		self.assertContains(self.response, 'anzahl_import_elemente war erfolgreich.')
-		self.assertContains(self.response, 'call_anzahl_import_elemente war erfolgreich.')
-		self.assertContains(self.response, 'vorbereitung war erfolgreich.')
-		self.assertContains(self.response, 'neueUser war erfolgreich.')
-		self.assertContains(self.response, 'behandleUser war erfolgreich.')
-		self.assertContains(self.response, 'behandleRechte war erfolgreich.')
-		self.assertContains(self.response, 'loescheDoppelteRechte war erfolgreich.')
-		self.assertContains(self.response, 'setzeNichtAIFlag war erfolgreich.')
+		self.assertContains(self.response, 'anzahl_import_elemente war erfolgreich.', 1)
+		self.assertContains(self.response, 'call_anzahl_import_elemente war erfolgreich.', 1)
+		self.assertContains(self.response, 'vorbereitung war erfolgreich.', 1)
+		self.assertContains(self.response, 'neueUser war erfolgreich.', 1)
+		self.assertContains(self.response, 'behandleUser war erfolgreich.', 1)
+		self.assertContains(self.response, 'behandleRechte war erfolgreich.', 1)
+		self.assertContains(self.response, 'loescheDoppelteRechte war erfolgreich.', 1)
+		self.assertContains(self.response, 'setzeNichtAIFlag war erfolgreich.', 1)
+		self.assertContains(self.response, 'erzeuge_af_liste war erfolgreich.', 1)
+		self.assertContains(self.response, 'ueberschreibeModelle war erfolgreich.', 1)
 
 
 class Import_new_csv_single_record(TestCase):
@@ -1049,15 +1048,15 @@ class Import_new_csv_files_no_input(TestCase):
 		url = reverse('import')
 		self.response = self.client.post(url, {})
 
-	def test_import_no_imput_correct_page(self):
+	def test_import_no_input_correct_page(self):
 		self.assertContains(self.response, 'Auswahl der Organisation und Hochladen der Datei')
 
-	def test_import_no_imput_correct_following_page(self):
+	def test_import_no_input_correct_following_page(self):
 		# Wir landen wieder auf derselben Seite
 		self.assertEquals(self.response.status_code, 200)
 		self.assertContains(self.response, 'Auswahl der Organisation und Hochladen der Datei')
 
-	def test_import_no_imput_form_error(self):
+	def test_import_no_input_form_error(self):
 		# Es muss ein Formfehler erkannt werden
 		form = self.response.context.get('form')
 		self.assertTrue(form.errors)
@@ -1077,19 +1076,17 @@ class Import_new_csv_files_wrong_input(TestCase):
 		url = reverse('import')
 		self.response = self.client.post(url, data)
 
-	def test_import_wrong_imput_correct_page(self):
+	def test_import_wrong_input_correct_page(self):
 		self.assertContains(self.response, 'Auswahl der Organisation und Hochladen der Datei')
 
-	def test_import_wrong_imput_correct_following_page(self):
+	def test_import_wrong_input_correct_following_page(self):
 		# Wir landen wieder auf derselben Seite
 		self.assertEquals(self.response.status_code, 200)
 		self.assertContains(self.response, 'Auswahl der Organisation und Hochladen der Datei')
 
-	def test_import_wrong_imput_form_error(self):
+	def test_import_wrong_input_form_error(self):
 		# Es muss ein Formfehler erkannt werden
 		form = self.response.context.get('form')
 		self.assertTrue(form.errors)
 
-class Concept_Pages(TestCase):
-	pass
 
