@@ -981,7 +981,7 @@ class Setup_database(TestCase):
 		url = reverse('stored_procedures')
 		data = {}
 		self.response = self.client.post(url, data)
-		self.assertContains(self.response, 'anzahl_import_elemente war erfolgreich.', 1)
+		self.assertContains(self.response, 'anzahl_import_elemente war erfolgreich.', 2)
 		self.assertContains(self.response, 'call_anzahl_import_elemente war erfolgreich.', 1)
 		self.assertContains(self.response, 'vorbereitung war erfolgreich.', 1)
 		self.assertContains(self.response, 'neueUser war erfolgreich.', 1)
