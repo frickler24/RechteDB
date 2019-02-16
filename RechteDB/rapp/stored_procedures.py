@@ -1216,7 +1216,9 @@ END
 """
 	return push_sp ('ueberschreibeModelle', sp, procs_schon_geladen)
 
-def finde_procs():
+# Suche nach Stored Procedures in der aktuellen Datenbank
+# return: Anzahl an derzeit geladenen Stored Procedures
+def suche_procs():
 	anzahl = 0  # Wenn die Zahl der Einträge bei SHOW > 0 ist, müssen die Procs jeweils gelöscht werden
 	with connection.cursor() as cursor:
 		try:
@@ -1227,7 +1229,14 @@ def finde_procs():
 			print('Error in finde_procs(): {}'.format(e))
 
 		cursor.close()
-		return anzahl > 0
+		return anzahl
+
+def finde_procs():
+
+		return suche_procs() > 0
+
+def finde_procs_exakt():
+	pass
 
 @login_required
 def handle_stored_procedures(request):
