@@ -18,7 +18,7 @@ class LoginTests(TestCase):
 		self.response = self.client.get(url)
 
 	def test_login_status_code(self):
-		self.assertEquals(self.response.status_code, 200)
+		self.assertEqual(self.response.status_code, 200)
 
 	def test_csrf(self):
 		self.assertContains(self.response, 'csrfmiddlewaretoken')
@@ -690,5 +690,5 @@ class LoginRequiredAndExistingGesamtTests(TestCase):
 
 	def test_redirection(self):
 		login_url = reverse('login')
-		self.assertEquals(self.response.status_code, 200)
+		self.assertEqual(self.response.status_code, 200)
 
