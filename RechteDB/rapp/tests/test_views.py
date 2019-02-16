@@ -26,102 +26,102 @@ class HomeTests(TestCase):
 	def test_home_view_status_code(self):
 		url = reverse('home')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 
 	def test_home_url_resolves_home_view(self):
 		view = resolve('/rapp/')
-		self.assertEquals(view.func, home)
+		self.assertEqual(view.func, home)
 
 
 	# Erreichbarkeit der Admin-Seiten (Simpel-Modus)
 	def test_adminrapp_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 
 	def test_adminrapp_l1_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tbluserhatrolle'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 
 	def test_adminrapp_l2_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tblrollehataf'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 
 	def test_adminrapp_l3_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tblrollen'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 
 	def test_adminrapp_l4_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tbluebersichtafgfs'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 
 	def test_adminrapp_l5_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tbluseridundname'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 
 	def test_adminrapp_l6_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tblorga'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 
 	def test_adminrapp_l7_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tblplattform'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 
 	def test_adminrapp_l8_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tblgesamt'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 
 	def test_adminrapp_l9_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tblsubsysteme'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 
 	def test_adminrapp_l10_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tblsachgebiete'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 
 	def test_adminrapp_l11_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tbldb2'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 
 	""" Diese Admin-Seite ist derzeit nicht aktiv
 	def test_adminrapp_l12_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tblracfgruppen'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 	"""
 
 	def test_adminrapp_l13_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tblafliste'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 
 	def test_adminrapp_l14_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/tblgesamthistorie'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 
 
 	def test_adminrapp_l15_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/racf_rechte'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 
 
 	def test_adminrapp_l16_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp/orga_details'
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 301)
+		self.assertEqual(response.status_code, 301)
 
 
 class GesamtlisteTests(TestCase):
@@ -241,18 +241,18 @@ class GesamtlisteTests(TestCase):
 	def test_gesamtliste_view_status_code(self):
 		url = reverse('gesamtliste')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 
 	def test_gesamtliste_view_not_found_status_code(self):
 		url = reverse('gesamt-detail', kwargs={'pk': 99999999})
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 404)
+		self.assertEqual(response.status_code, 404)
 
 	# Kann das zweite Element direkt adressiert werden?
 	def test_gesamtliste_view_success_status_code(self):
 		url = reverse('gesamt-detail', kwargs={'pk': TblGesamt.objects.get(tf = 'Die superlange schnuckelige TF2').id})
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 
 class TeamListTests(TestCase):
 	def setUp(self):
@@ -264,7 +264,7 @@ class TeamListTests(TestCase):
 	def test_teamlist_view_status_code(self):
 		url = reverse('teamliste')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 class CreateTeamTests(TestCase):
 	# Geht die Team-Liste inhaltlich?
 	def setUp(self):
@@ -275,11 +275,11 @@ class CreateTeamTests(TestCase):
 	def test_create_team_view_success_status_code(self):
 		url = reverse('team-create')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 	"""
 	def test_create_team_url_resolves_new_topic_view(self):
 		view = resolve('/teamliste/create/')
-		self.assertEquals(view.func, TblOrgaCreate.as_view)
+		self.assertEqual(view.func, TblOrgaCreate.as_view)
 	"""
 
 	def test_create_team_view_contains_link_back_to_board_topics_view(self):
@@ -297,7 +297,7 @@ class UserListTests(TestCase):
 	def test_userlist_view_status_code(self):
 		url = reverse('userliste')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 class CreateUserTests(TestCase):
 	# Geht die User-Liste inhaltlich?
 	def setUp(self):
@@ -342,7 +342,7 @@ class CreateUserTests(TestCase):
 	def test_create_user_view_success_status_code(self):
 		url = reverse('user-create')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 
 	def test_create_user_view_contains_link_back_to_board_topics_view(self):
 		new_user_url = reverse('user-create')
@@ -465,24 +465,24 @@ class PanelTests(TestCase):
 	def test_panel_view_status_code(self):
 		url = reverse('panel')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 
 	def test_panel_view_with_valid_selection_status_code(self):
 		url = '{0}{1}'.format(reverse('panel'), '?geloescht=3&userid_name__zi_organisation=ai-ba')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "User_xv10099")
 
 	def test_panel_view_with_invalid_selection1_status_code(self):
 		url = '{0}{1}'.format(reverse('panel'), '?geloescht=99&userid_name__zi_organisation=ZZ-XX')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "Keine Treffer")
 
 	def test_panel_view_with_invalid_selection2_status_code(self):
 		url = '{0}{1}'.format(reverse('panel'), '?DAS_FELD_GIBTS_NICHT=1')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "User_xv10099")
 
 class User_rolle_afTests_generate_pdf(TestCase):
@@ -631,7 +631,7 @@ class User_rolle_afTests_generate_pdf(TestCase):
 	def test_panel_view_use_konzept_pdf(self):
 		pdf_url = reverse('uhr_konzept_pdf')
 		response = self.client.get(pdf_url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 
 class User_rolle_afTests(TestCase):
 	# User / Rolle / AF : Das wird mal die Hauptseite für
@@ -788,25 +788,25 @@ class User_rolle_afTests(TestCase):
 	def test_panel_view_status_code(self):
 		url = reverse('user_rolle_af')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 	def test_panel_view_with_valid_selection_status_code(self):
 		url = '{0}{1}'.format(reverse('user_rolle_af'), '?name=UseR&gruppe=BA-ps')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "xv13254")
 	# Hat der User zwei Rollen (XV un DV)?
 	def test_panel_view_num_userids(self):
 		id = TblUserIDundName.objects.get(userid='xv13254').id
 		url = '{0}{1}/{2}'.format(reverse('user_rolle_af'), id, '?name=UseR&gruppe=BA-ps')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "xv13254")
 		self.assertContains(response, "dv13254")
 	def test_panel_view_num_roles(self):
 		id = TblUserIDundName.objects.get(userid='xv13254').id
 		url = '{0}{1}/{2}'.format(reverse('user_rolle_af'), id, '?name=UseR&gruppe=BA-ps')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "User_xv13254")
 		#print('_____________')
 		#print (response.content)
@@ -816,19 +816,19 @@ class User_rolle_afTests(TestCase):
 		id = TblUserIDundName.objects.get(userid='xv13254').id
 		url = '{0}{1}/{2}'.format(reverse('user_rolle_af'), id, '?name=UseR&gruppe=BA-ps')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "User_xv13254")
 		self.assertContains(response, 'icon-yes', 4)
 		self.assertContains(response, 'icon-no', 2)
 	def test_panel_view_with_invalid_selection_status_code(self):
 		url = '{0}{1}'.format(reverse('user_rolle_af'), '?geloescht=99&zi_organisation=ZZ-XX')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "Keine Treffer")
 	def test_panel_view_with_invalid_selection_returns_complete_list_status_code(self):
 		url = '{0}{1}'.format(reverse('user_rolle_af'), '?DAS_FELD_GIBTS_NICHT=1')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "User_xv13254")
 	def test_panel_view_contains_link_back_to_home_view(self):
 		new_user_url = reverse('user_rolle_af')
@@ -881,7 +881,7 @@ class User_rolle_afTests(TestCase):
 	def test_panel_view_with_valid_selection_find_UserHatRolle_id(self):
 		url = '{0}{1}'.format(reverse('user_rolle_af'), '?name=&orga=1&gruppe=&pagesize=100')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "User_xv13254")  # Die UserID gibt es schon mal
 
 		suchstr = "Wir haben in der ReST-Schreibweise keinen Treffer gelandet!"
@@ -895,7 +895,7 @@ class User_rolle_afTests(TestCase):
 	def test_panel_view_with_valid_selection_find_accordeon_link(self):
 		url = '{0}{1}'.format(reverse('user_rolle_af'), '?name=&orga=1&gruppe=&pagesize=100')
 		response = self.client.get(url)
-		self.assertEquals(response.status_code, 200)
+		self.assertEqual(response.status_code, 200)
 
 		for k in response:
 			foo = re.search('/user_rolle_af/(\d+)/', str(k))
@@ -907,7 +907,7 @@ class User_rolle_afTests(TestCase):
 				# print ()
 				# print ('suche nach folgender URL: {}'.format (url))
 				response = self.client.get(url)
-				self.assertEquals(response.status_code, 200)
+				self.assertEqual(response.status_code, 200)
 			else:
 				self.assertFalse(True)	# Das war nix - offensichtlich die URL nicht korrekt
 		self.assertContains(response, 'Erste Neue Rolle') # Rollenname
@@ -949,12 +949,12 @@ class Import_new_csv_single_record(TestCase):
 
 	def test_importpage_table_entry(self):
 		num = Tblrechteneuvonimport.objects.filter(vorname = 'Fester').count()
-		self.assertEquals(num, 1)
+		self.assertEqual(num, 1)
 
 	def test_importpage_view_status_code(self):
 		url = reverse('import')
 		response = self.client.get(url)
-		self.assertEquals(self.response.status_code, 200)
+		self.assertEqual(self.response.status_code, 200)
 
 	def test_importpage_csrf(self):
 		self.assertContains(self.response, 'csrfmiddlewaretoken')
@@ -969,7 +969,7 @@ class Setup_database(TestCase):
 		self.response = self.client.get(url)
 
 	def test_setup_database_view_status_code(self):
-		self.assertEquals(self.response.status_code, 200)
+		self.assertEqual(self.response.status_code, 200)
 
 	def test_setup_database_search_context(self):
 		self.assertContains(self.response, 'Ansonsten: Finger weg, das bringt hier nichts!')
@@ -1026,7 +1026,7 @@ class Import_new_csv_single_record(TestCase):
 		)
 
 	def test_importpage_view_status_code(self):
-		self.assertEquals(self.response.status_code, 200)
+		self.assertEqual(self.response.status_code, 200)
 
 	def test_importpage_csrf(self):
 		self.assertContains(self.response, 'csrfmiddlewaretoken')
@@ -1035,7 +1035,7 @@ class Import_new_csv_single_record(TestCase):
 	# Im späteren Testverlauf wird die Tabelle wieder gelöscht.
 	def test_importpage_table_entry(self):
 		num = Tblrechteneuvonimport.objects.filter(vorname = 'Fester').count()
-		self.assertEquals(num, 1)
+		self.assertEqual(num, 1)
 
 class Import_new_csv_files_no_input(TestCase):
 	# Und nun Test des Imports dreier Dateien.
@@ -1053,7 +1053,7 @@ class Import_new_csv_files_no_input(TestCase):
 
 	def test_import_no_input_correct_following_page(self):
 		# Wir landen wieder auf derselben Seite
-		self.assertEquals(self.response.status_code, 200)
+		self.assertEqual(self.response.status_code, 200)
 		self.assertContains(self.response, 'Auswahl der Organisation und Hochladen der Datei')
 
 	def test_import_no_input_form_error(self):
@@ -1081,7 +1081,7 @@ class Import_new_csv_files_wrong_input(TestCase):
 
 	def test_import_wrong_input_correct_following_page(self):
 		# Wir landen wieder auf derselben Seite
-		self.assertEquals(self.response.status_code, 200)
+		self.assertEqual(self.response.status_code, 200)
 		self.assertContains(self.response, 'Auswahl der Organisation und Hochladen der Datei')
 
 	def test_import_wrong_input_form_error(self):
