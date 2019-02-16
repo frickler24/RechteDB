@@ -20,7 +20,7 @@ def push_sp(name, sp, procs_schon_geladen):
 	"""
 	# ToDo Das Löschen wirft Warnings im MySQL-Treiber, wenn die SP gar nicht existiert. -> Liste lesen und checken
 	fehler = False
-	loeschstring = format ("DROP PROCEDURE IF EXISTS %s" % name)
+	loeschstring = 'DROP PROCEDURE IF EXISTS {}'.format(name)
 	with connection.cursor() as cursor:
 		try:
 			if procs_schon_geladen:
@@ -28,7 +28,7 @@ def push_sp(name, sp, procs_schon_geladen):
 			cursor.execute (sp)
 		except:
 			e = sys.exc_info()[0]
-			fehler = format("Error: %s" % e)
+			fehler = 'Error in push_sp(): {}'.format(e)
 
 		cursor.close()
 		return fehler
@@ -50,7 +50,7 @@ def call_sp_test():
 			liste = cursor.fetchone()
 		except:
 			e = sys.exc_info()[0]
-			fehler = format("Error: %s" % e)
+			fehler = 'Error: {}'.format(e)
 
 		cursor.close()
 		return fehler or not liste[0] >= 0
@@ -1216,7 +1216,9 @@ END
 """
 	return push_sp ('ueberschreibeModelle', sp, procs_schon_geladen)
 
-def finde_procs():
+# Suche nach Stored Procedures in der aktuellen Datenbank
+# return: Anzahl an derzeit geladenen Stored Procedures
+def anzahl_procs():
 	anzahl = 0  # Wenn die Zahl der Einträge bei SHOW > 0 ist, müssen die Procs jeweils gelöscht werden
 	with connection.cursor() as cursor:
 		try:
@@ -1224,10 +1226,32 @@ def finde_procs():
 			anzahl = cursor.rowcount
 		except:
 			e = sys.exc_info()[0]
-			format("Error in finde_procs: %s" % e)
+			print('Error in finde_procs(): {}'.format(e))
 
 		cursor.close()
-		return anzahl > 0
+		return anzahl
+
+def finde_procs():
+	finde_procs_exakt()
+	return anzahl_procs() > 0
+
+def finde_procs_exakt():
+	return anzahl_procs() == soll_procs()
+
+sps = {
+	1: push_sp_test,
+	2: push_sp_vorbereitung,
+	3: push_sp_neueUser,
+	4: push_sp_behandleUser,
+	5: push_sp_behandleRechte,
+	6: push_sp_loescheDoppelteRechte,
+	7: push_sp_nichtai,
+	8: push_sp_macheAFListe,
+	9: push_sp_ueberschreibeModelle,
+}
+
+def soll_procs():
+	return len(sps)
 
 @login_required
 def handle_stored_procedures(request):
@@ -1236,6 +1260,19 @@ def handle_stored_procedures(request):
 
 	if request.method == 'POST':
 		procs_schon_geladen = finde_procs()
+
+		daten['anzahl_import_elemente'] = sps[1](procs_schon_geladen)
+		daten['call_anzahl_import_elemente'] = call_sp_test()
+		daten['vorbereitung'] 			= sps[2](procs_schon_geladen)
+		daten['neueUser'] 				= sps[3](procs_schon_geladen)
+		daten['behandleUser'] 			= sps[4](procs_schon_geladen)
+		daten['behandleRechte'] 		= sps[5](procs_schon_geladen)
+		daten['loescheDoppelteRechte'] 	= sps[6](procs_schon_geladen)
+		daten['setzeNichtAIFlag'] 		= sps[7](procs_schon_geladen) # Falls die Funktion jemals wieder benötigt wird
+		daten['erzeuge_af_liste'] 		= sps[8](procs_schon_geladen)
+		daten['ueberschreibeModelle'] 	= sps[9](procs_schon_geladen)
+
+		"""
 		daten['anzahl_import_elemente'] = push_sp_test(procs_schon_geladen)
 		daten['call_anzahl_import_elemente'] = call_sp_test()
 		daten['vorbereitung'] = push_sp_vorbereitung(procs_schon_geladen)
@@ -1246,9 +1283,9 @@ def handle_stored_procedures(request):
 		daten['setzeNichtAIFlag'] = push_sp_nichtai(procs_schon_geladen) # Falls die Funktion jemals wieder benötigt wird
 		daten['erzeuge_af_liste'] = push_sp_macheAFListe(procs_schon_geladen)
 		daten['ueberschreibeModelle'] = push_sp_ueberschreibeModelle(procs_schon_geladen)
+		"""
 
 	context = {
 		'daten': daten,
 	}
 	return render(request, 'rapp/stored_procedures.html', context)
-
