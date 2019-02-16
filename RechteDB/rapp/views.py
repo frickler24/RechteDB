@@ -32,7 +32,7 @@ from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, TblUserh
 from .xhtml2 import render_to_pdf
 
 # An dieser stelle stehen diverse Tools zum Aufsetzen der Datenbank mit SPs
-from .stored_procedures import *
+from .stored_procedures import finde_procs_exakt, handle_stored_procedures, connection
 
 ###################################################################
 # RApp - erforderliche Sichten und Reports
@@ -108,6 +108,7 @@ def home(request):
 	num_userids_in_department = TblUserIDundName.objects.filter(geloescht=False, abteilung__icontains='ZI-AI-BA').count
 	num_teams = TblOrga.objects.all().count
 	num_active_rights = TblGesamt.objects.filter(geloescht=False).count
+	stored_procedures = finde_procs_exakt()
 
 	# Sicherheitshalber wird immer bei Aufruf der Startseite die Tabelle tbl_AFListe neu aufgebaut
 	with connection.cursor() as cursor:
@@ -135,6 +136,8 @@ def home(request):
 			'num_userIDsInDepartment': num_userids_in_department,
 			'num_teams': num_teams,
 			'num_users': User.objects.all().count,
+			'sps': stored_procedures,
+			'letzter_import': "unbekannt",
 		},
 	)
 

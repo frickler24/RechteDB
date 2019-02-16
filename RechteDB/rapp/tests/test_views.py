@@ -1046,7 +1046,7 @@ class Import_new_csv_files_no_input(TestCase):
 		Anmeldung(self.client.login)
 		Setup_database()
 		url = reverse('import')
-		self.response = self.client.post(url, {})q
+		self.response = self.client.post(url, {})
 
 	def test_import_no_input_correct_page(self):
 		self.assertContains(self.response, 'Auswahl der Organisation und Hochladen der Datei')

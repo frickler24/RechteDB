@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block breadcrumb %}
   <li class="breadcrumb-item active">Start</li>
 {% endblock breadcrumb %}
@@ -24,6 +24,24 @@
       </div>
     </div>
     <div class="container rounded bg-info text-light">
+      <div class="row pt-3 ">
+        <div class="col col-xs-10 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Status Stored Procedures:
+        </div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">
+          {% if sps %}
+            <img src="{% static 'admin/img/icon-yes.svg' %}">
+          {% else %}
+            <img src="{% static 'admin/img/icon-no.svg' %}">
+          {% endif %}
+        </div>
+      </div>
+      <div class="row ">
+        <div class="col col-xs-10 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+          Stand letzter Import:
+        </div>
+        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ letzter_import }}</div>
+      </div>
       <div class="row pt-3 ">
         <div class="col col-xs-10 col-sm-8 col-md-6 col-lg-5 col-xl-4">
           Administrierte Berechtigungen:
