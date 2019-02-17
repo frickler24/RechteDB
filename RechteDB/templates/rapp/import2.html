@@ -78,8 +78,13 @@
             {% csrf_token %}
            <div class="container bg-light py-3 mt-1">
                <div class="row">
+                    <div class="row my-3" id="loading2" style="display:none;">
+                        <img src="{% static 'loading.gif' %}" alt="Lade..." />
+                    </div>
+               </div>
+               <div class="row">
                    <div class="col py-3 col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3">
-                        <button class="btn btn-outline-danger " type="submit"
+                        <button class="btn btn-outline-danger " type="submit" id="hochladen"
                                 name="hochladen" value="submit">Inhalte aktualisieren!</button>
                    </div>
                    <div class="col pt-3 col-xs-12 col-sm-12 col-md-4 col-lg-6 col-xl-6 alert alert-warning">
@@ -95,5 +100,13 @@
                </div>
             </div>
         </form>
+        <script type="text/javascript">
+            (function (d) {
+                d.getElementById('hochladen').onclick = function () {
+                    d.getElementById('loading2').style.display = 'block';
+                };
+            }(document));
+        </script>
 	</div>
 {% endblock %}
+
