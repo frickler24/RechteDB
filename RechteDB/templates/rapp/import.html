@@ -22,7 +22,7 @@
             </div>
         {% endif %}
 
-        <form method="post" name="import" enctype="multipart/form-data" novalidate>
+        <form id="form" action="" method="post" name="import" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
 
             <div class="container alert-primary py-3">
@@ -64,8 +64,18 @@
                 </div>
             </div>
             <div class="container bg-light py-3 mt-3">
-                <button class="btn btn-outline-success" type="submit" name="hochladen" value="submit">Hochladen</button>
+                <div class="row my-3" id="loading2" style="display:none;">
+                    <img src="{% static 'loading.gif' %}" alt="Lade..." />
+                </div>
+                <button class="btn btn-outline-success" type="submit" name="hochladen" id="hochladen" value="submit">Hochladen</button>
             </div>
         </form>
+        <script type="text/javascript">
+            (function (d) {
+                d.getElementById('hochladen').onclick = function () {
+                    d.getElementById('loading2').style.display = 'block';
+                };
+            }(document));
+        </script>
 	</div>
 {% endblock %}
