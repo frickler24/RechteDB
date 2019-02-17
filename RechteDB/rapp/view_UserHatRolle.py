@@ -11,7 +11,7 @@ from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 import csv
 
-from .filters import PanelFilter, UseridFilter
+from .filters import RollenFilter, UseridFilter
 from .views import version, pagination
 from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportForm_schritt3
 from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, TblUserhatrolle, \
@@ -117,6 +117,10 @@ def UhR_erzeuge_listen(request):
 	"""
 	panel_liste = TblUserIDundName.objects.filter(geloescht=False).order_by('name')
 	panel_filter = UseridFilter(request.GET, queryset=panel_liste)
+
+	# rollen_liste = TblUserhatrolle.objects.all().order_by('rollenname')
+	# rollen_filter = RollenFilter(request.GET, queryset=rollen_liste)
+
 	namen_liste = panel_filter.qs.filter(userid__istartswith="xv")
 	panel_liste = panel_filter.qs.filter(userid__istartswith="xv").select_related("orga")
 
