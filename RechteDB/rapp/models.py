@@ -686,4 +686,19 @@ class Orga_details(models.Model):
 	def __str__(self) -> str:
 		return str(self.id)
 
+# Versionshistorie der Daten-Importe; Darüber ist auch ein aktuell laufender Import feststellbar
+# Die beiden Felder max und aktuell dienen dem Anzeigen eins Fortschrittbalkens
+class Letzter_import(models.Model):
+	id = 					models.AutoField(primary_key=True)
+	start = 				models.DateTimeField(null=False)
+	user =					models.CharField(max_length=100, null=True)
+	end =	 				models.DateTimeField(null=True)
+	max = 					models.IntegerField(null=False)
+	aktuell =	 			models.IntegerField(null=False)
+
+	class Meta:
+		managed = True
+		verbose_name = 'Letzter Import'
+		verbose_name_plural = 'Letzte Importe'
+		ordering = [ 'id', 'start', 'end' ]
 

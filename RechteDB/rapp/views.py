@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-# Create your views here.
 
 from django.shortcuts import get_object_or_404
 from django.views import generic, View
@@ -23,16 +22,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Zum Einlesen der csv
-import csv, textwrap, re, subprocess, os
+import csv, textwrap, re, subprocess, os, datetime
+from math import *
 
-from .filters import PanelFilter, UseridFilter
-from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportForm_schritt3
-from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, TblUserhatrolle, \
-					Tblrechteneuvonimport, Tblrechteamneu
-from .xhtml2 import render_to_pdf
+from .filters import PanelFilter
+from .forms import ImportForm, ImportForm_schritt3
+from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, \
+					Tblrechteneuvonimport, Tblrechteamneu, Letzter_import
 
 # An dieser stelle stehen diverse Tools zum Aufsetzen der Datenbank mit SPs
-from .stored_procedures import finde_procs_exakt, handle_stored_procedures, connection
+from .stored_procedures import finde_procs_exakt, connection, handle_stored_procedures
 
 ###################################################################
 # RApp - erforderliche Sichten und Reports
@@ -315,7 +314,37 @@ def import_csv(request):
 	:return: Gerendertes HTML
 	"""
 
+	def doprint():
+		print(import_datum.id, ':', import_datum.start, import_datum.end, import_datum.max, import_datum.aktuell)
+
 	zeiten = { 'import_start': timezone.now(), } # Hier werden Laufzeiten vermerkt
+
+	# Zunächst versuche zu ermitteln, ob gerade ein anderer Import läuft:
+	try:
+		letzter_import_im_modell = Letzter_import.objects.latest('id')
+		if letzter_import_im_modell.end is None:
+			# Dann läuft gerade ein anderer Import, sonst wäre das end-Feld gesetzt
+			# oder der letzte Import ist abgebrochen
+			print('1')
+			request.session['parallel_start'] = str(letzter_import_im_modell.start)
+			print('2')
+			request.session['parallel_user'] = letzter_import_im_modell.user
+			print('3')
+			print('Die Ende-Markierung wurde erkannt:', letzter_import_im_modell.id, ':', letzter_import_im_modell.start, letzter_import_im_modell.end,
+				  letzter_import_im_modell.max, letzter_import_im_modell.aktuell, letzter_import_im_modell.user)
+			print('4')
+			return render(request, 'rapp/import_parallel.html')
+			print('5')
+	except:
+		pass
+	print('6')
+
+	print(letzter_import_im_modell.id, ':', letzter_import_im_modell.start, letzter_import_im_modell.end,
+		  letzter_import_im_modell.max, letzter_import_im_modell.aktuell)
+
+	# Legt ein neues Datenobjekt zum Markieren des Import-Status an, speichert aber erst weiter unten
+	import_datum = Letzter_import(start = timezone.now())
+	doprint()
 
 	def patch_datum(deutsches_datum):
 		"""
@@ -351,8 +380,15 @@ def import_csv(request):
 		:return: void; zeiten[]
 		"""
 		zeiten['schreibe_start'] = timezone.now()
+		import_datum.max = request.session['Anzahl Zeilen']
+		del request.session['Anzahl Zeilen']
 
-		request.session['geschafft'] = 0  # Das darf man nicht abkürzen wegen leerer Dateien!
+		import_datum.aktuell = 0
+		import_datum.save()	# Jetzt wird das Objekt erst in der DB wirklich angelegt
+		current_user = request.user
+		import_datum.user = current_user.username
+		doprint()
+
 		for line in reader:
 			# Sicherheitshalber werden alle eingelesenen Daten auf Maximallänge reduziert.
 			# Derzeit gibt es bereits Einträge in 'TF Name' und 'TF Beschreibung',
@@ -380,10 +416,15 @@ def import_csv(request):
 				af_zuweisungsdatum = 	patch_datum (line['AF Zuweisungsdatum']),
 			)
 			neuerRecord.save()
-			request.session['geschafft'] = request.session.get('geschafft', 0) + 1 # Zeilenzähler
+			import_datum.aktuell += 1
+			if import_datum.aktuell % 100 == 0:
+				import_datum.save()
+				doprint()
+
 		zeiten['schreibe_ende'] = timezone.now()
-		del request.session['geschafft']
-		del request.session['Anzahl Zeilen']
+		import_datum.end = zeiten['schreibe_ende']
+		import_datum.save()	# Damit ist der Datensatz endgültig fertig.
+		doprint()
 
 	def hole_datei():
 		"""
@@ -465,18 +506,16 @@ def import_csv(request):
 			cursor.close()
 			return statistik, fehler
 
-	__DUMMY__ = False #or True	# Das 'or True' auskommentieren, wenn die Funktion unten genutzt werden sol
 	if request.method == 'POST':
 		form = ImportForm(request.POST, request.FILES)
 		if form.is_valid():
-			if not __DUMMY__:
-				orga = request.POST.get('organisation', 'Keine Orga!') # Auf dem Panel wurde die Ziel-Orga übergeben
-				request.session['organisation'] = orga	# und merken in der Session für Schritt 3
-				laufzeiten = bearbeite_datei(False)
-				statistik, fehler = import_schritt1(orga)
-				request.session['import_statistik'] = statistik
-				request.session['import_laufzeiten'] = laufzeiten
-				request.session['fehler1'] = fehler
+			orga = request.POST.get('organisation', 'Keine Orga!') # Auf dem Panel wurde die Ziel-Orga übergeben
+			request.session['organisation'] = orga	# und merken in der Session für Schritt 3
+			laufzeiten = bearbeite_datei(False)
+			statistik, fehler = import_schritt1(orga)
+			request.session['import_statistik'] = statistik
+			request.session['import_laufzeiten'] = laufzeiten
+			request.session['fehler1'] = fehler
 			return redirect('import2')
 	else:
 		form = ImportForm(initial={'organisation': 'AI-BA'}, auto_id=False)
@@ -586,7 +625,6 @@ def import2(request):
 	request.session['geloeschteUser'] = hole_geloeschteUser()[0]  # Nur die Daten, ohne den Returncode der Funktion
 	return render(request, 'rapp/import2.html', context)
 
-
 @login_required
 def import2_quittung(request):
 	"""
@@ -642,7 +680,6 @@ def import2_quittung(request):
 		'version': version,
 	}
 	return render(request, 'rapp/import2_quittung.html', context)
-
 
 @login_required
 def import3_quittung(request):
