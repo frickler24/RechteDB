@@ -89,6 +89,7 @@ urlpatterns += [
 	path('import2/', views.import2, name='import2'),
 	path('import2_quittung/', views.import2_quittung, name='import2_quittung'),
 	path('import3_quittung/', views.import3_quittung, name='import3_quittung'),
+	path('import_reset/', views.import_reset, name='import_reset'),
 	path('import_status/', views.import_status, name='import_status'),
 ]
 

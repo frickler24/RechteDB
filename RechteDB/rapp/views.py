@@ -109,6 +109,12 @@ def home(request):
 	num_active_rights = TblGesamt.objects.filter(geloescht=False).count
 	stored_procedures = finde_procs_exakt()
 
+	try:
+		letzter_import_im_modell = Letzter_import.objects.latest('id')
+		letzter_import = str(letzter_import_im_modell.end)[:19]
+	except:
+		letzter_import = 'unbekannt'
+
 	# Sicherheitshalber wird immer bei Aufruf der Startseite die Tabelle tbl_AFListe neu aufgebaut
 	with connection.cursor() as cursor:
 		try:
@@ -136,7 +142,7 @@ def home(request):
 			'num_teams': num_teams,
 			'num_users': User.objects.all().count,
 			'sps': stored_procedures,
-			'letzter_import': "unbekannt",
+			'letzter_import': letzter_import,
 		},
 	)
 
@@ -314,9 +320,6 @@ def import_csv(request):
 	:return: Gerendertes HTML
 	"""
 
-	def doprint():
-		print(import_datum.id, ':', import_datum.start, import_datum.end, import_datum.max, import_datum.aktuell)
-
 	zeiten = { 'import_start': timezone.now(), } # Hier werden Laufzeiten vermerkt
 
 	# Zunächst versuche zu ermitteln, ob gerade ein anderer Import läuft:
@@ -325,26 +328,17 @@ def import_csv(request):
 		if letzter_import_im_modell.end is None:
 			# Dann läuft gerade ein anderer Import, sonst wäre das end-Feld gesetzt
 			# oder der letzte Import ist abgebrochen
-			print('1')
 			request.session['parallel_start'] = str(letzter_import_im_modell.start)
-			print('2')
 			request.session['parallel_user'] = letzter_import_im_modell.user
-			print('3')
-			print('Die Ende-Markierung wurde erkannt:', letzter_import_im_modell.id, ':', letzter_import_im_modell.start, letzter_import_im_modell.end,
-				  letzter_import_im_modell.max, letzter_import_im_modell.aktuell, letzter_import_im_modell.user)
-			print('4')
 			return render(request, 'rapp/import_parallel.html')
-			print('5')
-	except:
-		pass
-	print('6')
 
-	print(letzter_import_im_modell.id, ':', letzter_import_im_modell.start, letzter_import_im_modell.end,
-		  letzter_import_im_modell.max, letzter_import_im_modell.aktuell)
+	except:
+		print('Fehler bei Erkennung der Ende-Markierung:', letzter_import_im_modell.id, ':',
+			  letzter_import_im_modell.start, letzter_import_im_modell.end,
+			  letzter_import_im_modell.max, letzter_import_im_modell.aktuell, letzter_import_im_modell.user)
 
 	# Legt ein neues Datenobjekt zum Markieren des Import-Status an, speichert aber erst weiter unten
 	import_datum = Letzter_import(start = timezone.now())
-	doprint()
 
 	def patch_datum(deutsches_datum):
 		"""
@@ -387,7 +381,6 @@ def import_csv(request):
 		import_datum.save()	# Jetzt wird das Objekt erst in der DB wirklich angelegt
 		current_user = request.user
 		import_datum.user = current_user.username
-		doprint()
 
 		for line in reader:
 			# Sicherheitshalber werden alle eingelesenen Daten auf Maximallänge reduziert.
@@ -419,12 +412,10 @@ def import_csv(request):
 			import_datum.aktuell += 1
 			if import_datum.aktuell % 100 == 0:
 				import_datum.save()
-				doprint()
 
 		zeiten['schreibe_ende'] = timezone.now()
 		import_datum.end = zeiten['schreibe_ende']
 		import_datum.save()	# Damit ist der Datensatz endgültig fertig.
-		doprint()
 
 	def hole_datei():
 		"""
@@ -712,3 +703,20 @@ def import_status(request):
 	proz = int(aktuell) * 100 // int(zeilen)
 	print (zeilen, aktuell, proz)
 	return render (request, 'rapp/import_status.html', {'proz': proz, 'version': version, })
+
+@login_required
+def import_reset(request):
+	print('Harter Reset angefordert in import_reset()')
+	try:
+		letzter_import_im_modell = Letzter_import.objects.latest('id')
+		letzter_import_im_modell.end = timezone.now()
+		current_user = request.user
+		letzter_import_im_modell.user = current_user.username
+		letzter_import_im_modell.user = '{} / {}'.format(current_user.username, 'explizit zurückgesetzt')
+		letzter_import_im_modell.save()
+	except:
+		print('Harter Reset hat Problem in import_reset():', letzter_import_im_modell.id, ':',
+			  letzter_import_im_modell.start, letzter_import_im_modell.end,
+			  letzter_import_im_modell.max, letzter_import_im_modell.aktuell, letzter_import_im_modell.user)
+
+	return redirect('import')
