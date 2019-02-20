@@ -333,9 +333,8 @@ def import_csv(request):
 			return render(request, 'rapp/import_parallel.html')
 
 	except:
-		print('Fehler bei Erkennung der Ende-Markierung:', letzter_import_im_modell.id, ':',
-			  letzter_import_im_modell.start, letzter_import_im_modell.end,
-			  letzter_import_im_modell.max, letzter_import_im_modell.aktuell, letzter_import_im_modell.user)
+		# print('Fehler bei Erkennung der Ende-Markierung. Kann aber ganz normal eine leere DB sein.')
+		pass
 
 	# Legt ein neues Datenobjekt zum Markieren des Import-Status an, speichert aber erst weiter unten
 	import_datum = Letzter_import(start = timezone.now())
