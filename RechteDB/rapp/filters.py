@@ -9,7 +9,7 @@ class PanelFilter(django_filters.FilterSet):
 	userid_name__userid = 			django_filters.CharFilter(lookup_expr='istartswith')
 	geloescht = 					django_filters.BooleanFilter()
 	userid_name__geloescht = 		django_filters.BooleanFilter()
-
+	userid_name__gruppe = 			django_filters.CharFilter(lookup_expr='icontains')
 	userid_name__zi_organisation = 	django_filters.CharFilter(lookup_expr='icontains')
 	modell__name_af_neu = 			django_filters.CharFilter(lookup_expr='icontains')
 	modell__name_gf_neu = 			django_filters.CharFilter(lookup_expr='icontains')

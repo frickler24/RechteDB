@@ -1,3 +1,4 @@
+**/.idea/*
 */__pycache__
 */*/__pycache__
 db.sqlite3
@@ -13,7 +14,7 @@ my3.6venv
 *.mdj
 other_files/RechteDB 20180825 Erster Export der Neuimplementierung.sql.gz
 Test.csv
-rapp_0.0.1.tar*
+**/rapp_*.tar*
 Organummernliste.csv
 other_files/storedProcedures_neue_Namenskonventionen.sql
 tbl_AFListe.txt
@@ -32,3 +33,4 @@ other_files/datadir*
 other_files/Organummernliste.csv.gz
 code_*
 other_files/Ansicht_Berechtigungskonzept_20190127_111017.png
+

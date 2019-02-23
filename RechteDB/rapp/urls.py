@@ -14,7 +14,7 @@ Including another URLconf
 	2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-from . import views, view_UserHatRolle
+from . import views, view_UserHatRolle, view_import, stored_procedures
 
 # app_name = 'rapp'		# Wird nur benötigt als namespace, falls mehrere Apps dieselbe Teil-URL haben
 
@@ -85,15 +85,16 @@ urlpatterns += [
 
 # URl zum Importieren neuer Daten aus IIQ (csv-File)
 urlpatterns += [
-	path('import/', views.import_csv, name='import'),
-	path('import2/', views.import2, name='import2'),
-	path('import2_quittung/', views.import2_quittung, name='import2_quittung'),
-	path('import3_quittung/', views.import3_quittung, name='import3_quittung'),
-	path('import_status/', views.import_status, name='import_status'),
+	path('import/', view_import.import_csv, name='import'),
+	path('import2/', view_import.import2, name='import2'),
+	path('import2_quittung/', view_import.import2_quittung, name='import2_quittung'),
+	path('import3_quittung/', view_import.import3_quittung, name='import3_quittung'),
+	path('import_reset/', view_import.import_reset, name='import_reset'),
+	path('import_status/', view_import.import_status, name='import_status'),
 ]
 
 # URl zum Bestücken der verschiedenen Stored Procedures in das DBMS
 urlpatterns += [
-	path('stored_procedures/', views.handle_stored_procedures, name='stored_procedures'),
+	path('stored_procedures/', stored_procedures.handle_stored_procedures, name='stored_procedures'),
 ]
 

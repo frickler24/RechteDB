@@ -3,25 +3,23 @@
 <html lang="de">
 	<head>
 		<meta charset="utf-8">
-		<link href="https://fonts.googleapis.com/css?family=Audiowide|Faster+One" rel="stylesheet">
  		<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 		<link rel="stylesheet" href="{% static 'css/style.css' %}">
 	</head>
-	<body>
+	<body class="container bg-light">
         <div class="container">
-            {% if proz %}
-                <div class="progress">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated"
-                         role="progressbar"
-                         aria-valuenow="{{ proz }}" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
-                         {{ proz }}
-                    </div>
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped progress-bar-animated"
+                     role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                     {% if proz > 0 %}
+                         aria-valuenow="{{ proz }}"
+                         style="width: {{ proz }}%;">{{ proz }}%
+                     {% else %}
+                         aria-valuenow="0"
+                         style="width: 1%;">0%
+                     {% endif %}
                 </div>
-            {% else %}
-                <div class="container alert-danger bp-3">
-                    Keine Daten
-                </div>
-            {% endif %}
+            </div>
         </div>
 	</body>
 </html>
