@@ -66,16 +66,31 @@
             <div class="container bg-light py-3 mt-3">
                 <div class="row my-3" id="loading2" style="display:none;">
                     <img src="{% static 'loading.gif' %}" alt="Lade..." />
+                    <iframe width="1000" height="20"
+                            style="border: 0; margin-top: 1rem; color: green;"
+                            id="FrameID" src="{% url 'import_status' %}">
+                    </iframe>
                 </div>
-                <button class="btn btn-outline-success" type="submit" name="hochladen" id="hochladen" value="submit">Hochladen</button>
+
+                <button class="btn btn-outline-success mt-3" type="submit" name="hochladen" id="hochladen"
+                        value="submit">Hochladen
+                </button>
             </div>
         </form>
         <script type="text/javascript">
             (function (d) {
                 d.getElementById('hochladen').onclick = function () {
                     d.getElementById('loading2').style.display = 'block';
+                    d.getElementById('hochladen').disabled = true;
+                    function timeout() {
+                        t = setTimeout (function() {
+                            document.getElementById('FrameID').contentWindow.location.reload(true);
+                            timeout();
+                        }, 1000);
+                    }
+                    timeout();
                 };
             }(document));
-        </script>
+       </script>
 	</div>
 {% endblock %}

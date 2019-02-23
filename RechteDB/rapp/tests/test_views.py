@@ -32,7 +32,26 @@ class HomeTests(TestCase):
 		view = resolve('/rapp/')
 		self.assertEqual(view.func, home)
 
+	def test_home_url_gets_info_screen(self):
+		# Alle Daten erscheinen auf der Übersichtsseite
+		url = reverse('home')
+		self.response = self.client.get(url)
+		self.assertEqual(self.response.status_code, 200)
+		self.assertContains(self.response, 'Statistik über die RApp-Inhalte:', 1)
+		self.assertContains(self.response, 'Status Stored Procedures:', 1)
+		self.assertContains(self.response, 'Stand letzter Import:', 1)
+		self.assertContains(self.response, 'Administrierte Berechtigungen:', 1)
+		self.assertContains(self.response, 'Aktive Rechte:', 1)
+		self.assertContains(self.response, 'Administrierte UserIDs:', 1)
+		self.assertContains(self.response, 'Aktive UserIDs:', 1)
+		self.assertContains(self.response, 'UserIDs von AI-BA:', 1)
+		self.assertContains(self.response, 'Vorhandene Teams:', 1)
+		self.assertContains(self.response, 'Bekannte Plattformen:', 1)
+		self.assertContains(self.response, 'Anwender der RApp:', 1)
+		self.assertContains(self.response, 'Aktuelle TFen in AI-BA:', 1)
+		self.assertContains(self.response, '/static/admin/img/icon-yes.svg', 1)
 
+class AdminPageTests(TestCase):
 	# Erreichbarkeit der Admin-Seiten (Simpel-Modus)
 	def test_adminrapp_view_status_code(self):
 		url = reverse('home')[:-5] + 'adminrapp'
