@@ -8,17 +8,13 @@
 	</head>
 	<body>
         <div class="container">
-            {% if proz %}
+            {% if proz > 0 %}
                 <div class="progress">
                     <div class="progress-bar progress-bar-striped progress-bar-animated"
                          role="progressbar"
-                         aria-valuenow="{{ proz }}" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
-                         {{ proz }}
+                         aria-valuenow="{{ proz }}" aria-valuemin="0" aria-valuemax="100"
+                         style="width: {{ proz }}%;">{{ proz }}%
                     </div>
-                </div>
-            {% else %}
-                <div class="container alert-danger bp-3">
-                    Keine Daten
                 </div>
             {% endif %}
         </div>

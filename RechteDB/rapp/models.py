@@ -695,6 +695,7 @@ class Letzter_import(models.Model):
 	end =	 				models.DateTimeField(null=True)
 	max = 					models.IntegerField(null=False)
 	aktuell =	 			models.IntegerField(null=False)
+	schritt = 				models.IntegerField(null=False, default=1)
 
 	class Meta:
 		managed = True

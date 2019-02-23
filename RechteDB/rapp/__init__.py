@@ -1,3 +1,2 @@
-__version__ = '0.2.7vi .gigi' \
-			  ''
+__version__ = '0.2.8'
 VERSION = __version__  # synonym
