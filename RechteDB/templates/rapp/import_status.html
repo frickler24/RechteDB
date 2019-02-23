@@ -6,17 +6,20 @@
  		<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 		<link rel="stylesheet" href="{% static 'css/style.css' %}">
 	</head>
-	<body>
+	<body class="container bg-light">
         <div class="container">
-            {% if proz > 0 %}
-                <div class="progress">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated"
-                         role="progressbar"
-                         aria-valuenow="{{ proz }}" aria-valuemin="0" aria-valuemax="100"
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped progress-bar-animated"
+                     role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                     {% if proz > 0 %}
+                         aria-valuenow="{{ proz }}"
                          style="width: {{ proz }}%;">{{ proz }}%
-                    </div>
+                     {% else %}
+                         aria-valuenow="0"
+                         style="width: 1%;">0%
+                     {% endif %}
                 </div>
-            {% endif %}
+            </div>
         </div>
 	</body>
 </html>

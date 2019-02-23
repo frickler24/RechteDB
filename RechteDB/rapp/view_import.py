@@ -499,9 +499,7 @@ def import_status(request):
 			'zeilen': -1,
 			'proz': -1,
 		}
-
-	a = 6
-
+	a=124
 	return render(request, 'rapp/import_status.html', context)
 
 
