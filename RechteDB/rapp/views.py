@@ -20,7 +20,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Zum Einlesen der Versionsnummer
-import os, re, subprocess
+import os, re, subprocess, sys
 from math import *
 
 from .filters import PanelFilter
