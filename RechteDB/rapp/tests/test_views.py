@@ -1108,4 +1108,18 @@ class Import_new_csv_files_wrong_input(TestCase):
 		form = self.response.context.get('form')
 		self.assertTrue(form.errors)
 
+from ..view_import import patch_datum, neuer_import
 
+class Import_helper_functions(TestCase):
+	def test_import_datum_konverter(self):
+		datum = patch_datum('07.03.2019')
+		self.assertEqual(datum, '2019-03-07 00:00+0100')
+
+	def test_import_datum_konverter_leereingabe(self):
+		datum = patch_datum('')
+		self.assertEqual(datum, None)
+
+	def test_import_neuer_import(self):
+		# Neuer Aufruf sollte keinen Fehler liefern
+		(flag, imp) = neuer_import(None)
+		self.assertFalse(flag)

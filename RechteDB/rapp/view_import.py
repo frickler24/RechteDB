@@ -19,7 +19,7 @@ from .models import TblGesamt, Tblrechteneuvonimport, Tblrechteamneu, Letzter_im
 # An dieser stelle stehen diverse Tools zum Aufsetzen der Datenbank mit SPs
 from .stored_procedures import connection
 from .views import version
-
+import time
 def neuer_import(request):
 	"""
 	:return: Fehler-Flag (True: In Retval steht ein Fehler-beschreibendes HTML, False: ein Objekt wurde erzeugt)
@@ -35,15 +35,18 @@ def neuer_import(request):
 			# oder der letzte Import ist abgebrochen
 			request.session['parallel_start'] = str(letzter_import_im_modell.start)
 			request.session['parallel_user'] = letzter_import_im_modell.user
-			retval = render(request, 'rapp/import_parallel.html')
-			return (True, retval)	# True signalisiert "Fehler"
+			fehlermeldung = render(request, 'rapp/import_parallel.html')
+			return (True, fehlermeldung)  # True signalisiert "Fehler"
 	except:
 		# print('Fehler bei Erkennung der Ende-Markierung. Kann aber ganz normal eine leere DB sein.')
 		pass
 
-# Legt ein neues Datenobjekt zum Markieren des Import-Status an, speichert aber erst weiter unten
+	# Legt ein neues Datenobjekt zum Markieren des Import-Status an, speichert aber erst weiter unten
 	letzter_import = Letzter_import(start = timezone.now(), schritt = 1)
 	return (False, letzter_import)	# False signalisiert "Alles OK, weitermachen"
+
+def speichere_schritt(import_datum):
+	import_datum.save()
 
 def naechster_schritt(request, schrittnummer):
 	"""
@@ -148,7 +151,8 @@ def import_csv(request):
 		del request.session['Anzahl Zeilen']
 
 		import_datum.aktuell = 0
-		import_datum.save()	# Jetzt wird das Objekt erst in der DB wirklich angelegt
+		speichere_schritt(import_datum)	# Jetzt wird das Objekt erst in der DB wirklich angelegt
+
 		current_user = request.user
 		import_datum.user = current_user.username
 
@@ -181,10 +185,10 @@ def import_csv(request):
 			neuerRecord.save()
 			import_datum.aktuell += 1
 			if import_datum.aktuell % 42 == 0:
-				import_datum.save()
+				speichere_schritt(import_datum)
 
 		zeiten['schreibe_ende'] = timezone.now()
-		import_datum.save()	# Damit ist der Datensatz für diesen Schritt endgültig fertig.
+		speichere_schritt(import_datum)	# Damit ist der Datensatz für diesen Schritt endgültig fertig.
 
 	def hole_datei():
 		"""
@@ -499,7 +503,7 @@ def import_status(request):
 			'zeilen': -1,
 			'proz': -1,
 		}
-	a=124
+
 	return render(request, 'rapp/import_status.html', context)
 
 
