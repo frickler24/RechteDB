@@ -107,7 +107,7 @@ def UhR_erzeuge_listen(request):
 	Von dort aus gibt eine ForeignKey-Verbindung zu TblRollen.
 
 	Problematisch ist noch die Verbindung zwischen TblRollen und TblRollaHatAf,
-	Weil hier der Foreign Key Definition in TblRolleHatAf liegt.
+	weil hier der Foreign Key Definition in TblRolleHatAf liegt.
 	Das kann aber aufgelöst werden,
 	sobald ein konkreter User betrachtet wird und nicht mehr eine Menge an Usern.
 
@@ -117,9 +117,6 @@ def UhR_erzeuge_listen(request):
 	"""
 	panel_liste = TblUserIDundName.objects.filter(geloescht=False).order_by('name')
 	panel_filter = UseridFilter(request.GET, queryset=panel_liste)
-
-	# rollen_liste = TblUserhatrolle.objects.all().order_by('rollenname')
-	# rollen_filter = RollenFilter(request.GET, queryset=rollen_liste)
 
 	namen_liste = panel_filter.qs.filter(userid__istartswith="xv")
 	panel_liste = panel_filter.qs.filter(userid__istartswith="xv").select_related("orga")
@@ -163,6 +160,67 @@ def UhR_erzeuge_listen(request):
 
 	return (namen_liste, panel_liste, panel_filter)
 
+def UhR_erzeuge_listen_ohne_rollen(request):
+	"""
+	Liefert zusätzlich zu den Daten aus UhR_erzeuge_listen noch eine leere Rollenliste,
+	damit das Suchfeld angezeigt wird
+	:param request:
+	:return: namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter
+	"""
+
+	# Hole erst mal eine leere Rollenliste ud dazu passenden Filter
+	rollen_liste = TblUserhatrolle.objects.none()
+	rollen_filter = RollenFilter(request.GET, queryset=rollen_liste)
+
+	# Und nun die eigentlich wichtigen Daten holen
+	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
+	return (namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter)
+
+def UhR_erzeuge_listen_mit_rollen(request):
+	"""
+	Liefert zusätzlich zu den Daten aus UhR_erzeuge_listen noch die dazu gehörenden Rollen
+	:param request:
+	:return: namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter
+	"""
+
+	# Hole erst mal die Menge an Rollen, die namentlich passen
+	suchstring = request.GET.get('rollenname', 'nix')
+	print('Suchstring:', suchstring)
+	rollen_liste = TblUserhatrolle.objects.filter(rollenname__rollenname__contains = suchstring).order_by('rollenname')
+	rollen_filter = RollenFilter(request.GET, queryset=rollen_liste)
+	print ('Anzahl Rollen:', len(rollen_liste))
+
+	userids = set ()
+	for x in rollen_liste:
+		userids.add(x.userid.userid)
+
+	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
+	namen_liste = panel_filter.qs.filter(userid__in = userids)
+
+	return (namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter, userids)
+
+def finde_userids_zum_namen(selektierter_name):
+	"""
+	Hole alle UserIDs, die zu dem ausgesuchten User passen.
+	Dies funktioniert nur, weil der Name ein unique Key in der Tabelle ist.
+	Wichtig: Filtere gelöschte User heraus, sonst gibt es falsche Anzeigen
+
+	:param selektierter_name: Zu welcehm Namen sollen die UserIDs gesucht werden?
+	:return: Liste der UserIDs (als Strings)
+	"""
+	selektierte_userids = set()	# Die Menge der UserIDs, die an Identität ID hängen
+
+	number_of_userids = TblUserIDundName.objects \
+		.filter(name=selektierter_name) \
+		.filter(geloescht=False) \
+		.count()
+	for num in range(number_of_userids):
+		selektierte_userids.add(TblUserIDundName.objects
+								.filter(name=selektierter_name)
+								.order_by('-userid') \
+								.filter(geloescht=False)[num].userid)
+	return selektierte_userids
+
 # Selektiere die erforderlichen User- und Berefchtigungsdaten
 def UhR_hole_daten(panel_liste, id):
 	"""
@@ -195,17 +253,7 @@ def UhR_hole_daten(panel_liste, id):
 		selektierte_haupt_userid = TblUserIDundName.objects.get(id = id).userid
 
 		# Hole alle UserIDs, die zu dem ausgesuchten User passen.
-		# Dies funktioniert nur, weil der Name ein unique Key in der Tabelle ist.
-		# Wichtig: Filtere gelöschte User heraus, sonst gibt es falsche Anzeigen
-		number_of_userids = TblUserIDundName.objects\
-			.filter(name = selektierter_name)\
-			.filter(geloescht = False)\
-			.count()
-		for num in range(number_of_userids):
-			selektierte_userids.add (TblUserIDundName.objects
-									 .filter(name = selektierter_name)
-									 .order_by('-userid') \
-									 .filter(geloescht=False)[num].userid)
+		selektierte_userids = finde_userids_zum_namen(selektierter_name)
 
 		# Selektiere alle Arbeitsplatzfunktionen, die derzeit mit dem User verknüpft sind.
 		afliste = TblUserIDundName.objects.get(id=id).tblgesamt_set.all()  # Das QuerySet
@@ -229,6 +277,47 @@ def UhR_hole_daten(panel_liste, id):
 
 	return (userHatRolle_liste, selektierter_name, userids, usernamen,
 			selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID)
+
+def finde_rollen(name, af):
+	vorhanden = set()
+	optional = set()
+
+	# Hole erst mal die Menge an Rollen, die namentlich zu der AF passen
+	rollen_liste = TblRollehataf.objects.filter(rollenname__af = af).order_by('rollenname')
+	return (list(vorhanden), list(optional))
+
+def UhR_hole_rollen_daten(namen_liste):
+	# Erzeuge die Liste der UserID, die mit den übergebenen Namen zusammenhängen
+	# Dann erzeuge die Liste der AFen, die mit den UserIDs verbunden sind
+	# - Notiere für jede der AFen, welche Rollen Grund für diese AF derzeit zugewiesen sind (aus UserHatRolle)
+	# - Notiere, welche weiteren Rollen, die derzeit nicht zugewiesen sind, für diese AF in Frage kämen
+	# Gib alles in einer fetten Datenstruktur zurück.
+
+	gesamt_liste = {}
+
+	for name in namen_liste:
+		print('Starte mit Namen:', name.name)
+		userids = finde_userids_zum_namen(name.name)
+		print('UserIDs:', userids)
+
+		for userid in userids:
+			af_liste = TblGesamt.objects.filter(userid_name_id__userid = userid).filter(geloescht = False).distinct()
+			print (len(af_liste))
+
+			af_menge = {}
+			for af in af_liste:
+				if af.enthalten_in_af not in af_menge:
+					(vorhandene_rollen, optionale_rollen) = finde_rollen(name, af.enthalten_in_af)
+					print('Vorhanden:', vorhandene_rollen)
+					print('Optionale:', optionale_rollen)
+					af_menge[af.enthalten_in_af] = (vorhandene_rollen, optionale_rollen)
+
+			gesamt_liste[userid] = (name, af_liste, af_menge)
+
+	print ('Gesamt_liste', gesamt_liste)
+
+	assert 0, 'schluss'
+	#return (userHatRolle_liste, selektierter_name, userids, usernamen, selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID)
 
 # Funktionen zum Erstellen des Berechtigungskonzepts
 def UhR_verdichte_daten(panel_liste):
@@ -269,46 +358,111 @@ def panel_UhR_konzept_pdf(request):
 def panel_UhR_konzept(request):
 	return UhR_konzept(request, True)
 
+class UhR(object):
+	def factory(typ):
+		if typ == 'einzel':
+			return EinzelUhr()
+		if typ == 'rolle':
+			return RollenListenUhr()
+		if typ == 'af':
+			return AFListenUhr()
+		assert 0, "Falsche Factory-Typ in Uhr: " + typ
+
+	factory = staticmethod(factory)
+
+class EinzelUhr(UhR):
+	def behandle(self, request, id):
+		"""
+		Finde alle relevanten Informationen zur aktuellen Selektion
+		Das ist die Factory-Klasse für die Betrachtung einzelner User und deren spezifischer Rollen
+
+		:param request: GET oder POST Request vom Browser
+		:param id: ID des XV-UserID-Eintrags, zu dem die Detaildaten geliefert werden sollen; 0 -> kein User gewählt
+		:return: Gerendertes HTML
+		"""
+		(namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter) = UhR_erzeuge_listen_ohne_rollen(request)
+		(userHatRolle_liste, selektierter_name, userids, usernamen,
+		 selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID) \
+			= UhR_hole_daten(panel_liste, id)
+		(paginator, pages, pagesize) = pagination(request, namen_liste, 10000)
+
+		form = ShowUhRForm(request.GET)
+		context = {
+			'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
+			'filter': panel_filter,
+			'rollen_liste': rollen_liste, 'rollen_filter': rollen_filter,
+			'userids': userids, 'usernamen': usernamen, 'afmenge': afmenge,
+			'userHatRolle_liste': userHatRolle_liste,
+			'id': id,
+			'form': form,
+			'selektierter_name': selektierter_name,
+			'selektierte_userid': selektierte_haupt_userid,
+			'selektierte_userids': selektierte_userids,
+			'afmenge_je_userID': afmenge_je_userID,
+			'version': version,
+		}
+		return render(request, 'rapp/panel_UhR.html', context)
+
+class RollenListenUhr(UhR):
+	def behandle(self, request, _):
+		"""
+		Finde alle relevanten Informationen zur aktuellen Selektion
+		Das ist die Factory-Klasse für die Betrachtung aller User mit spezifischen Rollen- oder AF-Namen
+
+		:param request: GET oder POST Request vom Browser
+		:param id: wird hier nicht verwendet, deshalb "_"
+		:return: Gerendertes HTML
+		"""
+		(namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter, userids) = UhR_erzeuge_listen_mit_rollen(request)
+
+		(userHatRolle_liste, selektierter_name, userids, usernamen, selektierte_haupt_userid,
+		 selektierte_userids, afmenge, afmenge_je_userID) = UhR_hole_rollen_daten(namen_liste)
+
+		#(paginator, pages, pagesize) = pagination(request, afmenge_je_userID, 100)
+
+		form = ShowUhRForm(request.GET)
+		context = {
+			#'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
+			'filter': panel_filter,
+			'rollen_liste': rollen_liste, 'rollen_filter': rollen_filter,
+			'userids': userids, 'usernamen': usernamen, 'afmenge': afmenge,
+			'userHatRolle_liste': userHatRolle_liste,
+			'id': id,
+			'form': form,
+			'selektierte_userids': selektierte_userids,
+			'afmenge_je_userID': afmenge_je_userID,
+			'version': version,
+		}
+		return render(request, 'rapp/panel_UhR_rolle.html', context)
+
+class AFListenUhr(UhR):
+	def behandle(self, request, id):
+		return ''
+
 # Zeige das Selektionspanel
 @login_required
 def panel_UhR(request, id = 0):
 	"""
-	Finde alle relevanten Informationen zur aktuellen Selektion:
+	Finde die richtige Anzeige und evaluiere sie über das factory-Pattern
 
 	:param request: GET oder POST Request vom Browser
 	:param pk: ID des XV-UserID-Eintrags, zu dem die Detaildaten geliefert werden sollen
 	:return: Gerendertes HTML
 	"""
 
-	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
+	assert request.method != 'POST', 'Irgendwas ist im panel_UhR über POST angekommen'
+	assert request.method == 'GET', 'Irgendwas ist im panel_UhR nicht über GET angekommen: ' + request.method
 
-	if request.method == 'POST':
-		form = ShowUhRForm(request.POST)
-		print ('Irgendwas ist im panel_UhR über POST angekommen')
-
-		if form.is_valid():
-			return redirect('home')  # TODO: redirect ordentlich machen oder POST-Teil entfernen
+	if request.GET.get('rollenname', None) != None and request.GET.get('rollenname', None) != "":
+		name = 'rolle'
+	elif request.GET.get('afname', None) != None and request.GET.get('afname', None) != "":
+		name = 'af'
 	else:
-		(userHatRolle_liste, selektierter_name, userids, usernamen,
-		 selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID) \
-			= UhR_hole_daten(panel_liste, id)
-		(paginator, pages, pagesize) = pagination(request, namen_liste, 10000)
+		name = 'einzel'
 
-	form = ShowUhRForm(request.GET)
-	context = {
-		'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
-		'filter': panel_filter,
-		'userids': userids, 'usernamen': usernamen, 'afmenge': afmenge,
-		'userHatRolle_liste': userHatRolle_liste,
-		'id': id,
-		'form': form,
-		'selektierter_name': selektierter_name,
-		'selektierte_userid': selektierte_haupt_userid,
-		'selektierte_userids': selektierte_userids,
-		'afmenge_je_userID': afmenge_je_userID,
-		'version': version,
-	}
-	return render(request, 'rapp/panel_UhR.html', context)
+	print (name)
+	obj = UhR.factory(name)
+	return obj.behandle(request, id)
 
 # Erzeuge das Berechtiogungskonzept für Anzeige und PDF
 def	UhR_konzept(request, ansicht):

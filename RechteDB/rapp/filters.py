@@ -71,7 +71,6 @@ class UseridFilter(django_filters.FilterSet):
 			'orga',
 		]
 
-
 class RollenFilter(django_filters.FilterSet):
 	name = django_filters.CharFilter(lookup_expr='istartswith')
 	gruppe = django_filters.CharFilter(lookup_expr='icontains')
