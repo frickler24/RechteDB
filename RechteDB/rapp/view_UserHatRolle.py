@@ -14,8 +14,7 @@ import csv
 from .filters import RollenFilter, UseridFilter
 from .views import version, pagination
 from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportForm_schritt3
-from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, TblUserhatrolle, \
-					Tblrechteneuvonimport, Tblrechteamneu
+from .models import TblUserIDundName, TblGesamt, TblRollehataf, TblUserhatrolle
 from .xhtml2 import render_to_pdf
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -186,7 +185,7 @@ def UhR_erzeuge_listen_mit_rollen(request):
 	# Hole erst mal die Menge an Rollen, die namentlich passen
 	suchstring = request.GET.get('rollenname', 'nix')
 	print('Suchstring:', suchstring)
-	rollen_liste = TblUserhatrolle.objects.filter(rollenname__rollenname__contains = suchstring).order_by('rollenname')
+	rollen_liste = TblUserhatrolle.objects.filter(rollenname__rollenname__icontains = suchstring).order_by('rollenname')
 	rollen_filter = RollenFilter(request.GET, queryset=rollen_liste)
 	print ('Anzahl Rollen:', len(rollen_liste))
 
@@ -194,8 +193,9 @@ def UhR_erzeuge_listen_mit_rollen(request):
 	for x in rollen_liste:
 		userids.add(x.userid.userid)
 
-	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
-	namen_liste = panel_filter.qs.filter(userid__in = userids)
+	(_, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
+	namen_liste = (panel_filter.qs.filter(userid__in = userids))
+	print('Gefilterte Namenliste:', namen_liste)
 
 	return (namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter, userids)
 
@@ -278,15 +278,59 @@ def UhR_hole_daten(panel_liste, id):
 	return (userHatRolle_liste, selektierter_name, userids, usernamen,
 			selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID)
 
-def finde_rollen(name, af):
+def finde_rollen(userid, af, rolle):
+	"""
+	Liefert die Liste der Rollen, in denen eine bestimmte AF vorkommt.
+	:param name: Die gerade betrachtete UserID des users
+	:param af: Name der gesuchten Arbeitsplatzfunktion AF
+	:param rolle: Name der gesuchten Rolle; Nur dazu passende AFen zurückliefern
+	:return: vorhanden = Liste der Rollen, in denen die AF vorkommt und die dem Namen zugeordnet sind
+	:return: optional = Liste der Rollen, in denen die AF vorkommt und die dem User nicht zugeordnet sind
+	"""
+	# Hole erst mal die Menge an Rollen, die namentlich zu der AF passen
+	print('Gesuchte UserID:', userid, '; Suche nach AF:', af)
+	if rolle is None:
+		rollen_liste = TblRollehataf.objects.filter(af__af_name = af).order_by('rollenname')
+	else:
+		rollen_liste = TblRollehataf.objects\
+			.filter(rollenname = rolle)\
+			.filter(af__af_name = af)\
+			.order_by('rollenname')
+	print ('Rollen_liste: ', rollen_liste)
+
+	# Wenn die Kombination Rollenname und Userid nicht passt, liefere leere Listen zurück
+	rolle_passt = TblUserhatrolle.objects\
+		.filter(userid__userid = userid)\
+		.filter(rollenname__rollenname = rolle)
+	if rolle_passt == 0:
+		return ([], [])
+
+	# Ansonsten suche alle Rollen, in denen die AF enthalten ist und prüfe, ob die UserID diese AF besitzt
 	vorhanden = set()
 	optional = set()
+	gefunden = TblGesamt.objects.filter(enthalten_in_af = af)\
+		.filter(geloescht = False)\
+		.filter(userid_name__userid = userid) \
+		.filter(userid_name__geloescht = False)
 
-	# Hole erst mal die Menge an Rollen, die namentlich zu der AF passen
-	rollen_liste = TblRollehataf.objects.filter(rollenname__af = af).order_by('rollenname')
+	print ('Anzahl gefundene AF-Einträge (mehrere TFen) für die Userid:', len(gefunden))
+	if len(gefunden) > 0:
+		vorhanden.add(af)
+	else:
+		optional.add(af)
+
+	print('Vorhanden:', list(vorhanden))
+	print('Optional :', list(optional))
 	return (list(vorhanden), list(optional))
 
-def UhR_hole_rollen_daten(namen_liste):
+def UhR_hole_rollen_daten(namen_liste, gesuchte_rolle):
+	"""
+	Finde alle UserIDs, die über die angegebene Rolle verfügen.
+	Wenn gesuchte_rolle is None, dann finde alle Rollen.
+	:param namen_liste: Zu welchen Namen soll die Liste erstellt werden?
+	:param gesuchte_rolle: s.o.
+	:return: ToDo: Weiß noch nicht genau
+	"""
 	# Erzeuge die Liste der UserID, die mit den übergebenen Namen zusammenhängen
 	# Dann erzeuge die Liste der AFen, die mit den UserIDs verbunden sind
 	# - Notiere für jede der AFen, welche Rollen Grund für diese AF derzeit zugewiesen sind (aus UserHatRolle)
@@ -307,9 +351,7 @@ def UhR_hole_rollen_daten(namen_liste):
 			af_menge = {}
 			for af in af_liste:
 				if af.enthalten_in_af not in af_menge:
-					(vorhandene_rollen, optionale_rollen) = finde_rollen(name, af.enthalten_in_af)
-					print('Vorhanden:', vorhandene_rollen)
-					print('Optionale:', optionale_rollen)
+					(vorhandene_rollen, optionale_rollen) = finde_rollen(userid, af.enthalten_in_af, gesuchte_rolle)
 					af_menge[af.enthalten_in_af] = (vorhandene_rollen, optionale_rollen)
 
 			gesamt_liste[userid] = (name, af_liste, af_menge)
@@ -367,7 +409,6 @@ class UhR(object):
 		if typ == 'af':
 			return AFListenUhr()
 		assert 0, "Falsche Factory-Typ in Uhr: " + typ
-
 	factory = staticmethod(factory)
 
 class EinzelUhr(UhR):
@@ -414,9 +455,10 @@ class RollenListenUhr(UhR):
 		:return: Gerendertes HTML
 		"""
 		(namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter, userids) = UhR_erzeuge_listen_mit_rollen(request)
+		print('Namenliste in RollenListenUhR:', namen_liste)
 
-		(userHatRolle_liste, selektierter_name, userids, usernamen, selektierte_haupt_userid,
-		 selektierte_userids, afmenge, afmenge_je_userID) = UhR_hole_rollen_daten(namen_liste)
+		(userHatRolle_liste, selektierter_name, userids, usernamen, selektierte_haupt_userid, selektierte_userids,
+		afmenge, afmenge_je_userID) = UhR_hole_rollen_daten(namen_liste, request.GET.get('rollenname', None))
 
 		#(paginator, pages, pagesize) = pagination(request, afmenge_je_userID, 100)
 
