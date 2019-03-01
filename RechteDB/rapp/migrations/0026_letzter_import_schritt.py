@@ -16,3 +16,8 @@ class Migration(migrations.Migration):
             field=models.IntegerField(default=0),
         ),
     ]
+    def apply(self, project_state, schema_editor, collect_sql=False):
+        return project_state.clone()
+
+    def unapply(self, project_state, schema_editor, collect_sql=False):
+        return project_state.clone()

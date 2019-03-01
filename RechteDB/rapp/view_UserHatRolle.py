@@ -199,29 +199,30 @@ def UhR_erzeuge_listen_mit_rollen(request):
 
 	return (namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter, userids)
 
-def finde_userids_zum_namen(selektierter_name):
+def hole_userids_zum_namen(selektierter_name):
 	"""
 	Hole alle UserIDs, die zu dem ausgesuchten User passen.
 	Dies funktioniert nur, weil der Name ein unique Key in der Tabelle ist.
 	Wichtig: Filtere gelöschte User heraus, sonst gibt es falsche Anzeigen
 
 	:param selektierter_name: Zu welcehm Namen sollen die UserIDs gesucht werden?
-	:return: Liste der UserIDs (als Strings)
+	:return: Liste der UserIDs (als String[])
 	"""
-	selektierte_userids = set()	# Die Menge der UserIDs, die an Identität ID hängen
+	userids = []	# Die Menge der UserIDs, die an Identität ID hängen
 
+	# Wir müssen das in einer Schleife machen, weil wir von jedem Identitäts--Element nur die UserID benötigen
 	number_of_userids = TblUserIDundName.objects \
 		.filter(name=selektierter_name) \
 		.filter(geloescht=False) \
 		.count()
 	for num in range(number_of_userids):
-		selektierte_userids.add(TblUserIDundName.objects
+		userids.append(TblUserIDundName.objects
 								.filter(name=selektierter_name)
 								.order_by('-userid') \
 								.filter(geloescht=False)[num].userid)
-	return selektierte_userids
+	return userids
 
-# Selektiere die erforderlichen User- und Berefchtigungsdaten
+# Selektiere die erforderlichen User- und Berechtigungsdaten
 def UhR_hole_daten(panel_liste, id):
 	"""
 	Selektiere alle Userids und alle Namen in TblUserHatRolle, die auch in der Selektion vorkommen
@@ -253,7 +254,7 @@ def UhR_hole_daten(panel_liste, id):
 		selektierte_haupt_userid = TblUserIDundName.objects.get(id = id).userid
 
 		# Hole alle UserIDs, die zu dem ausgesuchten User passen.
-		selektierte_userids = finde_userids_zum_namen(selektierter_name)
+		selektierte_userids = hole_userids_zum_namen(selektierter_name)
 
 		# Selektiere alle Arbeitsplatzfunktionen, die derzeit mit dem User verknüpft sind.
 		afliste = TblUserIDundName.objects.get(id=id).tblgesamt_set.all()  # Das QuerySet
@@ -323,43 +324,82 @@ def finde_rollen(userid, af, rolle):
 	print('Optional :', list(optional))
 	return (list(vorhanden), list(optional))
 
-def UhR_hole_rollen_daten(namen_liste, gesuchte_rolle):
+def hole_af_mengen(userids, gesuchte_rolle):
+	"""
+	Hole eine Liste mit AFen, die mit der gesuchten Rolle verbunden sind.
+	Erzeuge die Liste der AFen, die mit den UserIDs verbunden sind
+	und liefere die Menge an AFen, die beiden Kriterien entsprechen.
+	:param userids: Dictionary mit Key = Name der Identität und val = Liste der UserIDs der Identität
+					(Beispiel: userids['Eichler, Lutz'] = ['XV13254])
+	:return: af_dict{}[(Name, UserID)] = AF[]
+
+	"""
+	assert gesuchte_rolle is not None, 'hole_af_mengen: Achtung, gescuhte_rolle ist None'
+
+	such_af = set()
+	rollen_liste = TblRollehataf.objects.filter(rollenname__rollenname__icontains = gesuchte_rolle)
+	for rolle in rollen_liste:
+		such_af.add(rolle.af)
+
+	af_dict = {}
+	for name in dict(userids):
+		for userid in userids[name]:
+			if gesuchte_rolle is None: # Finde alle AFen zur UserID
+				af_liste = TblGesamt.objects.filter(userid_name_id__userid = userid).filter(geloescht = False)
+				print('Ohne Filter-Rolle')
+			else:
+				af_liste = TblGesamt.objects.filter(userid_name_id__userid = userid).\
+					filter(geloescht = False)\
+					.filter(enthalten_in_af__in = such_af)
+				print('Mit Filter-Rolle')
+			print ('Anzahl gefundener nicht-disjunkter AFen für Userid {}: {}'.format(userid, len(af_liste)))
+
+			af_menge = set()
+			for af in af_liste:
+				af_menge.add(af.enthalten_in_af)
+			print ('Anzahl gefundener disjunkter AFen für Userid {}: {}'.format(userid, len(af_menge)))
+
+			af_dict[(name, userid)] = af_menge
+	return af_dict
+
+def UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle):
 	"""
 	Finde alle UserIDs, die über die angegebene Rolle verfügen.
 	Wenn gesuchte_rolle is None, dann finde alle Rollen.
+
+	Erzeuge die Liste der UserID, die mit den übergebenen Namen zusammenhängen
+	Dann erzeuge die Liste der AFen, die mit den UserIDs verbunden sind
+	- Notiere für jede der AFen, welche Rollen Grund für diese AF derzeit zugewiesen sind (aus UserHatRolle)
+	- Notiere, welche weiteren Rollen, die derzeit nicht zugewiesen sind, für diese AF in Frage kämen
+
+	Liefert die folgende Hash-Liste zurück:
+	Rollenhash{}[(Name, UserID, AF)] = (
+		(liste der vorhandenen Rollen, in denen die AF enthalten ist),
+		(liste weiterer Rollen, in denen die AF enthalten ist)
+		)
+
+	Liefert die Namen / UserID-Liste zurück
+	userids{}[Name] = (Userids zu Name, alfabeitsch absteigend sortiert: XV, DV, CV, BV, AV)
+
 	:param namen_liste: Zu welchen Namen soll die Liste erstellt werden?
 	:param gesuchte_rolle: s.o.
-	:return: ToDo: Weiß noch nicht genau
+	:return: (rollenhash, userids)
 	"""
-	# Erzeuge die Liste der UserID, die mit den übergebenen Namen zusammenhängen
-	# Dann erzeuge die Liste der AFen, die mit den UserIDs verbunden sind
-	# - Notiere für jede der AFen, welche Rollen Grund für diese AF derzeit zugewiesen sind (aus UserHatRolle)
-	# - Notiere, welche weiteren Rollen, die derzeit nicht zugewiesen sind, für diese AF in Frage kämen
-	# Gib alles in einer fetten Datenstruktur zurück.
-
-	gesamt_liste = {}
-
+	userids = {}
 	for name in namen_liste:
-		print('Starte mit Namen:', name.name)
-		userids = finde_userids_zum_namen(name.name)
-		print('UserIDs:', userids)
+		userids[name.name] = hole_userids_zum_namen(name.name)
+		print ('UserIDs zum Namen {}: {}'.format(name.name, userids[name.name]))
+	print('UserIDs: {}'.format(userids))
 
-		for userid in userids:
-			af_liste = TblGesamt.objects.filter(userid_name_id__userid = userid).filter(geloescht = False).distinct()
-			print (len(af_liste))
-
-			af_menge = {}
-			for af in af_liste:
-				if af.enthalten_in_af not in af_menge:
-					(vorhandene_rollen, optionale_rollen) = finde_rollen(userid, af.enthalten_in_af, gesuchte_rolle)
-					af_menge[af.enthalten_in_af] = (vorhandene_rollen, optionale_rollen)
-
-			gesamt_liste[userid] = (name, af_liste, af_menge)
-
-	print ('Gesamt_liste', gesamt_liste)
-
+	af_dict = hole_af_mengen(userids, gesuchte_rolle)
+	print ('AF_Dictionary =', af_dict)
 	assert 0, 'schluss'
-	#return (userHatRolle_liste, selektierter_name, userids, usernamen, selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID)
+	hole_rollen()
+
+
+	rollenhash = fuelle_rollenhash(userids, gesuchte_rolle)
+
+	return (userids, rollenhash)
 
 # Funktionen zum Erstellen des Berechtigungskonzepts
 def UhR_verdichte_daten(panel_liste):
@@ -454,25 +494,20 @@ class RollenListenUhr(UhR):
 		:param id: wird hier nicht verwendet, deshalb "_"
 		:return: Gerendertes HTML
 		"""
-		(namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter, userids) = UhR_erzeuge_listen_mit_rollen(request)
+		(namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter, userids) =\
+			UhR_erzeuge_listen_mit_rollen(request)
 		print('Namenliste in RollenListenUhR:', namen_liste)
 
-		(userHatRolle_liste, selektierter_name, userids, usernamen, selektierte_haupt_userid, selektierte_userids,
-		afmenge, afmenge_je_userID) = UhR_hole_rollen_daten(namen_liste, request.GET.get('rollenname', None))
+		(userids, rollenhash) = UhR_hole_rollengefilterte_daten(namen_liste, request.GET.get('rollenname', None))
 
-		#(paginator, pages, pagesize) = pagination(request, afmenge_je_userID, 100)
+		(paginator, pages, pagesize) = pagination(request, rollenhash, 10)
 
 		form = ShowUhRForm(request.GET)
 		context = {
-			#'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
-			'filter': panel_filter,
-			'rollen_liste': rollen_liste, 'rollen_filter': rollen_filter,
-			'userids': userids, 'usernamen': usernamen, 'afmenge': afmenge,
-			'userHatRolle_liste': userHatRolle_liste,
-			'id': id,
-			'form': form,
-			'selektierte_userids': selektierte_userids,
-			'afmenge_je_userID': afmenge_je_userID,
+			'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
+			'filter': panel_filter, 'form': form,
+			'userids': userids,
+			'rollenhash': rollenhash, # ToDo: Funktion schaffen zum Rollenhash-auflösen
 			'version': version,
 		}
 		return render(request, 'rapp/panel_UhR_rolle.html', context)

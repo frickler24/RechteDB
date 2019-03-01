@@ -75,3 +75,8 @@ class Migration(migrations.Migration):
             options={'managed': True, 'ordering': ['geloescht', 'name', '-userid'], 'verbose_name': 'UserID-Name-Kombination', 'verbose_name_plural': '05_UserID-Name-Übersicht (tblUserIDundName)'},
         ),
     ]
+    def apply(self, project_state, schema_editor, collect_sql=False):
+        return project_state.clone()
+
+    def unapply(self, project_state, schema_editor, collect_sql=False):
+        return project_state.clone()
