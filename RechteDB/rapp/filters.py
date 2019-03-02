@@ -75,6 +75,7 @@ class RollenFilter(django_filters.FilterSet):
 	name = django_filters.CharFilter(lookup_expr='istartswith')
 	gruppe = django_filters.CharFilter(lookup_expr='icontains')
 	rollenname = django_filters.CharFilter(lookup_expr='icontains')
+	# afname = django_filters.CharFilter(lookup_expr='icontains')
 
 	class Meta:
 		model = TblUserhatrolle
@@ -85,5 +86,6 @@ class RollenFilter(django_filters.FilterSet):
 			'userid__gruppe',
 			'userid__orga',
 			'rollenname',
+			# 'afname',
 		]
 
