@@ -12,15 +12,11 @@
 				{% render_field filter.form.orga class="form-control" %}
 			</div>
 			<div class="form-group form-group-sm col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
-				<label class="control-label" for="{{ filter.form.zi_organisation.id_for_label }}">AF enthält</label>
-				{% render_field filter.form.zi_organisation class="form-control" %}
+				<label class="control-label" for="{{ rollenfilter.form.rollenname.id_for_label }}">Rolle enthält</label>
+				{% render_field rollen_filter.form.rollenname class="form-control" %}
 			</div>
 			<div class="form-group form-group-sm col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
-				<label class="control-label" for="{{ filter.form.zi_organisation.id_for_label }}">Rolle enthält</label>
-				{% render_field filter.form.zi_organisation class="form-control" %}
-			</div>
-			<div class="form-group form-group-sm col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
-				<label class="control-label" for="{{ filter.form.gruppe.id_for_label }}">Gruppe endet mit</label>
+				<label class="control-label" for="{{ filter.form.gruppe.id_for_label }}">Gruppe beginnt mit</label>
 				{% render_field filter.form.gruppe class="form-control" %}
 			</div>
 			<div class="container">
@@ -67,7 +63,7 @@
 						{{ row.userid|upper }}
 					</a>
 				</div>
-				<div class="col-4">
+				<div class="col-8">
 					<a href="{% url 'user_rolle_af_parm' row.pk %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}">
 					   {{ row.name }}
 					</a>
@@ -75,7 +71,7 @@
 			</div>
 		{% empty %}
 			<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-				Keine Treffer
+				Keine angezeigten User
 			</div>
 		{% endfor %}
 	</form>

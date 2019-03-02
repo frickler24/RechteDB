@@ -20,7 +20,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Zum Einlesen der Versionsnummer
-import os, re, subprocess
+import os, re, subprocess, sys
 from math import *
 
 from .filters import PanelFilter
@@ -32,15 +32,7 @@ from .stored_procedures import finde_procs_exakt, connection
 ###################################################################
 # RApp - erforderliche Sichten und Reports
 
-# ToDo: Alle Rollen sowie die daran hängenden AF für eine Selektion (gruppiert für PDF)
-# ToDo: Alle TF / GF / AF / Rollen für selektierte User - Evtl. gibt es das schon beim jetzigen Filterpanel
-
 # ToDo: Abgleich vorhandener Rechte selektierter User mit Zertifizierungsliste (Importfunktion für die Liste!)
-
-# ToDo: Abgleich vorhandener Rechte mit Rollenvorgaben
-# ToDo: - Was fehlt?
-# ToDo: - Was ist zu viel?
-# ToDo: - Jeweils aufgeteilt für XV-, jeden vorhandenen AV/BV/CV und evtl. vorhandenen DV-User
 
 # ToDo: Welche Direktzuordnungen hat eine UID schon über vorhandene AF?
 # ToDo: - Welche Zuordnung ist damit doppelt?
@@ -58,15 +50,9 @@ from .stored_procedures import finde_procs_exakt, connection
 # ToDo: Welche Rechte sind redundant, weil sie neu modelliert wurden und was ist die Alternativempfehlung?
 # ToDo: Zu welchen Orgabereichen (Importfunktion dafür!) gehören die identifizierten User (Vorbereitung Mail an FK zum Prüfen und eventuellem Löschen
 
-# ToDo: Links auf die change- create- und delete-Seiten ausprobieren. Sind eigene Seiten im Frontend besser?
-# ToDo: Filter-Panel mit excel Export versorgen
-# ToDo: Kompakte Liste für Rolle und AF mit Filtermöglichkeit und PDF Generierung
-
 # ToDo: Die gesamten Modellnamen können mal überarbeitet werden (kein TBL am Anfang etc.)
 
-# ToDo: Die tables alternierend einfärben
 # ToDo: Checken, ob tbl_Gesamt_komplett irgendwo noch als Gesamttabelle aller userids benötigt wird, sonst in SP löschen nach Nutzung
-# ToDO: Längenbegrenzungen checken in Modell für UserHatRolle
 
 # ToDo: Neuanlage von Rollen in mehreren Zeilen vorbereiten?
 # ToDo: Suche: Wo kann man die Modelle anpassen? Braucht das Ändern der Modellzugehörigkeit noch jemand, oder ist das mit dem neuen Rollenmodell obsolet?

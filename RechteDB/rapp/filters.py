@@ -57,7 +57,7 @@ class UseridFilter(django_filters.FilterSet):
 	#zi_organisation = 			django_filters.CharFilter(lookup_expr='icontains')
 	#geloescht = 				django_filters.BooleanFilter()
 	#abteilung = 				django_filters.CharFilter(lookup_expr='icontains')
-	gruppe = 					django_filters.CharFilter(lookup_expr='iendswith')
+	gruppe = 					django_filters.CharFilter(lookup_expr='icontains')
 
 	class Meta:
 		model = TblUserIDundName
@@ -69,5 +69,23 @@ class UseridFilter(django_filters.FilterSet):
 			'abteilung',
 			'gruppe',
 			'orga',
+		]
+
+class RollenFilter(django_filters.FilterSet):
+	name = django_filters.CharFilter(lookup_expr='istartswith')
+	gruppe = django_filters.CharFilter(lookup_expr='icontains')
+	rollenname = django_filters.CharFilter(lookup_expr='icontains')
+	# afname = django_filters.CharFilter(lookup_expr='icontains')
+
+	class Meta:
+		model = TblUserhatrolle
+		fields = [
+			'userid__name',
+			'userid__userid',
+			'userid__zi_organisation',
+			'userid__gruppe',
+			'userid__orga',
+			'rollenname',
+			# 'afname',
 		]
 
