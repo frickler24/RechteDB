@@ -34,17 +34,17 @@
 		<h1>User, Rollen und Arbeitsplatzfunktionen</h1>
 
 		{% if rollenMenge %}
-			<div>
-				<table repeat="1" id="pdfdruck">
-					<thead>
-						<tr>
-							<th colspan="2" style="text-align: left;"><br />Rollennname</th>
-							<th colspan="2" style="text-align: left;"><br />Beschreibung</th>
-							<th colspan="1" style="text-align: left;"><br />System</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for rolle in rollenMenge %}
+			{% for rolle in rollenMenge %}
+				<div>
+					<table repeat="0" id="pdfdruck">
+						<thead>
+							<tr>
+								<th colspan="2" style="text-align: left;"><br />Rollennname</th>
+								<th colspan="2" style="text-align: left;"><br />Beschreibung</th>
+								<th colspan="1" style="text-align: left;"><br />System</th>
+							</tr>
+						</thead>
+						<tbody>
 							<tr><td>&nbsp;</td></tr>
 							<tr>
 								<td colspan="2">
@@ -60,7 +60,7 @@
 							<tr>
 								<td>&nbsp;</td>
 								<td colspan="4">
-									<table repeat="1" id="pdfdruck2">
+									<table repeat="0" id="pdfdruck2">
 										<head>
 											<tr>
 												<td width="30%"><strong>AF</strong></td>
@@ -71,35 +71,40 @@
 										</head>
 										<tbody>
 											{% for meineaf in rolle.tblrollehataf_set.all %}
-												{% if forloop.counter0 >= 50 %}
-													{% if forloop.counter0 == 50 %}
-														<tr>
-															<td colspan="4">
-																<strong style="color: red;">
-																	Achtung, die Rolle enthält mehr als
-																	{{ forloop.counter0 }} Elemente.
-																	Es fehlen noch {{ forloop.revcounter }} Zeilen.
-																</strong>
-															</td>
-														</tr>
-													{% endif %}
-												{% else %}
-													<tr>
-														<td>{{ meineaf.af }}</td>
-														<td class="text-center">
-															{% if meineaf.mussfeld %}
-																<img src="static/checkbox-checked.jpg"
-																	 alt="checkbox checked" height="10" width="10">
-															{% else %}
-																<img src="static/checkbox-blank.jpg"
-																	 alt="checkbox checked" height="10" width="10">
-															{% endif %}
-														</td>
-														<td class="text-center">
-															<small>{{ meineaf.get_einsatz_display }}</small>
-														</td>
-														<td>{{ meineaf.bemerkung }}</td>
-													{% endif %}
+												{% if forloop.counter0 > 0 and forloop.counter0|divisibleby:45 %}
+										</tbody></table>
+									</tbody></table>
+
+									<table repeat="0" id="pdfdruck">
+												<tr>
+													<td>&nbsp;</td>
+													<td colspan="4">
+										<table repeat="1" id="pdfdruck2">
+											<head>
+												<tr>
+													<td width="30%"><strong>AF</strong></td>
+													<td width="5%"><strong>Muss</strong></td>
+													<td width="15%"><strong>Einsatz</strong></td>
+													<td width="50%"><strong>Anmerkung zur AF</strong></td>
+												</tr>
+											</head>
+											<tbody>
+												{% endif %}
+												<tr>
+													<td>{{ meineaf.af }}</td>
+													<td class="text-center">
+														{% if meineaf.mussfeld %}
+															<img src="static/checkbox-checked.jpg"
+																 alt="checkbox checked" height="10" width="10">
+														{% else %}
+															<img src="static/checkbox-blank.jpg"
+																 alt="checkbox checked" height="10" width="10">
+														{% endif %}
+													</td>
+													<td class="text-center">
+														<small>{{ meineaf.get_einsatz_display }}</small>
+													</td>
+													<td>{{ meineaf.bemerkung }}</td>
 												</tr>
 											{% empty %}
 												<tr>
@@ -111,9 +116,12 @@
 										</tbody>
 									</table>
 								</td>
-						{% endfor userHabenRollen %}
-					</tbody>
-				</table>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<p>&nbsp</p>
+				{% endfor userHabenRollen %}
 			{% else %}
 				<div class="text-danger">
 					<p>
