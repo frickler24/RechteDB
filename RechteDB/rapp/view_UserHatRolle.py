@@ -14,7 +14,7 @@ import csv
 from .filters import RollenFilter, UseridFilter
 from .views import version, pagination
 from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportForm_schritt3
-from .models import TblUserIDundName, TblGesamt, TblRollehataf, TblUserhatrolle
+from .models import TblUserIDundName, TblGesamt, TblRollehataf, TblUserhatrolle, TblOrga
 from .xhtml2 import render_to_pdf
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -461,11 +461,11 @@ def UhR_verdichte_daten(panel_liste):
 # Die beiden nachfolgenden Funktionen dienen nur dem Aufruf der eigentlichen Konzept-Funktion
 @login_required
 def panel_UhR_konzept_pdf(request):
-	return UhR_konzept(request, False)
+	return erzeuge_UhR_konzept(request, False)
 
 @login_required
 def panel_UhR_konzept(request):
-	return UhR_konzept(request, True)
+	return erzeuge_UhR_konzept(request, True)
 
 class UhR(object):
 	def factory(typ):
@@ -573,7 +573,7 @@ def panel_UhR(request, id = 0):
 	return obj.behandle(request, id)
 
 # Erzeuge das Berechtiogungskonzept für Anzeige und PDF
-def	UhR_konzept(request, ansicht):
+def	erzeuge_UhR_konzept(request, ansicht):
 	"""
 	Erzeuge das Berechtigungskonzept für eine Menge an selektierten Identitäten.
 
@@ -623,15 +623,16 @@ def	UhR_konzept(request, ansicht):
 			content = "attachment; filename='%s'" % (filename)
 		response['Content-Disposition'] = content
 		return response
-	return HttpResponse("Fehlerhafte PDF-Generierung in UhR_konzept")
+	return HttpResponse("Fehlerhafte PDF-Generierung in erzeuge_UhR_konzept")
 
 # Funktionen zum Erstellen des Funktionsmatrix
-def UhR_erzeuge_matrixdaten(panel_liste):
+def erzeuge_UhR_matrixdaten(panel_liste):
 	"""
 	Überschriften-Block:
 		Erste Spaltenüberschrift ist "Name" als String, darunter werden die Usernamen liegen, daneben:
-		Ausgehend von den Userids der Selektion zeige
-			die Liste der Rollen alle nebeneinander als Spaltenüberschriften
+			Zeige Teamzugehörigkeit(en), daneben
+				Ausgehend von den Userids der Selektion zeige
+					die Liste der Rollen alle nebeneinander als Spaltenüberschriften
 	Zeileninhalte:
 		Für jeden User (nur die XV-User zeigen auf Rollen, deshalb nehmen wir nur diese)
 			zeige den Usernamen sowie in jeder zu dem User passenden Rolle die Art der Verwendung (S/V/A)
@@ -643,9 +644,18 @@ def UhR_erzeuge_matrixdaten(panel_liste):
 	usernamen = set()	# Die Namen aller User,  die in der Selektion erfasst werden
 	rollenmenge = set()		# Die Menge aller AFs aller spezifizierten User (aus Auswahl-Panel)
 	rollen_je_username = {} # Die Rollen, die zum Namen gehören
+	teams_je_username = {} # Derzeit nur ein Team/UserID, aber multi-Teams müssen vorbereitet werden
 
 	for row in panel_liste:
 		usernamen.add(row.name)
+		teamliste = TblOrga.objects\
+			.filter(tbluseridundname__name = row.name) \
+			.exclude(team = "Gelöschter User") # Die als gelöscht markierten User werden nicht mehr angezeigt
+
+		teammenge = set()
+		for team in teamliste:
+			teammenge.add(str(team))
+		teams_je_username[row.name] = [ str(team) for team in teammenge ]
 
 		# Erzeuge zunächst die Hashes für die UserIDs. Daran werden nachher die Listen der Rechte gehängt.
 		rollen_je_username[row.name] = set()
@@ -662,7 +672,7 @@ def UhR_erzeuge_matrixdaten(panel_liste):
 			rollenmenge.add(rolle.rollenname)
 
 	def order(a): return a.rollenname.lower() 	# Liefert das kleingeschriebene Element, nach dem sortiert werden soll
-	return (sorted(usernamen), sorted(list(rollenmenge), key=order), rollen_je_username)
+	return (sorted(usernamen), sorted(list(rollenmenge), key=order), rollen_je_username, teams_je_username)
 
 @login_required
 def panel_UhR_matrix(request):
@@ -670,7 +680,6 @@ def panel_UhR_matrix(request):
 	Erzeuge eine Verantwortungsmatrix für eine Menge an selektierten Identitäten.
 
 	:param request: GET Request vom Browser
-	:param ansicht: Flag, ob die Daten als HTML zur Ansicht oder als PDF zum Download geliefert werden sollen
 	:return: Gerendertes HTML
 	"""
 
@@ -678,9 +687,9 @@ def panel_UhR_matrix(request):
 	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
 
 	if request.method == 'GET':
-		(usernamen, rollenmenge, rollen_je_username) = UhR_erzeuge_matrixdaten(panel_liste)
+		(usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(panel_liste)
 	else:
-		(usernamen, rollenmenge, rollen_je_username) = (set(), set(), set())
+		(usernamen, rollenmenge, rollen_je_username, teams_je_username) = (set(), set(), set(), {})
 
 	(paginator, pages, pagesize) = pagination(request, namen_liste)
 
@@ -702,6 +711,7 @@ def panel_UhR_matrix(request):
 		'usernamen': usernamen,
 		'rollenmenge': rollenmenge,
 		'rollen_je_username': rollen_je_username,
+		'teams_je_username': teams_je_username,
 		'version': version,
 	}
 	return render(request, 'rapp/panel_UhR_matrix.html', context)
@@ -718,7 +728,7 @@ def panel_UhR_matrix_csv(request, flag = False):
 		return HttpResponse("Fehlerhafte CSV-Generierung in panel_UhR_matrix_csv")
 
 	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
-	(usernamen, rollenmenge, rollen_je_username) = UhR_erzeuge_matrixdaten(panel_liste)
+	(usernamen, rollenmenge, rollen_je_username) = erzeuge_UhR_matrixdaten(panel_liste)
 
 	response = HttpResponse(content_type="text/csv")
 	response['Content-Distribution'] = 'attachment; filename="matrix.csv"' # ToDo Hänge Datum an Dateinamen an
