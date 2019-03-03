@@ -571,10 +571,7 @@ def panel_UhR(request, id = 0):
 	return obj.behandle(request, id)
 
 def erzeuge_pdf_namen(request):
-	name = 'Berechtigungskonzept_{}_{}.pdf' \
-		.format(request.GET.get('gruppe', ''), timezone.now())
-	print ('Name der Datei wird:', name)
-	return name
+	return 'Berechtigungskonzept_{}_{}.pdf'.format(request.GET.get('gruppe', ''), timezone.now())
 
 # Erzeuge das Berechtiogungskonzept für Anzeige und PDF
 def	erzeuge_UhR_konzept(request, ansicht):
