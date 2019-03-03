@@ -65,12 +65,9 @@ class RollenInline(admin.TabularInline):
 	model = TblRollen
 	extra = 1
 
-
-
 # ######################################################################################################
 # tbl Gesamt
 # ######################################################################################################
-
 @admin.register(TblGesamt)
 class GesamtAdmin(ImportExportModelAdmin):
 	actions_on_top = False		# Keine Actions, weil diese Tabelle nie manuell geändert wird
@@ -99,10 +96,10 @@ class GesamtAdmin(ImportExportModelAdmin):
 	list_display_links = ('id', )
 	list_editable = ('tf', 'tf_beschreibung', 'enthalten_in_af', 'plattform', 'gf', )
 	search_fields = ['id', 'userid_name__name', 'tf',
-					 # 'tf_beschreibung', 'enthalten_in_af', 'plattform', 'gf',
+					'tf_beschreibung', #'enthalten_in_af', 'plattform', 'gf',
 	]
 
-	list_per_page = 10
+	list_per_page = 50
 
 	# Parameter für import/export
 	resource_class = GesamtExporterModel
@@ -111,10 +108,10 @@ class GesamtAdmin(ImportExportModelAdmin):
 # ######################################################################################################
 # tbl UserIDundName
 # ######################################################################################################
-
-
 @admin.register(TblUserIDundName)
 class UserIDundNameAdmin(admin.ModelAdmin):
+
+	list_select_related = ('orga', )
 
 	fieldsets = [
 		('User-Informationen', {'fields': ['userid', 'name', 'orga', 'geloescht']}),
@@ -138,11 +135,9 @@ class UserIDundNameAdmin(admin.ModelAdmin):
 	list_per_page = 25
 	# inlines = [UserhatrolleInline]
 
-
 # ######################################################################################################
 # tbl Orga
 # ######################################################################################################
-
 @admin.register(TblOrga)
 class Orga(admin.ModelAdmin):
 	actions_on_top = True
@@ -155,11 +150,9 @@ class Orga(admin.ModelAdmin):
 
 	inlines = [UserIDundNameInline]
 
-
 # ######################################################################################################
 # tbl Plattform
 # ######################################################################################################
-
 @admin.register(TblPlattform)
 class Plattform(admin.ModelAdmin):
 	actions_on_top = True
@@ -169,15 +162,12 @@ class Plattform(admin.ModelAdmin):
 	# list_display_links = ('tf_technische_plattform')
 	list_editable = ('tf_technische_plattform',)
 	search_fields = ['tf_technische_plattform', ]
-
 	# Nette Idee, grottig lahm
 	# inlines = [GesamtInline]
-
 
 # ######################################################################################################
 # tbl UebersichtAfGfs
 # ######################################################################################################
-
 @admin.register(TblUebersichtAfGfs)
 class UebersichtAfGfs(admin.ModelAdmin):
 	actions_on_top = True
@@ -207,11 +197,9 @@ class UebersichtAfGfs(admin.ModelAdmin):
 
 	# inlines = [GesamtInline]
 
-
 # ######################################################################################################
 # tbl GesamtHistorie
 # ######################################################################################################
-
 @admin.register(TblGesamtHistorie)
 class TblGesamtHistorie(admin.ModelAdmin):
 	actions_on_top = False
@@ -224,11 +212,9 @@ class TblGesamtHistorie(admin.ModelAdmin):
 
 	search_fields = ['id_alt__id', 'userid_name__name', 'tf', 'tf_beschreibung', 'enthalten_in_af',]
 
-
  ######################################################################################################
 # tbl Userhatrolle
 # ######################################################################################################
-
 @admin.register(TblUserhatrolle)
 class Userhatrolle(admin.ModelAdmin):
 	actions_on_top = True
@@ -256,11 +242,9 @@ class Userhatrolle(admin.ModelAdmin):
 	list_per_page = 25 # sys.maxsize
 	extra = 1
 
-
 # ######################################################################################################
 # tbl Rollen
 # ######################################################################################################
-
 @admin.register(TblRollen)
 class Rollen(admin.ModelAdmin):
 	actions_on_top = True
@@ -285,11 +269,9 @@ class Rollen(admin.ModelAdmin):
 	inlines = [RollehatafInline, UserhatrolleInline, ]
 	extra = 1
 
-
 # ######################################################################################################
 # tbl AFListe
 # ######################################################################################################
-
 @admin.register(TblAfliste)
 class Afliste(admin.ModelAdmin):
 	actions_on_top = True
@@ -303,13 +285,11 @@ class Afliste(admin.ModelAdmin):
 
 	inlines = [RollehatafInline]
 
-
 # ######################################################################################################
 # tbl RolleHatAF
 # ######################################################################################################
 # ToDo: Suche AF in Rollen mit Anzeige zugehöriger User
 # ToDo: - Suche ist schon erweitert: Anzeige betroffener User integrieren (besser in neuer Abfrage?)
-
 @admin.register(TblRollehataf)
 class Rollehataf(admin.ModelAdmin):
 	actions_on_top = True
@@ -336,7 +316,6 @@ class Rollehataf(admin.ModelAdmin):
 # ######################################################################################################
 # Eine Reihe von Hilfstabellen, alle nach dem selben Schema. Keine Foreign Keys
 # ######################################################################################################
-
 @admin.register(Tblsubsysteme)
 class Subsysteme(admin.ModelAdmin):
 	alle = ['sgss', 'definition', 'verantwortlicher', 'fk',]

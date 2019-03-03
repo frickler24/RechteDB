@@ -41,7 +41,6 @@ class TblRollen(models.Model):
 #	einsatz = 4:	Nur gültig für XV-Userid
 #	einsatz = 2: 	Gültig für alles außer DV-User
 #	einsatz = 1:	Nur gültig für DV-User
-
 class TblRollehataf(models.Model):
 	EINSATZ_NONE  = 0
 	EINSATZ_NURDV = 1
@@ -80,7 +79,6 @@ class TblRollehataf(models.Model):
 	get_muss.admin_order_field = 'mussfeld'
 	get_muss.short_description = 'Muss'
 	mussfeld.boolean = True
-
 
 # Referenz der User auf die ihnen zur Verfügung stehenden Rollen
 class TblUserhatrolle(models.Model):
@@ -135,8 +133,6 @@ class TblUserhatrolle(models.Model):
 		# Returns the url to access a particular instance of the model.
 		return reverse('user_rolle_af-delete', args=[str(self.userundrollenid)])
 
-
-
 # Tabelle enthält die aktuell genehmigten (modellierten und in Modellierung befindlichen) AF + GF-Kombinationen
 class TblUebersichtAfGfs(models.Model):
 	id = 					models.AutoField(db_column='id', primary_key=True)  # Field name made lowercase.
@@ -168,12 +164,13 @@ class TblUebersichtAfGfs(models.Model):
 	geloescht.boolean = True
 	kannweg.boolean = True
 
-# Die Tabelle enthält die Teambeschreibungen. Das eigentliche Team ist das Feld intern_extern
+# Die Tabelle enthält die Teambeschreibungen. Das eigentliche Team ist das Feld "team"
 class TblOrga(models.Model):
-	id = 				models.AutoField(db_column='id', primary_key=True)  # Field name made lowercase.
-	team = 				models.CharField(db_column='team', unique=True, max_length=64, blank=False, null=False, db_index=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-	themeneigentuemer =	models.CharField(db_column='themeneigentuemer', max_length=64, blank=False, null=False, db_index=True)  # Field name made lowercase.
-
+	id = 				models.AutoField(db_column='id', primary_key=True)
+	team = 				models.CharField(db_column='team', unique=True, max_length=64, blank=False,
+										   null=False, db_index=True)
+	themeneigentuemer =	models.CharField(db_column='themeneigentuemer', max_length=64, blank=False,
+											null=False, db_index=True)
 	class Meta:
 		managed = True
 		db_table = 'tblOrga'
@@ -183,21 +180,15 @@ class TblOrga(models.Model):
 
 	def __str__(self) -> str:
 		return self.team
-
 	def get_absolute_url(self):
 		# Returns the url for the item.
 		return reverse('teamliste', args=[])
-
 	def get_absolute_update_url(self):
 		# Returns the url to access a particular instance of the model.
-		# return reverse('user-detail', args=[str(self.id)])
 		return reverse('team-update', args=[str(self.id)])
-
 	def get_absolute_delete_url(self):
 		# Returns the url to access a particular instance of the model.
-		# return reverse('user-detail', args=[str(self.id)])
 		return reverse('team-delete', args=[str(self.id)])
-
 	def get_absolute_create_url(self):
 		# Returns the url to open the create-instance of the model (no ID given, the element does not exist yet).
 		return reverse('team-create', args=[])
