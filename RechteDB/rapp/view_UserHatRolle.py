@@ -20,6 +20,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .templatetags.gethash import finde
+from django.utils import timezone
 
 ###################################################################
 # Zuordnungen der Rollen zu den Usern (TblUserHatRolle ==> UhR)
@@ -477,7 +478,6 @@ class UhR(object):
 			return AFListenUhr()
 		assert 0, "Falsche Factory-Typ in Uhr: " + typ
 	factory = staticmethod(factory)
-
 class EinzelUhr(UhR):
 	def behandle(self, request, id):
 		"""
@@ -509,7 +509,6 @@ class EinzelUhr(UhR):
 			'version': version,
 		}
 		return render(request, 'rapp/panel_UhR.html', context)
-
 class RollenListenUhr(UhR):
 	def behandle(self, request, _):
 		"""
@@ -540,7 +539,6 @@ class RollenListenUhr(UhR):
 			'version': version,
 		}
 		return render(request, 'rapp/panel_UhR_rolle.html', context)
-
 class AFListenUhr(UhR):
 	def behandle(self, request, id):
 		return ''
@@ -571,6 +569,12 @@ def panel_UhR(request, id = 0):
 
 	obj = UhR.factory(name)
 	return obj.behandle(request, id)
+
+def erzeuge_pdf_namen(request):
+	name = 'Berechtigungskonzept_{}_{}.pdf' \
+		.format(request.GET.get('gruppe', ''), timezone.now())
+	print ('Name der Datei wird:', name)
+	return name
 
 # Erzeuge das Berechtiogungskonzept für Anzeige und PDF
 def	erzeuge_UhR_konzept(request, ansicht):
@@ -616,11 +620,11 @@ def	erzeuge_UhR_konzept(request, ansicht):
 	pdf = render_to_pdf('rapp/panel_UhR_konzept_pdf.html', context)
 	if pdf:
 		response = HttpResponse(pdf, content_type='application/pdf')
-		filename = "Berechtigungskonzept_%s.pdf" % ("hierMussNochEinVernünftigerNameHin")
-		content = "inline; filename='%s'" % (filename)
+		filename = erzeuge_pdf_namen(request)
+		content = "inline; filename={}".format(filename)
 		download = request.GET.get("download")
 		if download:
-			content = "attachment; filename='%s'" % (filename)
+			content = "attachment; filename={}".format(filename)
 		response['Content-Disposition'] = content
 		return response
 	return HttpResponse("Fehlerhafte PDF-Generierung in erzeuge_UhR_konzept")
