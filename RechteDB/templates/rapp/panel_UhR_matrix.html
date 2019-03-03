@@ -66,6 +66,7 @@
 					<thead>
 						<tr class="bg-primary text-left">
 							<th width="10%">Name</th>
+							<th width="10%">Teams</th>
 							{% for rolle in rollenmenge %}
 								<th><small>{{ rolle }}</small></th>
 							{% endfor %}
@@ -77,12 +78,19 @@
 							<td>
 								{{ user }}
 							</td>
+							<td>
+								{% for team in teams_je_username|hash:user %}
+									<small>
+										{{ team }}{% if not forloop.last %},<br />{% endif %}
+									</small>
+								{% endfor %}
+							</td>
 							{% for rolle in rollenmenge %}
-								<th>
+								<td>
 									<small>
 										{{ rollen_je_username|hash:user|finde:rolle }}
 									</small>
-								</th>
+								</td>
 							{% endfor %}
 						</tr>
 					{% endfor usernamen %}
