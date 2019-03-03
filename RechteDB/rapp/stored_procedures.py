@@ -185,9 +185,6 @@ BEGIN
     FROM qryF3_RechteNeuVonImportDuplikatfrei
     ON DUPLICATE KEY UPDATE doppelerkennung=doppelerkennung+1;
 
-    -- Hä#ufig gefundene Fehlermeldung vor Anpassung von Feldlängen und Indizes (bes. GF schien zu kurz gewesen zu sein)
-    -- #1062 - Doppelter Eintrag 'AV00087-#B91MADM-rva_01219_beta91_job_abst-RACF - P-rvg_01219_be' für Schlüssel 'für _5b_'
-
     /*
         Beim Kopieren ist wichtig, dass die Felder,
         die später in JOINs verwendet werden sollen,
@@ -243,7 +240,6 @@ create procedure neueUser (IN orga char(32))
 BEGIN
 
     /*
-        Bis hierhin ging die Vorbereitung.
         Die nächsten Schritte müssen manuell und visuell unterstützt werden:
             - Sichtung der neu hinzugekommenen useriden,
             - Übernahme in die userid-Liste
@@ -253,14 +249,14 @@ BEGIN
         Zunächst die Suche nach neu hinzugekommenen Usern:
     */
 
-
     /*
-        Dieses Statement wird aufgerufen, nachdem die CSV-Daten eingeleesen wurden ('vorbereitung'
+        Dieses Statement wird aufgerufen, nachdem die CSV-Daten eingelesen wurden ('vorbereitung')
         und bevor der "Neue User speichern" Button angeklickt wird.
-        Zunächst werden die User in eine temporäre Tabelle geschrieben,
+        Zunächst werden diejenigen User in eine temporäre Tabelle geschrieben,
         die in der Importliste auftauchen und
             die nicht in der User-Tabelle auftauchen (die beiden ersten Zeilen im WHERE), oder
             die in der User-Tabelle vorhanden, aber auf "geloescht" gesetzt sind (dritte Zeile im WHERE),
+	    Dabei wird die3 Team-Zuordnung "neu" mit der konstanten Nummer 35 eingetragen.
         Der Vergleich erfolgt sowohl über über name als auch userid,
         damit auch erneut vergebene useriden auffallen.
 
@@ -336,6 +332,10 @@ def push_sp_behandleUser(procs_schon_geladen):
 create procedure behandleUser ()
 BEGIN
 
+	/*
+		Merke die als gelöscht markierten User in einer temoprären Tabelle,
+		damit imm nächsten SAchritt das Join schnell funktioniert.
+	*/
     create temporary table tbl_tmpGeloeschte as
         SELECT userid1
             FROM qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a
