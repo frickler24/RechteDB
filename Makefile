@@ -101,6 +101,15 @@ rappprod:
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB:/RechteDB/code \
 		rapp:latest
 
+rappfull:
+	-docker rm -f rapp
+	docker run -d \
+		--name rapp \
+		-p 8089:8000 \
+		--network mariaNetz \
+		--restart unless-stopped \
+		rapp_full:latest
+
 status:
 	sleep 1
 	docker ps
