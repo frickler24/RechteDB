@@ -50,9 +50,12 @@
 									<td>
 										{% for rolle in vorhanden|hash2:uid|hash3:af %}
 											{# Als letztes Element wird immer ein Leerstring geliefert! #}
+											{% if forloop.first and rolle == ""%}
+												<strong class="text-danger">nicht vergeben</strong>
+											{% endif %}
 											{% if not forloop.last %}{{ rolle }}<br />{% endif %}
 										{% empty %}
-											Keine Rolle vergeben
+											Fehler im Datensatz
 										{% endfor vorhanden %}
 									</td>
 									<td>

@@ -1,4 +1,4 @@
-from .models import TblGesamt, TblUserIDundName, TblUserhatrolle
+from .models import TblGesamt, TblUserIDundName, TblUserhatrolle, TblRollehataf
 import django_filters
 
 class PanelFilter(django_filters.FilterSet):
@@ -86,6 +86,21 @@ class RollenFilter(django_filters.FilterSet):
 			'userid__gruppe',
 			'userid__orga',
 			'rollenname',
-			# 'afname',
+		]
+
+# Filter für das halbautomatische Selektieren über die Arbeitsplatzfunktion.
+# Wird insbesondere in der AF-Factory bei UhR genutzt
+class RolleAFFilter(django_filters.FilterSet):
+	rollenname = 		django_filters.CharFilter(lookup_expr='istartswith')
+	af = 				django_filters.CharFilter(lookup_expr='istartswith')
+	af__af_name = 		django_filters.CharFilter(lookup_expr='istartswith')
+
+	class Meta:
+		model = TblRollehataf
+		fields = [
+			'rollenname',
+			'rollenname__rollenname',
+			'af__af_name',
+			'mussfeld',
 		]
 
