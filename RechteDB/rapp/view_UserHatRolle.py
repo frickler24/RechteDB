@@ -262,7 +262,8 @@ def UhR_hole_daten(panel_liste, id):
 		# Selektiere alle Arbeitsplatzfunktionen, die derzeit mit dem User verknüpft sind.
 		afliste = TblUserIDundName.objects.get(id=id).tblgesamt_set.all()  # Das QuerySet
 		for e in afliste:
-			afmenge.add(e.enthalten_in_af)  # Filtern der AFen aus der Treffermenge
+			if not e.geloescht: # Bitte nur die Rechte, die nicht schon gelöscht wurden
+				afmenge.add(e.enthalten_in_af)  # AF der Treffermenge in die Menge übernehmen (Wiederholungsfrei)
 
 		# Erzeuge zunächst die Hashes für die UserIDs.
 		# Daran werden nachher die Listen der Rechte gehängt.
@@ -271,9 +272,9 @@ def UhR_hole_daten(panel_liste, id):
 
 		# Selektiere alle Arbeitsplatzfunktionen, die derzeit mit den konkreten UserIDs verknüpft sind.
 		for uid in selektierte_userids:
-			tmp_afliste = TblUserIDundName.objects.get(userid = uid).tblgesamt_set.all()  # Das QuerySet
+			tmp_afliste = TblUserIDundName.objects.get(userid = uid).tblgesamt_set.filter(geloescht = False)
 			for e in tmp_afliste:
-				afmenge_je_userID[uid].add(e.enthalten_in_af)  # Element an die UserID-spezifische Liste hängen
+				afmenge_je_userID[uid].add(e.enthalten_in_af)  # Element an das UserID-spezifische Dictionary hängen
 	else:
 		userHatRolle_liste = []
 		selektierter_name = -1
@@ -521,11 +522,11 @@ class RollenListenUhr(UhR):
 		"""
 		(namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter, userids) =\
 			UhR_erzeuge_listen_mit_rollen(request)
-		# print('Namenliste in RollenListenUhR:', namen_liste)
 
 		gesuchte_rolle = request.GET.get('rollenname', None)
 		if gesuchte_rolle == "*":	# Das ist die Wildcard-Suche, um den Modus in der Oberfläche auszuwählen
 			gesuchte_rolle = None
+
 		(userids, af_per_uid, vorhanden, optional) = UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle)
 
 		form = ShowUhRForm(request.GET)
@@ -541,7 +542,7 @@ class RollenListenUhr(UhR):
 		return render(request, 'rapp/panel_UhR_rolle.html', context)
 class AFListenUhr(UhR):
 	def behandle(self, request, id):
-		return ''
+		assert 0, 'Funktion AFListenUhr::behandle() ist noch nicht implementiert. Der Aufruf ist nicht valide.'
 
 # Zeige das Selektionspanel
 @login_required
