@@ -4,53 +4,51 @@
 It is for internal use only, therefor documentation is done in german language.</b>
 
 # Vorbereitung Image
-- Login auf dem Server mit Putty RechteDB-x86
-
+Für den Fall, dass ein völlig neuer Server aufgesetzt werden muss und kein akueller Server existiert,
+müssen die erforderlichen INformationen über den Client auf den Server geladen werden.
+- Login auf dem Server mit Putty
 - Öffnen eines lokalen CMD-Fensters
 ```
 c:
-cd \users\xv13254\Downloads
-psftp RechteDB-x86 (macht Login mit denselben credentials wie sie die offene Verbindung hat)
+cd \users\USER\Downloads
+psftp PROFILNAME (macht Login mit denselben credentials wie sie die offene Verbindung hat)
 
 cd tarfiles (das geschieht remote)
+put bashfiles.tar.gz
+put config_x86.tar.gz
+put datadir_<DATUM>.tar.gz
 put rapp_<VERSION>.tar.gz
 ```
-
   Geduld{,,,,,}
 
 - Wenn man will, im Online-Fenster draufgucken mit
+`watch -n 10 ls -lt ~/tarfiles/rapp* | tail -1`
 
-`watch -n 10 ls -l ~/tarfiles/rapp*`
+- Das kann man mit STRG-C abbrechen.
 
-- Das kann man mit STRG-C abbrechen
-Irgendwann ist der Upload fertig.
-
+Irgendwann ist der Upload fertig. 
 Nun muss das hochgeladene Image-Tar in docker geladen werden:
 ```
-zcat ~/tarfiles/rapp_<VERSION>.tar.gz | docker image load
-docker image tag rapp:latest f4s-docker.ruv.de/rechtedb/rapp:<VERSION>
+make neu
 ```
-Damit sollten sowohl ein rapp:latest als auch das entsprechende Tag oben angelegt worden sein.
+Damit werden sowohl ein rapp:latest als auch das entsprechende Tag oben angelegt.
+ZUsätzlich wurde das Image als latest und mit der aktuellen Versionsnummer im Harbor abgelegt.
+Dafür macht make ein docker login auf den Harbor
 ```
 docker image ls
-docker login
-docker push f4s-docker.ruv.de/rechtedb/rapp:<VERSION>
 ```
-# Vorbereitung git Code-Basis
-- Leider kann man den aktuellen Stand auf den Servern nur ohne den git-Verlauf laden (über zip-File). Erst mit dem Cloning eines eigenen Repos und Netzzugriff ginge das auch direkt.
-So muss das Repo irgendwo auf einem git-fähigen Entwicklungsrechner ge-clone-t  und das Ergebnis komplett wieder über psftp kopiert werden 
-
-`put RechteDB.git.tar.gz`
-
-und im Online-Window:
-`cd ; tar xvfz tarfiles/Rechtedb.git.tar.gz`
-
+# Umkopieren der vorhandenen Daten
+- `make sicherung` im Home-Verzeichnis erzeugt auf dem aktuellen Server in ~/tarfiles/ sowohl ein Backup der Daten, 
+als auch die Menge der Konfigurationsdateien, jeweils als gezipptes Tarfile.
+- ToDo: das ist hier noch inkonsistent
 - Dann erfolgt das Zurückspielen der maschinenspezifischen Elemente:
 ```
-cp RechteDB/RechteDB/.env.x86  RechteDB/RechteDB/.env
-cp RechteDB/mariadbconf.d/my.cnf.x86 RechteDB/mariadbconf.d/my.cnf
-cp RechteDB/Makefile.x86 RechteDB/Makefile
+Hochladen des Schlüsselpaares vom Client auf die Zielmaschine,
+Akzeptieren des öffentlichen Schlüssels auf der Zielmaschine
+cp -r ~/tarfiles ZIELMASCHINE:.
 ```
+- Entpacken der bash-Dateien, des Datenverzeichnisses und der Konfigurationsdateien
+- Anpassen der Konfigdatei für Django (erlaubte Server-Zugriffe)
 
 # Generieren der Container
 - Das komplette Neuaufsetzen der drei Container + Netzwerk kann beliebig häufig wiederholt werden. 
@@ -75,5 +73,5 @@ Genutzt werden kann die App in vernünftigen Browsern (nicht IE11, der weiß nic
 # ToDos
 Wichtige noch fehlende Aktivitäten oder gute Ideen werden 
 - bei Fehlern als Issue im github vermerkt
+- Notwendige Erweiterungen sollen ebenfalls im Projekt auf Github gesammelt werden, weil damit die Priorisierung einfacher wird.
 - bei Kleinigkeiten im jeweiligen Programm angelegt (Suche über die jeweilige SEU nach "ToDo:")
-- bei generelleren Themen in der Datei RechteDB/rapp/views.py in einem Block zu Beginn der Datei gesammelt.
