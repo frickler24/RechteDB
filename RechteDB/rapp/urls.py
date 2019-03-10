@@ -68,7 +68,7 @@ urlpatterns += [
 	path('panel/', views.panel, name='panel'),
 ]
 
-# Der Link auf das Eingabepanel zur freien Selektion auf der Usertabelle mit Änderungslink
+# Der Link auf das Eingabepanel zur freien Selektion auf der User-hat-Rolle Tabelle mit Änderungslink
 urlpatterns += [
 	path('user_rolle_af/<int:pk>/delete/', 		view_UserHatRolle.UhRDelete.as_view(), 		name='user_rolle_af-delete'),
 	# path('user_rolle_af/<int:pk>/update/', 		view_UserHatRolle.UhRUpdate.as_view(), 		name='user_rolle_af-update'),
