@@ -1379,16 +1379,16 @@ class User_rolle_exportCSVTest(TestCase):
 		url = '{0}{1}'.format(reverse('uhr_matrix_csv'), '?name=UseR&gruppe=BA-ps')
 		response = self.client.get(url)
 		self.assertEqual(response.status_code, 200)
-		self.assertContains(response, "Name,Erste Neue Rolle,Zweite Neue Rolle\r\n", 1)
-		self.assertContains(response, "User_xv13254,Schwerpunkt,Vertretung\r\n", 1)
+		self.assertContains(response, "Name;Erste Neue Rolle;Zweite Neue Rolle\r\n", 1)
+		self.assertContains(response, "User_xv13254;Schwerpunkt;Vertretung\r\n", 1)
 
 	# Eine gültige Auswahl für einen User in einer Gruppe, csv-Export kurzvariante
 	def test_panel_short_pdf_with_valid_selection(self):
 		url = '{0}{1}'.format(reverse('uhr_matrix_csv'), 'kompakt/?name=UseR&gruppe=BA-ps')
 		response = self.client.get(url)
 		self.assertEqual(response.status_code, 200)
-		self.assertContains(response, "Name,Erste Neue Rolle,Zweite Neue Rolle\r\n", 1)
-		self.assertContains(response, "User_xv13254,S,V\r\n", 1)
+		self.assertContains(response, "Name;Erste Neue Rolle;Zweite Neue Rolle\r\n", 1)
+		self.assertContains(response, "User_xv13254;S;V\r\n", 1)
 
 
 class Import_new_csv_single_record(TestCase):

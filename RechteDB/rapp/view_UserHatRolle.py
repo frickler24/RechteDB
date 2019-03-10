@@ -739,7 +739,7 @@ def panel_UhR_matrix_csv(request, flag = False):
 	for r in rollenmenge:
 		headline += [r.rollenname]
 
-	writer = csv.writer(response, delimiter = ',', quotechar = "'")
+	writer = csv.writer(response, delimiter = ';', quotechar = '"')
 	writer.writerow(headline)
 
 	for user in usernamen:
