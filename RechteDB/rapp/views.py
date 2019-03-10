@@ -23,6 +23,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 import os, re, subprocess, sys
 from math import *
 
+import csv
+
 from .filters import PanelFilter
 from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, Letzter_import # ToDo LetzterImport raus hier
 
@@ -264,12 +266,11 @@ def panelDownload(request):
 		'pagesize': pagesize,
 	}
 	f = PanelFilter(request.GET, queryset=TblGesamt.objects.all())
-	print('Anzahl Elemete in panel_list:', panel_list.count())
 
 	response = HttpResponse(content_type="text/csv")
 	response['Content-Distribution'] = 'attachment; filename="gesamt.csv"' # ToDo Hänge Datum an Dateinamen an
 
-	writer = csv.writer(response, delimiter = ',')
+	writer = csv.writer(response, delimiter = ';', quotechar = '"')
 	writer.writerow([
 		'tf', 'tf_beschreibung',
 		'enthalten_in_af',

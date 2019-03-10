@@ -504,6 +504,147 @@ class PanelTests(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "User_xv10099")
 
+class Panel_exportCSVTest(TestCase):
+	# User / Rolle / AF : Das wird mal die Hauptseite für
+	# Aktualisierungen / Ergänzungen / Löschungen von Rollen und Verbindungen
+	def setUp(self):
+		Anmeldung(self.client.login)
+		Setup_database()
+
+		TblOrga.objects.create(
+			team = 'Django-Team-01',
+			themeneigentuemer = 'Ihmchen_01'
+		)
+
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu =			'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
+			name_af_neu =			'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+			kommentar =				'Kein Kommentar',
+			zielperson =			'Lutz',
+			af_text =				'Das ist der AF-normaltext',
+			gf_text = 				'Das ist der GF-normaltext',
+			af_langtext = 			'Das ist der AF-Laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaang-Text',
+			af_ausschlussgruppen =	'Das soll niemand außer mir bekommen!!!',
+			af_einschlussgruppen =	'das soll die ganze Welt erhalten können',
+			af_sonstige_vergabehinweise = 'Keine Hinweise',
+			geloescht =				False,
+			kannweg = 				False,
+			modelliert = 			timezone.now(),
+		)
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu =			'rvg_00500_neueAF mit echt mehr Zeichen als üblich',
+			name_af_neu =			'rva_00500_neue_AF auch mit mehr Zeichen als üblich',
+		)
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu =			'rvg_00380_neueAF mit echt mehr Zeichen als üblich',
+			name_af_neu =			'rva_00380_neue_AF auch mit mehr Zeichen als üblich',
+		)
+
+		TblUserIDundName.objects.create(
+			userid = 			'xv10099',
+			name = 				'User_xv10099',
+			orga = 				TblOrga.objects.get(team = 'Django-Team-01'),
+			zi_organisation =	'AI-BA',
+			geloescht = 		False,
+			abteilung = 		'ZI-AI-BA',
+			gruppe = 			'ZI-AI-BA-PS',
+		)
+
+		TblPlattform.objects.create(tf_technische_plattform = 'RACFP')
+
+		TblGesamt.objects.create(
+			userid_name = 			TblUserIDundName.objects.get(userid = 'xv10099'),
+			tf = 					'Die superlange schnuckelige TF',
+			tf_beschreibung = 		'Die superlange schnuckelige TF-Beschreibung',
+			enthalten_in_af = 		'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+			modell = 				TblUebersichtAfGfs.objects.get(name_af_neu='rva_00380_neue_AF auch mit mehr Zeichen als üblich',
+																   name_gf_neu='rvg_00380_neueAF mit echt mehr Zeichen als üblich'),
+			tf_kritikalitaet = 		'Superkritisch sich ist das auch schon zu lang',
+			tf_eigentuemer_org = 	'Keine Ahnung Org',
+			plattform = 			TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
+			gf = 					'rvg_00380_neueGF mit echt mehr Zeichen als üblich',
+			vip_kennzeichen = 		'',
+			zufallsgenerator = 		'',
+			af_gueltig_ab = 		timezone.now() - timedelta(days=365),
+			af_gueltig_bis = 		timezone.now() + timedelta(days=365),
+			direct_connect = 		'no direct connect',
+			hoechste_kritikalitaet_tf_in_af = 'u',
+			gf_beschreibung = 		'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
+			af_zuweisungsdatum = 	timezone.now() - timedelta(days=200),
+			datum = 				timezone.now() - timedelta(days=500),
+			geloescht = 			False,
+			gefunden = 				True,
+			wiedergefunden = 		timezone.now(),
+			geaendert = 			False,
+			neueaf = 				'',
+			nicht_ai = 				False,
+			patchdatum = 			None,
+			wertmodellvorpatch =	'Hier kommt nix rein',
+			loeschdatum = 			None,
+			letzte_aenderung =		None
+		)
+
+		TblGesamt.objects.create(
+			userid_name = 			TblUserIDundName.objects.get(userid = 'xv10099'),
+			tf = 					'Die superlange schnuckelige TF2',
+			tf_beschreibung = 		'Die superlange schnuckelige TF-Beschreibung',
+			enthalten_in_af = 		'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+			modell = 				TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+																   name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
+			tf_kritikalitaet = 		'Superkritisch sich ist das auch schon zu lang',
+			tf_eigentuemer_org = 	'Keine Ahnung Org',
+			plattform = 			TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
+			gf = 					'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
+			vip_kennzeichen = 		'',
+			zufallsgenerator = 		'',
+			af_gueltig_ab = 		timezone.now() - timedelta(days=365),
+			af_gueltig_bis = 		timezone.now() + timedelta(days=365),
+			direct_connect = 		'no direct connect',
+			hoechste_kritikalitaet_tf_in_af = 'u',
+			gf_beschreibung = 		'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
+			af_zuweisungsdatum = 	timezone.now() - timedelta(days=200),
+			datum = 				timezone.now() - timedelta(days=500),
+			geloescht = 			False,
+			gefunden = 				True,
+			wiedergefunden = 		timezone.now(),
+			geaendert = 			False,
+			neueaf = 				'',
+			nicht_ai = 				False,
+			patchdatum = 			None,
+			wertmodellvorpatch =	'Hier kommt nix rein',
+			loeschdatum = 			None,
+			letzte_aenderung =		None
+		)
+
+	# Eine leere Auswahl
+	def test_panel_online_without_selection(self):
+		url = reverse('panel_download')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "tf;tf_beschreibung;enthalten_in_af;name;userid;team;name_af_neu;name_gf_neu", 1)
+		self.assertContains(response, "Die superlange schnuckelige TF;Die superlange schnuckelige TF-Beschreibung;", 1)
+		self.assertContains(response, "Die superlange schnuckelige TF2;Die superlange schnuckelige TF-Beschreibung;", 1)
+		self.assertContains(response, "rva_00458_neue_AF auch mit mehr Zeichen als ", 3)
+		self.assertContains(response, "rvg_00458_neueGF mit echt mehr Zeichen als ", 1)
+		self.assertContains(response, "User_xv10099;xv10099;AI-BA;", 2)
+		self.assertContains(response, "rva_00380_neue_AF auch mit mehr Zeichen als ", 1)
+		self.assertContains(response, "rvg_00380_neueAF mit echt mehr Zeichen als ", 1)
+
+	# Eine gültige Auswahl für einen User in einer Gruppe
+	def test_panel_online_with_valid_selection(self):
+		url = '{0}{1}'.format(reverse('panel_download'), '?tf=TF2')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "tf;tf_beschreibung;enthalten_in_af;name;userid;team;name_af_neu;name_gf_neu", 1)
+		self.assertNotContains(response, "Die superlange schnuckelige TF;")
+		self.assertNotContains(response, "rva_00380_neue_AF auch mit mehr Zeichen als ")
+		self.assertNotContains(response, "rvg_00380_neueAF mit echt mehr Zeichen als ")
+		self.assertContains(response, "rva_00458_neue_AF auch mit mehr Zeichen als ", 2)
+		self.assertContains(response, "rvg_00458_neueGF mit echt mehr Zeichen als ", 1)
+		self.assertContains(response, "Die superlange schnuckelige TF2;Die superlange schnuckelige TF-Beschreibung;", 1)
+		self.assertContains(response, "User_xv10099;xv10099;AI-BA;", 1)
+
+
 class User_rolle_afTests_generate_pdf(TestCase):
 	# Der Testfall muss aufgrund der PDF-Lieferung separat gehalten werden
 	def setUp(self):

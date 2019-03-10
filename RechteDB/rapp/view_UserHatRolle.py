@@ -747,12 +747,11 @@ def panel_UhR_matrix_csv(request, flag = False):
 		line = [user]
 		for rolle in rollenmenge:
 			if flag:
-				wert = [finde(rollen_je_username[user], rolle)]
-				print ('Wert =', wert)
-				if len(wert) > 0:
-					line += [wert[0]]
-				else:
+				wert = finde(rollen_je_username[user], rolle)
+				if wert == None or len(wert) <= 0:
 					line += ['']
+				else:
+					line += [wert[0]]
 			else:
 				line += [finde(rollen_je_username[user], rolle)]
 		writer.writerow(line)
