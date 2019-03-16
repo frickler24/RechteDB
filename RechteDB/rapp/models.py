@@ -714,5 +714,5 @@ class Modellierung(models.Model):
 	eigentuemer_der_af =			models.CharField(max_length=100, null=True)
 	aus_modellierung_entfernen =	models.CharField(max_length=100, null=True)
 	datei =							models.CharField(max_length=100, null=True)
-	letzte_aenderung = 				models.DateTimeField(null=False)
+	letzte_aenderung = 				models.DateTimeField(default=timezone.now, null=True)
 
