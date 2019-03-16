@@ -694,3 +694,25 @@ class Letzter_import(models.Model):
 		verbose_name_plural = 'Letzte Importe'
 		ordering = [ 'id', 'start', 'end' ]
 
+
+class Modellierung(models.Model):
+	"""
+	Tabelle aus dem Export für die TF-Rezertifizierung.
+	Die Daten enthalten alle aktuellen Modellierungen einer TF in die GFs und AFs
+
+	Das kann dem späteren Erzeugen von Mails dienen, um User auf Möglichekiten hinzuweisen,
+	sich von Direct Connects zu trennen.
+	"""
+	entitlement =					models.CharField(max_length=50, null=True, db_index=True)
+	neue_beschreibung =				models.CharField(max_length=500, null=True)
+	plattform =						models.CharField(max_length=30, null=True, db_index=True)
+	gf =							models.CharField(max_length=50, null=False, db_index=True)
+	beschreibung_der_gf =			models.CharField(max_length=500, null=True)
+	af =							models.CharField(max_length=50, null=False, db_index=True)
+	beschreibung_der_af =			models.CharField(max_length=500, null=True)
+	organisation_der_af =			models.CharField(max_length=100, null=True)
+	eigentuemer_der_af =			models.CharField(max_length=100, null=True)
+	aus_modellierung_entfernen =	models.CharField(max_length=100, null=True)
+	datei =							models.CharField(max_length=100, null=True)
+	letzte_aenderung = 				models.DateTimeField(null=False)
+
