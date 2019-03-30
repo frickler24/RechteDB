@@ -4,8 +4,7 @@ Some Ressources for handling csv and Excel sheets
 """
 
 from import_export import resources
-from .models import Tblrechteneuvonimport, TblGesamt
-
+from .models import Tblrechteneuvonimport, TblGesamt, Modellierung
 
 class MeinCSVImporterModel(resources.ModelResource):
 	"""
@@ -45,3 +44,21 @@ class GesamtExporterModel(resources.ModelResource):
 
 		export_order = fields
 
+class ModellierungExporterModel(resources.ModelResource):
+	"""
+		Resource-Class für export der Modellierungs-Tabelle
+	"""
+	class Meta:
+		model = Modellierung
+		encoding = "utf-8"
+		delimiter = ';'
+		quotechar = '"'
+		escapechar = '\\',
+		fields = (
+			'entitlement', 'neue_beschreibung', 'plattform', 'gf',
+			'beschreibung_der_gf', 'af', 'beschreibung_der_af',
+			'organisation_der_af', 'eigentuemer_der_af',
+			'aus_modellierung_entfernen', 'datei', 'letzte_aenderung',
+		)
+
+		export_order = fields

@@ -716,3 +716,8 @@ class Modellierung(models.Model):
 	datei =							models.CharField(max_length=100, null=True)
 	letzte_aenderung = 				models.DateTimeField(default=timezone.now, null=True)
 
+	class Meta:
+		managed = True
+		verbose_name = 'Modellierung AF GF TF'
+		verbose_name_plural = '60_Modellierung AF GF TF'
+		#ordering = [ 'id', 'organisation', 'orgID', 'parentOrga', 'fkName', ]

@@ -16,11 +16,12 @@ from rapp.models import TblUebersichtAfGfs, TblUserIDundName, TblOrga, TblPlattf
 						TblGesamt, TblGesamtHistorie, Tblrechteneuvonimport, \
 						TblRollen, TblAfliste, TblUserhatrolle, TblRollehataf, \
 						Tblsubsysteme, Tblsachgebiete, TblDb2, TblRacfGruppen, \
-						RACF_Rechte, Orga_details
+						RACF_Rechte, Orga_details, \
+						Modellierung
 
 # Für den Im- und Export
 from import_export.admin import ImportExportModelAdmin
-from rapp.resources import MeinCSVImporterModel, GesamtExporterModel
+from rapp.resources import MeinCSVImporterModel, GesamtExporterModel, ModellierungExporterModel
 
 # Vorwärtsreferenzen gehen nicht in python :-(
 # Inline function to show all Instances in other view
@@ -361,3 +362,19 @@ class Orga_details(admin.ModelAdmin):
 			'datum', ]
 	search_fields = alle
 	list_display = alle
+
+@admin.register(Modellierung)
+class Modellierung(ImportExportModelAdmin):
+	alle = [
+		'entitlement', 'neue_beschreibung', 'plattform', 'gf',
+		'beschreibung_der_gf', 'af', 'beschreibung_der_af',
+		'organisation_der_af', 'eigentuemer_der_af',
+		'aus_modellierung_entfernen', 'datei', 'letzte_aenderung'
+	]
+	search_fields = alle
+	list_display = alle
+	list_editable = () # Read Only Tabelle
+
+	# Parameter für import/export
+	resource_class = ModellierungExporterModel
+	sortable_by = ['entitlement', 'plattform', 'gf', 'af']
