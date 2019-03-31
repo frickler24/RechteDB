@@ -98,3 +98,8 @@ urlpatterns += [
 	path('stored_procedures/', stored_procedures.handle_stored_procedures, name='stored_procedures'),
 ]
 
+# URl zum Testen neuer Funktionalität (liegt in "Magie")
+urlpatterns += [
+	path('magic_click/', views.magic_click, name='magic_click'),
+]
+

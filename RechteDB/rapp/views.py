@@ -70,6 +70,20 @@ def get_version(package):
 	return manual + ' - ' + git_rev.decode('utf-8')
 version = get_version('rapp')
 
+def initialisiere_AFliste():
+	'''
+	Aufbau der tbl_AFListe; Deren Inhalt ist abhängig von Veränderungen in tblUebersichtAF_GFs
+
+	:return: nichts
+	'''
+	with connection.cursor() as cursor:
+		try:
+			cursor.callproc("erzeuge_af_liste")  # diese SProc benötigt die Orga nicht als Parameter
+		except:
+			e = sys.exc_info()[0]
+			fehler = 'Fehler in initialisiere_AFliste(): {}'.format(e)
+			print('Fehler Beim Erstellen der AFListe, StoredProc erzeuge_af_liste', fehler)
+		cursor.close()
 
 # Der Direkteinsteig für die gesamte Anwendung
 # Dies ist die Einstiegsseite, sie ist ohne Login erreichbar.
@@ -99,18 +113,9 @@ def home(request):
 		letzter_import = 'unbekannt'
 
 	# Sicherheitshalber wird immer bei Aufruf der Startseite die Tabelle tbl_AFListe neu aufgebaut
-	with connection.cursor() as cursor:
-		try:
-			cursor.callproc("erzeuge_af_liste")  # diese SProc benötigt die Orga nicht als Parameter
-		except:
-			e = sys.exc_info()[0]
-			fehler = 'Error in home(): {}'.format(e)
-			print('Fehler Beim Erstellen der AFListe, StoredProc erzeuge_af_liste', fehler)
-
-		cursor.close()
+	initialisiere_AFliste()
 
 	request.session['version'] = version
-
 	return render(
 		request,
 		'index.html',
@@ -287,4 +292,66 @@ def panelDownload(request):
 		])
 
 	return response
+
+@login_required
+def magic_click(request):
+	'''
+	Ist nur eine Hülle, um Funktionen aufrufen zu können, die noch über keine Seite verfügen.
+	:param request:
+	:return:
+	'''
+	findeNeueAFGF('rva_00763_web_entwickler')
+	return home(request)
+
+
+def findeNeueAFGF(gesuchte_af):
+	'''
+	Finde alle AF/GF-Kombinationen zu einer AF in der Tabelle der erlaubten Kombinationen
+	Das wird am Anfang benötigt für den Fall, dass nur einzelne Teilkombinationen fehlen
+	Anschließend muss die AF_Liste gegebebnenfalls ergänzt werden.
+
+	:param gesuchte_af: STring mimt der AF, zu der ggfs. die AF/GF-Kombinationen gesucht und ergänzt werden sollen.
+	:return: None oder Fehlerstring
+	'''
+
+	sql = '''
+		INSERT INTO `tblUEbersichtAF_GFs`
+			(`name_gf_neu`, `name_af_neu`, `kommentar`, `zielperson`, geloescht, `modelliert`)
+		
+			SELECT 	`gf` as name_gf_neu,
+				`enthalten_in_af` as name_af_neu,
+				'Automatisch ergänzt' as kommentar,
+				'Alle' as zielperson,
+				0 as geloescht,
+				now() as modelliert
+			FROM `tblGesamt`
+			WHERE `enthalten_in_af` = \'{}\'
+				AND NOT geloescht = true
+			GROUP BY `enthalten_in_af`, `gf`
+		
+		ON DUPLICATE KEY UPDATE
+			`modelliert` = now(),
+			geloescht = 0;	
+	'''.format(gesuchte_af)
+
+	with connection.cursor() as cursor:
+		try:
+			cursor.execute (sql)
+		except:
+			e = sys.exc_info()[0]
+			fehler = 'Error in push_sp(): {}'.format(e)
+			return fehler
+		cursor.close()
+
+
+	with connection.cursor() as cursor:
+		try:
+			cursor.callproc("erzeuge_af_liste")  # diese SProc benötigt die Orga nicht als Parameter
+		except:
+			e = sys.exc_info()[0]
+			fehler = 'Fehler in findeNeueAFGF(): {}'.format(e)
+			print('Fehler Beim Erstellen der AFListe, StoredProc erzeuge_af_liste', fehler)
+			return fehler
+		cursor.close()
+	return None
 
