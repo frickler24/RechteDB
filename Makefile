@@ -20,6 +20,7 @@ mariadb:
 		--network-alias maria \
 		--restart unless-stopped \
 		-p 13306:3306 \
+        -e TZ='Europe/Berlin' \
 		-e MYSQL_ROOT_PASSWORD=geheim \
 		-v /home/lutz/datadir:/var/lib/mysql \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/mariadbconf.d:/etc/mysql/conf.d \
@@ -31,6 +32,7 @@ phpmyadmin:
 		--name phpmyadmin \
 		--network mariaNetz \
 		--restart unless-stopped \
+        -e TZ='Europe/Berlin' \
 		-e PMA_HOST=maria \
 		phpmyadmin/phpmyadmin
 
@@ -40,6 +42,7 @@ phpmyadmin_pma:
 		--name phpmyadmin \
 		--network mariaNetz \
 		--restart unless-stopped \
+        -e TZ='Europe/Berlin' \
 		-e PMA_HOST=maria \
 		-e PMA_CONTROLUSER=pma \
 		-e PMA_CONTROLPASS=0oWiPLfdhAcSqy9TnmhKcI222QQIO87BvvjiHX9r57\
@@ -87,6 +90,7 @@ rapptest:
 	docker run -it --rm \
 		--name testDjango \
 		--network mariaNetz \
+        -e TZ='Europe/Berlin' \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB:/RechteDB \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB:/RechteDB/code \
 		rapp:latest sh -c "echo yes | /RechteDB/code/manage.py test -v2"
@@ -97,6 +101,7 @@ rappprod:
 		-p 8089:8000 \
 		--network mariaNetz \
 		--restart unless-stopped \
+        -e TZ='Europe/Berlin' \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB:/RechteDB \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB:/RechteDB/code \
 		rapp:latest
@@ -108,6 +113,7 @@ rappfull:
 		-p 8089:8000 \
 		--network mariaNetz \
 		--restart unless-stopped \
+        -e TZ='Europe/Berlin' \
 		rapp_full:latest
 
 status:
