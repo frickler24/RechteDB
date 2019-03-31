@@ -53,16 +53,29 @@ cp -r ~/tarfiles ZIELMASCHINE:.
 # Generieren der Container
 - Das komplette Neuaufsetzen der drei Container + Netzwerk kann beliebig häufig wiederholt werden. 
 Insbesondere nach Systemneustarts kann damit die gesamt Anwendung erneut hochgefahren werden.
-
-Das sollte mal auf docker-compose umgestellt werden, dazu ist das ja mal erfunden worden.
+  - Das sollte mal auf docker-compose umgestellt werden, dazu ist das ja mal erfunden worden.
 Allerdings müssen dann die Nutzung des manage.py test und das Test-curl (s.u.) anders aufgebaut werden.
+- `make neu`
+  - Dabei werden das Tarfile des Images in Docker geladen, der Maria-Container, das phpmyadmin und das Testszenario aufgerufen und zum Schluss - nach erfolgreichem Test - der rapp-Container gestartet.
+- Beim Ablauf der Tests darf eine Warnung der PDF-Generierung auftauchen, 
+aber alle Tests müssen erfolgreich abgeschlossen sein, sonst stimmt etwas nicht:
+```
+Using existing test database for alias 'default'...
+System check identified no issues (0 silenced).
+..........................................................................................Selector Pseudo Function closing ')' not found:: (':not(', '[href]):not([tabinde')
+................
+----------------------------------------------------------------------
+Ran 106 tests in 21.905s
 
-`make`
+OK
+Preserving test database for alias 'default'...
+
+```
 
 - Abschließend wird im make zum Test ein curl auf den erzeugten Weberserver durchgeführt 
 und nach einer bestimmten Zeile der Einstiegsseite gesucht.
 
-Die Ausgabe (mit aktueller Berechtigungszahl) sollte folgendermaßen aussehen:
+- Die Ausgabe (mit aktueller Berechtigungszahl) sollte folgendermaßen aussehen:
 
 `        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">38604</div>`
 
