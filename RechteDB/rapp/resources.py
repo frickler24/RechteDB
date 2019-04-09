@@ -4,7 +4,7 @@ Some Ressources for handling csv and Excel sheets
 """
 
 from import_export import resources
-from .models import Tblrechteneuvonimport, TblGesamt, Modellierung
+from .models import Tblrechteneuvonimport, TblGesamt, Modellierung, Direktverbindungen
 
 class MeinCSVImporterModel(resources.ModelResource):
 	"""
@@ -59,6 +59,24 @@ class ModellierungExporterModel(resources.ModelResource):
 			'beschreibung_der_gf', 'af', 'beschreibung_der_af',
 			'organisation_der_af', 'eigentuemer_der_af',
 			'aus_modellierung_entfernen', 'datei', 'letzte_aenderung',
+		)
+
+		export_order = fields
+
+class DirektverbindungenExporterModel(resources.ModelResource):
+	"""
+		Resource-Class für Im- und Eport der Direktverbindungen-Tabelle
+	"""
+	class Meta:
+		model = Direktverbindungen
+		encoding = "utf-8"
+		delimiter = ';'
+		quotechar = '"'
+		escapechar = '\\',
+		fields = ('id',
+			'organisation', 'entscheidung', 'entitlement', 'applikation',
+			'instanz', 'identitaet', 'manager', 'vorname', 'nachname', 'account_name',
+			'status', 'typ', 'nicht_anmailen', 'ansprechpartner'
 		)
 
 		export_order = fields

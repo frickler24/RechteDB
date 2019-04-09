@@ -17,11 +17,12 @@ from rapp.models import TblUebersichtAfGfs, TblUserIDundName, TblOrga, TblPlattf
 						TblRollen, TblAfliste, TblUserhatrolle, TblRollehataf, \
 						Tblsubsysteme, Tblsachgebiete, TblDb2, TblRacfGruppen, \
 						RACF_Rechte, Orga_details, \
-						Modellierung
+						Modellierung, Direktverbindungen
 
 # Für den Im- und Export
 from import_export.admin import ImportExportModelAdmin
-from rapp.resources import MeinCSVImporterModel, GesamtExporterModel, ModellierungExporterModel
+from rapp.resources import MeinCSVImporterModel, GesamtExporterModel, \
+							ModellierungExporterModel, DirektverbindungenExporterModel
 
 # Vorwärtsreferenzen gehen nicht in python :-(
 # Inline function to show all Instances in other view
@@ -377,4 +378,19 @@ class Modellierung(ImportExportModelAdmin):
 
 	# Parameter für import/export
 	resource_class = ModellierungExporterModel
+	sortable_by = ['entitlement', 'plattform', 'gf', 'af']
+
+@admin.register(Direktverbindungen)
+class Direktverbindungen(ImportExportModelAdmin):
+	alle = [
+		'organisation', 'entscheidung', 'entitlement', 'applikation',
+		'instanz', 'identitaet', 'manager', 'vorname', 'nachname', 'account_name',
+		'status', 'typ', 'nicht_anmailen', 'ansprechpartner', 'letzte_aenderung'
+	]
+	search_fields = alle
+	list_display = alle
+	list_editable = ('entscheidung', 'nicht_anmailen', 'ansprechpartner')
+
+	# Parameter für import/export
+	resource_class = DirektverbindungenExporterModel
 	sortable_by = ['entitlement', 'plattform', 'gf', 'af']

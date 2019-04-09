@@ -308,9 +308,9 @@ def findeNeueAFGF(gesuchte_af):
 	'''
 	Finde alle AF/GF-Kombinationen zu einer AF in der Tabelle der erlaubten Kombinationen
 	Das wird am Anfang benötigt für den Fall, dass nur einzelne Teilkombinationen fehlen
-	Anschließend muss die AF_Liste gegebebnenfalls ergänzt werden.
+	Anschließend muss die AF_Liste gegebenenfalls ergänzt werden.
 
-	:param gesuchte_af: STring mimt der AF, zu der ggfs. die AF/GF-Kombinationen gesucht und ergänzt werden sollen.
+	:param gesuchte_af: String mit der AF, zu der ggfs. die AF/GF-Kombinationen gesucht und ergänzt werden sollen.
 	:return: None oder Fehlerstring
 	'''
 
