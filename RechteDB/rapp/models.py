@@ -734,7 +734,7 @@ class Direktverbindungen(models.Model):
 	"""
 	organisation =					models.CharField(max_length=30, null=False)
 	entscheidung =					models.CharField(max_length=30, null=True)
-	entitlement =					models.CharField(max_length=200, null=False, db_index=True)
+	entitlement =					models.CharField(max_length=100, null=False, db_index=True)
 	applikation =					models.CharField(max_length=20, null=True)
 	instanz =						models.CharField(max_length=20, null=True)
 	identitaet =					models.CharField(max_length=50, null=False, db_index=True)

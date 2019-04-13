@@ -63,6 +63,37 @@ tarfile:
 			&& mv /tmp/code_file.tar.gz RechteDB/code_$(shell grep "^__version__" RechteDB/rapp/__init__.py | cut -d\' -f 2).tar.gz \
 	)
 
+codefile:
+	( \
+		cd /home/lutz/Projekte/RechteDB2MySQL/ \
+			&& rm -f RechteDB/code_* \
+			&& tar cf /tmp/code_file_s390x.tar.gz \
+                RechteDB/code \
+                RechteDB/Dockerfile \
+                RechteDB/Dockerfile_full \
+                RechteDB/.dockerignore \
+                RechteDB/Makefile \
+                RechteDB/RechteDB \
+                RechteDB/requirements.txt \
+                RechteDB/Testfabrik_clear.csv \
+                RechteDB/Testfabrik_init.csv \
+                RechteDB/Testfabrik_run.csv \
+                RechteDB/.git/branches \
+                RechteDB/.git/COMMIT_EDITMSG \
+                RechteDB/.git/config \
+                RechteDB/.git/description \
+                RechteDB/.git/FETCH_HEAD \
+                RechteDB/.git/HEAD \
+                RechteDB/.git/hooks \
+                RechteDB/.git/index \
+                RechteDB/.git/info \
+                RechteDB/.git/logs \
+                RechteDB/.git/ORIG_HEAD \
+                RechteDB/.git/packed-refs \
+                RechteDB/.git/refs \
+			&& mv /tmp/code_file_s390x.tar.gz RechteDB/code_s390x_$(shell grep "^__version__" RechteDB/rapp/__init__.py | cut -d\' -f 2).tar.gz \
+	)
+
 image:
 	( \
 		cd /home/lutz/Projekte/RechteDB2MySQL/RechteDB/ \
