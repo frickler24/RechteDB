@@ -151,3 +151,14 @@ status:
 	sleep 1
 	docker ps
 
+halb:
+	-docker run -it --rm \
+		--name hap \
+		--publish 8081:80 \
+		--network mariaNetz \
+		--network-alias hap \
+		-e TZ='Europe/Berlin' \
+		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/other_files/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cnf \
+		haproxy bash
+
+
