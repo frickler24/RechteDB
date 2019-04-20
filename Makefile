@@ -1,13 +1,15 @@
 # vim:set ft=Makefile ts=8:
 
-it:	clean netzwerk mariadb phpmyadmin 
-
+it:     clean netzwerk mariadb phpmyadmin halb
+con:    it rappprod
+coni:   it image rappprod
 all:	it image rapptest rappprod status
 
 clean:
 	-docker rm -f rapp
 	-docker rm -f phpmyadmin
 	-docker rm -f mariadb
+	-docker rm -f hap
 	-docker network rm mariaNetz
 
 netzwerk:
@@ -31,22 +33,24 @@ phpmyadmin:
 		-p 8080:80 \
 		--name phpmyadmin \
 		--network mariaNetz \
+		--network-alias pma \
 		--restart unless-stopped \
         -e TZ='Europe/Berlin' \
 		-e PMA_HOST=maria \
-		phpmyadmin/phpmyadmin
+		mypma
 
 phpmyadmin_pma:
 	docker run -d \
 		-p 8088:80 \
 		--name phpmyadmin \
 		--network mariaNetz \
+		--network-alias pma \
 		--restart unless-stopped \
         -e TZ='Europe/Berlin' \
 		-e PMA_HOST=maria \
 		-e PMA_CONTROLUSER=pma \
 		-e PMA_CONTROLPASS=0oWiPLfdhAcSqy9TnmhKcI222QQIO87BvvjiHX9r57\
-		phpmyadmin/phpmyadmin
+		mypma
 
 importfile:
 	cd irgendwohin
@@ -129,8 +133,9 @@ rapptest:
 rappprod:
 	docker run -d \
 		--name rapp \
-		-p 8089:8000 \
+		-p 8089:8089 \
 		--network mariaNetz \
+		--network-alias rapp \
 		--restart unless-stopped \
         -e TZ='Europe/Berlin' \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB:/RechteDB \
@@ -143,6 +148,7 @@ rappfull:
 		--name rapp \
 		-p 8089:8000 \
 		--network mariaNetz \
+		--network-alias rapp \
 		--restart unless-stopped \
         -e TZ='Europe/Berlin' \
 		rapp_full:latest
@@ -152,13 +158,14 @@ status:
 	docker ps
 
 halb:
-	-docker run -it --rm \
+	-docker run -d \
+		--restart unless-stopped \
 		--name hap \
-		--publish 8081:80 \
+		--publish 8088:80 \
 		--network mariaNetz \
 		--network-alias hap \
 		-e TZ='Europe/Berlin' \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/other_files/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cnf \
-		haproxy bash
+		haproxy haproxy -f /usr/local/etc/haproxy/haproxy.cnf -d -V
 
 
