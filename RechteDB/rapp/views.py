@@ -30,6 +30,7 @@ from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, Letzter_
 
 # An dieser stelle stehen diverse Tools zum Aufsetzen der Datenbank mit SPs
 from .stored_procedures import finde_procs_exakt, connection
+from .view_serienbrief import serienbrief
 
 ###################################################################
 # RApp - erforderliche Sichten und Reports
