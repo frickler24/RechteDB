@@ -14,7 +14,7 @@ Including another URLconf
 	2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-from . import views, view_UserHatRolle, view_import, stored_procedures
+from . import views, view_UserHatRolle, view_import, stored_procedures, view_serienbrief
 
 # app_name = 'rapp'		# Wird nur benötigt als namespace, falls mehrere Apps dieselbe Teil-URL haben
 
@@ -100,7 +100,8 @@ urlpatterns += [
 
 # URl zum Erzeugen der LaTeX-Serienbriefinformation zu Direct Connects
 urlpatterns += [
-	path('serienbrief/', views.serienbrief, name='serienbrief'),
+	path('einzelbrief/', view_serienbrief.einzelbrief, name='einzelbrief'),
+	path('serienbrief/', view_serienbrief.serienbrief, name='serienbrief'),
 ]
 
 # URl zum Testen neuer Funktionalität (liegt in "Magie")
