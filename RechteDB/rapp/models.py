@@ -716,3 +716,41 @@ class Modellierung(models.Model):
 	datei =							models.CharField(max_length=100, null=True)
 	letzte_aenderung = 				models.DateTimeField(default=timezone.now, null=True)
 
+	class Meta:
+		managed = True
+		verbose_name = 'Modellierung AF GF TF'
+		verbose_name_plural = '60_Modellierung AF GF TF'
+		#ordering = [ 'id', 'organisation', 'orgID', 'parentOrga', 'fkName', ]
+
+
+class Direktverbindungen(models.Model):
+	"""
+	Tabelle aus dem Export für die TF-Rezertifizierung.
+	Die Daten enthalten alle derzeit bekannten Direktverbindungen zu TFs der Abteilung.
+
+	Auch das kann dem späteren Erzeugen von Mails dienen, um User auf Möglichekiten hinzuweisen,
+	sich von Direct Connects zu trennen.
+	Diese Tabelle muss geeignet mit der Tabelle Modellierung verknüpft werden
+	"""
+	organisation =					models.CharField(max_length=30, null=False)
+	entscheidung =					models.CharField(max_length=30, null=True)
+	entitlement =					models.CharField(max_length=100, null=False, db_index=True)
+	applikation =					models.CharField(max_length=20, null=True)
+	instanz =						models.CharField(max_length=20, null=True)
+	identitaet =					models.CharField(max_length=50, null=False, db_index=True)
+	manager =						models.CharField(max_length=100, null=True)
+	vorname =						models.CharField(max_length=100, null=False)
+	nachname =						models.CharField(max_length=100, null=False)
+	account_name =					models.CharField(max_length=50, null=False)
+	status =						models.CharField(max_length=100, null=True)
+	typ =							models.CharField(max_length=100, null=True)
+	nicht_anmailen =				models.CharField(max_length=8, null=True)
+	ansprechpartner =				models.CharField(max_length=100, null=True)
+	letzte_aenderung = 				models.DateTimeField(default=timezone.now, null=True)
+
+	class Meta:
+		managed = True
+		verbose_name = 'Direktverbindungen'
+		verbose_name_plural = '61_Direktverbindungen'
+		unique_together = (('entitlement', 'account_name'),)
+
