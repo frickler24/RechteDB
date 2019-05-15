@@ -22,7 +22,7 @@
 						{% else %}<small style="color: red;">nicht in der Session</small>
 						{% endif %}
 					</a>
-					<br />
+					&nbsp; | &nbsp;
 					<a
 						{% if request.user.is_authenticated %}
 							href={% url 'logout' %}?next={% url 'home' %} style="color: rgba(255,255,255,.75);">
@@ -35,6 +35,21 @@
 								style="color: rgba(255,255,255,.75);">
 							Benutzer unbekannt
 						{% endif %}
+					</a>
+					<br />
+					<a href="https://github.com/frickler24/RechteDB/wiki/Versionshistorie"
+											   target="_blank"
+											   style="color: rgba(255,255,255,.75);">Release-Information
+					</a>
+					&nbsp; | &nbsp;
+					<a href="{{ request.host }}/stats"
+											   target="_blank"
+											   style="color: rgba(255,255,255,.75);">Proxy-Status
+					</a>
+					&nbsp; | &nbsp;
+					<a href="{{ request.host }}/pma"
+											   target="_blank"
+											   style="color: rgba(255,255,255,.75);">PMA
 					</a>
 				</small>
 			</div>
@@ -84,7 +99,6 @@
 					</ul>
                 </div>
             </div>
-
 		</nav>
 
 		<div class="container-fluid">

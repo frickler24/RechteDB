@@ -3,7 +3,7 @@
 it:     clean netzwerk mariadb phpmyadmin halb
 con:    it rappprod
 coni:   it image rappprod
-all:	it image rapptest rappprod status
+all:	it image codefile rapptest rappprod status
 
 clean:
 	-docker rm -f rapp

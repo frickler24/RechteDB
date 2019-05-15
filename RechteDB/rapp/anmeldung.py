@@ -3,6 +3,8 @@ from django.contrib.auth import authenticate
 
 # Die Hilfsklasse zum Login: User John Doe einrichten und anmelden.
 # Falls der User bereits existiert, einfach nur anmelden.
+# Diese Klasse wird ausschließlich von den Testscripten verwendet
+
 class Anmeldung():
 	def login(self, loginfunc):
 		user = authenticate(username='john', password='123')

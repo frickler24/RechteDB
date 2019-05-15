@@ -1,7 +1,7 @@
 # All requirement needed for app "rapp" which is short for RechteDB-APP
 
 # Step 1: Standard
-django >= 2.1
+django >= 2.2
 
 # Step 2: Decoupling sensitive infos from GIT repo
 python-decouple >= 3.1
