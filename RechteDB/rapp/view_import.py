@@ -10,7 +10,7 @@ from django import forms
 from django.contrib.auth.decorators import login_required
 
 # Zum Einlesen der csv
-import csv, datetime, textwrap
+import csv, datetime, textwrap, sys
 from math import *
 
 from .forms import ImportForm, ImportForm_schritt3
