@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from typing import Type, List
-
 from django.contrib import admin
 
 # Register your models here.
@@ -241,7 +239,7 @@ class Userhatrolle(admin.ModelAdmin):
 	list_editable = ('schwerpunkt_vertretung', 'bemerkung', )
 	search_fields = [ 'schwerpunkt_vertretung', 'rollenname__rollenname', 'bemerkung', 'userid__name', 'userid__userid', ]
 
-	list_per_page = 25 # sys.maxsize
+	list_per_page = 25
 	extra = 1
 
 # ######################################################################################################
@@ -313,7 +311,7 @@ class Rollehataf(admin.ModelAdmin):
 	search_fields = ['rollenname__rollenname', 'af__af_name', 'bemerkung', ]
 	list_filter = ('mussfeld', 'einsatz', )
 
-	list_per_page = 25 # sys.maxsize
+	list_per_page = 25
 
 # ######################################################################################################
 # Eine Reihe von Hilfstabellen, alle nach dem selben Schema. Keine Foreign Keys
