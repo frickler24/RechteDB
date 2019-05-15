@@ -138,6 +138,7 @@
 				<th>AF Neu</th>
 				<th>GF Neu</th>
 				<th>TF Beschreibung</th>
+				<th>TF Kritikalität</th>
 				<th>Recht aktiv</th>
 				<th>User aktiv</th>
 			</tr>
@@ -155,6 +156,7 @@
 					<td class="vllzulangertext knappeTabelle">{{ row.modell.name_af_neu }}</td>
 					<td class="vllzulangertext knappeTabelle">{{ row.modell.name_gf_neu }}</td>
 					<td class="vllzulangertext knappeTabelle">{{ row.tf_beschreibung }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.tf_kritikalitaet | lower }}</td>
 
                     {# Das "Gelöscht"-Flag wird als aktiv angezeigt und damit invertiert als Grafik #}
                     <td align="center" class="knappeTabelle">
