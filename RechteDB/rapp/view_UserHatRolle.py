@@ -66,17 +66,22 @@ class UhRDelete(LoginRequiredMixin, DeleteView):
 	# Im Erfolgsfall soll die vorherige Selektion im Panel "User und RolleN" wieder aktualisiert gezeigt werden.
 	# Dazu werden nebem dem URL-Stamm die Nummer des anzuzeigenden Users sowie die gesetzte Suchparameter benötigt.
 	def get_success_url(self):
-		usernr = self.request.GET.get('user', 0) # Sicherheitshalber - falls mal kein User angegeben ist
+		usernr = self.request.GET.get('user', "0") # Sicherheitshalber - falls mal kein User angegeben ist
 
 		urlparams = "%s?"
 		for k in self.request.GET.keys():
 			if (k != 'user' and self.request.GET[k] != ''):
 				urlparams += "&" + k + "=" + self.request.GET[k]
-		url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
+		# Falls dieUsernr leer ist, kommmen wir von der Rollensicht des Panels, weil dort die Usernummer egal ist.
+		# Die Nummer ist nur gesetzt wen wir auf der Standard-Factory aufgerufen werden.
+		if usernr == "":
+			url = urlparams % reverse('user_rolle_af')
+		else:
+			url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
 		return url
 class UhRUpdate(LoginRequiredMixin, UpdateView):
 	"""Ändert die Zuordnung von Rollen zu einem User."""
-	# ToDo: Hierfür gibt es noch keine Buttons.
+	# ToDo: Hierfür gibt es noch keine Buttons. Das ist noch über "Change" inkonsistent abgebildet
 	model = TblUserhatrolle
 	fields = '__all__'
 
@@ -288,7 +293,7 @@ def hole_rollen_zuordnungen(af_dict):
 	Liefert eine Liste der Rollen, in denen eine Menge von AFs vorkommt,
 	sortiert nach Zuordnung zu einer Liste an UserIDs
 
-	:param af_dict: Die Eingabeliste besteht aus einer Dictionary af_dict[Userid] = AF_Menge_zur_UserID[]
+	:param af_dict: Die Eingabeliste besteht aus einem Dictionary af_dict[Userid] = AF_Menge_zur_UserID[]
 	:return: vorhanden = Liste der Rollen, in denen die AF vorkommt und die dem Namen zugeordnet sind
 	:return: optional = Liste der Rollen, in denen die AF vorkommt und die dem User nicht zugeordnet sind
 	"""
@@ -344,7 +349,7 @@ def suche_rolle_fuer_userid_und_af(userid, af):
 		.order_by('rollenname')
 
 	# Sortiere die Rollen, ob sie dem dem User zugeordnet sind oder nicht
-	vorhanden = [str(einzelrolle.rollenname)\
+	vorhanden = [str("{}!{}".format(einzelrolle.userundrollenid, einzelrolle.rollenname))\
 				 for einzelrolle in userrollen\
 				 if str(einzelrolle.rollenname) in rollen_liste
 				]
@@ -549,6 +554,10 @@ class AFListenUhr(UhR):
 def panel_UhR(request, id = 0):
 	"""
 	Finde die richtige Anzeige und evaluiere sie über das factory-Pattern
+
+	- wenn rollennamme gesetzt ist, rufe die Factory "rolle"
+	- wenn rollenname nicht gesetzt oder leer ist und afname gesetzt ist, rufe factory "af"
+	- Ansonsten rufe die Standard-Factory "einzel"
 
 	:param request: GET oder POST Request vom Browser
 	:param pk: ID des XV-UserID-Eintrags, zu dem die Detaildaten geliefert werden sollen
@@ -757,3 +766,4 @@ def panel_UhR_matrix_csv(request, flag = False):
 		writer.writerow(line)
 
 	return response
+

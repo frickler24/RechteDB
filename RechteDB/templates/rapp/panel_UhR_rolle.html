@@ -53,7 +53,11 @@
 											{% if forloop.first and rolle == ""%}
 												<strong class="text-danger">nicht vergeben</strong>
 											{% endif %}
-											{% if not forloop.last %}{{ rolle }}<br />{% endif %}
+											{% if not forloop.last %}
+												<a href="{% url 'user_rolle_af-delete' rolle|part1 %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&user={{ id }}">
+													<img src="{% static 'icons8-müll-50.png' %}" width="20rem" />
+												</a> {{ rolle|part2 }}<br />
+											{% endif %}
 										{% empty %}
 											Fehler im Datensatz
 										{% endfor vorhanden %}
