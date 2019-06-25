@@ -71,7 +71,8 @@ urlpatterns += [
 # Der Link auf das Eingabepanel zur freien Selektion auf der User-hat-Rolle Tabelle mit Änderungslink
 urlpatterns += [
 	path('user_rolle_af/<int:pk>/delete/', 		view_UserHatRolle.UhRDelete.as_view(), 		name='user_rolle_af-delete'),
-	# path('user_rolle_af/<int:pk>/update/', 		view_UserHatRolle.UhRUpdate.as_view(), 		name='user_rolle_af-update'),
+	path('user_rolle_af/<str:userid>/create/<str:rollenname>',
+		 										view_UserHatRolle.UhRCreate.as_view(), 		name='uhr_create'),
 	path('user_rolle_af/<int:id>/', 			view_UserHatRolle.panel_UhR, 				name='user_rolle_af_parm'),
 	path('user_rolle_af/create/<str:userid>/',	view_UserHatRolle.UhRCreate.as_view(), 		name='user_rolle_af-create' ),
 	path('user_rolle_af/konzept/', 				view_UserHatRolle.panel_UhR_konzept,		name='uhr_konzept'),

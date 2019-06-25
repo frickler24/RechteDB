@@ -8,7 +8,7 @@ from django.urls import reverse
 # Imports für die Selektions-Views panel, selektion u.a.
 from django.shortcuts import render, redirect
 
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 import csv
 
 from .filters import RollenFilter, UseridFilter
@@ -36,15 +36,25 @@ class UhRCreate(LoginRequiredMixin, CreateView):
 	def get_context_data(self, **kwargs):
 		# Call the base implementation first to get a context
 		context = super().get_context_data(**kwargs)
+
 		context['userid'] = self.kwargs['userid']
-		user_entry = TblUserIDundName.objects.filter(userid__istartswith=self.kwargs['userid'])[0]
-		context['username'] = user_entry
+		print ('userid =', context['userid'])
+
+		context['rollenname'] = self.kwargs['rollenname']
+		print('rollenname =', context['rollenname'])
+
 		return context
 
 	def get_form_kwargs(self):
+		"""
+		Definiere die benötigten benannten Parameter
+		:return: kwargs mit den Inhalten der Oberklasse und den benötigten Parametern
+		"""
 		kwargs = super(UhRCreate, self).get_form_kwargs()
 		kwargs['userid'] = self.kwargs['userid']
+		kwargs['rollenname'] = self.kwargs['rollenname']
 		return kwargs
+
 
 	# Im Erfolgsfall soll die vorherige Selektion im Panel "User und Rollen" wieder aktualisiert gezeigt werden.
 	# Dazu werden nebem dem URL-Stamm die Nummer des anzuzeigenden Users sowie die gesetzte Suchparameter benötigt.
@@ -56,7 +66,7 @@ class UhRCreate(LoginRequiredMixin, CreateView):
 			if (k != 'user' and self.request.GET[k] != ''):
 				urlparams += "&" + k + "=" + self.request.GET[k]
 		url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
-		# print (url)
+		print (url)
 		return url
 class UhRDelete(LoginRequiredMixin, DeleteView):
 	"""Löscht die Zuordnung einer Rollen zu einem User."""
@@ -97,7 +107,6 @@ class UhRUpdate(LoginRequiredMixin, UpdateView):
 		url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
 		# print (url)
 		return url
-
 
 def UhR_erzeuge_listen(request):
 	"""
@@ -563,7 +572,6 @@ def panel_UhR(request, id = 0):
 	:param pk: ID des XV-UserID-Eintrags, zu dem die Detaildaten geliefert werden sollen
 	:return: Gerendertes HTML
 	"""
-
 	assert request.method != 'POST', 'Irgendwas ist im panel_UhR über POST angekommen'
 	assert request.method == 'GET', 'Irgendwas ist im panel_UhR nicht über GET angekommen: ' + request.method
 

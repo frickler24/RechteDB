@@ -18,11 +18,19 @@ class CreateUhRForm(forms.ModelForm):
 		fields = ['userid', 'rollenname', 'schwerpunkt_vertretung', 'bemerkung', ]
 
 	def __init__(self, *args, **kwargs):
+
+		print ('kwargs in CreateUhRForm:')
+		for k in kwargs:
+			print (k, '->', kwargs[k])
+		print ('-------------')
+
 		self.userid = kwargs.pop('userid', None)
+		self.rollenname = kwargs.pop('rollenname', 'blabla')
 		super(CreateUhRForm, self).__init__(*args, **kwargs)
+
 		# assign the default userID to the choice field
 		self.initial['userid'] = self.userid
-
+		self.initial['rollennamme'] = self.rollenname
 
 
 #Auch hier ist das Thema das Initialisieren des Organisations-Choicefields
