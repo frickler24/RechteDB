@@ -24,24 +24,39 @@ from django.utils import timezone
 
 ###################################################################
 # Zuordnungen der Rollen zu den Usern (TblUserHatRolle ==> UhR)
-class UhRCreate(LoginRequiredMixin, CreateView):
+class UhRCreate(CreateView):
 	"""
 	Erzeugt einen neue Rolle für einen User.
-	Die Rolle kann eine bestehende oder eine neu definierte Rolle sein.
+	Sowohl User als auch Rolle müssen bereits existieren.
 	"""
 	model = TblUserhatrolle
 	template_name = 'rapp/uhr_form.html'
+	# Entweder form-Angabe oder Field-Liste
 	form_class = CreateUhRForm
+	#fields = ['userid', 'rollenname', 'schwerpunkt_vertretung', 'bemerkung', ]
+	"""
+	initial = {
+		'userid': 'xv881P7'.upper(),
+		# 'rollenname': 'AI-BA Leitung',
+		'rollenname': 'Bereitstellung Host',
+		'schwerpunkt_vertretung': 'Vertretung',
+	}
+	print (initial)
+	"""
 
-	def get_context_data(self, **kwargs):
+
+	def xxxget_context_data(self, **kwargs):
 		# Call the base implementation first to get a context
 		context = super().get_context_data(**kwargs)
 
-		context['userid'] = self.kwargs['userid']
-		print ('userid =', context['userid'])
+		context['userid'] = self.kwargs['userid'].upper()[:8]
+		print ('get_context_data: userid =', context['userid'])
 
 		context['rollenname'] = self.kwargs['rollenname']
-		print('rollenname =', context['rollenname'])
+		print('get_context_data: rollenname =', context['rollenname'])
+
+		context['schwerpunkt_vertretung'] = self.kwargs['schwerpunkt_vertretung']
+		print('get_context_data: schwerpunkt_vertretung =', context['schwerpunkt_vertretung'])
 
 		return context
 
@@ -53,7 +68,9 @@ class UhRCreate(LoginRequiredMixin, CreateView):
 		kwargs = super(UhRCreate, self).get_form_kwargs()
 		kwargs['userid'] = self.kwargs['userid']
 		kwargs['rollenname'] = self.kwargs['rollenname']
+		kwargs['schwerpunkt_vertretung'] = self.kwargs['schwerpunkt_vertretung']
 		return kwargs
+
 
 
 	# Im Erfolgsfall soll die vorherige Selektion im Panel "User und Rollen" wieder aktualisiert gezeigt werden.
@@ -68,7 +85,7 @@ class UhRCreate(LoginRequiredMixin, CreateView):
 		url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
 		print (url)
 		return url
-class UhRDelete(LoginRequiredMixin, DeleteView):
+class UhRDelete(DeleteView):
 	"""Löscht die Zuordnung einer Rollen zu einem User."""
 	model = TblUserhatrolle
 	template_name = 'rapp/uhr_confirm_delete.html'
@@ -89,7 +106,7 @@ class UhRDelete(LoginRequiredMixin, DeleteView):
 		else:
 			url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
 		return url
-class UhRUpdate(LoginRequiredMixin, UpdateView):
+class UhRUpdate(UpdateView):
 	"""Ändert die Zuordnung von Rollen zu einem User."""
 	# ToDo: Hierfür gibt es noch keine Buttons. Das ist noch über "Change" inkonsistent abgebildet
 	model = TblUserhatrolle
@@ -325,7 +342,6 @@ def hole_rollen_zuordnungen(af_dict):
 			optional[tag] = opt
 	return (vorhanden, optional)
 
-
 """
 Liefert die XV-Nummer zu einer UserID zurück (die Stammnummer der Identität zur UserID)
 :param userid: Eine beliebige UserID einer Identität
@@ -373,7 +389,6 @@ def suche_rolle_fuer_userid_und_af(userid, af):
 	# print ('erzeugtes vorhanden:', vorhanden)
 	# print ('erzeugtes optional:', optional)
 	return (vorhanden, optional)
-
 
 def hole_af_mengen(userids, gesuchte_rolle):
 	"""
@@ -475,11 +490,9 @@ def UhR_verdichte_daten(panel_liste):
 	return (sorted(list(rollenMenge), key=order), userids, usernamen)
 
 # Die beiden nachfolgenden Funktionen dienen nur dem Aufruf der eigentlichen Konzept-Funktion
-@login_required
 def panel_UhR_konzept_pdf(request):
 	return erzeuge_UhR_konzept(request, False)
 
-@login_required
 def panel_UhR_konzept(request):
 	return erzeuge_UhR_konzept(request, True)
 
@@ -559,7 +572,6 @@ class AFListenUhr(UhR):
 		assert 0, 'Funktion AFListenUhr::behandle() ist noch nicht implementiert. Der Aufruf ist nicht valide.'
 
 # Zeige das Selektionspanel
-@login_required
 def panel_UhR(request, id = 0):
 	"""
 	Finde die richtige Anzeige und evaluiere sie über das factory-Pattern
@@ -694,7 +706,6 @@ def erzeuge_UhR_matrixdaten(panel_liste):
 	def order(a): return a.rollenname.lower() 	# Liefert das kleingeschriebene Element, nach dem sortiert werden soll
 	return (sorted(usernamen), sorted(list(rollenmenge), key=order), rollen_je_username, teams_je_username)
 
-@login_required
 def panel_UhR_matrix(request):
 	"""
 	Erzeuge eine Verantwortungsmatrix für eine Menge an selektierten Identitäten.
@@ -736,7 +747,6 @@ def panel_UhR_matrix(request):
 	}
 	return render(request, 'rapp/panel_UhR_matrix.html', context)
 
-@login_required
 def panel_UhR_matrix_csv(request, flag = False):
 	"""
 	Exportfunktion für das Filter-Panel zum Selektieren aus der "User und Rollen"-Tabelle).

@@ -1,4 +1,6 @@
 from django import template
+from urllib.parse import quote, unquote
+
 register = template.Library()
 
 # Liefert einen Wert eines Hashes für die Templates
@@ -26,6 +28,14 @@ def part1(_1):
 		return s[0]
 	else:
 		return s
+
+@register.filter
+def part1a(_1):
+	s = part1(_1)
+	if len(s) > 0:
+		return quote(part1(_1)[0], safe='')
+	else:
+		return ""
 
 @register.filter
 def part2(_1):
