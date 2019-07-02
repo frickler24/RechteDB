@@ -30,12 +30,13 @@ class CreateUhRForm(forms.ModelForm):
 		print ('-------------')
 		"""
 
-		self.userid = kwargs.pop('userid', None)[:7].upper()
+		self.userid = kwargs.pop('userid', None)
+		if self.userid != None:
+			self.userid = 'X' + self.userid[1:7].upper()
 		self.rollenname = unquote(kwargs.pop('rollenname', 'Spielrolle'))
 		self.schwerpunkt_vertretung = kwargs.pop('schwerpunkt_vertretung', 'Schwerpunkt')
 		super(CreateUhRForm, self).__init__(*args, **kwargs)
 
-		# print ('CreateUhRForm(__init__):', self.userid, self.rollenname, self.schwerpunkt_vertretung)
 		self.initial['userid'] = self.userid
 		self.initial['rollenname'] = self.rollenname
 		self.initial['schwerpunkt_vertretung'] = self.schwerpunkt_vertretung
