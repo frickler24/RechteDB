@@ -43,7 +43,7 @@
 					{% for name, uids in userids.items %}
 						{% for uid in uids %}
 							{% for af in af_per_uid|hash:uid %}
-								<tr>
+								<tr id="{{ uid }}.{{ af }}">
 									<td>{% ifchanged %}{{ name }}{% endifchanged %}</td>
 									<td>{% ifchanged %}{{ uid }}{% endifchanged %}</td>
 									<td>{% ifchanged %}{{ af }}{% endifchanged %}</td>
@@ -66,7 +66,7 @@
 										{% for rolle in optional|hash2:uid|hash3:af %}
 											{# Als letztes Element wird immer ein Leerstring geliefert! #}
 											{% if not forloop.last %}
-												<a href="{% url 'uhr_create' userid=uid rollenname=rolle|part1a schwerpunkt_vertretung='Schwerpunkt' %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}">{{ rolle }}</a><br />
+												<a href="{% url 'uhr_create' userid=uid rollenname=rolle|part1a schwerpunkt_vertretung='Schwerpunkt' %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}#{{ uid }}.{{ af }}">{{ rolle }}</a><br />
 											{% endif %}
 										{% empty %}
 											Keine optionale Rolle gefunden
