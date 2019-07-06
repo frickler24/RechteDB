@@ -23,11 +23,6 @@ class CreateUhRForm(forms.ModelForm):
 		Damit werden die drei Werte Userid, Rollenname und Schweerpunkt/Vertretung initialisiert angezeigt.
 		:param args:
 		:param kwargs: Das Wesentliche steht hier drin
-
-		print ('kwargs in CreateUhRForm:')
-		for k in kwargs:
-			print (k, '->', kwargs[k])
-		print ('-------------')
 		"""
 
 		self.userid = kwargs.pop('userid', None)
