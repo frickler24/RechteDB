@@ -175,8 +175,8 @@ class UebersichtAfGfs(admin.ModelAdmin):
 
 	fieldsets = [
 		('Standard       ', {'fields': ['name_af_neu', 'name_gf_neu', 'af_text', 'gf_text',
-										'geloescht', 'af_langtext', 'modelliert', ]}),
-		('Rechte-Details ', {'fields': ['zielperson', 'kommentar', 'af_ausschlussgruppen', 'af_einschlussgruppen',
+										'geloescht', 'af_langtext', 'modelliert', 'zielperson', ]}),
+		('Rechte-Details ', {'fields': ['kommentar', 'af_ausschlussgruppen', 'af_einschlussgruppen',
 										'af_sonstige_vergabehinweise', 'kannweg', ],
 							 'classes': ['collapse']}),
 	]
@@ -322,7 +322,7 @@ class Subsysteme(admin.ModelAdmin):
 	search_fields = alle
 	list_display = alle
 
-@admin.register(Tblsachgebiete)		# ToDo Mal eine aktuelle Sachgebiets-/Subsystemtabelle runterladen
+@admin.register(Tblsachgebiete)
 class Sachgebiete(admin.ModelAdmin):
 	alle = ['sachgebiet', 'definition', 'verantwortlicher', 'fk',]
 	search_fields = alle
