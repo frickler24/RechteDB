@@ -1,4 +1,6 @@
 from django import template
+from urllib.parse import quote, unquote
+
 register = template.Library()
 
 # Liefert einen Wert eines Hashes für die Templates
@@ -19,7 +21,31 @@ def hash3(_1_2, _3):
 	key = '!'.join((_2, _3))
 	return hash(_1, key)
 
-#Liefert den Zweck einer Rolle (ist der zweite Teil des Tupels)
+@register.filter
+def part1(_1):
+	s = _1.split("!")
+	if len(s) > 1:
+		return s[0]
+	else:
+		return s
+
+@register.filter
+def part1a(_1):
+	s = part1(_1)
+	if len(s) > 0:
+		return quote(part1(_1)[0], safe='')
+	else:
+		return ""
+
+@register.filter
+def part2(_1):
+	s = _1.split("!")
+	if len(s) > 1:
+		return s[1]
+	else:
+		return "Kein zweites Element gefunden"
+
+# Liefert den Zweck einer Rolle (ist der zweite Teil des Tupels)
 @register.filter
 def finde(inputset, search):
 	for s in inputset:

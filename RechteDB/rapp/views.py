@@ -1,36 +1,30 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.shortcuts import get_object_or_404
-from django.views import generic, View
-
-from django.http import HttpResponseRedirect, HttpResponse
-from django.urls import reverse
-
+import csv
+# Zum Einlesen der Versionsnummer
+import os
+import re
+import subprocess
+import sys
 # Imports für die Selektions-Views panel, selektion u.a.
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
-
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import get_object_or_404
+from django.shortcuts import render
+from django.urls import reverse
+from django.urls import reverse_lazy
+from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
-from django.urls import reverse_lazy
-
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-
-# Zum Einlesen der Versionsnummer
-import os, re, subprocess, sys
 from math import *
 
-import csv
-
 from .filters import PanelFilter
-from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, Letzter_import # ToDo LetzterImport raus hier
-
+from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, Letzter_import  # ToDo LetzterImport raus hier
 # An dieser stelle stehen diverse Tools zum Aufsetzen der Datenbank mit SPs
 from .stored_procedures import finde_procs_exakt, connection
-from .view_serienbrief import serienbrief
+
 
 ###################################################################
 # RApp - erforderliche Sichten und Reports
@@ -137,37 +131,36 @@ def home(request):
 
 ###################################################################
 # Gesamtliste
-class GesamtListView(LoginRequiredMixin, ListView):
+class GesamtListView(ListView):
 	"""Die Gesamtliste der Rechte ungefiltert"""
 	model = TblGesamt
 	paginate_by = 50
 
-class GesamtDetailView(LoginRequiredMixin, generic.DetailView):
+class GesamtDetailView(generic.DetailView):
 	"""Die Detailsicht eines einzelnen Rechts"""
 	model = TblGesamt
 
 
 ###################################################################
 # Rechte-User (Gemeint sind nicht die Anwender der RechteDB!)
-class UserIDundNameListView(LoginRequiredMixin, ListView):
+class UserIDundNameListView(ListView):
 	"""Die Gesamtliste der User ungefiltert"""
 	model = TblUserIDundName
 	paginate_by = 50
-class TblUserIDundNameCreate(LoginRequiredMixin, CreateView):
+class TblUserIDundNameCreate(CreateView):
 	"""Erstellen eines neuen Users"""
 	model = TblUserIDundName
 	fields = '__all__'
 	initial = {'geloscht' : 'False',}
-class TblUserIDundNameUpdate(LoginRequiredMixin, UpdateView):
+class TblUserIDundNameUpdate(UpdateView):
 	"""Ändern eines Users"""
 	model = TblUserIDundName
 	fields = '__all__'
-class TblUserIDundNameDelete(LoginRequiredMixin, DeleteView):
+class TblUserIDundNameDelete(DeleteView):
 	"""Löschen eines Users"""
 	model = TblUserIDundName
 	success_url = reverse_lazy('userliste')
 
-@login_required
 def userToggleGeloescht(request, pk):
 	"""
 	View function zum Togglen des Gelöscht-Flags in der DB für eine konkrete Instanz.
@@ -187,20 +180,20 @@ def userToggleGeloescht(request, pk):
 
 ###################################################################
 # Die Gesamtliste der Teams (TblOrga)
-class TeamListView(LoginRequiredMixin, generic.ListView):
+class TeamListView(generic.ListView):
 	"""Die Gesamtliste der Teams (TblOrga)"""
 	model = TblOrga
 
-class TblOrgaCreate(LoginRequiredMixin, CreateView):
+class TblOrgaCreate(CreateView):
 	"""Neues Team erstellen"""
 	model = TblOrga
 	fields = '__all__'
 	initial = {'geloscht' : 'False',}
-class TblOrgaUpdate(LoginRequiredMixin, UpdateView):
+class TblOrgaUpdate(UpdateView):
 	"""Team ändern"""
 	model = TblOrga
 	fields = '__all__'
-class TblOrgaDelete(LoginRequiredMixin, DeleteView):
+class TblOrgaDelete(DeleteView):
 	"""Team löschen"""
 	model = TblOrga
 	success_url = reverse_lazy('teamliste')
@@ -225,7 +218,6 @@ def pagination(request, liste, psize=20):
 
 ###################################################################
 # Panel geht direkt auf die Gesamt-Datentabelle
-@login_required
 def panel(request):
 	"""
 	# Filter-Panel zum Selektieren aus der Gesamttabelle nach allen möglichen Kriterien
@@ -252,7 +244,6 @@ def panel(request):
 ###################################################################
 # Panel_UhR betrachtet den Soll-Zustand über UserHatRolle
 
-@login_required
 def panelDownload(request):
 	"""
 	Exportfunktion für das Filter-Panel zum Selektieren aus der Gesamttabelle (s. panel()).
@@ -294,7 +285,6 @@ def panelDownload(request):
 
 	return response
 
-@login_required
 def magic_click(request):
 	'''
 	Ist nur eine Hülle, um Funktionen aufrufen zu können, die noch über keine Seite verfügen.

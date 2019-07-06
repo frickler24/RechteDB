@@ -1,5 +1,7 @@
 from django import forms
 from .models import TblUserhatrolle, hole_organisationen
+from urllib.parse import quote, unquote
+
 
 # Das hätte man auch einfacher haben können, indem die relevanten Infos in views.py eingetragen worden wären
 class ShowUhRForm(forms.ModelForm):
@@ -8,21 +10,36 @@ class ShowUhRForm(forms.ModelForm):
 		fields = ['userid', 'rollenname', 'schwerpunkt_vertretung', 'bemerkung', ]
 
 
-# Hier ist das anders, weil zwei Methoden zur Klasse hinzugekommen sind
-# Initialisiere das Input Formular für neue Rolleneinträge mit der UserID
+# Hier ist das anders, weil eine Methode zur Klasse hinzugekommen ist:
+# Initialisiere das Input Formular für neue Rolleneinträge mit der UserID, dem Modell und der Zuständigkeitsstufe
 class CreateUhRForm(forms.ModelForm):
-	userid = "Keine ID"
-
 	class Meta:
 		model = TblUserhatrolle
 		fields = ['userid', 'rollenname', 'schwerpunkt_vertretung', 'bemerkung', ]
 
 	def __init__(self, *args, **kwargs):
-		self.userid = kwargs.pop('userid', None)
-		super(CreateUhRForm, self).__init__(*args, **kwargs)
-		# assign the default userID to the choice field
-		self.initial['userid'] = self.userid
+		"""
+		Hole die 3 Parameter, die von der ReST-Schnittstelle übergeben wurden und fülle damit eine initial-Struktur.
+		Damit werden die drei Werte Userid, Rollenname und Schweerpunkt/Vertretung initialisiert angezeigt.
+		:param args:
+		:param kwargs: Das Wesentliche steht hier drin
 
+		print ('kwargs in CreateUhRForm:')
+		for k in kwargs:
+			print (k, '->', kwargs[k])
+		print ('-------------')
+		"""
+
+		self.userid = kwargs.pop('userid', None)
+		if self.userid != None:
+			self.userid = 'X' + self.userid[1:7].upper()
+		self.rollenname = unquote(kwargs.pop('rollenname', 'Spielrolle'))
+		self.schwerpunkt_vertretung = kwargs.pop('schwerpunkt_vertretung', 'Schwerpunkt')
+		super(CreateUhRForm, self).__init__(*args, **kwargs)
+
+		self.initial['userid'] = self.userid
+		self.initial['rollenname'] = self.rollenname
+		self.initial['schwerpunkt_vertretung'] = self.schwerpunkt_vertretung
 
 
 #Auch hier ist das Thema das Initialisieren des Organisations-Choicefields

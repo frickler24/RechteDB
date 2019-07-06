@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.urls import path
 from . import views, view_UserHatRolle, view_import, stored_procedures, view_serienbrief
+from django.contrib.auth.decorators import login_required
+
 
 # app_name = 'rapp'		# Wird nur benötigt als namespace, falls mehrere Apps dieselbe Teil-URL haben
 
@@ -29,83 +31,84 @@ urlpatterns = [
 
 # Der Link auf die Gesamtliste
 urlpatterns += [
-	path('gesamtliste/', views.GesamtListView.as_view(), name='gesamtliste'),
+	path('gesamtliste/', login_required(views.GesamtListView.as_view()), name='gesamtliste'),
 ]
 
 # Der Link auf ein einzelnes Recht aus der Gesamtliste mit seiner generierten Detailsicht
 urlpatterns += [
-	path('gesamtliste/<int:pk>', views.GesamtDetailView.as_view(), name='gesamt-detail'),
+	path('gesamtliste/<int:pk>', login_required(views.GesamtDetailView.as_view()), name='gesamt-detail'),
 ]
 
 # Der Link auf die User-liste
 urlpatterns += [
-	path('userliste/', views.UserIDundNameListView.as_view(), name='userliste'),
+	path('userliste/', login_required(views.UserIDundNameListView.as_view()), name='userliste'),
 ]
 
 # Generische Formulare für CUD UserIDundName (werden im Frontend bedient)
 urlpatterns += [
-	path('user/<int:pk>/delete/', views.TblUserIDundNameDelete.as_view(), name='user-delete'),
-	path('user/create/', views.TblUserIDundNameCreate.as_view(), name='user-create'),
-	path('user/<int:pk>/update/', views.TblUserIDundNameUpdate.as_view(), name='user-update'),
-	path('user/<int:pk>/toggle_geloescht/', views.userToggleGeloescht, name='user-toggle-geloescht'),
+	path('user/<int:pk>/delete/', login_required(views.TblUserIDundNameDelete.as_view()), name='user-delete'),
+	path('user/create/', login_required(views.TblUserIDundNameCreate.as_view()), name='user-create'),
+	path('user/<int:pk>/update/', login_required(views.TblUserIDundNameUpdate.as_view()), name='user-update'),
+	path('user/<int:pk>/toggle_geloescht/', login_required(views.userToggleGeloescht), name='user-toggle-geloescht'),
 ]
 
 # Der Link auf die Team-liste
 urlpatterns += [
-	path('teamliste/', views.TeamListView.as_view(), name='teamliste'),
+	path('teamliste/', login_required(views.TeamListView.as_view()), name='teamliste'),
 ]
 
 # Generische Formulare für CUD Orga (Teams, werden im Frontend bedient)
 urlpatterns += [
-	path('team/<int:pk>/delete/', views.TblOrgaDelete.as_view(), name='team-delete'),
-	path('team/create/', views.TblOrgaCreate.as_view(), name='team-create'),
-	path('team/<int:pk>/update/', views.TblOrgaUpdate.as_view(), name='team-update'),
+	path('team/<int:pk>/delete/', login_required(views.TblOrgaDelete.as_view()), name='team-delete'),
+	path('team/create/', login_required(views.TblOrgaCreate.as_view()), name='team-create'),
+	path('team/<int:pk>/update/', login_required(views.TblOrgaUpdate.as_view()), name='team-update'),
 ]
 
 # Der Link auf das Eingabepanel zur freien Selektion direkt auf der Gesamttabelle
 urlpatterns += [
-	path('panel/download', views.panelDownload, name='panel_download'),
-	path('panel/', views.panel, name='panel'),
+	path('panel/download', login_required(views.panelDownload), name='panel_download'),
+	path('panel/', login_required(views.panel), name='panel'),
 ]
 
 # Der Link auf das Eingabepanel zur freien Selektion auf der User-hat-Rolle Tabelle mit Änderungslink
 urlpatterns += [
-	path('user_rolle_af/<int:pk>/delete/', 		view_UserHatRolle.UhRDelete.as_view(), 		name='user_rolle_af-delete'),
-	# path('user_rolle_af/<int:pk>/update/', 		view_UserHatRolle.UhRUpdate.as_view(), 		name='user_rolle_af-update'),
-	path('user_rolle_af/<int:id>/', 			view_UserHatRolle.panel_UhR, 				name='user_rolle_af_parm'),
-	path('user_rolle_af/create/<str:userid>/',	view_UserHatRolle.UhRCreate.as_view(), 		name='user_rolle_af-create' ),
-	path('user_rolle_af/konzept/', 				view_UserHatRolle.panel_UhR_konzept,		name='uhr_konzept'),
-	path('user_rolle_af/konzept_pdf/', 			view_UserHatRolle.panel_UhR_konzept_pdf, 	name='uhr_konzept_pdf'),
-	path('user_rolle_af/matrix/', 				view_UserHatRolle.panel_UhR_matrix, 		name='uhr_matrix'),
-	path('user_rolle_af/matrix_csv/', 			view_UserHatRolle.panel_UhR_matrix_csv, 	name='uhr_matrix_csv'),
+	path('user_rolle_af/<int:pk>/delete/', 		login_required(view_UserHatRolle.UhRDelete.as_view()), 		name='user_rolle_af-delete'),
+	path('user_rolle_af/<str:userid>/create/<str:rollenname>/<str:schwerpunkt_vertretung>',
+		 										login_required(view_UserHatRolle.UhRCreate.as_view()), 		name='uhr_create'),
+	path('user_rolle_af/<int:id>/', 			login_required(view_UserHatRolle.panel_UhR), 				name='user_rolle_af_parm'),
+	path('user_rolle_af/create/<str:userid>/',	login_required(view_UserHatRolle.UhRCreate.as_view()), 		name='user_rolle_af-create' ),
+	path('user_rolle_af/konzept/', 				login_required(view_UserHatRolle.panel_UhR_konzept),		name='uhr_konzept'),
+	path('user_rolle_af/konzept_pdf/', 			login_required(view_UserHatRolle.panel_UhR_konzept_pdf), 	name='uhr_konzept_pdf'),
+	path('user_rolle_af/matrix/', 				login_required(view_UserHatRolle.panel_UhR_matrix), 		name='uhr_matrix'),
+	path('user_rolle_af/matrix_csv/', 			login_required(view_UserHatRolle.panel_UhR_matrix_csv), 	name='uhr_matrix_csv'),
 	path('user_rolle_af/matrix_csv/<str:flag>/',
-		 										view_UserHatRolle.panel_UhR_matrix_csv, 	name='uhr_matrix_csv'),
-	path('user_rolle_af/', 						view_UserHatRolle.panel_UhR, 				name='user_rolle_af'),
+		 										login_required(view_UserHatRolle.panel_UhR_matrix_csv), 	name='uhr_matrix_csv'),
+	path('user_rolle_af/', 						login_required(view_UserHatRolle.panel_UhR), 				name='user_rolle_af'),
 ]
 
 # URl zum Importieren neuer Daten aus IIQ (csv-File)
 urlpatterns += [
-	path('import/', view_import.import_csv, name='import'),
-	path('import2/', view_import.import2, name='import2'),
-	path('import2_quittung/', view_import.import2_quittung, name='import2_quittung'),
-	path('import3_quittung/', view_import.import3_quittung, name='import3_quittung'),
-	path('import_reset/', view_import.import_reset, name='import_reset'),
-	path('import_status/', view_import.import_status, name='import_status'),
+	path('import/', login_required(view_import.import_csv), name='import'),
+	path('import2/', login_required(view_import.import2), name='import2'),
+	path('import2_quittung/', login_required(view_import.import2_quittung), name='import2_quittung'),
+	path('import3_quittung/', login_required(view_import.import3_quittung), name='import3_quittung'),
+	path('import_reset/', login_required(view_import.import_reset), name='import_reset'),
+	path('import_status/', login_required(view_import.import_status), name='import_status'),
 ]
 
 # URl zum Bestücken der verschiedenen Stored Procedures in das DBMS
 urlpatterns += [
-	path('stored_procedures/', stored_procedures.handle_stored_procedures, name='stored_procedures'),
+	path('stored_procedures/', login_required(stored_procedures.handle_stored_procedures), name='stored_procedures'),
 ]
 
 # URl zum Erzeugen der LaTeX-Serienbriefinformation zu Direct Connects
 urlpatterns += [
-	path('einzelbrief/', view_serienbrief.einzelbrief, name='einzelbrief'),
-	path('serienbrief/', view_serienbrief.serienbrief, name='serienbrief'),
+	path('einzelbrief/', login_required(view_serienbrief.einzelbrief), name='einzelbrief'),
+	path('serienbrief/', login_required(view_serienbrief.serienbrief), name='serienbrief'),
 ]
 
 # URl zum Testen neuer Funktionalität (liegt in "Magie")
 urlpatterns += [
-	path('magic_click/', views.magic_click, name='magic_click'),
+	path('magic_click/', login_required(views.magic_click), name='magic_click'),
 ]
 
