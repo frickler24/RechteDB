@@ -9,6 +9,7 @@ from ..anmeldung import Anmeldung
 from ..views import home
 from ..models import TblOrga, TblUebersichtAfGfs, TblUserIDundName, TblPlattform, TblGesamt, \
 					 TblAfliste, TblUserhatrolle, TblRollehataf, TblRollen, Tblrechteneuvonimport
+from ..view_import import patch_datum, neuer_import
 
 class HomeTests(TestCase):
 	def setup(self):
@@ -1594,6 +1595,8 @@ class Import_new_csv_single_record(TestCase):
 	def test_importpage_csrf(self):
 		self.assertContains(self.response, 'csrfmiddlewaretoken')
 
+	def test_importpage_has_cuurent_comments_active(self):
+		self.assertContains(self.response, 'nicht Excel wegen Unicode!')
 
 class Setup_database(TestCase):
 	# Tests für den Import der Stored Procedures in die Datenbank
@@ -1696,7 +1699,6 @@ class Import_new_csv_files_no_input(TestCase):
 		form = self.response.context.get('form')
 		self.assertTrue(form.errors)
 
-
 class Import_new_csv_files_wrong_input(TestCase):
 	# Und nun Test des Imports dreier Dateien.
 	# Die erste Datei erstellt zwei User mit Rechten
@@ -1723,8 +1725,6 @@ class Import_new_csv_files_wrong_input(TestCase):
 		# Es muss ein Formfehler erkannt werden
 		form = self.response.context.get('form')
 		self.assertTrue(form.errors)
-
-from ..view_import import patch_datum, neuer_import
 
 class Import_helper_functions(TestCase):
 	def test_import_datum_konverter(self):
