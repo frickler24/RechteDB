@@ -30,10 +30,23 @@
                 <p>
                     Vor dem Import müssen die folgenden, bekannten Schwächen der Importfiles behoben werden:
                 </p>
-                <ul>
-                    <li>Suchen nach "der Protokolle" und drei Zeilenteile joinen</li>
-                    <li>Suchen nach \Transfer\; und die einzelnen Backslashes gegen doppelte tauschen</li>
-                </ul><hr />
+                <ol>
+                    <li>Speichern der Auswertungen -> Berichte -> Berichtsergebnisse -> Suche nach "BA-Rechte"</li>
+                    <li>Öffnen mit Notepad++ oder ähnlichem Werkzeug, das regexp versteht
+                        (<strong style="color: red;">nicht Excel wegen Unicode!</strong>)</li>
+                    <li>Ersetze alle harten Zeilenumbrüche innerhalb von Kommentarfeldern:<br />
+                        Ersetze alle &nbsp;&nbsp;&nbsp;
+                        \n^([^xv])<br />
+                        gegen &nbsp;&nbsp;&nbsp;
+                        \1
+                    </li>
+                    <li>Ersetze alle einfachen Backslashes gegen doppelte:<br />
+                        Ersetze alle &nbsp;&nbsp;&nbsp;
+                        ([^\\])\\([^\\])<br />
+                        gegen &nbsp;&nbsp;&nbsp;
+                        \1\\\\\2
+                    </li>
+                </ol><hr />
    				<div class="form-group form-group-sm col-12">
                     {% for field in form %}
                         <div class="form-group">
