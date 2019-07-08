@@ -45,32 +45,21 @@ class UhRCreate(CreateView):
 	"""
 
 
-	def xxxget_context_data(self, **kwargs):
-		# Call the base implementation first to get a context
-		context = super().get_context_data(**kwargs)
-
-		context['userid'] = self.kwargs['userid'].upper()[:8]
-		print ('get_context_data: userid =', context['userid'])
-
-		context['rollenname'] = self.kwargs['rollenname']
-		print('get_context_data: rollenname =', context['rollenname'])
-
-		context['schwerpunkt_vertretung'] = self.kwargs['schwerpunkt_vertretung']
-		print('get_context_data: schwerpunkt_vertretung =', context['schwerpunkt_vertretung'])
-
-		return context
-
 	def get_form_kwargs(self):
 		"""
 		Definiere die benötigten benannten Parameter
 		:return: kwargs mit den Inhalten der Oberklasse und den benötigten Parametern
 		"""
 		kwargs = super(UhRCreate, self).get_form_kwargs()
+		kwargs['rollenname'] = ""
+		kwargs['schwerpunkt_vertretung'] = ""
 		kwargs['userid'] = self.kwargs['userid']
-		kwargs['rollenname'] = self.kwargs['rollenname']
-		kwargs['schwerpunkt_vertretung'] = self.kwargs['schwerpunkt_vertretung']
-		return kwargs
 
+		if 'rollenname' in self.kwargs:
+			kwargs['rollenname'] = self.kwargs['rollenname']
+		if 'schwerpunkt_vertretung' in self.kwargs:
+			kwargs['schwerpunkt_vertretung'] = self.kwargs['schwerpunkt_vertretung']
+		return kwargs
 
 
 	# Im Erfolgsfall soll die vorherige Selektion im Panel "User und Rollen" wieder aktualisiert gezeigt werden.

@@ -792,8 +792,7 @@ class User_rolle_afTests_generate_pdf(TestCase):
 		self.assertEqual(response.status_code, 200)
 
 class User_rolle_afTests(TestCase):
-	# User / Rolle / AF : Das wird mal die Hauptseite für
-	# Aktualisierungen / Ergänzungen / Löschungen von Rollen und Verbindungen
+	# User / Rolle / AF: Die Hauptseite für Aktualisierungen / Ergänzungen / Löschungen von Rollen und Verbindungen
 	def setUp(self):
 		Anmeldung(self.client.login)
 		Setup_database()
@@ -978,6 +977,80 @@ class User_rolle_afTests(TestCase):
 		self.assertContains(response, "User_xv13254")
 		self.assertContains(response, 'icon-yes', 4)
 		self.assertContains(response, 'icon-no', 2)
+	def test_panel_view_with_deep_insight_find_delete_link(self):
+		id = TblUserIDundName.objects.get(userid='xv13254').id
+		url = '{0}{1}/{2}'.format(reverse('user_rolle_af'), id, '?name=UseR&gruppe=BA-ps')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "User_xv13254")
+		rolle1 = TblUserhatrolle.objects.get(userid = 'xv13254', rollenname = 'Erste Neue Rolle')
+		rolle2 = TblUserhatrolle.objects.get(userid = 'xv13254', rollenname = 'Zweite Neue Rolle')
+		self.assertContains(response, '/rapp/user_rolle_af/{}/delete/?'.format(rolle1), 1)
+		self.assertContains(response, '/rapp/user_rolle_af/{}/delete/?'.format(rolle2), 1)
+
+		# Zum Abschluss klicken wir mal auf die Löschlinks und erhalten die Sicherheitsabfrage.
+		# Erster Link
+		loeschurl = '/rapp/user_rolle_af/{}/delete/'.format(rolle1)
+		response = self.client.get(loeschurl)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, '<p>Sie löschen gerade den folgenden Rollen-Eintrag:</p>')
+		self.assertContains(response, '<p>"Erste Neue Rolle":</p>')
+		# Zweiter Link
+		loeschurl = '/rapp/user_rolle_af/{}/delete/'.format(rolle2)
+		response = self.client.get(loeschurl)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, '<p>Sie löschen gerade den folgenden Rollen-Eintrag:</p>')
+		self.assertContains(response, '<p>"Zweite Neue Rolle":</p>')
+
+	def test_panel_view_with_deep_insight_find_change_link(self):
+		id = TblUserIDundName.objects.get(userid='xv13254').id
+		url = '{0}{1}/{2}'.format(reverse('user_rolle_af'), id, '?name=UseR&gruppe=BA-ps')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "User_xv13254")
+
+		rolle1 = TblUserhatrolle.objects.get(userid = 'xv13254', rollenname = 'Erste Neue Rolle')
+		rolle2 = TblUserhatrolle.objects.get(userid = 'xv13254', rollenname = 'Zweite Neue Rolle')
+		changeurl1 = '/adminrapp/tbluserhatrolle/{}/change/?'.format(rolle1)
+		changeurl2 = '/adminrapp/tbluserhatrolle/{}/change/?'.format(rolle2)
+
+		self.assertContains(response, changeurl1, 1)
+		self.assertContains(response, changeurl2, 1)
+
+		# ToDo Zum Abschluss klicken wir mal auf die Change-Links und erhalten den Änderungsdialog.
+		"""
+		Aus welchen Gründen auch immer das hier nur zu einer Weiterleitung 302 führt...
+		# Erster Link
+		response = self.client.get(changeurl1)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'User und Ihre Rollen ändern')
+		self.assertContains(response, '<option value="Erste Neue Rolle">')
+		#Zweiter Link
+		response = self.client.get(changeurl2)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'User und Ihre Rollen ändern')
+		self.assertContains(response, '<option value="Zweite Neue Rolle">')
+		"""
+
+	def test_panel_view_with_deep_insight_find_create_link(self):
+		id = TblUserIDundName.objects.get(userid='xv13254').id
+		url = '{0}{1}/{2}'.format(reverse('user_rolle_af'), id, '?name=UseR&gruppe=BA-ps')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "User_xv13254")
+		self.assertContains(response, '/rapp/user_rolle_af/create/xv13254/?&', 1)
+
+		# Zum Abschluss klicken wir mal auf den Create-Link und erhalten den Erstellungsdialog.
+		createurl = '/rapp/user_rolle_af/create/xv13254/?&name=&orga=1&rollenname=&gruppe=&user='
+		response = self.client.get(createurl)
+		self.assertEqual(response.status_code, 200)
+		# print('____________')
+		# print(response.content)
+		self.assertContains(response, 'Rollen-Eintrag ergänzen für')
+		self.assertContains(response, '<option value="xv13254">xv13254 | User_xv13254</option>')
+		self.assertContains(response, '<option value="" selected>---------</option>', 2)
+		self.assertContains(response, '<option value="">---------</option>', 1)
+
 	def test_panel_view_with_invalid_selection_status_code(self):
 		url = '{0}{1}'.format(reverse('user_rolle_af'), '?geloescht=99&zi_organisation=ZZ-XX')
 		response = self.client.get(url)
