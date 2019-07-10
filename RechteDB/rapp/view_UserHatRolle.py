@@ -137,8 +137,8 @@ def UhR_erzeuge_listen(request):
 	panel_liste = TblUserIDundName.objects.filter(geloescht=False).order_by('name')
 	panel_filter = UseridFilter(request.GET, queryset=panel_liste)
 
-	namen_liste = panel_filter.qs.filter(userid__istartswith="xv")
-	panel_liste = panel_filter.qs.filter(userid__istartswith="xv").select_related("orga")
+	namen_liste = panel_filter.qs.filter(userid__istartswith="xv").select_related("orga")
+	# panel_liste = panel_filter.qs.filter(userid__istartswith="xv").select_related("orga")
 
 	"""
 	# Ein paar Testzugriffe über das komplette Modell
@@ -177,7 +177,7 @@ def UhR_erzeuge_listen(request):
 	print ('6:', af_liste)
 	"""
 
-	return (namen_liste, panel_liste, panel_filter)
+	return (namen_liste, panel_filter)
 
 def UhR_erzeuge_listen_ohne_rollen(request):
 	"""
@@ -192,8 +192,8 @@ def UhR_erzeuge_listen_ohne_rollen(request):
 	rollen_filter = RollenFilter(request.GET, queryset=rollen_liste)
 
 	# Und nun die eigentlich wichtigen Daten holen
-	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
-	return (namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter)
+	(namen_liste, panel_filter) = UhR_erzeuge_listen(request)
+	return (namen_liste, panel_filter, rollen_liste, rollen_filter)
 
 def UhR_erzeuge_listen_mit_rollen(request):
 	"""
@@ -203,12 +203,11 @@ def UhR_erzeuge_listen_mit_rollen(request):
 
 	Geliefert wird
 	- die Liste der selektiert Namen (unabhängig davon, ob ihnen AFen oder Rollen zugewiesen sind)
-	- die panel_liste (ToDo scheint das gleiche zu sein, wie die Liste der Namen: Klären und bereinigen)
-	- den Panel_filer (ToDo wozu wird der bnenötigt?)
+	- den Panel_filter für korrekte Anzeige
 	- Die Liste der Rollen, die in der Abfrage derzeit relevant sind
 	- der Rollen_filter, der benötigt wird, um das "Rolle enthält"-Feld anzeigen lassen zu können
 	:param request:
-	:return: namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter
+	:return: namen_liste, panel_filter, rollen_liste, rollen_filter
 	"""
 
 	# Hole erst mal die Menge an Rollen, die namentlich passen
@@ -221,17 +220,9 @@ def UhR_erzeuge_listen_mit_rollen(request):
 			.order_by('rollenname')
 	rollen_filter = RollenFilter(request.GET, queryset=rollen_liste)
 
-	# userids = set ()
-	# for x in rollen_liste:
-	# 	userids.add(x.userid.userid)
-	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
-	print(namen_liste)
-	print(panel_liste)
-	# gefilterte_namen_liste = (panel_filter.qs.filter(userid__in = userids))
-	# gefilterte_namen_liste = namen_liste
-	# if (len(gefilterte_namen_liste) == 0):
-	# 	gefilterte_namen_liste = namen_liste
-	return (namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter)
+	(namen_liste, panel_filter) = UhR_erzeuge_listen(request)
+
+	return (namen_liste, panel_filter, rollen_liste, rollen_filter)
 
 def hole_userids_zum_namen(selektierter_name):
 	"""
@@ -516,10 +507,10 @@ class EinzelUhr(UhR):
 		:param id: ID des XV-UserID-Eintrags, zu dem die Detaildaten geliefert werden sollen; 0 -> kein User gewählt
 		:return: Gerendertes HTML
 		"""
-		(namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter) = UhR_erzeuge_listen_ohne_rollen(request)
+		(namen_liste, panel_filter, rollen_liste, rollen_filter) = UhR_erzeuge_listen_ohne_rollen(request)
 		(userHatRolle_liste, selektierter_name, userids, usernamen,
 		 selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID) \
-			= UhR_hole_daten(panel_liste, id)
+			= UhR_hole_daten(namen_liste, id)
 		(paginator, pages, pagesize) = pagination(request, namen_liste, 10000)
 
 		form = ShowUhRForm(request.GET)
@@ -547,7 +538,7 @@ class RollenListenUhr(UhR):
 		:param id: wird hier nicht verwendet, deshalb "_"
 		:return: Gerendertes HTML
 		"""
-		(namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter) =\
+		(namen_liste, panel_filter, rollen_liste, rollen_filter) =\
 			UhR_erzeuge_listen_mit_rollen(request)
 
 		gesuchte_rolle = request.GET.get('rollenname', None)
@@ -615,10 +606,10 @@ def	erzeuge_UhR_konzept(request, ansicht):
 	"""
 
 	# Erst mal die relevanten User-Listen holen - sie sind abhängig von Filtereinstellungen
-	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
+	(namen_liste, panel_filter) = UhR_erzeuge_listen(request)
 
 	if request.method == 'GET':
-		(rollenMenge, userids, usernamen) = UhR_verdichte_daten(panel_liste)
+		(rollenMenge, userids, usernamen) = UhR_verdichte_daten(namen_liste)
 	else:
 		(rollenMenge, userids, usernamen) = (set(), set(), set())
 
@@ -715,10 +706,10 @@ def panel_UhR_matrix(request):
 	"""
 
 	# Erst mal die relevanten User-Listen holen - sie sind abhängig von Filtereinstellungen
-	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
+	(namen_liste, panel_filter) = UhR_erzeuge_listen(request)
 
 	if request.method == 'GET':
-		(usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(panel_liste)
+		(usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(namen_liste)
 	else:
 		(usernamen, rollenmenge, rollen_je_username, teams_je_username) = (set(), set(), set(), {})
 
@@ -757,8 +748,8 @@ def panel_UhR_matrix_csv(request, flag = False):
 	if request.method != 'GET':
 		return HttpResponse("Fehlerhafte CSV-Generierung in panel_UhR_matrix_csv")
 
-	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
-	(usernamen, rollenmenge, rollen_je_username, _) = erzeuge_UhR_matrixdaten(panel_liste) # Ignoriere teamliste im PDF
+	(namen_liste, panel_filter) = UhR_erzeuge_listen(request)
+	(usernamen, rollenmenge, rollen_je_username, _) = erzeuge_UhR_matrixdaten(namen_liste) # Ignoriere teamliste im PDF
 
 	response = HttpResponse(content_type="text/csv")
 	response['Content-Distribution'] = 'attachment; filename="matrix.csv"' # ToDo Hänge Datum an Dateinamen an
