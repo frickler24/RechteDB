@@ -1031,7 +1031,6 @@ class User_rolle_afTests(TestCase):
 		self.assertContains(response, 'User und Ihre Rollen ändern')
 		self.assertContains(response, '<option value="Zweite Neue Rolle">')
 		"""
-
 	def test_panel_view_with_deep_insight_find_create_link(self):
 		id = TblUserIDundName.objects.get(userid='xv13254').id
 		url = '{0}{1}/{2}'.format(reverse('user_rolle_af'), id, '?name=UseR&gruppe=BA-ps')
@@ -1214,6 +1213,17 @@ class User_rolle_variantsTest(TestCase):
 			gruppe = 			'ZI-AI-BA-LS',
 		)
 
+		# Eine UserID für eine weitere Identität: XV aktiv: Für diesen User gibt es noch keine eingetragene Rolle
+		TblUserIDundName.objects.create (
+			userid = 			'xv00023',
+			name = 				'User_xv00023',
+			orga = 				TblOrga.objects.get(team = 'Django-Team-01'),
+			zi_organisation =	'AI-BA',
+			geloescht = 		False,
+			abteilung = 		'ZI-AI-BA',
+			gruppe = 			'ZI-AI-BA-LS',
+		)
+
 		# Zwei Rollen, die auf den ersten XV-User vergeben werden, die zweite wird auch dem m2. User vergeben
 		TblRollen.objects.create (
 			rollenname = 		'Erste Neue Rolle',
@@ -1226,7 +1236,7 @@ class User_rolle_variantsTest(TestCase):
 			rollenbeschreibung = 'Das ist auch eine Testrolle',
 		)
 
-		# Drei AF-Zuordnungen
+		# Drei AF-Zuordnungen zu Rollen
 		TblRollehataf.objects.create (
 			mussfeld =			True,
 			einsatz =			TblRollehataf.EINSATZ_XABCV,
@@ -1249,7 +1259,7 @@ class User_rolle_variantsTest(TestCase):
 			rollenname = 		TblRollen.objects.get(rollenname= 'Zweite Neue Rolle'),
 		)
 
-		# Dem XV-User werden zwei Rollen zugewiesen, dem AV- und DV-User keine
+		# User 12354_ Dem XV-User werden zwei Rollen zugewiesen, dem AV- und DV-User keine
 		TblUserhatrolle.objects.create(
 			userid =	 		TblUserIDundName.objects.get(userid = 'xv13254'),
 			rollenname = 		TblRollen.objects.first(),
@@ -1264,7 +1274,7 @@ class User_rolle_variantsTest(TestCase):
 			bemerkung = 		'Das ist auch eine Testrolle für ZI-AI-BA-LS',
 			letzte_aenderung= 	timezone.now(),
 		)
-		# Dem zweiten User wird nur eine Rolle zugeordnet
+		# Dem zweiten User 00042 wird nur eine Rolle zugeordnet
 		TblUserhatrolle.objects.create(
 			userid =	 		TblUserIDundName.objects.get(userid = 'xv00042'),
 			rollenname = 		TblRollen.objects.first(),
@@ -1272,6 +1282,7 @@ class User_rolle_variantsTest(TestCase):
 			bemerkung = 		'Das ist eine Testrolle für ZI-AI-BA-LS',
 			letzte_aenderung= 	timezone.now(),
 		)
+		# Und dem dritten User 00023 keine Rolle
 
 		# Die nächsten beiden Objekte werden für tblGesamt als ForeignKey benötigt
 		TblUebersichtAfGfs.objects.create(
@@ -1345,7 +1356,18 @@ class User_rolle_variantsTest(TestCase):
 		url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=*&name=UseR&gruppe=BA-ls')
 		response = self.client.get(url)
 		self.assertEqual(response.status_code, 200)
-		self.assertContains(response, "xv13254")
+		self.assertContains(response, "xv13254", 8)
+		self.assertContains(response, "xv00042", 7)
+		self.assertContains(response, "xv00023", 2)
+
+	def test_panel_03a_view_with_valid_role_star_unique_name_and_group(self):
+		url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=*&name=UseR_xv00023&gruppe=BA-ls')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertNotContains(response, "xv13254")
+		self.assertNotContains(response, "xv00042")
+		self.assertContains(response, "xv00023", 5)
+
 	def test_panel_04_view_with_valid_role_star(self):
 		url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=*')
 		response = self.client.get(url)
@@ -1429,7 +1451,6 @@ class User_rolle_variantsTest(TestCase):
 												})
 		# Todo: Warum geht das? Die Rolle ist doch schon vergeben...
 		self.assertEqual(response.status_code, 200)
-
 
 class User_rolle_exportCSVTest(TestCase):
 	# User / Rolle / AF : Das wird mal die Hauptseite für
@@ -1626,7 +1647,6 @@ class User_rolle_exportCSVTest(TestCase):
 		self.assertContains(response, "Name;Erste Neue Rolle;Zweite Neue Rolle\r\n", 1)
 		self.assertContains(response, "User_xv13254;S;V\r\n", 1)
 
-
 class Import_new_csv_single_record(TestCase):
 	# Tests für den Import neuer CSV-Listen und der zugehörigen Tabellen
 	def setUp(self):
@@ -1655,19 +1675,15 @@ class Import_new_csv_single_record(TestCase):
 			af_gueltig_bis = 		timezone.now() + timedelta(days=365),
 			af_zuweisungsdatum = 	timezone.now() - timedelta(days=366),
 		)
-
 	def test_importpage_table_entry(self):
 		num = Tblrechteneuvonimport.objects.filter(vorname = 'Fester').count()
 		self.assertEqual(num, 1)
-
 	def test_importpage_view_status_code(self):
 		url = reverse('import')
 		response = self.client.get(url)
 		self.assertEqual(self.response.status_code, 200)
-
 	def test_importpage_csrf(self):
 		self.assertContains(self.response, 'csrfmiddlewaretoken')
-
 	def test_importpage_has_cuurent_comments_active(self):
 		self.assertContains(self.response, 'nicht Excel wegen Unicode!')
 
@@ -1702,7 +1718,6 @@ class Setup_database(TestCase):
 		self.assertContains(self.response, 'setzeNichtAIFlag war erfolgreich.', 1)
 		self.assertContains(self.response, 'erzeuge_af_liste war erfolgreich.', 1)
 		self.assertContains(self.response, 'ueberschreibeModelle war erfolgreich.', 1)
-
 
 class Import_new_csv_single_record(TestCase):
 	# Tests für den Import neuer CSV-Listen und der zugehörigen Tabellen
