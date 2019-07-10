@@ -16,8 +16,8 @@ from .views import version, pagination
 from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportForm_schritt3
 from .models import TblUserIDundName, TblGesamt, TblRollehataf, TblUserhatrolle, TblOrga
 from .xhtml2 import render_to_pdf
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+# from django.contrib.auth.decorators import login_required
+# from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .templatetags.gethash import finde
 from django.utils import timezone
@@ -116,7 +116,7 @@ class UhRUpdate(UpdateView):
 
 def UhR_erzeuge_listen(request):
 	"""
-	Finde alle relevanten Informationen zur aktuellen Selektion:
+	Finde alle relevanten Informationen zur aktuellen Selektion: UserIDs und zugehörige Orga
 
 	Ausgangspunkt ist TblUseridUndName.
 	Hierfür gibt es einen Filter, der per GET abgefragt wird.
@@ -127,12 +127,11 @@ def UhR_erzeuge_listen(request):
 	Von dort aus gibt eine ForeignKey-Verbindung zu TblRollen.
 
 	Problematisch ist noch die Verbindung zwischen TblRollen und TblRollaHatAf,
-	weil hier der Foreign Key Definition in TblRolleHatAf liegt.
+	weil hier der Foreign Key per Definition in TblRolleHatAf liegt.
 	Das kann aber aufgelöst werden,
 	sobald ein konkreter User betrachtet wird und nicht mehr eine Menge an Usern.
 
 	:param request: GET oder POST Request vom Browser
-	:param pk: optional: ID des XV-UserID-Eintrags, zu dem die Detaildaten geliefert werden sollen
 	:return: name_liste, panel_liste, panel_filter
 	"""
 	panel_liste = TblUserIDundName.objects.filter(geloescht=False).order_by('name')
@@ -198,7 +197,16 @@ def UhR_erzeuge_listen_ohne_rollen(request):
 
 def UhR_erzeuge_listen_mit_rollen(request):
 	"""
-	Liefert zusätzlich zu den Daten aus UhR_erzeuge_listen noch die dazu gehörenden Rollen
+	Liefert zusätzlich zu den Daten aus UhR_erzeuge_listen noch die dazu gehörenden Rollen.
+	Ausgangspunkt sind die Rollen, nach denen gesucht werden soll.
+	Daran hängen UserIDs, die wiederum geeignet gefilter werden nach den zu findenden Usern
+
+	Geliefert wird
+	- die Liste der selektiert Namen (unabhängig davon, ob ihnen AFen oder Rollen zugewiesen sind)
+	- die panel_liste (ToDo scheint das gleiche zu sein, wie die Liste der Namen: Klären und bereinigen)
+	- den Panel_filer (ToDo wozu wird der bnenötigt?)
+	- Die Liste der Rollen, die in der Abfrage derzeit relevant sind
+	- der Rollen_filter, der benötigt wird, um das "Rolle enthält"-Feld anzeigen lassen zu können
 	:param request:
 	:return: namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter
 	"""
@@ -213,14 +221,17 @@ def UhR_erzeuge_listen_mit_rollen(request):
 			.order_by('rollenname')
 	rollen_filter = RollenFilter(request.GET, queryset=rollen_liste)
 
-	userids = set ()
-	for x in rollen_liste:
-		userids.add(x.userid.userid)
-
-	(_, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
-	namen_liste = (panel_filter.qs.filter(userid__in = userids))
-
-	return (namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter, userids)
+	# userids = set ()
+	# for x in rollen_liste:
+	# 	userids.add(x.userid.userid)
+	(namen_liste, panel_liste, panel_filter) = UhR_erzeuge_listen(request)
+	print(namen_liste)
+	print(panel_liste)
+	# gefilterte_namen_liste = (panel_filter.qs.filter(userid__in = userids))
+	# gefilterte_namen_liste = namen_liste
+	# if (len(gefilterte_namen_liste) == 0):
+	# 	gefilterte_namen_liste = namen_liste
+	return (namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter)
 
 def hole_userids_zum_namen(selektierter_name):
 	"""
@@ -421,7 +432,7 @@ def UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle):
 	Finde alle UserIDs, die über die angegebene Rolle verfügen.
 	Wenn gesuchte_rolle is None, dann finde alle Rollen.
 
-	Erzeuge die Liste der UserID, die mit den übergebenen Namen zusammenhängen
+	Erzeuge die Liste der UserIDen, die mit den übergebenen Namen zusammenhängen
 	Dann erzeuge die Liste der AFen, die mit den UserIDs verbunden sind
 	- Notiere für jede der AFen, welche Rollen Grund für diese AF derzeit zugewiesen sind (aus UserHatRolle)
 	- Notiere, welche weiteren Rollen, die derzeit nicht zugewiesen sind, für diese AF in Frage kämen
@@ -536,7 +547,7 @@ class RollenListenUhr(UhR):
 		:param id: wird hier nicht verwendet, deshalb "_"
 		:return: Gerendertes HTML
 		"""
-		(namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter, userids) =\
+		(namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter) =\
 			UhR_erzeuge_listen_mit_rollen(request)
 
 		gesuchte_rolle = request.GET.get('rollenname', None)

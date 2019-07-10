@@ -53,10 +53,6 @@ class UseridRollenFilter(django_filters.FilterSet):
 
 class UseridFilter(django_filters.FilterSet):
 	name = 						django_filters.CharFilter(lookup_expr='istartswith')
-	#userid = 					django_filters.CharFilter(lookup_expr='istartswith')
-	#zi_organisation = 			django_filters.CharFilter(lookup_expr='icontains')
-	#geloescht = 				django_filters.BooleanFilter()
-	#abteilung = 				django_filters.CharFilter(lookup_expr='icontains')
 	gruppe = 					django_filters.CharFilter(lookup_expr='icontains')
 
 	class Meta:
