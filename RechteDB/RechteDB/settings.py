@@ -87,7 +87,7 @@ TEMPLATES = [
 	},
 ]
 
-WSGI_APPLICATION = 'RechteDB.wsgi.application'
+#WSGI_APPLICATION = 'RechteDB.wsgi.application'
 
 
 # Database
