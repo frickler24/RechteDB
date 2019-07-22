@@ -206,7 +206,7 @@ def UhR_erzeuge_listen_mit_rollen(request):
 	- den Panel_filter für korrekte Anzeige
 	- Die Liste der Rollen, die in der Abfrage derzeit relevant sind
 	- der Rollen_filter, der benötigt wird, um das "Rolle enthält"-Feld anzeigen lassen zu können
-	:param request:
+	:param request
 	:return: namen_liste, panel_filter, rollen_liste, rollen_filter
 	"""
 
@@ -326,7 +326,7 @@ def hole_rollen_zuordnungen(af_dict):
 			# Für genau eine Kombination aus UserID und AF wird gesucht, ob sie als Rolle (oder mehrere Rollen)
 			# bereits administriert ist: ex(istierende Rollen).
 			# Zusätzlich werden alle Möglichkeiten der Administration angeboten,
-			# die noch nicht genutzt wurden: opt(ionale ROllen).
+			# die noch nicht genutzt wurden: opt(ionale Rollen).
 			(ex, opt) = suche_rolle_fuer_userid_und_af(userid, af)
 			tag = '!'.join((userid, af)) # Flache Datenstruktur für Template erforderlich
 			vorhanden[tag] = ex
@@ -372,13 +372,15 @@ def suche_rolle_fuer_userid_und_af(userid, af):
 
 	# Mengenoperation: Die Differenz zwischen den Rollen, die zur AF gehören und den Rollen, die der User bereits hat,
 	# ist die Menge der Rollen, die als optional ebenfalls für die AF genutzt werden kann.
-	optional = list(set(rollen_liste) - set(vorhanden))
+	# Leider sind "rollen_liste" und "vorhanden" inzwischen in verschiedenen Formaten,
+	# deshalb geht die einfache Mengendifferenzbildung nicht mehr.
+	optional = set(rollen_liste)
+	for s in set(vorhanden):
+		optional.discard(s.split('!')[1])
+	optional = list(optional)
 	optional.sort()
 	vorhanden.append('') # Das hier sind die beiden Leerstrings am Ende der Liste
 	optional.append('')
-
-	# print ('erzeugtes vorhanden:', vorhanden)
-	# print ('erzeugtes optional:', optional)
 	return (vorhanden, optional)
 
 def hole_af_mengen(userids, gesuchte_rolle):
