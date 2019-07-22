@@ -42,37 +42,39 @@
 				<tbody>
 					{% for name, uids in userids.items %}
 						{% for uid in uids %}
-							{% for af in af_per_uid|hash:uid %}
-								<tr id="{{ uid }}.{{ af }}">
-									<td>{% ifchanged %}{{ name }}{% endifchanged %}</td>
-									<td>{% ifchanged %}{{ uid }}{% endifchanged %}</td>
-									<td>{% ifchanged %}{{ af }}{% endifchanged %}</td>
-									<td>
-										{% for rolle in vorhanden|hash2:uid|hash3:af %}
-											{# Als letztes Element wird immer ein Leerstring geliefert! #}
-											{% if forloop.first and rolle == ""%}
-												<strong class="text-danger">nicht vergeben</strong>
-											{% endif %}
-											{% if not forloop.last %}
-												<a href="{% url 'user_rolle_af-delete' rolle|part1 %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&user={{ id }}">
-													<img src="{% static 'icons8-müll-50.png' %}" width="20rem" />
-												</a> {{ rolle|part2 }}<br />
-											{% endif %}
-										{% empty %}
-											Fehler im Datensatz
-										{% endfor vorhanden %}
-									</td>
-									<td>
-										{% for rolle in optional|hash2:uid|hash3:af %}
-											{# Als letztes Element wird immer ein Leerstring geliefert! #}
-											{% if not forloop.last %}
-												<a href="{% url 'uhr_create' userid=uid rollenname=rolle|part1a schwerpunkt_vertretung='Schwerpunkt' %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}#{{ uid }}.{{ af }}">{{ rolle }}</a><br />
-											{% endif %}
-										{% empty %}
-											Keine optionale Rolle gefunden
-										{% endfor optional %}
-									</td>
-								</tr>
+							{% for af in af_per_uid|hash:uid|sort %}
+								{% if af != "ka" %}
+									<tr id="{{ uid }}.{{ af }}">
+										<td>{% ifchanged %}{{ name }}{% endifchanged %}</td>
+										<td>{% ifchanged %}{{ uid }}{% endifchanged %}</td>
+										<td>{% ifchanged %}{{ af }}{% endifchanged %}</td>
+										<td>
+											{% for rolle in vorhanden|hash2:uid|hash3:af %}
+												{# Als letztes Element wird immer ein Leerstring geliefert! #}
+												{% if forloop.first and rolle == ""%}
+													<strong class="text-danger">nicht vergeben</strong>
+												{% endif %}
+												{% if not forloop.last %}
+													<a href="{% url 'user_rolle_af-delete' rolle|part1 %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&user={{ id }}">
+														<img src="{% static 'icons8-müll-50.png' %}" width="20rem" />
+													</a> {{ rolle|part2 }}<br />
+												{% endif %}
+											{% empty %}
+												Fehler im Datensatz
+											{% endfor vorhanden %}
+										</td>
+										<td>
+											{% for rolle in optional|hash2:uid|hash3:af %}
+												{# Als letztes Element wird immer ein Leerstring geliefert! #}
+												{% if not forloop.last %}
+													<a href="{% url 'uhr_create' userid=uid rollenname=rolle|part1a schwerpunkt_vertretung='Schwerpunkt' %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}#{{ uid }}.{{ af }}">{{ rolle }}</a><br />
+												{% endif %}
+											{% empty %}
+												Keine optionale Rolle gefunden
+											{% endfor optional %}
+										</td>
+									</tr>
+								{% endif %}
 							{% empty %}
 								<tr>
 									<td>{% ifchanged %}{{ name }}{% endifchanged %}</td>

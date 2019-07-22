@@ -54,3 +54,8 @@ def finde(inputset, search):
 			return zweck
 	return ('')
 
+@register.filter
+def sort(menge):
+	liste = list(menge)
+	liste.sort()
+	return liste
