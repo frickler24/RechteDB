@@ -85,31 +85,31 @@
 							</td>
 							<td>
 								<input type="text" class="form-control col-12 col-sm-6 col-md-4 col-lg-4 col-xl-12"
-									   placeholder="Rollenname" disabled="disabled"
+									   placeholder="Rollenname" readonly="readonly"
 									   id="id_rollenname" name="rollenname" maxlength="100"
 									   value="{{ rolle.rollenname }}" />
 							</td>
 							<td>
 								<input type="text" class="form-control col-12 col-sm-6 col-md-4 col-lg-4 col-xl-12"
-									   placeholder="Bemerkung" disabled="disabled"
+									   placeholder="Bemerkung" readonly="readonly"
 									   id="id_bemerkung" name="bemerkung" maxlength="100"
 									   value="{{ rolle.bemerkung }}" />
 							</td>
 							<td>
 								<input type="text" class="form-control col-12 col-sm-6 col-md-4 col-lg-4 col-xl-12"
-									   placeholder="Bemerkung" disabled="disabled"
+									   placeholder="Bemerkung" readonly="readonly"
 									   id="id_schwerpunkt_vertretung" name="schwerpunkt_vertretung" maxlength="50"
 									   value="{{ rolle.schwerpunkt_vertretung }}" />
 							</td>
 							<td>
 								<input type="text" class="form-control" placeholder="System"
-									   id="id_system" name="system" maxlength="150" disabled="disabled"
+									   id="id_system" name="system" maxlength="150" readonly="readonly"
 									   value="{{ rolle.rollenname.system }}" />
 							</td>
 							<td width="16%">
-								<input type="text" class="form-control" disabled="disabled"
+								<input type="text" class="form-control" readonly="readonly"
 									   id="id_datum" name="datum"
-									   value="{{ rolle.rollenname.datum|date }}" />
+									   value="{{ rolle.letzte_aenderung }}" />
 							</td>
 						</tr>
 						<tr>
