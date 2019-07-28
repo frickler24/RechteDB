@@ -71,7 +71,7 @@
 						<label for="{{ filter.form.userid_name__geloescht_for_label }}">User gelöscht:</label>
 						{% render_field filter.form.userid_name__geloescht class="form-control" %}
 					</div>
-					<div class="form-group col-12 col-sm-4 col-md-3 col-lg-3 col-xl-3">
+					<div class="form-group col-12 col-sm-4 col-md-3 col-lg-3 col-xl-2">
 						{{ filter.form.plattform.label_tag }}
 						{% render_field filter.form.plattform class="form-control" %}
 					</div>
@@ -84,9 +84,14 @@
 						{% render_field filter.form.modell__name_gf_neu class="form-control" %}
 					</div>
 
-					<div class="form-group col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+					<div class="form-group col-12 col-sm-4 col-md-2 col-lg-2 col-xl-2">
+						<label for="{{ filter.form.direct_connect_for_label }}">Direktverbdg. enthält:</label>
+						{% render_field filter.form.direct_connect class="form-control" %}
+					</div>
+					<div class="form-group col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2">
 						<label for="pagesize">Zeilen pro Seite</label>
 						<input class="input" id="pagesize" name="pagesize" type="text" maxlength="5"
+							   style="width: 10em;"
 						{% if pagesize %}
 		 					value="{{ pagesize }}"
 						{% endif %}
@@ -141,6 +146,17 @@
 				<th>TF Kritikalität</th>
 				<th>Recht aktiv</th>
 				<th>User aktiv</th>
+
+				<th>gf_beschreibung</th>
+				<th>loeschdatum</th>
+				<th>af_gueltig_ab</th>
+				<th>af_gueltig_bis</th>
+				<th>direct_connect</th>
+				<th>af_zuweisungsdatum</th>
+				<th>tf_eigentuemer_org</th>
+				<th>gefunden</th>
+				<th>wiedergefunden</th>
+				<th>letzte_aenderung</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -181,6 +197,17 @@
                             </a>
                         {% endif %}
                     </td>
+
+					<td class="vllzulangertext knappeTabelle">{{ row.gf_beschreibung | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.loeschdatum | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.af_gueltig_ab | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.af_gueltig_bis | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.direct_connect | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.af_zuweisungsdatum | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.tf_eigentuemer_org | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.gefunden | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.wiedergefunden | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.letzte_aenderung | lower }}</td>
 				</tr>
 			{% empty %}
 				<tr>

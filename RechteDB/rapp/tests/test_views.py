@@ -378,6 +378,11 @@ class PanelTests(TestCase):
 			themeneigentuemer = 'Ihmchen_01'
 		)
 
+		TblOrga.objects.create(
+			team = 'Django-Team-02',
+			themeneigentuemer = 'Ihmchen_02'
+		)
+
 		TblUebersichtAfGfs.objects.create(
 			name_gf_neu =			'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
 			name_af_neu =			'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
@@ -429,7 +434,7 @@ class PanelTests(TestCase):
 			zufallsgenerator = 		'',
 			af_gueltig_ab = 		timezone.now() - timedelta(days=365),
 			af_gueltig_bis = 		timezone.now() + timedelta(days=365),
-			direct_connect = 		'no direct connect',
+			direct_connect = 		'nein',
 			hoechste_kritikalitaet_tf_in_af = 'u',
 			gf_beschreibung = 		'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
 			af_zuweisungsdatum = 	timezone.now() - timedelta(days=200),
@@ -461,10 +466,42 @@ class PanelTests(TestCase):
 			zufallsgenerator = 		'',
 			af_gueltig_ab = 		timezone.now() - timedelta(days=365),
 			af_gueltig_bis = 		timezone.now() + timedelta(days=365),
-			direct_connect = 		'no direct connect',
+			direct_connect = 		'nein',
 			hoechste_kritikalitaet_tf_in_af = 'u',
 			gf_beschreibung = 		'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
 			af_zuweisungsdatum = 	timezone.now() - timedelta(days=200),
+			datum = 				timezone.now() - timedelta(days=500),
+			geloescht = 			False,
+			gefunden = 				True,
+			wiedergefunden = 		timezone.now(),
+			geaendert = 			False,
+			neueaf = 				'',
+			nicht_ai = 				False,
+			patchdatum = 			None,
+			wertmodellvorpatch =	'Hier kommt nix rein',
+			loeschdatum = 			None,
+			letzte_aenderung =		None
+		)
+
+		TblGesamt.objects.create(
+			userid_name= 		TblUserIDundName.objects.get(userid = 'xv10099'),
+			tf = 					'Die direct connection TF3',
+			tf_beschreibung = 		'Die superlange schnuckelige TF-Beschreibung',
+			enthalten_in_af = 		'ka',
+			modell = 				TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+																   name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
+			tf_kritikalitaet = 		'Superkritisch sich ist das auch schon zu lang',
+			tf_eigentuemer_org = 	'Keine Ahnung Org',
+			plattform = 			TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
+			gf = 					'ka',
+			vip_kennzeichen = 		'',
+			zufallsgenerator = 		'',
+			af_gueltig_ab = 		timezone.now() - timedelta(days=365),
+			af_gueltig_bis = 		timezone.now() + timedelta(days=365),
+			direct_connect = 		'ja',
+			hoechste_kritikalitaet_tf_in_af = 'u',
+			gf_beschreibung = 		'',
+			af_zuweisungsdatum = 	None,
 			datum = 				timezone.now() - timedelta(days=500),
 			geloescht = 			False,
 			gefunden = 				True,
@@ -501,6 +538,185 @@ class PanelTests(TestCase):
 		response = self.client.get(url)
 		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "User_xv10099")
+
+
+	def test_panel_view_with_valid_userID(self):
+		url = '{0}{1}'.format(reverse('panel'), '?userid_name__userid=xv10099')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 8)
+
+	def test_panel_view_with_invalid_userID(self):
+		url = '{0}{1}'.format(reverse('panel'), '?userid_name__userid=xvabc99')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertNotContains(response, "xv10099")
+
+	def test_panel_view_with_valid_userName(self):
+		url = '{0}{1}'.format(reverse('panel'), '?userid_name__name=User_xv10099')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 8)
+
+	def test_panel_view_with_invalid_userName(self):
+		url = '{0}{1}'.format(reverse('panel'), '?userid_name__name=meier%2C+f')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertNotContains(response, "xv10099")
+
+	def test_panel_view_with_valid_team(self):
+		id = TblOrga.objects.get(team = 'Django-Team-01').id
+		url = '{0}{1}{2}'.format(reverse('panel'), '?userid_name__orga=', id)
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 6)
+
+	def test_panel_view_with_invalid_team(self):
+		id = TblOrga.objects.get(team = 'Django-Team-02').id
+		url = '{0}{1}{2}'.format(reverse('panel'), '?userid_name__orga=', id)
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertNotContains(response, "xv10099")
+
+	def test_panel_view_with_valid_TFBeschreibung(self):
+		url = '{0}{1}'.format(reverse('panel'), '?tf_beschreibung=TF')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 6)
+
+	def test_panel_view_with_validNotActive_TFBeschreibung(self):
+		url = '{0}{1}'.format(reverse('panel'), '?tf_beschreibung=TF2')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertNotContains(response, "xv10099")
+
+	def test_panel_view_with_invalid_TFBeschreibung(self):
+		url = '{0}{1}'.format(reverse('panel'), '?tf_beschreibung=gibtsnicht')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertNotContains(response, "xv10099")
+
+	def test_panel_view_with_valid_group(self):
+		url = '{0}{1}'.format(reverse('panel'), '?userid_name__gruppe=BA')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 6)
+
+		url = '{0}{1}'.format(reverse('panel'), '?userid_name__gruppe=AI-BA')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 6)
+
+		url = '{0}{1}'.format(reverse('panel'), '?userid_name__gruppe=AI-BA-PS')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 6)
+
+		url = '{0}{1}'.format(reverse('panel'), '?userid_name__gruppe=ZI-AI-BA')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 6)
+
+		url = '{0}{1}'.format(reverse('panel'), '?userid_name__gruppe=ZI-AI-BA-PS')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 6)
+
+	def test_panel_view_with_invalid_group(self):
+		url = '{0}{1}'.format(reverse('panel'), '?userid_name__gruppe=die-sollte-es-nicht-geben')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertNotContains(response, "xv10099")
+
+	def test_panel_view_with_valid_af(self):
+		url = '{0}{1}'.format(reverse('panel'), '?enthalten_in_af=rva_00458_neue_AF auch mit mehr Zeichen als üblich')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 4)
+		url = '{0}{1}'.format(reverse('panel'), '?enthalten_in_af=rva_00458_neue_AF')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 4)
+		url = '{0}{1}'.format(reverse('panel'), '?enthalten_in_af=Zeichen als üblich')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 4)
+		url = '{0}{1}'.format(reverse('panel'), '?enthalten_in_af=auch mit ')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 4)
+
+	def test_panel_view_with_invalid_af(self):
+		url = '{0}{1}'.format(reverse('panel'), '?enthalten_in_af=rvo_00458_org_ba')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertNotContains(response, "xv10099")
+
+	def test_panel_view_with_valid_tf(self):
+		url = '{0}{1}'.format(reverse('panel'), '?tf=Die superlange schnuckelige TF2')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 2)
+
+		url = '{0}{1}'.format(reverse('panel'), '?tf=Die superlange')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 4)
+
+		url = '{0}{1}'.format(reverse('panel'), '?tf=superlange schnuckelige')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 4)
+
+		url = '{0}{1}'.format(reverse('panel'), '?tf=TF2')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 2)
+
+	def test_panel_view_with_invalid_tf(self):
+		url = '{0}{1}'.format(reverse('panel'), '?tf=nö')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertNotContains(response, "xv10099")
+
+	def test_panel_view_with_valid_dc(self):
+		url = '{0}{1}'.format(reverse('panel'), '?direct_connect=n')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 4)
+
+		url = '{0}{1}'.format(reverse('panel'), '?direct_connect=nein')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 4)
+
+		url = '{0}{1}'.format(reverse('panel'), '?direct_connect=Nein')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 4)
+
+		url = '{0}{1}'.format(reverse('panel'), '?direct_connect=j')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 2)
+
+		url = '{0}{1}'.format(reverse('panel'), '?direct_connect=ja')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 2)
+
+		url = '{0}{1}'.format(reverse('panel'), '?direct_connect=Ja')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "xv10099", 2)
+
+
+	def test_panel_view_with_invalid_dc(self):
+		url = '{0}{1}'.format(reverse('panel'), '?tf=nö')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertNotContains(response, "xv10099")
+
 
 class Panel_exportCSVTest(TestCase):
 	# User / Rolle / AF : Das wird mal die Hauptseite für
