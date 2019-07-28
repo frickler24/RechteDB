@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.shortcuts import render, redirect
 
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
+from django.utils.encoding import smart_str
 import csv
 
 from .filters import RollenFilter, UseridFilter
@@ -597,7 +598,7 @@ def erzeuge_pdf_namen(request):
 	zeit = str(timezone.now())[:10]
 	return 'Berechtigungskonzept_{}_{}.pdf'.format(zeit, request.GET.get('gruppe', ''))
 
-# Erzeuge das Berechtiogungskonzept für Anzeige und PDF
+# Erzeuge das Berechtigungskonzept für Anzeige und PDF
 def	erzeuge_UhR_konzept(request, ansicht):
 	"""
 	Erzeuge das Berechtigungskonzept für eine Menge an selektierten Identitäten.
@@ -754,13 +755,14 @@ def panel_UhR_matrix_csv(request, flag = False):
 	(usernamen, rollenmenge, rollen_je_username, _) = erzeuge_UhR_matrixdaten(namen_liste) # Ignoriere teamliste im PDF
 
 	response = HttpResponse(content_type="text/csv")
-	response['Content-Distribution'] = 'attachment; filename="matrix.csv"' # ToDo Hänge Datum an Dateinamen an
+	response['Content-Disposition'] = 'attachment; filename="matrix.csv"' # ToDo Hänge Datum an Dateinamen an
+	response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
 
-	headline = ['Name']
+	headline = [smart_str(u'Name')]
 	for r in rollenmenge:
-		headline += [r.rollenname]
+		headline += [smart_str(r.rollenname)]
 
-	writer = csv.writer(response, delimiter = ';', quotechar = '"')
+	writer = csv.writer(response, csv.excel, delimiter = ',', quotechar = '"')
 	writer.writerow(headline)
 
 	for user in usernamen:
@@ -771,9 +773,9 @@ def panel_UhR_matrix_csv(request, flag = False):
 				if wert == None or len(wert) <= 0:
 					line += ['']
 				else:
-					line += [wert[0]]
+					line += [smart_str([0])]
 			else:
-				line += [finde(rollen_je_username[user], rolle)]
+				line += [smart_str(finde(rollen_je_username[user], rolle))]
 		writer.writerow(line)
 
 	return response
