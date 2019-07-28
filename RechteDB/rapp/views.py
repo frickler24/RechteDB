@@ -230,6 +230,7 @@ def panel(request):
 	panel_list = panel_filter.qs
 
 	(paginator, pages, pagesize) = pagination(request, panel_list)
+	print(panel_list)
 	context = {
 		'paginator': paginator,
 		'filter': panel_filter,
