@@ -14,7 +14,8 @@ Including another URLconf
 	2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-from . import views, view_UserHatRolle, view_import, stored_procedures, view_serienbrief
+from . import 	views, view_UserHatRolle, view_import, stored_procedures, view_serienbrief, \
+				view_neueAFGF
 from django.contrib.auth.decorators import login_required
 
 
@@ -107,8 +108,14 @@ urlpatterns += [
 	path('serienbrief/', login_required(view_serienbrief.serienbrief), name='serienbrief'),
 ]
 
+# Finden neuer Kombiunationen aus AF und GF: Anzeige und spezifische Aktualisierung
+urlpatterns += [
+	path('neue_afgf/', login_required(view_neueAFGF.zeige_neue_afgf), name='zeige_neue_afgf'),
+	path('neueAFGF_download/', login_required(view_neueAFGF.neue_afgf_download), name='neueAFGF_download'),
+	path('neueAFGF_setzen/', login_required(view_neueAFGF.neueAFGF_setzen), name='neueAFGF_setzen'),
+]
+
 # URl zum Testen neuer Funktionalität (liegt in "Magie")
 urlpatterns += [
 	path('magic_click/', login_required(views.magic_click), name='magic_click'),
 ]
-

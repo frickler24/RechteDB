@@ -294,7 +294,6 @@ def hole_userid(name):
 		userid = ('x' + account[0][1:]).lower()
 	return userid
 
-@login_required
 def serienbrief(request):
 	"""
 	Exportfunktion für das Erstellen eines einzelnen LaTeX-Dokkuments mit allen Briefen
@@ -339,7 +338,6 @@ def gib_dateiname(name, userid):
 			+ ".tex"
 	return s
 
-@login_required
 def einzelbrief(request):
 	"""
 	Exportfunktion für das Erstellen eines LaTeX-Dokkuments mit allen einzelnen Briefen.
