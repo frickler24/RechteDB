@@ -16,6 +16,16 @@ class PanelFilter(django_filters.FilterSet):
 
 	plattform_id__tf_technische_plattform =\
 									django_filters.ChoiceFilter()
+	modell__gf_beschreibung = 		django_filters.CharFilter(lookup_expr='icontains')
+	loeschdatum = 					django_filters.CharFilter(lookup_expr='icontains')
+	af_gueltig_ab = 				django_filters.CharFilter(lookup_expr='icontains')
+	af_gueltig_bis = 				django_filters.CharFilter(lookup_expr='icontains')
+	direct_connect = 				django_filters.CharFilter(lookup_expr='icontains')
+	af_zuweisungsdatum = 			django_filters.CharFilter(lookup_expr='icontains')
+	tf_eigentuemer_org = 			django_filters.CharFilter(lookup_expr='icontains')
+	gefunden = 						django_filters.BooleanFilter()
+	wiedergefunden = 				django_filters.CharFilter(lookup_expr='icontains')
+	letzte_aenderung = 				django_filters.CharFilter(lookup_expr='icontains')
 
 	class Meta:
 		model = TblGesamt
@@ -23,7 +33,7 @@ class PanelFilter(django_filters.FilterSet):
 			'id', 'userid_name', 'tf', 'tf_beschreibung', 'enthalten_in_af', 'modell', 'tf_kritikalitaet',
 			'tf_eigentuemer_org', 'plattform', 'gf', 'af_gueltig_ab', 'af_gueltig_bis', 'direct_connect',
 			'hoechste_kritikalitaet_tf_in_af', 'gf_beschreibung', 'af_zuweisungsdatum', 'datum',
-			'geloescht', 'loeschdatum',
+			'geloescht',
 			'userid_name__orga',
 			'userid_name__name',
 			'userid_name__userid',
@@ -32,6 +42,16 @@ class PanelFilter(django_filters.FilterSet):
 			'userid_name__gruppe',
 			'modell__name_af_neu',
 			'modell__name_gf_neu',
+			'gf_beschreibung',
+			'loeschdatum',
+			'af_gueltig_ab',
+			'af_gueltig_bis',
+			'direct_connect',
+			'af_zuweisungsdatum',
+			'tf_eigentuemer_org',
+			'gefunden',
+			'wiedergefunden',
+			'letzte_aenderung'
 		]
 
 class UseridRollenFilter(django_filters.FilterSet):
