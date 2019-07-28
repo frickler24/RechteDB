@@ -140,7 +140,6 @@ class AdminPageTests(TestCase):
 		response = self.client.get(url)
 		self.assertEqual(response.status_code, 301)
 
-
 class GesamtlisteTests(TestCase):
 	# Funktioniert die Gesamtliste?
 	def setUp(self):
@@ -717,7 +716,6 @@ class PanelTests(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertNotContains(response, "xv10099")
 
-
 class Panel_exportCSVTest(TestCase):
 	# User / Rolle / AF : Das wird mal die Hauptseite für
 	# Aktualisierungen / Ergänzungen / Löschungen von Rollen und Verbindungen
@@ -857,7 +855,6 @@ class Panel_exportCSVTest(TestCase):
 		self.assertContains(response, "rvg_00458_neueGF mit echt mehr Zeichen als ", 1)
 		self.assertContains(response, "Die superlange schnuckelige TF2;Die superlange schnuckelige TF-Beschreibung;", 1)
 		self.assertContains(response, "User_xv10099;xv10099;AI-BA;", 1)
-
 
 class User_rolle_afTests_generate_pdf(TestCase):
 	# Der Testfall muss aufgrund der PDF-Lieferung separat gehalten werden
@@ -1003,9 +1000,10 @@ class User_rolle_afTests_generate_pdf(TestCase):
 			geloescht = 		True,
 		)
 	def test_panel_view_use_konzept_pdf(self):
+		print()	# weil das PDF immer irgend eine Warnung ausgibt
 		pdf_url = reverse('uhr_konzept_pdf')
 		response = self.client.get(pdf_url)
-		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.status_code, 200) # Und trotzdem funktioniert es
 
 class User_rolle_afTests(TestCase):
 	# User / Rolle / AF: Die Hauptseite für Aktualisierungen / Ergänzungen / Löschungen von Rollen und Verbindungen
@@ -1592,17 +1590,10 @@ class User_rolle_variantsTest(TestCase):
 		self.assertContains(response, "Betrachtung von Rollenvarianten")
 		self.assertContains(response, "rva_01219_beta91_job_abst", 5)
 		# Beide Identitäten haben eine Rolle, für die es mehrere Varianten gibt.
-		# ToDo Der Testfall muss angepasst werden, wenn die Doppelnennung von Rollen behandelt wird
-		"""
 		self.assertContains(response,
-							'<a href="/rapp/user_rolle_af/xv00042/create/Erste%20Neue%20Rolle/Schwerpunkt?&rollenname=*#xv00042.rva_01219_beta91_job_abst">Erste Neue Rolle</a')
+							'<a href="/rapp/user_rolle_af/xv00042/create/Zweite%2520Neue%2520Rolle/Schwerpunkt?&rollenname=*#xv00042.rva_01219_beta91_job_abst">Zweite Neue Rolle</a>', 1)
 		self.assertContains(response,
-							'<a href="/rapp/user_rolle_af/xv00042/create/Zweite%20Neue%20Rolle/Schwerpunkt?&rollenname=*#xv00042.rva_01219_beta91_job_abst">Zweite Neue Rolle</a>')
-		self.assertContains(response,
-							'<a href="/rapp/user_rolle_af/xv13254/create/Erste%20Neue%20Rolle/Schwerpunkt?&rollenname=*#xv13254.rva_01219_beta91_job_abst">Erste Neue Rolle</a>')
-		self.assertContains(response,
-							'<a href="/rapp/user_rolle_af/xv13254/create/Zweite%20Neue%20Rolle/Schwerpunkt?&rollenname=*#xv13254.rva_01219_beta91_job_abst">Zweite Neue Rolle</a>')
-		"""
+							'<a href="/rapp/user_rolle_af/xv00042/create/Zweite%2520Neue%2520Rolle/Schwerpunkt?&rollenname=*#xv00042.rva_01219_beta91_job_abst">Zweite Neue Rolle</a>', 1)
 		# Die Löschlinks enthalten die Nummern der User-hat-Rolle-Definition. Das brauchen wir später nochmal
 		erste_rolle_des_ersten_users = TblUserhatrolle.objects.get(userid=TblUserIDundName.objects.get(userid='xv13254'),
 			rollenname=TblRollen.objects.first())
@@ -1639,13 +1630,7 @@ class User_rolle_variantsTest(TestCase):
 		self.assertContains(response, "rva_01219_beta91_job_abst", 5)
 		# Beide Identitäten haben eine Rolle, für die es mehrere Varianten gibt.
 		# ToDo Der Testfall muss angepasst werden, wenn die Doppelnennung von Rollen behandelt wird
-		"""
-		for uid in ('xv13254', 'xv00042'):
-			for xte in ('Erste', 'Zweite'):
-				bastelstring = '<a href="/rapp/user_rolle_af/{}/create/{}%20Neue%20Rolle/Schwerpunkt?&rollenname=*#{}.rva_01219_beta91_job_abst">{} Neue Rolle</a>'\
-							 .format (uid, xte, uid, xte)
-				self.assertContains(response, bastelstring)
-		"""
+		self.assertContains(response, '<a href="/rapp/user_rolle_af/xv00042/create/Zweite%2520Neue%2520Rolle/Schwerpunkt?&rollenname=*#xv00042.rva_01219_beta91_job_abst">Zweite Neue Rolle</a>', 1)
 		# Zum Abschluss klicken wir mal auf einen der Löschlinks und erhalten die Sicherheitsabfrage:
 		createurl = '/rapp/user_rolle_af/{}/create/{}%20Neue%20Rolle/Schwerpunkt?&rollenname=*#{}.rva_01219_beta91_job_abst' \
 						   .format('xv00042', 'Zweite', 'xv00042')
@@ -1822,7 +1807,7 @@ class User_rolle_exportCSVTest(TestCase):
 		)
 
 	# Eine leere Auswahl
-	def test_panel_online_without_selection(self):
+	def test_matrix_online_without_selection(self):
 		url = reverse('uhr_matrix')
 		response = self.client.get(url)
 		self.assertEqual(response.status_code, 200)
@@ -1836,7 +1821,7 @@ class User_rolle_exportCSVTest(TestCase):
 		self.assertContains(response, 'Vertretung', 1)
 
 	# Eine gültige Auswahl für einen User in einer Gruppe
-	def test_panel_online_with_valid_selection(self):
+	def test_matrix_online_with_valid_selection(self):
 		url = '{0}{1}'.format(reverse('uhr_matrix'), '?name=UseR&gruppe=BA-ps')
 		response = self.client.get(url)
 		self.assertEqual(response.status_code, 200)
@@ -1850,20 +1835,20 @@ class User_rolle_exportCSVTest(TestCase):
 		self.assertContains(response, 'Vertretung', 1)
 
 	# Eine gültige Auswahl für einen User in einer Gruppe, csv-Export Langvariante
-	def test_panel_long_pdf_with_valid_selection(self):
+	def test_matrix_long_csv_with_valid_selection(self):
 		url = '{0}{1}'.format(reverse('uhr_matrix_csv'), '?name=UseR&gruppe=BA-ps')
 		response = self.client.get(url)
 		self.assertEqual(response.status_code, 200)
-		self.assertContains(response, "Name;Erste Neue Rolle;Zweite Neue Rolle\r\n", 1)
-		self.assertContains(response, "User_xv13254;Schwerpunkt;Vertretung\r\n", 1)
+		self.assertContains(response, "Name,Erste Neue Rolle,Zweite Neue Rolle\r\n", 1)
+		self.assertContains(response, "User_xv13254,Schwerpunkt,Vertretung\r\n", 1)
 
 	# Eine gültige Auswahl für einen User in einer Gruppe, csv-Export kurzvariante
-	def test_panel_short_pdf_with_valid_selection(self):
+	def test_matrix_short_scv_with_valid_selection(self):
 		url = '{0}{1}'.format(reverse('uhr_matrix_csv'), 'kompakt/?name=UseR&gruppe=BA-ps')
 		response = self.client.get(url)
 		self.assertEqual(response.status_code, 200)
-		self.assertContains(response, "Name;Erste Neue Rolle;Zweite Neue Rolle\r\n", 1)
-		self.assertContains(response, "User_xv13254;S;V\r\n", 1)
+		self.assertContains(response, "Name,Erste Neue Rolle,Zweite Neue Rolle\r\n", 1)
+		self.assertContains(response, "User_xv13254,S,V\r\n", 1)
 
 class Import_new_csv_single_record(TestCase):
 	# Tests für den Import neuer CSV-Listen und der zugehörigen Tabellen

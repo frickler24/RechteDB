@@ -230,7 +230,6 @@ def panel(request):
 	panel_list = panel_filter.qs
 
 	(paginator, pages, pagesize) = pagination(request, panel_list)
-	print(panel_list)
 	context = {
 		'paginator': paginator,
 		'filter': panel_filter,
@@ -266,7 +265,7 @@ def panelDownload(request):
 	f = PanelFilter(request.GET, queryset=TblGesamt.objects.all())
 
 	response = HttpResponse(content_type="text/csv")
-	response['Content-Distribution'] = 'attachment; filename="gesamt.csv"' # ToDo Hänge Datum an Dateinamen an
+	response['Content-Disposition'] = 'attachment; filename="gesamt.csv"' # ToDo Hänge Datum an Dateinamen an
 
 	writer = csv.writer(response, delimiter = ';', quotechar = '"')
 	writer.writerow([

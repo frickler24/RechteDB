@@ -773,7 +773,7 @@ def panel_UhR_matrix_csv(request, flag = False):
 				if wert == None or len(wert) <= 0:
 					line += ['']
 				else:
-					line += [smart_str([0])]
+					line += [smart_str(wert[0])]
 			else:
 				line += [smart_str(finde(rollen_je_username[user], rolle))]
 		writer.writerow(line)
