@@ -4,7 +4,7 @@ from django.test import TestCase
 from datetime import datetime, timedelta
 from django.utils import timezone
 # from django.core.files.base import ContentFile
-import re
+import re, time
 from ..anmeldung import Anmeldung
 from ..views import home
 from ..models import TblOrga, TblUebersichtAfGfs, TblUserIDundName, TblPlattform, TblGesamt, \
@@ -252,7 +252,6 @@ class GesamtlisteTests(TestCase):
 			loeschdatum = 			None,
 			letzte_aenderung =		None
 		)
-
 
 	def test_gesamtliste_view_status_code(self):
 		url = reverse('gesamtliste')
@@ -1179,8 +1178,6 @@ class User_rolle_afTests(TestCase):
 		response = self.client.get(url)
 		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "User_xv13254")
-		#print('_____________')
-		#print (response.content)
 		self.assertContains(response, '(2 Rollen,')
 	# Sind bei einer der Rollen ein Recht nicht vergeben und zwei Rechte vergeben und insgesamt 3 Rechte behandelt?
 	def test_panel_view_with_deep_insight(self):
@@ -2030,3 +2027,136 @@ class Import_helper_functions(TestCase):
 		# Neuer Aufruf sollte keinen Fehler liefern
 		(flag, imp) = neuer_import(None)
 		self.assertFalse(flag)
+
+class TestNeuAFGF(TestCase):
+	def setUp(self):
+		Anmeldung(self.client.login)
+		Setup_database()
+		TblOrga.objects.create (
+			team = 'Django-Team-01',
+			themeneigentuemer = 'Ihmchen_01',
+		)
+		TblOrga.objects.create (
+			team = 'Django-Team-02',
+			themeneigentuemer = 'Ihmchen_02',
+		)
+
+		# Drei User: XV und DV aktiv, AV gelöscht
+		TblUserIDundName.objects.create (
+			userid = 			'xv13254',
+			name = 				'User_xv13254',
+			orga = 				TblOrga.objects.get(team = 'Django-Team-01'),
+			zi_organisation =	'AI-BA',
+			geloescht = 		False,
+			abteilung = 		'ZI-AI-BA',
+			gruppe = 			'ZI-AI-BA-PS',
+		)
+		TblUserIDundName.objects.create (
+			userid = 			'dv13254',
+			name = 				'User_xv13254',
+			orga = 				TblOrga.objects.get(team = 'Django-Team-01'),
+			zi_organisation =	'AI-BA',
+			geloescht = 		False,
+			abteilung = 		'ZI-AI-BA',
+			gruppe = 			'ZI-AI-BA-PS',
+		)
+		TblUserIDundName.objects.create (
+			userid = 			'av13254',
+			name = 				'User_xv13254',
+			orga = 				TblOrga.objects.get(team = 'Django-Team-01'),
+			zi_organisation =	'AI-BA',
+			geloescht = 		True,
+			abteilung = 		'ZI-AI-BA',
+			gruppe = 			'ZI-AI-BA-PS',
+		)
+
+		# Die nächsten Objekte werden für tblGesamt als ForeignKey benötigt
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu = 		"GF-foo in tblÜbersichtAFGF",
+			name_af_neu =		"AF-foo in tblÜbersichtAFGF",
+			zielperson = 		'Fester BesterTester',
+			modelliert = 		timezone.now()
+		)
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu = 		"GF-foo2 in tblÜbersichtAFGF",
+			name_af_neu =		"AF-foo in tblÜbersichtAFGF",
+			zielperson = 		'Fester BesterTester'
+		)
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu = 		"GF-foo2 in tblÜbersichtAFGF",
+			name_af_neu =		"AF-foo2 in tblÜbersichtAFGF",
+			zielperson = 		'Fester BesterTester'
+		)
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu = 		"GF-foo-gelöscht in tblÜbersichtAFGF",
+			name_af_neu =		"AF-foo-gelöscht in tblÜbersichtAFGF",
+			zielperson = 		'Fester BesterTester'
+		)
+		# Eine der AFen ist bekannt - aber das sollte egal sein.
+		TblAfliste.objects.create (
+			af_name = 			'AF-foo in tblÜbersichtAFGF',
+			neu_ab = 			timezone.now(),
+		)
+
+		TblPlattform.objects.create(
+			tf_technische_plattform = 'Test-Plattform'
+		)
+
+		# Es werden in der Tabelle die vier Rechte vergeben, eines davon gelöscht
+		TblGesamt.objects.create(
+			userid_name = 		TblUserIDundName.objects.get(userid = 'xv13254'),
+			tf = 				'foo-TF',
+			tf_beschreibung = 	'TF-Beschreibung für foo-TF',
+			enthalten_in_af = 	'AF-foo in tblÜbersichtAFGF',
+			gf = 				'GF-foo in tblÜbersichtAFGF',
+			modell =			TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+			plattform = 		TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+			datum = 			timezone.now(),
+			geloescht = 		False,
+		)
+
+		TblGesamt.objects.create(
+			userid_name = 		TblUserIDundName.objects.get(userid = 'dv13254'),
+			tf = 				'foo-TF2',
+			tf_beschreibung = 	'TF-Beschreibung für foo-TF',
+			enthalten_in_af = 	'AF-foo in tblÜbersichtAFGF',
+			gf = 				'GF-foo2 in tblÜbersichtAFGF',
+			modell =			TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+			plattform = 		TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+			datum = 			timezone.now(),
+			geloescht = 		False,
+		)
+
+		TblGesamt.objects.create(
+			userid_name = 		TblUserIDundName.objects.get(userid = 'av13254'),
+			tf = 				'foo-TF3',
+			tf_beschreibung = 	'TF-Beschreibung für foo-TF',
+			gf = 				'GF-foo2 in tblÜbersichtAFGF',
+			enthalten_in_af = 	'AF-foo2 in tblÜbersichtAFGF',
+			modell =			TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+			plattform = 		TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+			datum = 			timezone.now(),
+			geloescht = 		False,
+		)
+
+		# und hier noch ein bereits gelöschtes Recht auf TF-Ebene.
+		TblGesamt.objects.create(
+			userid_name = 		TblUserIDundName.objects.get(userid = 'xv13254'),
+			tf = 				'foo-TF-gelöscht',
+			tf_beschreibung = 	'TF-Beschreibung für foo-TF-gelöscht',
+			enthalten_in_af = 	'AF-foo-gelöscht in tblÜbersichtAFGF',
+			gf = 				'GF-foo-gelöscht in tblÜbersichtAFGF',
+			modell =			TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+			plattform = 		TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+			datum = 			timezone.now() - timedelta(days=365),
+			geloescht = 		True,
+		)
+
+	# Eine leere Auswahl
+	def test_NeuAFGF_suche(self):
+		url = reverse('zeige_neue_afgf')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+
+
+
