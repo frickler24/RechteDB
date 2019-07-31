@@ -24,21 +24,31 @@
 				{% if form.non_field_errors %}
 					<p>{{ form.non_field_errors }}</p>
 				{% endif %}
-				<h3>Rollen von {{ selektierter_name }}
+				<div class="row">
+					<div class="col-1">
+						<a href="{% url 'user_rolle_af_export' id %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}"
+							class="btn btn-outline-primary btn-sm"
+							role="button">
+							Export
+						</a>
+					</div>
+					<div class="col-11">
+						<h3>Rollen von {{ selektierter_name }}
 
-					({{ userHatRolle_liste.count }} {% if userHatRolle_liste.count == 1 %}Rolle,
-					{% else %}Rollen,
-					{% endif %}
-					UserID-Liste =
-					{% for x in selektierte_userids %}
-						{% if forloop.last %}
-							{{ x }})
-						{% else %}
-							{{ x }},
-						{% endif %}
-					{% endfor %}
-				</h3>
-			</div>
+							({{ userHatRolle_liste.count }} {% if userHatRolle_liste.count == 1 %}Rolle,
+							{% else %}Rollen,
+							{% endif %}
+							UserID-Liste =
+							{% for x in selektierte_userids %}
+								{% if forloop.last %}
+									{{ x }})
+								{% else %}
+									{{ x }},
+								{% endif %}
+							{% endfor %}
+						</h3>
+					</div>
+				</div>
 			<div>
 				<table class="table table-striped table-sm">
 				<thead>
