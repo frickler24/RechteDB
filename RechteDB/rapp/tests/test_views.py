@@ -1025,6 +1025,11 @@ class User_rolle_afTests(TestCase):
 		)
 
 		TblAfliste.objects.create (
+			af_name = 			'rva_01219_beta91_job_abst_nu',
+			neu_ab = 			timezone.now(),
+		)
+
+		TblAfliste.objects.create (
 			af_name = 			'rva_01219_beta91_job_abst_nicht_zugewiesen',
 			neu_ab = 			timezone.now(),
 		)
@@ -1120,6 +1125,11 @@ class User_rolle_afTests(TestCase):
 			name_af_neu =		"AF-foo-gelöscht in tblÜbersichtAFGF",
 			zielperson = 		'Fester BesterTester'
 		)
+		TblUebersichtAfGfs.objects.create(
+			name_gf_neu = 		"rvg_01219_beta91_job_abst_nu",
+			name_af_neu =		"rva_01219_beta91_job_abst_nu",
+			zielperson = 		'Fester BesterTester'
+		)
 		TblPlattform.objects.create(
 			tf_technische_plattform = 'Test-Plattform'
 		)
@@ -1153,7 +1163,6 @@ class User_rolle_afTests(TestCase):
 			geloescht = 		True,
 		)
 
-
 	# Ist die Seite da?
 	def test_panel_view_status_code(self):
 		url = reverse('user_rolle_af')
@@ -1186,8 +1195,8 @@ class User_rolle_afTests(TestCase):
 		response = self.client.get(url)
 		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "User_xv13254")
-		self.assertContains(response, 'icon-yes', 4)
-		self.assertContains(response, 'icon-no', 2)
+		self.assertContains(response, 'icon-yes', 2)
+		self.assertContains(response, 'icon-no', 4)
 	def test_panel_view_with_deep_insight_find_delete_link(self):
 		id = TblUserIDundName.objects.get(userid='xv13254').id
 		url = '{0}{1}/{2}'.format(reverse('user_rolle_af'), id, '?name=UseR&gruppe=BA-ps')
@@ -1254,12 +1263,32 @@ class User_rolle_afTests(TestCase):
 		createurl = '/rapp/user_rolle_af/create/xv13254/?&name=&orga=1&rollenname=&gruppe=&user='
 		response = self.client.get(createurl)
 		self.assertEqual(response.status_code, 200)
-		# print('____________')
-		# print(response.content)
 		self.assertContains(response, 'Rollen-Eintrag ergänzen für')
 		self.assertContains(response, '<option value="xv13254">xv13254 | User_xv13254</option>')
 		self.assertContains(response, '<option value="" selected>---------</option>', 2)
 		self.assertContains(response, '<option value="">---------</option>', 1)
+	def test_panel_view_with_deep_insight_find_export_link(self):
+		id = TblUserIDundName.objects.get(userid='xv13254').id
+		url = '{0}{1}/{2}'.format(reverse('user_rolle_af'), id, '?name=UseR&gruppe=BA-ps')
+		response = self.client.get(url)
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "User_xv13254")
+		# Nun klicken wir mal auf den Export-Link und erhalten den Erstellungsdialog.
+		exporturl = '/rapp/user_rolle_af/export/{}/?'.format(id)
+		self.assertContains(response, exporturl)
+		response = self.client.get(exporturl)
+		self.assertEqual(response.status_code, 200)
+		# print('____________')
+		# print(response.content)
+		gesuchter_exportstring = "Name,Rollenname,AF,Mussrecht,xv13254,dv13254\r\n"\
+			+ "User_xv13254,Erste Neue Rolle,rva_01219_beta91_job_abst,ja,nein,nein\r\n"\
+			+ "User_xv13254,Erste Neue Rolle,rva_01219_beta91_job_abst_nicht_zugewiesen,ja,nein,nein\r\n"\
+			+ "User_xv13254,Zweite Neue Rolle,rva_01219_beta91_job_abst,nein,nein,nein\r\n"
+		self.assertContains(response, 'Name,Rollenname,AF,Mussrecht,xv13254,dv13254\r\n')
+		self.assertContains(response, 'User_xv13254,Erste Neue Rolle,rva_01219_beta91_job_abst,ja,nein,nein\r\n')
+		self.assertContains(response, 'User_xv13254,Erste Neue Rolle,rva_01219_beta91_job_abst_nicht_zugewiesen,ja,nein,nein\r\n')
+		self.assertContains(response, 'User_xv13254,Zweite Neue Rolle,rva_01219_beta91_job_abst,nein,nein,nein\r\n')
+		self.assertContains(response, gesuchter_exportstring)
 
 	def test_panel_view_with_invalid_selection_status_code(self):
 		url = '{0}{1}'.format(reverse('user_rolle_af'), '?geloescht=99&zi_organisation=ZZ-XX')

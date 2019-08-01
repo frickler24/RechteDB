@@ -821,7 +821,6 @@ def panel_UhR_af_export(request, id):
 	]
 	for userid in selektierte_userids:
 		headline.append(smart_str(userid))
-	print (headline)
 
 	writer = csv.writer(response, csv.excel, delimiter = ',', quotechar = '"')
 	writer.writerow(headline)
@@ -832,7 +831,6 @@ def panel_UhR_af_export(request, id):
 			if rollendefinition.mussfeld > 0: line.append('ja')
 			else: line.append('nein')
 			for userid in selektierte_userids:
-				print(line, userid)
 				if str(rollendefinition.af) in afmenge_je_userID[userid]: line.append('ja')
 				else: line.append('nein')
 			writer.writerow(line)
