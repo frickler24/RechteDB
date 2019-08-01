@@ -64,6 +64,5 @@ def sort(menge):
 def vergleich(einzel, menge):
 	for element in menge:
 		if element == einzel:
-			print ('gefunden:', element, einzel)
 			return True
 	return False
