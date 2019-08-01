@@ -71,12 +71,13 @@ urlpatterns += [
 	path('panel/', login_required(views.panel), name='panel'),
 ]
 
-# Der Link auf das Eingabepanel zur freien Selektion auf der User-hat-Rolle Tabelle mit Änderungslink
+# Der Link auf das Eingabepanel zur freien Selektion auf der User-hat-Rolle Tabelle (UhR)
 urlpatterns += [
 	path('user_rolle_af/<int:pk>/delete/', 		login_required(view_UserHatRolle.UhRDelete.as_view()), 		name='user_rolle_af-delete'),
 	path('user_rolle_af/<str:userid>/create/<str:rollenname>/<str:schwerpunkt_vertretung>',
 		 										login_required(view_UserHatRolle.UhRCreate.as_view()), 		name='uhr_create'),
 	path('user_rolle_af/<int:id>/', 			login_required(view_UserHatRolle.panel_UhR), 				name='user_rolle_af_parm'),
+	path('user_rolle_af/export/<int:id>/',		login_required(view_UserHatRolle.panel_UhR_af_export), 		name='user_rolle_af_export'),
 	path('user_rolle_af/create/<str:userid>/',	login_required(view_UserHatRolle.UhRCreate.as_view()), 		name='user_rolle_af-create' ),
 	path('user_rolle_af/konzept/', 				login_required(view_UserHatRolle.panel_UhR_konzept),		name='uhr_konzept'),
 	path('user_rolle_af/konzept_pdf/', 			login_required(view_UserHatRolle.panel_UhR_konzept_pdf), 	name='uhr_konzept_pdf'),
