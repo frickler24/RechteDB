@@ -59,3 +59,11 @@ def sort(menge):
 	liste = list(menge)
 	liste.sort()
 	return liste
+
+@register.filter
+def vergleich(einzel, menge):
+	for element in menge:
+		if element == einzel:
+			print ('gefunden:', element, einzel)
+			return True
+	return False

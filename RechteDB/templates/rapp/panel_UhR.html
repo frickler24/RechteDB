@@ -160,11 +160,16 @@
 																&nbsp;
 															{% else %}
 																{# Aus dem QueryElement meineaf.af muss ein String zur Suche in der Menge gemacht werden #}
-																{% if meineaf.af|stringformat:"s"|lower in afmenge_je_userID|hash:uid|lower %}
-																	<img src="{% static 'admin/img/icon-yes.svg' %}">
-																{% else %}
-																	<img src="{% static 'admin/img/icon-no.svg' %}">
-																{% endif %}
+																{# Das folgende Statement geht leider nicht (findet falsche Substrings: #}
+																{# if meineaf.af|stringformat:"s"|lower in afmenge_je_userID|hash:uid|lower #}
+																{# Also musste ein programmierter Vergleich her #}
+																{% with menge=afmenge_je_userID|hash:uid %}
+																	{% if meineaf.af|stringformat:"s"|lower|vergleich:menge %}
+																		<img src="{% static 'admin/img/icon-yes.svg' %}">
+																	{% else %}
+																		<img src="{% static 'admin/img/icon-no.svg' %}">
+																	{% endif %}
+																{% endwith %}
 															{% endif %}
 														</td>
 													{% endfor %}
