@@ -8,6 +8,7 @@ from django.contrib import admin
 # Zum Verändern der Standardeigenschaften eines Textpanes
 from django.db import models
 from django.forms import Textarea
+from mdeditor.widgets import MDEditorWidget
 
 # Die Datenbanken / Models
 from rapp.models import TblUebersichtAfGfs, TblUserIDundName, TblOrga, TblPlattform, \
@@ -15,7 +16,8 @@ from rapp.models import TblUebersichtAfGfs, TblUserIDundName, TblOrga, TblPlattf
 						TblRollen, TblAfliste, TblUserhatrolle, TblRollehataf, \
 						Tblsubsysteme, Tblsachgebiete, TblDb2, TblRacfGruppen, \
 						RACF_Rechte, Orga_details, \
-						Modellierung, Direktverbindungen
+						Modellierung, Direktverbindungen, \
+						Manuelle_Berechtigung
 
 # Für den Im- und Export
 from import_export.admin import ImportExportModelAdmin
@@ -392,3 +394,9 @@ class Direktverbindungen(ImportExportModelAdmin):
 	# Parameter für import/export
 	resource_class = DirektverbindungenExporterModel
 	sortable_by = ['entitlement', 'plattform', 'gf', 'af']
+
+@admin.register(Manuelle_Berechtigung)
+class Manuelle_BerechtigungAdmin(admin.ModelAdmin):
+	formfield_overrides = {
+        models.TextField: {'widget': MDEditorWidget}
+    }

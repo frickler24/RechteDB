@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'manuell_liste' %}">Manuelles</a></li>
+    <li class="breadcrumb-item active">Manuell zu behandelnde Berechtigung ändern</li>
+{% endblock breadcrumb %}
+
+{% block title %}
+	Manuelle Rechte-Liste - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12" style="text-align: bottom;">
+                <h3>Manuell zu behandelnde Berechtigungen anpassen</h3>
+            </div>
+        </div>
+        <div class="row mb-5 align-bottom">
+        </div>
+    </div>
+
+    <form method = "post" action = "./">
+        {% csrf_token%}
+        {{form.media}}
+        {{form.as_p}}
+        <p> <input type = "submit" value = "Abschicken"> </ p>
+    </ form>
+
+{% endblock %}

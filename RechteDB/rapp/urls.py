@@ -1,23 +1,15 @@
-"""books URL Configuration
+from __future__ import unicode_literals
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-	https://docs.djangoproject.com/en/2.0/topics/http/urls/
-Examples:
-Function views
-	1. Add an import:  from my_app import views
-	2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-	1. Add an import:  from other_app.views import Home
-	2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-	1. Import the include() function: from django.urls import include, path
-	2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.urls import path
-from . import 	views, view_UserHatRolle, view_import, stored_procedures, view_serienbrief, \
-				view_neueAFGF
 from django.contrib.auth.decorators import login_required
+from django.urls import path
 
+from . import views
+from . import view_UserHatRolle
+from . import view_import
+from . import stored_procedures
+from . import view_serienbrief
+from . import view_neueAFGF
+from . import view_manuell
 
 # app_name = 'rapp'		# Wird nur benötigt als namespace, falls mehrere Apps dieselbe Teil-URL haben
 
@@ -86,6 +78,19 @@ urlpatterns += [
 	path('user_rolle_af/matrix_csv/<str:flag>/',
 		 										login_required(view_UserHatRolle.panel_UhR_matrix_csv), 	name='uhr_matrix_csv'),
 	path('user_rolle_af/', 						login_required(view_UserHatRolle.panel_UhR), 				name='user_rolle_af'),
+]
+
+# Die Behandlujng der Beschreibungen manuell zu verwaltender Berechtigungen
+# Hier sollte auch der mdeditor mitspielen
+urlpatterns += [
+	path('manuell/<int:pk>/delete/',
+		 login_required(view_manuell.Manuelle_BerechtigungDelete.as_view()), name='manuell_delete'),
+	path('manuell/<int:pk>/update/',
+		 login_required(view_manuell.Manuelle_BerechtigungUpdate.as_view()), name='manuell_update'),
+	path('manuell/create/',
+		 login_required(view_manuell.Manuelle_BerechtigungCreate.as_view()), name='manuell_create'),
+	path('manuell/',
+		 login_required(view_manuell.Manuelle_BerechtigungListe.as_view()), name='manuell_liste'),
 ]
 
 # URl zum Importieren neuer Daten aus IIQ (csv-File)
