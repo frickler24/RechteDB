@@ -25,28 +25,44 @@
         <form id="form" action="" method="post" name="import" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
 
-            <div class="container alert-primary py-3">
+            <ol class="container alert-primary py-3">
                 <h4>Auswahl der Organisation und Hochladen der Datei</h4><hr />
-                <p>
-                    Vor dem Import müssen die folgenden, bekannten Schwächen der Importfiles behoben werden:
-                </p>
-                <ol>
-                    <li>Speichern der Auswertungen -> Berichte -> Berichtsergebnisse -> Suche nach "BA-Rechte"</li>
-                    <li>Öffnen mit Notepad++ oder ähnlichem Werkzeug, das regexp versteht
-                        (<strong style="color: red;">nicht Excel wegen Unicode!</strong>)</li>
-                    <li>Ersetze alle harten Zeilenumbrüche innerhalb von Kommentarfeldern:<br />
-                        Ersetze alle &nbsp;&nbsp;&nbsp;
-                        \n^([^xv])<br />
-                        gegen &nbsp;&nbsp;&nbsp;
-                        \1
-                    </li>
-                    <li>Ersetze alle einfachen Backslashes gegen doppelte:<br />
-                        Ersetze alle &nbsp;&nbsp;&nbsp;
-                        ([^\\])\\([^\\])<br />
-                        gegen &nbsp;&nbsp;&nbsp;
-                        \1\\\\\2
-                    </li>
-                </ol><hr />
+                    <p>Laden Sie die täglich neu erzeugten Berichtsergebnise "BA-Rechte"
+                        aus IIQ in den Downloads-Ordner:<p>
+                    <ol>
+                        <li>Selektieren Sie dazu die Auswertungen -> Berichte -> Berichtsergebnisse -> Suche nach "BA-Rechte"</li>
+                        <li>Vor dem Import müssen die bekannten Schwächen dieser Datei behoben werden,
+                    dazu gibt es zwei verschiedene Möglichkeiten:</li>
+                        <ol>
+                            <li>
+                                Nutzen des Konvertierungs-Tools
+                                <ol>
+                                <li>Bitte laden Sie einmalig die beiden Dateien in Ihren Downloads-Ordner,
+                                    die unter O:\10_ZIAI\70_A2... liegen</li>
+                                <li>Starten Sie in Ihrem Downloads-Ordner die Datei "konvertiere.bat"</li>
+                                </ol>
+                            </li>
+                            <li> Manuelle Konvertierung
+                                <ol>
+                                    <li>Öffnen der Datei mit Notepad++ oder ähnlichem Werkzeug, das regexp versteht
+                                        (<strong style="color: red;">nicht Excel wegen Unicode!</strong>)</li>
+                                    <li>Ersetzen Sie alle harten Zeilenumbrüche innerhalb von Kommentarfeldern:<br />
+                                        Ersetze alle &nbsp;&nbsp;&nbsp;
+                                        \n^([^xv])<br />
+                                        gegen &nbsp;&nbsp;&nbsp;
+                                        \1
+                                    </li>
+                                    <li>Ersetzen Sie alle einfachen Backslashes gegen doppelte:<br />
+                                        Ersetze alle &nbsp;&nbsp;&nbsp;
+                                        ([^\\])\\([^\\])<br />
+                                        gegen &nbsp;&nbsp;&nbsp;
+                                        \1\\\\\2
+                                    </li>
+                                </ol>
+                            </li>
+                        </ol>
+                        <li>Wählen Sie die so erzeugte Datei unten über "Durchsuchen..."</li>
+                    </ol><hr />
    				<div class="form-group form-group-sm col-12">
                     {% for field in form %}
                         <div class="form-group">
