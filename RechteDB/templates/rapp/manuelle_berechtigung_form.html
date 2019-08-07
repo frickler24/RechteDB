@@ -8,7 +8,7 @@
 {% endblock breadcrumb %}
 
 {% block title %}
-	Manuelle Rechte-Liste - {{ block.super }}
+	Manuelle Rechte - {{ block.super }}
 {% endblock %}
 
 {% block content %}
@@ -22,11 +22,82 @@
         </div>
     </div>
 
+    <div class="container">
+        {{ form.non_field_errors }}
+    </div>
     <form method = "post" action = "./">
         {% csrf_token%}
-        {{form.media}}
-        {{form.as_p}}
-        <p> <input type = "submit" value = "Abschicken"> </ p>
-    </ form>
 
+        {# Leider muss mman das hier einzeln machen, denn geschachtelte {%-Ausdrücke gibt es wohl nicht #}
+        <div class="container">
+            <div class="row justify-content-lg-center">
+                 <div class="form-group form-group-sm col ">
+                    <label class="control-label" for="form.name">{{ form.name.label }}</label>
+                    {{ form.name }}
+                     {% if form.name.errors %}
+                        <ol>
+                        {% for error in form.name.errors %}
+                            <li><strong>{{ error|escape }}</strong></li>
+                        {% endfor %}
+                        </ol>
+                    {% endif %}
+                </div>
+                <div class="form-group form-group-sm col ">
+                    <label class="control-label" for="form.ersteller">{{ form.ersteller.label }}</label>
+                    {{ form.ersteller }}
+                     {% if form.ersteller.errors %}
+                        <ol>
+                        {% for error in form.ersteller.errors %}
+                            <li><strong>{{ error|escape }}</strong></li>
+                        {% endfor %}
+                        </ol>
+                    {% endif %}
+                </div>
+                <div class="form-group form-group-sm col ">
+                    <label class="control-label" for="form.verbundene_af">{{ form.verbundene_af.label }}</label>
+                    {{ form.verbundene_af }}
+                     {% if form.verbundene_af.errors %}
+                        <ol>
+                        {% for error in form.verbundene_af.errors %}
+                            <li><strong>{{ error|escape }}</strong></li>
+                        {% endfor %}
+                        </ol>
+                    {% endif %}
+                </div>
+                <div class="form-group form-group-sm col ">
+                    <label class="control-label" for="form.letzte_aenderung">Letzte Änderung</label>
+                    {{ form.letzte_aenderung }}
+                     {% if form.letzte_aenderung.errors %}
+                        <ol>
+                        {% for error in form.letzte_aenderung.errors %}
+                            <li style="color: red;">{{ error|escape }}</li>
+                        {% endfor %}
+                        </ol>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {{ form.statisch }}
+        {{ form.media }}
+        {{ form.relativ }}
+        {{ form.media }}
+
+         <table style="width: 100%; align=center;">
+            <tr>
+                <td width="25%"></td>
+                <td width="25%" align="center">
+                    <input type="submit" value="Abschicken" class="btn btn-success btn-sm" />
+                </td>
+                <td width="25%" align="center">
+                    <a href="{% url 'manuell_liste' %}{{ request.GET.user }}?{% for key,value in request.GET.items %}{%if key != 'user' %}&{{ key }}={{ value }}{%endif %}{%endfor %}">
+                        <button class="btn btn-primary btn-sm" type="button">
+                            Bitte abbrechen!
+                        </button>
+                    </a>
+                </td>
+                <td width="25%"></td>
+            </tr>
+        </table>
+     </form>
+    <p>&nbsp;</p>
 {% endblock %}

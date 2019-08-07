@@ -9,6 +9,7 @@ from django.views.generic.edit import DeleteView
 from django.views.generic.list import ListView
 
 from .models import Manuelle_Berechtigung
+# from .forms import ManuellForm
 
 class Manuelle_BerechtigungCreate(CreateView):
 	"""Neue manuell behandelte Berechtigung erstellen"""
