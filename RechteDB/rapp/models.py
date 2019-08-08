@@ -761,8 +761,8 @@ class Manuelle_Berechtigung(models.Model):
 	verbundene_af = 	models.ForeignKey('TblAfliste', models.PROTECT, null=True,)
 	ersteller = 		models.CharField(max_length=50, null=True,)
 	letzte_aenderung =	models.DateTimeField(default=timezone.now)
-	statisch = 			MDTextField(default="")
-	relativ = 			MDTextField(default="")
+	statisch = 			MDTextField()
+	relativ = 			MDTextField()
 
 	class Meta:
 		managed = True

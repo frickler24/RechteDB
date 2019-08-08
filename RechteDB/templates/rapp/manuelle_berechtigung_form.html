@@ -77,15 +77,14 @@
                 </div>
             </div>
         </div>
-        {{ form.statisch }} {# Die Textfenster, immer erst das Eingabefenster, dann das Ausgabefenster #}
-        {{ form.media }}
+        {{ form.media }} {# Die Textfenster, immer erst das Ausgabefenster, dann das Eingabefenster #}
+        {{ form.statisch }} {# Ansonsten funktioniert die Sprachumstellung über settings.py nicht #}
 
+        {{ form.media }}
         {{ form.relativ }}
-        {{ form.media }}
 
-         <table style="width: 100%; align=center;">
+         <table style="width: 50%; align=center;">
             <tr>
-                <td width="25%"></td>
                 <td width="25%" align="center">
                     <input type="submit" value="Abschicken" class="btn btn-success btn-sm" />
                 </td>
@@ -96,7 +95,6 @@
                         </button>
                     </a>
                 </td>
-                <td width="25%"></td>
             </tr>
         </table>
      </form>
