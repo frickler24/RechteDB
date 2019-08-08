@@ -143,6 +143,7 @@ IMPORT_EXPORT_EXPORT_PERMISSION_CODE = 'add'
 # MDEditor-Settings
 MDEDITOR_CONFIGS = {
 	'default': {
+		'language' : 'de',
 		'width': '90% ',  # Custom edit box width
 		'heigth': 500,  # Custom edit box height
 		'toolbar': ["undo", "redo", "|",
@@ -167,7 +168,6 @@ MDEDITOR_CONFIGS = {
 		'sequence': True,  # Whether to open the sequence diagram function
 		'watch': True,  # Live preview
 		'lineWrapping': False,  # lineWrapping
-		'lineNumbers': False,  # lineNumbers
-		'language' : 'de'
+		'lineNumbers': True,  # lineNumbers
 	}
 }
