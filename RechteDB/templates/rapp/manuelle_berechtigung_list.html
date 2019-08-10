@@ -42,9 +42,10 @@
                             <th width="5%">Nummer</th>
                             <th width="10%">Name</th>
                             <th width="10%">Ersteller</th>
+                            <th width="10%">Verbundene AF</th>
                             <th width="10%">Letzte Änderung</th>
-                            <th width="30%">Statischer Inhalt</th>
-                            <th width="30%">Info je Benutzer</th>
+                            <th width="25%">Statischer Inhalt</th>
+                            <th width="25%">Info je Benutzer</th>
                         </tr>
                 </thead>
                 <tbody>
@@ -58,6 +59,7 @@
                             <td align="center"><a href="{% url 'manuell_update' man.id %}">{{ man.id }}</a></td>
                             <td> <a href="{% url 'manuell_update' man.id %}">{{ man.name }}</a></td>
                             <td>{{ man.ersteller }}</td>
+                            <td>{{ man.verbundene_af }}</td>
                             <td>{{ man.letzte_aenderung | date:"d. F Y" }}</td>
                             <td>{{ man.statisch }}</td>
                             <td>{{ man.relativ }}</td>
