@@ -11,12 +11,20 @@ from django.shortcuts import render, redirect
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.utils.encoding import smart_str
 import csv
+import copy
 
 from .filters import RollenFilter, UseridFilter
+from .xhtml2 import render_to_pdf
+
 from .views import version, pagination
 from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportForm_schritt3
-from .models import TblUserIDundName, TblGesamt, TblRollehataf, TblUserhatrolle, TblOrga
-from .xhtml2 import render_to_pdf
+from .models import TblUserIDundName
+from .models import TblGesamt
+from .models import TblRollehataf
+from .models import TblUserhatrolle
+from .models import TblOrga
+from .models import TblAfliste
+from .models import TblRollen
 # from django.contrib.auth.decorators import login_required
 # from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -65,12 +73,12 @@ class UhRCreate(CreateView):
 		print (url)
 		return url
 class UhRDelete(DeleteView):
-	"""Löscht die Zuordnung einer Rollen zu einem User."""
+	"""Löscht die Zuordnung einer Rolle zu einem User."""
 	model = TblUserhatrolle
 	template_name = 'rapp/uhr_confirm_delete.html'
 
-	# Im Erfolgsfall soll die vorherige Selektion im Panel "User und RolleN" wieder aktualisiert gezeigt werden.
-	# Dazu werden nebem dem URL-Stamm die Nummer des anzuzeigenden Users sowie die gesetzte Suchparameter benötigt.
+	# Nach dem Löschen soll die vorherige Selektion im Panel "User und Rollen" wieder aktualisiert gezeigt werden.
+	# Dazu werden nebem dem URL-Stamm die Nummer des anzuzeigenden Users sowie die gesetzten Suchparameter benötigt.
 	def get_success_url(self):
 		usernr = self.request.GET.get('user', "0") # Sicherheitshalber - falls mal kein User angegeben ist
 
@@ -202,8 +210,8 @@ def UhR_erzeuge_listen_mit_rollen(request):
 
 	# Hole erst mal die Menge an Rollen, die namentlich passen
 	suchstring = request.GET.get('rollenname', 'nix')
-	if suchstring == "*":
-		rollen_liste = TblUserhatrolle.objects.all().order_by('rollenname')
+	if suchstring == "*" or suchstring == "-":	# ToDo: Das ist ätzend, das ist doch factory-relevant!
+		rollen_liste = TblUserhatrolle.objects.all().order_by('rollenname').order_by('rollenname')
 	else:
 		rollen_liste = TblUserhatrolle.objects\
 			.filter(rollenname__rollenname__icontains = suchstring)\
@@ -382,35 +390,67 @@ def hole_af_mengen(userids, gesuchte_rolle):
 	:param userids: Dictionary mit Key = Name der Identität und val = Liste der UserIDs der Identität
 					(Beispiel: userids['Eichler, Lutz'] = ['XV13254])
 	:param gesuchte_rolle: Wenn None, suche nach allen Rollen, sonst filtere nach dem Suchstring (icontains).
+					Ist die geuchte Rolle "-", dann filtere nach unzugewiesenen AFen.
 					gesuchte_rolle wird als None übergeben, wenn der Suchstring "*" verwendet wurde
 	:return: af_dict{}[UserID] = AF[]
 
 	"""
 
-	such_af = set()
-	if gesuchte_rolle is None:
-		rollen_liste = TblRollehataf.objects.all()
+	if gesuchte_rolle is None or gesuchte_rolle == "-":
+		such_af = TblRollehataf.objects.all()\
+			.values('af__af_name')\
+			.distinct()\
+			.order_by('af__af_name')
 	else:
-		rollen_liste = TblRollehataf.objects.filter(rollenname__rollenname__icontains = gesuchte_rolle)
-
-	for rolle in rollen_liste: # Filtere mehrfach gefundene Elemente heraus (django hat kein echtes group by)
-		such_af.add(rolle.af)
+		such_af = TblRollehataf.objects\
+			.filter(rollenname__rollenname__icontains = gesuchte_rolle)\
+			.values('af__af_name')\
+			.distinct()\
+			.order_by('af__af_name')
 
 	af_dict = {}
 	for name in dict(userids):
-		for userid in userids[name]:
+		for userid in userids[name]: # Die erste UserID ist die XV-Nummer
 			if gesuchte_rolle is None: # Finde alle AFen zur UserID
 				af_liste = TblGesamt.objects.filter(userid_name_id__userid = userid).filter(geloescht = False)
+
+			elif gesuchte_rolle == "-":  # Finde alle AFen zur UserID, die nicht Rollen zugeordnet sind
+				bekannte_rollen = TblUserhatrolle.objects.filter(userid = userids[name][0]).values('rollenname')
+
+				suche_nach_none_wert(bekannte_rollen) # Irgendwelche Merkwürdigkeiten?
+				unerwuenschte_af = TblRollehataf.objects.filter(rollenname__in = bekannte_rollen)\
+					.exclude(af__af_name = None)\
+					.values('af__af_name')
+
+				af_liste = TblGesamt.objects.filter(userid_name_id__userid = userid)\
+					.filter(geloescht = False)\
+					.exclude(enthalten_in_af__in = unerwuenschte_af)
+					# ToDo: Hier könnte vielleicht auch ein values('enthalten_in_af') helfen, mit distinct()
 			else:
-				af_liste = TblGesamt.objects.filter(userid_name_id__userid = userid).\
-					filter(geloescht = False)\
+				af_liste = TblGesamt.objects.filter(userid_name_id__userid = userid)\
+					.filter(geloescht = False)\
 					.filter(enthalten_in_af__in = such_af)
 
 			af_menge = set([af.enthalten_in_af for af in af_liste])
 			af_dict[userid] = af_menge
 	return af_dict
 
-def UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle):
+def suche_nach_none_wert(bekannte_rollen):
+	"""
+	#Suche nach Einträgen in der Tabelle RolleHatAf, bei denen die AF None ist.
+	:param bekannte_rollen:
+	:return: True, wenn was gefunden wurde, sonst False
+	"""
+	none_af = TblRollehataf.objects.filter(rollenname__in=bekannte_rollen).filter(af__af_name=None)
+	if len(none_af) > 0:
+		print('WARNING: Möglicherweise Irritierende Resultate, weil None in Suchmenge enthalten ist:')
+		print('none_af:', len(none_af), none_af)
+		print('Der Wert wurde in dieser Abfrage herausgefiltert, kann aber an andere Stelle irritieren.')
+		print('Das entsteht, wenn als AF in einer Rolle "-----" selektiert wurde')
+		return True
+	return False
+
+def UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle = None):
 	"""
 	Finde alle UserIDs, die über die angegebene Rolle verfügen.
 	Wenn gesuchte_rolle is None, dann finde alle Rollen.
@@ -436,7 +476,6 @@ def UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle):
 	userids = {}
 	for name in namen_liste:
 		userids[name.name] = hole_userids_zum_namen(name.name)
-		# print ('UserIDs zum Namen {}: {}'.format(name.name, userids[name.name]))
 
 	af_dict = hole_af_mengen(userids, gesuchte_rolle)
 	(vorhanden, optional) = hole_rollen_zuordnungen(af_dict)
@@ -479,16 +518,21 @@ def panel_UhR_konzept_pdf(request):
 def panel_UhR_konzept(request):
 	return erzeuge_UhR_konzept(request, True)
 
+# Fabric für das Behandeln von Rollenzuordnungen
 class UhR(object):
 	def factory(typ):
 		if typ == 'einzel':
 			return EinzelUhr()
 		if typ == 'rolle':
 			return RollenListenUhr()
+		if typ == 'nur_neue':
+			return NeueListenUhr()
 		if typ == 'af':
 			return AFListenUhr()
 		assert 0, "Falsche Factory-Typ in Uhr: " + typ
 	factory = staticmethod(factory)
+
+# Ein einzelner User mmit siene UserID sund all sienen vergebenen Rollen
 class EinzelUhr(UhR):
 	def behandle(self, request, id):
 		"""
@@ -520,6 +564,8 @@ class EinzelUhr(UhR):
 			'version': version,
 		}
 		return render(request, 'rapp/panel_UhR.html', context)
+
+# Für alle selektierten Used und ihre IDs alle AFen und die dazugehörigen Rollen
 class RollenListenUhr(UhR):
 	def behandle(self, request, _):
 		"""
@@ -537,7 +583,8 @@ class RollenListenUhr(UhR):
 		if gesuchte_rolle == "*":	# Das ist die Wildcard-Suche, um den Modus in der Oberfläche auszuwählen
 			gesuchte_rolle = None
 
-		(userids, af_per_uid, vorhanden, optional) = UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle)
+		(userids, af_per_uid, vorhanden, optional) \
+			= UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle)
 
 		form = ShowUhRForm(request.GET)
 		context = {
@@ -550,9 +597,58 @@ class RollenListenUhr(UhR):
 			'version': version,
 		}
 		return render(request, 'rapp/panel_UhR_rolle.html', context)
+
+# FFU
 class AFListenUhr(UhR):
 	def behandle(self, request, id):
 		assert 0, 'Funktion AFListenUhr::behandle() ist noch nicht implementiert. Der Aufruf ist nicht valide.'
+
+# Für alle selktierten User und deren IDs alle AFen, die für die konkrete UserID nicht zu Rollen zugeordnet sind
+class NeueListenUhr(UhR):
+	def loesche_modellierte_AFen(vorhanden):
+		"""
+		Finde alle Key/Value-Paare, bei denen der Value nur aus einer Liste mit einem Leerstring besteht.
+		Das sind dann die AFen (mit der UserIDs zusammen bilden die den Key), nach denen wir suchen,
+		denn diese AFen haben keine zugeordneten Rollen für die UserID.
+		:param vorhanden: Das Dictionarym das gefiltert werden muss
+		:return: Ein Dictionary, bei dem alle Elemente als Value eine Liste mit einem Leerstring haben
+		"""
+		kopie = copy.deepcopy(vorhanden)
+		for key in kopie.keys():
+			val = kopie[key]
+			if val != ['']:
+				del vorhanden[key]
+		return vorhanden
+
+	def behandle(self, request, _):
+		"""
+		Diese Factory-Klasse selektiert zunächst alle AFen,
+		die für den jeweiligen User noch nicht mit einer Rolle belegt sind.
+
+		Darüber hinaus werden alle Optionen gesucht, die für die jeweiligen AFen gültig sind.
+
+		:param request: GET oder POST Request vom Browser
+		:param id: wird hier nicht verwendet, deshalb "_"
+		:return: Gerendertes HTML
+		"""
+		(namen_liste, panel_filter, rollen_liste, rollen_filter) =\
+			UhR_erzeuge_listen_mit_rollen(request)
+
+		(userids, af_per_uid, vorhanden, optional) \
+			= UhR_hole_rollengefilterte_daten(namen_liste, "-")
+
+		form = ShowUhRForm(request.GET)
+		context = {
+			'filter': panel_filter, 'form': form,
+			'rollen_liste': rollen_liste, 'rollen_filter': rollen_filter,
+			'userids': userids,
+			'af_per_uid': af_per_uid,
+			'vorhanden': vorhanden,
+			'nur_neue': True,
+			'optional': optional,
+			'version': version,
+		}
+		return render(request, 'rapp/panel_UhR_rolle.html', context)
 
 # Zeige das Selektionspanel
 def panel_UhR(request, id = 0):
@@ -570,12 +666,12 @@ def panel_UhR(request, id = 0):
 	assert request.method != 'POST', 'Irgendwas ist im panel_UhR über POST angekommen'
 	assert request.method == 'GET', 'Irgendwas ist im panel_UhR nicht über GET angekommen: ' + request.method
 
-	if 'afname' in request.GET.keys(): print (request.GET['afname'])
-
-	if request.GET.get('rollenname', None) != None and request.GET.get('rollenname', None) != "":
+	if request.GET.get('rollenname', None) != None and request.GET.get('rollenname', None) == "-":
+		name = 'nur_neue'
+	elif request.GET.get('rollenname', None) != None and request.GET.get('rollenname', None) != "":
 		name = 'rolle'
-	elif 'afname' in request.GET.keys() and request.GET['afname'] != None and request.GET['afname'] != "":
-		print ('Factory AF')
+	elif request.GET.get('afname', None) != None and request.GET.get('afname', None) != "":
+		print('Factory AF')
 		name = 'af'
 	else:
 		name = 'einzel'
