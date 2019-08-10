@@ -49,19 +49,23 @@
 										<td>{% ifchanged %}{{ uid }}{% endifchanged %}</td>
 										<td>{% ifchanged %}{{ af }}{% endifchanged %}</td>
 										<td>
-											{% for rolle in vorhanden|hash2:uid|hash3:af %}
-												{# Als letztes Element wird immer ein Leerstring geliefert! #}
-												{% if forloop.first and rolle == ""%}
-													<strong class="text-danger">nicht vergeben</strong>
-												{% endif %}
-												{% if not forloop.last %}
-													<a href="{% url 'user_rolle_af-delete' rolle|part1 %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&user={{ id }}">
-														<img src="{% static 'icons8-müll-50.png' %}" width="20rem" />
-													</a> {{ rolle|part2 }}<br />
-												{% endif %}
-											{% empty %}
-												Fehler im Datensatz
-											{% endfor vorhanden %}
+											{% if not nur_neue %}
+												{% for rolle in vorhanden|hash2:uid|hash3:af %}
+													{# Als letztes Element wird immer ein Leerstring geliefert! #}
+													{% if forloop.first and rolle == ""%}
+														<strong class="text-danger">nicht vergeben</strong>
+													{% endif %}
+													{% if not forloop.last %}
+														<a href="{% url 'user_rolle_af-delete' rolle|part1 %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&user={{ id }}">
+															<img src="{% static 'icons8-müll-50.png' %}" width="20rem" />
+														</a> {{ rolle|part2 }}<br />
+													{% endif %}
+												{% empty %}
+													Fehler im Datensatz
+												{% endfor vorhanden %}
+											{% else %}
+												<strong class="text-danger">nicht vergeben</strong>
+											{% endif %}
 										</td>
 										<td>
 											{% for rolle in optional|hash2:uid|hash3:af %}
@@ -79,7 +83,7 @@
 								<tr>
 									<td>{% ifchanged %}{{ name }}{% endifchanged %}</td>
 									<td>{% ifchanged %}{{ uid }}{% endifchanged %}</td>
-									<td>Keine AF zugewiesen</td>
+									<td>Keine AF zugewiesen oder durch Filter ausgeblendet</td>
 								</tr>
 							{% endfor af_per_uid %}
 						{% empty %}
