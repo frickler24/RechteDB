@@ -8,6 +8,7 @@
 		<link rel="stylesheet" href="{% static 'css/style.css' %}">
 		<link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}" />
 		<script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+
 	</head>
 	<body>
 		<nav class="navbar sticky-top navbar-expand-lg navbar-expand-xl navbar-dark bg-primary">
@@ -75,6 +76,7 @@
 							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownLists" role="button"
 							   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Listen</a>
 							<div class="dropdown-menu" aria-labelledby="navbarDropdownLists">
+								<a class="dropdown-item" href="{% url 'manuell_liste' %}">Manuelle Rechte</a>
 								<a class="dropdown-item" href="{% url 'userliste' %}">UserID-Liste</a>
 								<a class="dropdown-item" href="{% url 'teamliste' %}">Team-Liste</a>
 							</div>

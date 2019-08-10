@@ -35,16 +35,6 @@ class UhRCreate(CreateView):
 	# Entweder form-Angabe oder Field-Liste
 	form_class = CreateUhRForm
 	#fields = ['userid', 'rollenname', 'schwerpunkt_vertretung', 'bemerkung', ]
-	"""
-	initial = {
-		'userid': 'xv881P7'.upper(),
-		# 'rollenname': 'AI-BA Leitung',
-		'rollenname': 'Bereitstellung Host',
-		'schwerpunkt_vertretung': 'Vertretung',
-	}
-	print (initial)
-	"""
-
 
 	def get_form_kwargs(self):
 		"""
@@ -61,7 +51,6 @@ class UhRCreate(CreateView):
 		if 'schwerpunkt_vertretung' in self.kwargs:
 			kwargs['schwerpunkt_vertretung'] = self.kwargs['schwerpunkt_vertretung']
 		return kwargs
-
 
 	# Im Erfolgsfall soll die vorherige Selektion im Panel "User und Rollen" wieder aktualisiert gezeigt werden.
 	# Dazu werden nebem dem URL-Stamm die Nummer des anzuzeigenden Users sowie die gesetzte Suchparameter benötigt.
