@@ -390,7 +390,7 @@ def hole_af_mengen(userids, gesuchte_rolle):
 	:param userids: Dictionary mit Key = Name der Identität und val = Liste der UserIDs der Identität
 					(Beispiel: userids['Eichler, Lutz'] = ['XV13254])
 	:param gesuchte_rolle: Wenn None, suche nach allen Rollen, sonst filtere nach dem Suchstring (icontains).
-					Ist die geuchte Rolle "-", dann filtere nach unzugewiesenen AFen.
+					Ist die gesuchte Rolle "-", dann filtere nach unzugewiesenen AFen.
 					gesuchte_rolle wird als None übergeben, wenn der Suchstring "*" verwendet wurde
 	:return: af_dict{}[UserID] = AF[]
 
@@ -532,7 +532,7 @@ class UhR(object):
 		assert 0, "Falsche Factory-Typ in Uhr: " + typ
 	factory = staticmethod(factory)
 
-# Ein einzelner User mmit siene UserID sund all sienen vergebenen Rollen
+# Ein einzelner User mit seiner UserID und all seinen vergebenen Rollen
 class EinzelUhr(UhR):
 	def behandle(self, request, id):
 		"""
@@ -603,23 +603,8 @@ class AFListenUhr(UhR):
 	def behandle(self, request, id):
 		assert 0, 'Funktion AFListenUhr::behandle() ist noch nicht implementiert. Der Aufruf ist nicht valide.'
 
-# Für alle selktierten User und deren IDs alle AFen, die für die konkrete UserID nicht zu Rollen zugeordnet sind
+# Für alle selektierten User und deren IDs alle AFen, die für die konkrete UserID nicht zu Rollen zugeordnet sind
 class NeueListenUhr(UhR):
-	def loesche_modellierte_AFen(vorhanden):
-		"""
-		Finde alle Key/Value-Paare, bei denen der Value nur aus einer Liste mit einem Leerstring besteht.
-		Das sind dann die AFen (mit der UserIDs zusammen bilden die den Key), nach denen wir suchen,
-		denn diese AFen haben keine zugeordneten Rollen für die UserID.
-		:param vorhanden: Das Dictionarym das gefiltert werden muss
-		:return: Ein Dictionary, bei dem alle Elemente als Value eine Liste mit einem Leerstring haben
-		"""
-		kopie = copy.deepcopy(vorhanden)
-		for key in kopie.keys():
-			val = kopie[key]
-			if val != ['']:
-				del vorhanden[key]
-		return vorhanden
-
 	def behandle(self, request, _):
 		"""
 		Diese Factory-Klasse selektiert zunächst alle AFen,
