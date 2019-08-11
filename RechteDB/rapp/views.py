@@ -18,6 +18,7 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
+from django.utils import timezone
 from math import *
 
 from .filters import PanelFilter
@@ -199,7 +200,7 @@ class TblOrgaDelete(DeleteView):
 	success_url = reverse_lazy('teamliste')
 
 # Paginierung nach Tutorial - Aufteilung langer Seiten in mehrere
-def pagination(request, liste, psize=20):
+def pagination(request, liste, psize=10):
 	pagesize = request.GET.get('pagesize')
 	if type(pagesize) == type(None) or pagesize == '' or int(pagesize) < 1:
 		pagesize = psize  # default, kann man von außen übersteuern
@@ -229,7 +230,7 @@ def panel(request):
 	panel_filter = PanelFilter(request.GET, queryset=panel_list)
 	panel_list = panel_filter.qs
 
-	(paginator, pages, pagesize) = pagination(request, panel_list)
+	(paginator, pages, pagesize) = pagination(request, panel_list, psize=20)
 	context = {
 		'paginator': paginator,
 		'filter': panel_filter,
@@ -254,33 +255,71 @@ def panelDownload(request):
 	panel_filter = PanelFilter(request.GET, queryset=panel_list)
 	panel_list = panel_filter.qs
 
-	(paginator, pages, pagesize) = pagination(request, panel_list, 100000)
-	context = {
-		'paginator': paginator,
-		'filter': panel_filter,
-		'pages': pages,
-		'meineTabelle': panel_list,
-		'pagesize': pagesize,
-	}
-	f = PanelFilter(request.GET, queryset=TblGesamt.objects.all())
+	dateiname = "gesamt_" + timezone.now().strftime("%Y-%m-%d-%H-%M") + ".csv"
+	response = HttpResponse(content_type="text/tsv")
+	response['Content-Disposition'] = 'attachment; filename='+dateiname
+	response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
 
-	response = HttpResponse(content_type="text/csv")
-	response['Content-Disposition'] = 'attachment; filename="gesamt.csv"' # ToDo Hänge Datum an Dateinamen an
-
-	writer = csv.writer(response, delimiter = ';', quotechar = '"')
+	writer = csv.writer(response, delimiter = '\t', quotechar = '"')
 	writer.writerow([
-		'tf', 'tf_beschreibung',
-		'enthalten_in_af',
-		'name', 'userid', 'team',
-		'name_af_neu', 'name_gf_neu'
+		'Name',
+		'Team',
+		'TF',
+		'TF Beschreibung',
+		'AF',
+
+		'GF',
+		'gf_beschreibung',
+		'ZI-Orga',
+		'Plattform',
+		'AF Neu',
+
+		'GF Neu',
+		'TF Kritikalität',
+		'Recht aktiv',
+		'User aktiv',
+		'loeschdatum',
+
+		'af_gueltig_ab',
+		'af_gueltig_bis',
+		'direct_connect',
+		'af_zuweisungsdatum',
+		'tf_eigentuemer_org',
+
+		'gefunden',
+		'wiedergefunden',
+		'letzte_aenderung'
 	])
 
-	for obj in pages:
+	for obj in panel_list:
 		writer.writerow([
-			obj.tf, obj.tf_beschreibung,
+			obj.userid_name.name,
+			obj.userid_name.orga.team,
+			obj.tf,
+			obj.tf_beschreibung,
 			obj.enthalten_in_af,
-			obj.userid_name.name, obj.userid_name.userid, obj.userid_name.zi_organisation,
-			obj.modell.name_af_neu, obj.modell.name_gf_neu
+
+			obj.gf,
+			obj.gf_beschreibung,
+			obj.userid_name.zi_organisation,
+			obj.plattform.tf_technische_plattform,
+			obj.modell.name_af_neu,
+
+			obj.modell.name_gf_neu,
+			obj.tf_kritikalitaet,
+			not obj.geloescht,
+			not obj.userid_name.geloescht,
+			obj.loeschdatum,
+
+			obj.af_gueltig_ab,
+			obj.af_gueltig_bis,
+			obj.direct_connect,
+			obj.af_zuweisungsdatum,
+			obj.tf_eigentuemer_org,
+
+			not not obj.gefunden,
+			obj.wiedergefunden,
+			obj.letzte_aenderung,
 		])
 
 	return response

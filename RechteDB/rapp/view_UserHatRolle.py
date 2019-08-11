@@ -686,8 +686,6 @@ def	erzeuge_UhR_konzept(request, ansicht):
 	else:
 		(rollenMenge, userids, usernamen) = (set(), set(), set())
 
-	(paginator, pages, pagesize) = pagination(request, namen_liste)
-
 	if request.GET.get('display') == '1':
 			print('rollenMenge')
 			print(rollenMenge)
@@ -701,7 +699,6 @@ def	erzeuge_UhR_konzept(request, ansicht):
 				print(a)
 
 	context = {
-		'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
 		'filter': panel_filter,
 		'rollenMenge': rollenMenge,
 		'version': version,
@@ -773,7 +770,6 @@ def erzeuge_UhR_matrixdaten(panel_liste):
 def panel_UhR_matrix(request):
 	"""
 	Erzeuge eine Verantwortungsmatrix für eine Menge an selektierten Identitäten.
-
 	:param request: GET Request vom Browser
 	:return: Gerendertes HTML
 	"""
@@ -811,6 +807,20 @@ def panel_UhR_matrix(request):
 	}
 	return render(request, 'rapp/panel_UhR_matrix.html', context)
 
+def string_aus_liste(liste):
+	"""
+	Erzeugt einen String, der alle Listenelemmente der Parameters Kommma-getrennt enthält
+	:param liste: Eine Liste mit Strings, bspw. ['abc', 'def']
+	:return: String mmit den Inhalten, getrennt durch ', ': "abc, def"
+	"""
+	res = ""
+	for s in liste:
+		if (res == ""):
+			res = s
+		else:
+			res += (", " + s)
+	return res
+
 def panel_UhR_matrix_csv(request, flag = False):
 	"""
 	Exportfunktion für das Filter-Panel zum Selektieren aus der "User und Rollen"-Tabelle).
@@ -821,22 +831,22 @@ def panel_UhR_matrix_csv(request, flag = False):
 	if request.method != 'GET':
 		return HttpResponse("Fehlerhafte CSV-Generierung in panel_UhR_matrix_csv")
 
-	(namen_liste, panel_filter) = UhR_erzeuge_listen(request)
-	(usernamen, rollenmenge, rollen_je_username, _) = erzeuge_UhR_matrixdaten(namen_liste) # Ignoriere teamliste im PDF
+	(namen_liste, _) = UhR_erzeuge_listen(request)
+	(usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(namen_liste)
 
-	response = HttpResponse(content_type="text/csv")
+	response = HttpResponse(content_type="text/tsv")
 	response['Content-Disposition'] = 'attachment; filename="matrix.csv"' # ToDo Hänge Datum an Dateinamen an
 	response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
 
-	headline = [smart_str(u'Name')]
+	headline = [smart_str(u'Name')] + [smart_str(u'Teams')]
 	for r in rollenmenge:
 		headline += [smart_str(r.rollenname)]
 
-	writer = csv.writer(response, csv.excel, delimiter = ',', quotechar = '"')
+	writer = csv.writer(response, csv.excel, delimiter = '\t', quotechar = '"')
 	writer.writerow(headline)
 
 	for user in usernamen:
-		line = [user]
+		line = [user] + [smart_str(string_aus_liste(teams_je_username[user]))]
 		for rolle in rollenmenge:
 			if flag:
 				wert = finde(rollen_je_username[user], rolle)
@@ -879,7 +889,7 @@ def panel_UhR_af_export(request, id):
 		'version': version,
 	}
 	"""
-	response = HttpResponse(content_type="text/csv")
+	response = HttpResponse(content_type="text/tsv")
 	response['Content-Disposition'] = 'attachment; filename="rollen.csv"'
 	response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
 
@@ -892,7 +902,7 @@ def panel_UhR_af_export(request, id):
 	for userid in selektierte_userids:
 		headline.append(smart_str(userid))
 
-	writer = csv.writer(response, csv.excel, delimiter = ',', quotechar = '"')
+	writer = csv.writer(response, csv.excel, delimiter = '\t', quotechar = '"')
 	writer.writerow(headline)
 
 	for rolle in userHatRolle_liste:
