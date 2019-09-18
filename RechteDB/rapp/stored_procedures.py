@@ -1229,7 +1229,7 @@ def anzahl_procs():
 			print('Error in finde_procs(): {}'.format(e))
 
 		cursor.close()
-		return anzahl
+	return anzahl
 
 def finde_procs():
 	finde_procs_exakt()
@@ -1251,7 +1251,7 @@ sps = {
 }
 
 def soll_procs():
-	return len(sps)
+	return len(sps) + 1 # ToDo Das wird nur gebraucht wegen der manuell eingespielten SP
 
 @login_required
 def handle_stored_procedures(request):

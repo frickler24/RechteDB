@@ -666,7 +666,7 @@ def panel_UhR(request, id = 0):
 
 def erzeuge_pdf_namen(request):
 	zeit = str(timezone.now())[:10]
-	return 'Berechtigungskonzept_{}_{}.pdf'.format(zeit, request.GET.get('gruppe', ''))
+	return 'Rollenkonzept_{}_{}.pdf'.format(zeit, request.GET.get('gruppe', ''))
 
 # Erzeuge das Berechtigungskonzept für Anzeige und PDF
 def	erzeuge_UhR_konzept(request, ansicht):
