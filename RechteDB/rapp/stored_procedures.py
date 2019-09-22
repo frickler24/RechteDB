@@ -1216,6 +1216,160 @@ END
 """
 	return push_sp ('ueberschreibeModelle', sp, procs_schon_geladen)
 
+def push_sp_directConnects(procs_schon_geladen):
+	sp = """
+CREATE PROCEDURE directConnects()
+-- ----------------------------------------
+--
+-- Suche nach Direct Connections innerhalb der Abteilung
+--
+-- ----------------------------------------
+-- ----------------------------------------
+-- ----------------------------------------
+-- ----------------------------------------
+
+
+-- Teil 1: Finde alle aktiven Direct Connects der Abteilung,
+-- die nicht zu SAP gehören
+-- und die nicht zu Test-CICS gehören
+BEGIN
+    DROP TABLE IF EXISTS dircon_dircons;
+    CREATE TABLE dircon_dircons
+    SELECT
+        tblUserIDundName.userid,
+        tblUserIDundName.name,
+        tblUserIDundName.gruppe,
+        tblPlattform.tf_technische_plattform as `Plattform`,
+        tblGesamt.tf,
+        tblGesamt.tf_beschreibung,
+        tblGesamt.tf_kritikalitaet,
+        tblGesamt.tf_eigentuemer_org,
+        tblGesamt.af_gueltig_ab,
+        tblGesamt.af_gueltig_bis,
+        tblGesamt.direct_connect,
+        tblGesamt.af_zuweisungsdatum
+
+    FROM `tblGesamt`
+        INNER JOIN tblUserIDundName
+            ON tblGesamt.userid_und_name_id = tblUserIDundName.id
+        INNER JOIN tblPlattform
+            ON tblGesamt.plattform_id = tblPlattform.id
+
+    WHERE NOT tblGesamt.geloescht
+        AND NOT tblUserIDundName.geloescht
+        AND tblGesamt.direct_connect = "ja"
+        AND tblPlattform.tf_technische_plattform NOT LIKE "%test%"
+        AND tblPlattform.tf_technische_plattform NOT LIKE "CICS - T"
+        AND tblPlattform.tf_technische_plattform NOT LIKE "%SAP%"
+
+    ORDER BY tblUserIDundName.name, tblUserIDundName.userid, tblGesamt.tf
+    ;
+
+    -- Teil 2: Zeige zu allen AFs die Anzahl der darin befindlichen TFs
+
+    -- Hole erst mal alle Kombinationen aus AF, TF und Plattform.
+    DROP TABLE IF EXISTS dircon_aftfplatt;
+    CREATE TABLE dircon_aftfplatt
+    SELECT
+        tblGesamt.enthalten_in_af as af,
+        tblGesamt.tf as tf,
+        tblPlattform.tf_technische_plattform as plattform,
+        0 as Anzahl
+
+    FROM `tblGesamt`
+        INNER JOIN tblUserIDundName
+            ON tblGesamt.userid_und_name_id = tblUserIDundName.id
+        INNER JOIN tblPlattform
+            ON tblGesamt.plattform_id = tblPlattform.id
+
+    WHERE tblGesamt.enthalten_in_af != "ka"
+        AND tblGesamt.enthalten_in_af != "AV"
+        AND tblGesamt.enthalten_in_af != "XV"
+        AND tblGesamt.enthalten_in_af != "DV"
+
+    GROUP BY tblGesamt.enthalten_in_af, tblGesamt.tf
+    ORDER BY tf, plattform, af
+    ;
+
+    -- Zähle die TFs, die zu einer AF gehören
+    DROP TABLE IF EXISTS dircon_numtfs;
+    CREATE TABLE dircon_numtfs
+    SELECT
+        af,
+        count(tf) as `Anzahl`
+    FROM dircon_aftfplatt
+    GROUP BY af
+    ORDER BY Anzahl ASC
+    ;
+
+    -- Und ergänze die Anzahl in der aftfplatt
+
+    UPDATE dircon_aftfplatt
+        INNER JOIN dircon_numtfs
+            ON dircon_aftfplatt.AF = dircon_numtfs.AF
+    SET dircon_aftfplatt.Anzahl = dircon_numtfs.Anzahl
+    ;
+
+    -- Teil 3: Verbinde die Informationen geeignet für die TFen, die es in der AF-Liste gibt
+
+    DROP TABLE IF EXISTS dircon_vorschlagsliste;
+    CREATE TABLE dircon_vorschlagsliste
+    SELECT     dircon_dircons.`name`,
+        dircon_dircons.`userid`,
+        dircon_dircons.`gruppe`,
+        dircon_dircons.`tf`,
+        dircon_dircons.`Plattform`,
+        dircon_dircons.`tf_beschreibung`,
+        "   " as leerfeld,
+        dircon_aftfplatt.af as 'Vorschlag für AF',
+        dircon_aftfplatt.Anzahl as 'Anzahl TFen in AF'
+
+    FROM `dircon_dircons`
+       INNER JOIN dircon_aftfplatt
+          ON dircon_dircons.tf = dircon_aftfplatt.tf
+             AND dircon_dircons.Plattform = dircon_aftfplatt.plattform
+
+    ORDER BY
+        dircon_dircons.`gruppe`,
+        dircon_dircons.`name`,
+        dircon_dircons.`userid`,
+        dircon_dircons.`tf`,
+        dircon_dircons.`Plattform`
+    ;
+
+
+    -- Teil 4: Finde die TFen, die es NICHT in der AF-Liste gibt
+
+    DROP TABLE IF EXISTS dircon_nichtModelliert;
+    CREATE TABLE dircon_nichtModelliert
+    SELECT     dircon_dircons.`name`,
+        dircon_dircons.`userid`,
+        dircon_dircons.`gruppe`,
+        dircon_dircons.`tf`,
+        dircon_dircons.`Plattform`,
+        dircon_dircons.`tf_beschreibung`,
+        "   " as leerfeld,
+        dircon_aftfplatt.af as 'Vorschlag für AF',
+        dircon_aftfplatt.Anzahl as 'Anzahl TFen in AF'
+
+    FROM `dircon_dircons`
+        LEFT JOIN dircon_aftfplatt
+        ON dircon_dircons.tf = dircon_aftfplatt.tf
+            AND dircon_dircons.Plattform = dircon_aftfplatt.plattform
+
+    WHERE dircon_aftfplatt.af is null
+    ORDER BY
+        dircon_dircons.`gruppe`,
+        dircon_dircons.`name`,
+        dircon_dircons.`userid`,
+        dircon_dircons.`tf`,
+        dircon_dircons.`Plattform`
+    ;
+END
+"""
+	return push_sp ('directConnects', sp, procs_schon_geladen)
+
+
 # Suche nach Stored Procedures in der aktuellen Datenbank
 # return: Anzahl an derzeit geladenen Stored Procedures
 def anzahl_procs():
@@ -1248,10 +1402,11 @@ sps = {
 	7: push_sp_nichtai,
 	8: push_sp_macheAFListe,
 	9: push_sp_ueberschreibeModelle,
+	10: push_sp_directConnects,
 }
 
 def soll_procs():
-	return len(sps) + 1 # ToDo Das wird nur gebraucht wegen der manuell eingespielten SP
+	return len(sps)
 
 @login_required
 def handle_stored_procedures(request):
@@ -1271,6 +1426,7 @@ def handle_stored_procedures(request):
 		daten['setzeNichtAIFlag'] 		= sps[7](procs_schon_geladen) # Falls die Funktion jemals wieder benötigt wird
 		daten['erzeuge_af_liste'] 		= sps[8](procs_schon_geladen)
 		daten['ueberschreibeModelle'] 	= sps[9](procs_schon_geladen)
+		daten['directConnects'] 		= sps[10](procs_schon_geladen)
 
 		"""
 		daten['anzahl_import_elemente'] = push_sp_test(procs_schon_geladen)
