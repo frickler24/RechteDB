@@ -12,27 +12,27 @@ from .models import Manuelle_Berechtigung
 # from .forms import ManuellForm
 
 class Manuelle_BerechtigungCreate(CreateView):
-	"""Neue manuell behandelte Berechtigung erstellen"""
-	model = Manuelle_Berechtigung
-	fields = '__all__'
-	initial = {'letzte_aenderung' : timezone.now(),}
-	success_url = reverse_lazy('manuell_liste')
+    """Neue manuell behandelte Berechtigung erstellen"""
+    model = Manuelle_Berechtigung
+    fields = '__all__'
+    initial = {'letzte_aenderung' : timezone.now(),}
+    success_url = reverse_lazy('manuell_liste')
 
 class Manuelle_BerechtigungUpdate(UpdateView):
-	"""Manuell behandelte Berechtigung ändern"""
-	model = Manuelle_Berechtigung
-	fields = '__all__'
-	initial = {'letzte_aenderung': timezone.now(), }
-	success_url = reverse_lazy('manuell_liste')
+    """Manuell behandelte Berechtigung ändern"""
+    model = Manuelle_Berechtigung
+    fields = '__all__'
+    initial = {'letzte_aenderung': timezone.now(), }
+    success_url = reverse_lazy('manuell_liste')
 
 class Manuelle_BerechtigungDelete(DeleteView):
-	"""Manuell behandelte Berechtigung löschen"""
-	model = Manuelle_Berechtigung
-	fields = '__all__'
-	initial = {'letzte_aenderung': timezone.now(), }
-	success_url = reverse_lazy('manuell_liste')
+    """Manuell behandelte Berechtigung löschen"""
+    model = Manuelle_Berechtigung
+    fields = '__all__'
+    initial = {'letzte_aenderung': timezone.now(), }
+    success_url = reverse_lazy('manuell_liste')
 
 class Manuelle_BerechtigungListe(ListView):
-	"""Manuell behandelte Berechtigung löschen"""
-	model = Manuelle_Berechtigung
-	fields = '__all__'
+    """Manuell behandelte Berechtigung löschen"""
+    model = Manuelle_Berechtigung
+    fields = '__all__'
