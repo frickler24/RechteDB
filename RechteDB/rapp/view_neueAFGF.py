@@ -51,7 +51,7 @@ def bedingung():
 			AND NOT tblUserIDundName.geloescht
 			AND NOT tblGesamt.enthalten_in_af = "ka"
 			AND tblUEbersichtAF_GFs.name_af_neu is null
-			AND tblUserIDundName.zi_organisation = "AI-BA"
+			-- AND tblUserIDundName.zi_organisation = "AI-BA"
 	"""
 	return where
 
