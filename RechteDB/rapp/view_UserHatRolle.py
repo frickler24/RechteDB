@@ -668,7 +668,7 @@ def erzeuge_pdf_namen(request):
     return 'Rollenkonzept_{}_{}.pdf'.format(zeit, request.GET.get('gruppe', ''))
 
 # Erzeuge das Berechtigungskonzept für Anzeige und PDF
-def    erzeuge_UhR_konzept(request, ansicht):
+def erzeuge_UhR_konzept(request, ansicht):
     """
     Erzeuge das Berechtigungskonzept für eine Menge an selektierten Identitäten.
 
@@ -741,9 +741,8 @@ def erzeuge_UhR_matrixdaten(panel_liste):
     for row in panel_liste:
         usernamen.add(row.name)
         teamliste = TblOrga.objects\
-            .filter(tbluseridundname__name = row.name) \
-            .exclude(tbluseridundname__geloescht = False) \
-            .exclude(team = "Gelöschter User") # Die als gelöscht markierten User werden nicht mehr angezeigt
+            .filter(tbluseridundname__name=row.name, tbluseridundname__geloescht=False) \
+            .exclude(team="Gelöschter User") # Die als gelöscht markierten User werden nicht mehr angezeigt
 
         teammenge = set()
         for team in teamliste:
@@ -764,8 +763,13 @@ def erzeuge_UhR_matrixdaten(panel_liste):
             rollen_je_username[row.name].add(info)
             rollenmenge.add(rolle.rollenname)
 
-    def order(a): return a.rollenname.lower()     # Liefert das kleingeschriebene Element, nach dem sortiert werden soll
+    def order(a):
+        return a.rollenname.lower()  # Liefert das kleingeschriebene Element, nach dem sortiert werden soll
     return (sorted(usernamen), sorted(list(rollenmenge), key=order), rollen_je_username, teams_je_username)
+
+
+
+
 
 def panel_UhR_matrix(request):
     """
