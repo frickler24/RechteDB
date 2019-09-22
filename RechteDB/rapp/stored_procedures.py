@@ -11,52 +11,52 @@ from django.contrib.auth.decorators import login_required
 
 
 def push_sp(name, sp, procs_schon_geladen):
-	"""
-	Speichere eine als Parameter übergebene Stored Procedure
+    """
+    Speichere eine als Parameter übergebene Stored Procedure
 
-	:param name: Name der zu löschenden Stored_Procedure
-	:param sp: Die Stored Procedure, die gespeichert werden soll (SQL-Mengen-String)
-	:return: Fehler (False = kein Fehler)
-	"""
-	# ToDo Das Löschen wirft Warnings im MySQL-Treiber, wenn die SP gar nicht existiert. -> Liste lesen und checken
-	fehler = False
-	loeschstring = 'DROP PROCEDURE IF EXISTS {}'.format(name)
-	with connection.cursor() as cursor:
-		try:
-			if procs_schon_geladen:
-				cursor.execute (loeschstring)
-			cursor.execute (sp)
-		except:
-			e = sys.exc_info()[0]
-			fehler = 'Error in push_sp(): {}'.format(e)
+    :param name: Name der zu löschenden Stored_Procedure
+    :param sp: Die Stored Procedure, die gespeichert werden soll (SQL-Mengen-String)
+    :return: Fehler (False = kein Fehler)
+    """
+    # ToDo Das Löschen wirft Warnings im MySQL-Treiber, wenn die SP gar nicht existiert. -> Liste lesen und checken
+    fehler = False
+    loeschstring = 'DROP PROCEDURE IF EXISTS {}'.format(name)
+    with connection.cursor() as cursor:
+        try:
+            if procs_schon_geladen:
+                cursor.execute (loeschstring)
+            cursor.execute (sp)
+        except:
+            e = sys.exc_info()[0]
+            fehler = 'Error in push_sp(): {}'.format(e)
 
-		cursor.close()
-		return fehler
+        cursor.close()
+        return fehler
 
 def push_sp_test(procs_schon_geladen):
-	sp = """
+    sp = """
 CREATE PROCEDURE anzahl_import_elemente()
 BEGIN
   SELECT COUNT(*) FROM `tblRechteNeuVonImport`;
 END
 """
-	return push_sp ('anzahl_import_elemente', sp, procs_schon_geladen)
+    return push_sp ('anzahl_import_elemente', sp, procs_schon_geladen)
 
 def call_sp_test():
-	fehler = False
-	with connection.cursor() as cursor:
-		try:
-			cursor.execute ("CALL anzahl_import_elemente")
-			liste = cursor.fetchone()
-		except:
-			e = sys.exc_info()[0]
-			fehler = 'Error: {}'.format(e)
+    fehler = False
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute ("CALL anzahl_import_elemente")
+            liste = cursor.fetchone()
+        except:
+            e = sys.exc_info()[0]
+            fehler = 'Error: {}'.format(e)
 
-		cursor.close()
-		return fehler or not liste[0] >= 0
+        cursor.close()
+        return fehler or not liste[0] >= 0
 
 def push_sp_vorbereitung(procs_schon_geladen):
-	sp = """
+    sp = """
 create procedure vorbereitung()
 BEGIN
     /*
@@ -129,23 +129,23 @@ BEGIN
         (> 1% der Zeilen werden aus IIQ doppelt geliefert)
     */
     create temporary table qryF3_RechteNeuVonImportDuplikatfrei as
-        SELECT `AF zugewiesen an Account-name` 		AS userid,
-               CONCAT(`Nachname`,', ',`Vorname`) 	AS name,
-               `tf name` 							AS tf,
-               `tf beschreibung` 					AS tf_beschreibung,
-               `AF Anzeigename` 					AS enthalten_in_af,
-               `tf kritikalität` 					AS tf_kritikalitaet,
-               `tf eigentümer org` 					AS tf_eigentuemer_org,
-               `tf Applikation` 					AS tf_technische_plattform,
-               `GF name` 							AS GF,
-               'gibt es nicht mehr' 				AS vip,
-               'gibt es nicht mehr'					AS zufallsgenerator,
-               `af gültig ab`						AS af_gueltig_ab,
-               `af gültig bis`						AS af_gueltig_bis,
-               `direct connect`						AS direct_connect,
-               `höchste kritikalität tf in af`		AS hk_tf_in_af,
-               `gf beschreibung`					AS gf_beschreibung,
-               `af zuweisungsdatum`					AS af_zuweisungsdatum
+        SELECT `AF zugewiesen an Account-name`         AS userid,
+               CONCAT(`Nachname`,', ',`Vorname`)     AS name,
+               `tf name`                             AS tf,
+               `tf beschreibung`                     AS tf_beschreibung,
+               `AF Anzeigename`                     AS enthalten_in_af,
+               `tf kritikalität`                     AS tf_kritikalitaet,
+               `tf eigentümer org`                     AS tf_eigentuemer_org,
+               `tf Applikation`                     AS tf_technische_plattform,
+               `GF name`                             AS GF,
+               'gibt es nicht mehr'                 AS vip,
+               'gibt es nicht mehr'                    AS zufallsgenerator,
+               `af gültig ab`                        AS af_gueltig_ab,
+               `af gültig bis`                        AS af_gueltig_bis,
+               `direct connect`                        AS direct_connect,
+               `höchste kritikalität tf in af`        AS hk_tf_in_af,
+               `gf beschreibung`                    AS gf_beschreibung,
+               `af zuweisungsdatum`                    AS af_zuweisungsdatum
         FROM tblRechteNeuVonImport
         GROUP BY `userid`,
                  `tf`,
@@ -232,10 +232,10 @@ BEGIN
     */
 END
 """
-	return push_sp ('vorbereitung', sp, procs_schon_geladen)
+    return push_sp ('vorbereitung', sp, procs_schon_geladen)
 
 def push_sp_neueUser(procs_schon_geladen):
-	sp = """
+    sp = """
 create procedure neueUser (IN orga char(32))
 BEGIN
 
@@ -256,7 +256,7 @@ BEGIN
         die in der Importliste auftauchen und
             die nicht in der User-Tabelle auftauchen (die beiden ersten Zeilen im WHERE), oder
             die in der User-Tabelle vorhanden, aber auf "geloescht" gesetzt sind (dritte Zeile im WHERE),
-	    Dabei wird die3 Team-Zuordnung "neu" mit der konstanten Nummer 35 eingetragen.
+        Dabei wird die3 Team-Zuordnung "neu" mit der konstanten Nummer 35 eingetragen.
         Der Vergleich erfolgt sowohl über über name als auch userid,
         damit auch erneut vergebene useriden auffallen.
 
@@ -325,17 +325,17 @@ BEGIN
     ;
 END
 """
-	return push_sp ('neueUser', sp, procs_schon_geladen)
+    return push_sp ('neueUser', sp, procs_schon_geladen)
 
 def push_sp_behandleUser(procs_schon_geladen):
-	sp = """
+    sp = """
 create procedure behandleUser ()
 BEGIN
 
-	/*
-		Merke die als gelöscht markierten User in einer temoprären Tabelle,
-		damit imm nächsten SAchritt das Join schnell funktioniert.
-	*/
+    /*
+        Merke die als gelöscht markierten User in einer temoprären Tabelle,
+        damit imm nächsten SAchritt das Join schnell funktioniert.
+    */
     create temporary table tbl_tmpGeloeschte as
         SELECT userid1
             FROM qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a
@@ -370,7 +370,7 @@ BEGIN
     */
     INSERT INTO tblUserIDundName (userid, name, orga_id, `zi_organisation`, geloescht, gruppe, abteilung )
         SELECT userid1, name1, Ausdr1 AS orga_id, Ausdr2 AS `zi_organisation`, 
-        		False AS geloescht, "" as gruppe, "" as abteilung
+                False AS geloescht, "" as gruppe, "" as abteilung
             FROM qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a
             WHERE COALESCE(`geloescht`, FALSE) = FALSE
                 AND (userid1 IS NOT NULL OR name1 IS NOT NULL);
@@ -423,7 +423,7 @@ BEGIN
         INNER JOIN (tblUserIDundName
                     inner join qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
                     on qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a.userid = tblUserIDundName.userid)
-	        ON tblGesamt.`userid_und_name_id` = tblUserIDundName.id
+            ON tblGesamt.`userid_und_name_id` = tblUserIDundName.id
         SET tblGesamt.geloescht = TRUE,
             tblGesamt.`loeschdatum` = Now()
         WHERE COALESCE(tblGesamt.`geloescht`, FALSE) = FALSE;
@@ -440,10 +440,10 @@ BEGIN
 
 END
 """
-	return push_sp ('behandleUser', sp, procs_schon_geladen)
+    return push_sp ('behandleUser', sp, procs_schon_geladen)
 
 def push_sp_behandleRechte(procs_schon_geladen):
-	sp = """
+    sp = """
 create procedure behandleRechte (IN orga char(32))
 BEGIN
 
@@ -504,11 +504,11 @@ BEGIN
     */
 
     drop table if exists tbl_Gesamt_komplett;
-	create temporary table uids as
-		select distinct userid as uid from tblRechteAMNeu;
+    create temporary table uids as
+        select distinct userid as uid from tblRechteAMNeu;
 
     create table tbl_Gesamt_komplett as
-		SELECT tblGesamt.id,
+        SELECT tblGesamt.id,
                tblUserIDundName.userid,
                tblUserIDundName.name,
                tblGesamt.tf,
@@ -942,10 +942,10 @@ BEGIN
 */
 END
 """
-	return push_sp ('behandleRechte', sp, procs_schon_geladen)
+    return push_sp ('behandleRechte', sp, procs_schon_geladen)
 
 def push_sp_loescheDoppelteRechte(procs_schon_geladen):
-	sp = """
+    sp = """
 create procedure loescheDoppelteRechte (IN nurLesen bool)
 BEGIN
     /*
@@ -988,19 +988,19 @@ BEGIN
         select count(*) from qryF3_DoppelteElementeFilterAusGesamtTabelle;
     ELSE
         UPDATE tblGesamt
-        	INNER JOIN qryF3_DoppelteElementeFilterAusGesamtTabelle
+            INNER JOIN qryF3_DoppelteElementeFilterAusGesamtTabelle
             ON tblGesamt.id = qryF3_DoppelteElementeFilterAusGesamtTabelle.id
             
             SET tblGesamt.geloescht = True,
-	            tblGesamt.patchdatum = Now()
-			WHERE COALESCE(tblGesamt.geloescht, FALSE) = False;
+                tblGesamt.patchdatum = Now()
+            WHERE COALESCE(tblGesamt.geloescht, FALSE) = False;
     END IF;
 END
 """
-	return push_sp ('loescheDoppelteRechte', sp, procs_schon_geladen)
+    return push_sp ('loescheDoppelteRechte', sp, procs_schon_geladen)
 
 def push_sp_nichtai(procs_schon_geladen):
-	sp = """
+    sp = """
 create procedure setzeNichtAIFlag()
 BEGIN
 
@@ -1162,10 +1162,10 @@ BEGIN
 
 END
 """
-	return push_sp ('setzeNichtAIFlag', sp, procs_schon_geladen)
+    return push_sp ('setzeNichtAIFlag', sp, procs_schon_geladen)
 
 def push_sp_macheAFListe(procs_schon_geladen):
-	sp = """
+    sp = """
 CREATE PROCEDURE erzeuge_af_liste()
 BEGIN
     /*
@@ -1179,10 +1179,10 @@ BEGIN
         GROUP BY tblUEbersichtAF_GFs.`name_af_neu`;
 END
 """
-	return push_sp ('erzeuge_af_liste', sp, procs_schon_geladen)
+    return push_sp ('erzeuge_af_liste', sp, procs_schon_geladen)
 
 def push_sp_ueberschreibeModelle(procs_schon_geladen):
-	sp = """
+    sp = """
 CREATE PROCEDURE ueberschreibeModelle()
 BEGIN
     /*
@@ -1193,31 +1193,31 @@ BEGIN
           und diese Kombination ehemals mit einem manuellen Modell versehen worden ist
         - wenn eine Rechteliste neeu eingelesen wird und der Importer versucht, unnötig intelligent zu sein
 
-		In Access heißt die Query qryModellNichtGF_AF.
+        In Access heißt die Query qryModellNichtGF_AF.
     */
-	CREATE TEMPORARY TABLE auchBloed
-	  SELECT 	
-	  		tblGesamt.id as diffID,
-			tblGesamt.modell as gewaehltes_Modell,
-			tblUEbersichtAF_GFs.id as freigegebenes_Modell
-	  FROM `tblGesamt`
-		INNER JOIN tblUEbersichtAF_GFs
-		ON (
-			tblUEbersichtAF_GFs.name_af_neu = tblGesamt.enthalten_in_af
-			AND tblUEbersichtAF_GFs.name_gf_neu = tblGesamt.gf
-		)
-	  WHERE tblGesamt.modell <> tblUEbersichtAF_GFs.id;
+    CREATE TEMPORARY TABLE auchBloed
+      SELECT     
+              tblGesamt.id as diffID,
+            tblGesamt.modell as gewaehltes_Modell,
+            tblUEbersichtAF_GFs.id as freigegebenes_Modell
+      FROM `tblGesamt`
+        INNER JOIN tblUEbersichtAF_GFs
+        ON (
+            tblUEbersichtAF_GFs.name_af_neu = tblGesamt.enthalten_in_af
+            AND tblUEbersichtAF_GFs.name_gf_neu = tblGesamt.gf
+        )
+      WHERE tblGesamt.modell <> tblUEbersichtAF_GFs.id;
 
-	UPDATE 	tblGesamt
-		INNER JOIN auchBloed
-		ON tblGesamt.id = auchBloed.diffID
-	SET tblGesamt.modell = auchBloed.freigegebenes_Modell;
+    UPDATE     tblGesamt
+        INNER JOIN auchBloed
+        ON tblGesamt.id = auchBloed.diffID
+    SET tblGesamt.modell = auchBloed.freigegebenes_Modell;
 END
 """
-	return push_sp ('ueberschreibeModelle', sp, procs_schon_geladen)
+    return push_sp ('ueberschreibeModelle', sp, procs_schon_geladen)
 
 def push_sp_directConnects(procs_schon_geladen):
-	sp = """
+    sp = """
 CREATE PROCEDURE directConnects()
 -- ----------------------------------------
 --
@@ -1367,81 +1367,81 @@ BEGIN
     ;
 END
 """
-	return push_sp ('directConnects', sp, procs_schon_geladen)
+    return push_sp ('directConnects', sp, procs_schon_geladen)
 
 
 # Suche nach Stored Procedures in der aktuellen Datenbank
 # return: Anzahl an derzeit geladenen Stored Procedures
 def anzahl_procs():
-	anzahl = 0  # Wenn die Zahl der Einträge bei SHOW > 0 ist, müssen die Procs jeweils gelöscht werden
-	with connection.cursor() as cursor:
-		try:
-			cursor.execute ("show procedure status where db like (select DATABASE())")
-			anzahl = cursor.rowcount
-		except:
-			e = sys.exc_info()[0]
-			print('Error in finde_procs(): {}'.format(e))
+    anzahl = 0  # Wenn die Zahl der Einträge bei SHOW > 0 ist, müssen die Procs jeweils gelöscht werden
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute ("show procedure status where db like (select DATABASE())")
+            anzahl = cursor.rowcount
+        except:
+            e = sys.exc_info()[0]
+            print('Error in finde_procs(): {}'.format(e))
 
-		cursor.close()
-	return anzahl
+        cursor.close()
+    return anzahl
 
 def finde_procs():
-	finde_procs_exakt()
-	return anzahl_procs() > 0
+    finde_procs_exakt()
+    return anzahl_procs() > 0
 
 def finde_procs_exakt():
-	return anzahl_procs() == soll_procs()
+    return anzahl_procs() == soll_procs()
 
 sps = {
-	1: push_sp_test,
-	2: push_sp_vorbereitung,
-	3: push_sp_neueUser,
-	4: push_sp_behandleUser,
-	5: push_sp_behandleRechte,
-	6: push_sp_loescheDoppelteRechte,
-	7: push_sp_nichtai,
-	8: push_sp_macheAFListe,
-	9: push_sp_ueberschreibeModelle,
-	10: push_sp_directConnects,
+    1: push_sp_test,
+    2: push_sp_vorbereitung,
+    3: push_sp_neueUser,
+    4: push_sp_behandleUser,
+    5: push_sp_behandleRechte,
+    6: push_sp_loescheDoppelteRechte,
+    7: push_sp_nichtai,
+    8: push_sp_macheAFListe,
+    9: push_sp_ueberschreibeModelle,
+    10: push_sp_directConnects,
 }
 
 def soll_procs():
-	return len(sps)
+    return len(sps)
 
 @login_required
 def handle_stored_procedures(request):
-	# Behandle den Import von Stored-Procedures in die Datenbank
-	daten = {}
+    # Behandle den Import von Stored-Procedures in die Datenbank
+    daten = {}
 
-	if request.method == 'POST':
-		procs_schon_geladen = finde_procs()
+    if request.method == 'POST':
+        procs_schon_geladen = finde_procs()
 
-		daten['anzahl_import_elemente'] = sps[1](procs_schon_geladen)
-		daten['call_anzahl_import_elemente'] = call_sp_test()
-		daten['vorbereitung'] 			= sps[2](procs_schon_geladen)
-		daten['neueUser'] 				= sps[3](procs_schon_geladen)
-		daten['behandleUser'] 			= sps[4](procs_schon_geladen)
-		daten['behandleRechte'] 		= sps[5](procs_schon_geladen)
-		daten['loescheDoppelteRechte'] 	= sps[6](procs_schon_geladen)
-		daten['setzeNichtAIFlag'] 		= sps[7](procs_schon_geladen) # Falls die Funktion jemals wieder benötigt wird
-		daten['erzeuge_af_liste'] 		= sps[8](procs_schon_geladen)
-		daten['ueberschreibeModelle'] 	= sps[9](procs_schon_geladen)
-		daten['directConnects'] 		= sps[10](procs_schon_geladen)
+        daten['anzahl_import_elemente'] = sps[1](procs_schon_geladen)
+        daten['call_anzahl_import_elemente'] = call_sp_test()
+        daten['vorbereitung']             = sps[2](procs_schon_geladen)
+        daten['neueUser']                 = sps[3](procs_schon_geladen)
+        daten['behandleUser']             = sps[4](procs_schon_geladen)
+        daten['behandleRechte']         = sps[5](procs_schon_geladen)
+        daten['loescheDoppelteRechte']     = sps[6](procs_schon_geladen)
+        daten['setzeNichtAIFlag']         = sps[7](procs_schon_geladen) # Falls die Funktion jemals wieder benötigt wird
+        daten['erzeuge_af_liste']         = sps[8](procs_schon_geladen)
+        daten['ueberschreibeModelle']     = sps[9](procs_schon_geladen)
+        daten['directConnects']         = sps[10](procs_schon_geladen)
 
-		"""
-		daten['anzahl_import_elemente'] = push_sp_test(procs_schon_geladen)
-		daten['call_anzahl_import_elemente'] = call_sp_test()
-		daten['vorbereitung'] = push_sp_vorbereitung(procs_schon_geladen)
-		daten['neueUser'] = push_sp_neueUser(procs_schon_geladen)
-		daten['behandleUser'] = push_sp_behandleUser(procs_schon_geladen)
-		daten['behandleRechte'] = push_sp_behandleRechte(procs_schon_geladen)
-		daten['loescheDoppelteRechte'] = push_sp_loescheDoppelteRechte(procs_schon_geladen)
-		daten['setzeNichtAIFlag'] = push_sp_nichtai(procs_schon_geladen) # Falls die Funktion jemals wieder benötigt wird
-		daten['erzeuge_af_liste'] = push_sp_macheAFListe(procs_schon_geladen)
-		daten['ueberschreibeModelle'] = push_sp_ueberschreibeModelle(procs_schon_geladen)
-		"""
+        """
+        daten['anzahl_import_elemente'] = push_sp_test(procs_schon_geladen)
+        daten['call_anzahl_import_elemente'] = call_sp_test()
+        daten['vorbereitung'] = push_sp_vorbereitung(procs_schon_geladen)
+        daten['neueUser'] = push_sp_neueUser(procs_schon_geladen)
+        daten['behandleUser'] = push_sp_behandleUser(procs_schon_geladen)
+        daten['behandleRechte'] = push_sp_behandleRechte(procs_schon_geladen)
+        daten['loescheDoppelteRechte'] = push_sp_loescheDoppelteRechte(procs_schon_geladen)
+        daten['setzeNichtAIFlag'] = push_sp_nichtai(procs_schon_geladen) # Falls die Funktion jemals wieder benötigt wird
+        daten['erzeuge_af_liste'] = push_sp_macheAFListe(procs_schon_geladen)
+        daten['ueberschreibeModelle'] = push_sp_ueberschreibeModelle(procs_schon_geladen)
+        """
 
-	context = {
-		'daten': daten,
-	}
-	return render(request, 'rapp/stored_procedures.html', context)
+    context = {
+        'daten': daten,
+    }
+    return render(request, 'rapp/stored_procedures.html', context)
