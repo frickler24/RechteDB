@@ -155,32 +155,31 @@ def import_csv(request):
 
         current_user = request.user
         import_datum.user = current_user.username
-
         for line in reader:
             # Sicherheitshalber werden alle eingelesenen Daten auf Maximallänge reduziert.
             # Derzeit gibt es bereits Einträge in 'TF Name' und 'TF Beschreibung',
             # die die Grenzen bei weitem überschreiten.
             neuerRecord = Tblrechteneuvonimport(
-                identitaet =             textwrap.shorten (line['Identität'], width=150, placeholder="..."),
-                nachname =                 textwrap.shorten (line['Nachname'], width=150, placeholder="..."),
-                vorname =                 textwrap.shorten (line['Vorname'], width=150, placeholder="..."),
-                tf_name =                 textwrap.shorten (line['TF Name'], width=100, placeholder="..."),
-                tf_beschreibung =         textwrap.shorten (line['TF Beschreibung'], width=250, placeholder="..."),
-                af_anzeigename =         textwrap.shorten (line['AF Anzeigename'], width=100, placeholder="..."),
-                af_beschreibung =         textwrap.shorten (line['AF Beschreibung'], width=250, placeholder="..."),
+                identitaet = textwrap.shorten (line['Identität'], width=150, placeholder="..."),
+                nachname = textwrap.shorten (line['Nachname'], width=150, placeholder="..."),
+                vorname = textwrap.shorten (line['Vorname'], width=150, placeholder="..."),
+                tf_name = textwrap.shorten (line['TF Name'], width=100, placeholder="..."),
+                tf_beschreibung = textwrap.shorten (line['TF Beschreibung'], width=250, placeholder="..."),
+                af_anzeigename = textwrap.shorten (line['AF Anzeigename'], width=100, placeholder="..."),
+                af_beschreibung = textwrap.shorten (line['AF Beschreibung'], width=250, placeholder="..."),
                 hoechste_kritikalitaet_tf_in_af = textwrap.shorten (line['Höchste Kritikalität TF in AF'],
                                                                     width=150, placeholder="..."),
-                tf_eigentuemer_org =     textwrap.shorten (line['TF Eigentümer Org'], width=150, placeholder="..."),
-                tf_applikation =         textwrap.shorten (line['TF Applikation'], width=250, placeholder="..."),
-                tf_kritikalitaet =         textwrap.shorten (line['TF Kritikalitätskennzeichen'], width=150, placeholder="..."),
-                gf_name =                 textwrap.shorten (line['GF Name'], width=150, placeholder="..."),
-                gf_beschreibung =         textwrap.shorten (line['GF Beschreibung'], width=250, placeholder="..."),
-                direct_connect =         textwrap.shorten (line['Direct Connect'], width=150, placeholder="..."),
+                tf_eigentuemer_org = textwrap.shorten (line['TF Eigentümer Org'], width=150, placeholder="..."),
+                tf_applikation = textwrap.shorten (line['TF Applikation'], width=250, placeholder="..."),
+                tf_kritikalitaet = textwrap.shorten (line['TF Kritikalitätskennzeichen'], width=150, placeholder="..."),
+                gf_name = textwrap.shorten (line['GF Name'], width=150, placeholder="..."),
+                gf_beschreibung = textwrap.shorten (line['GF Beschreibung'], width=250, placeholder="..."),
+                direct_connect = textwrap.shorten (line['Direct Connect'], width=150, placeholder="..."),
                 af_zugewiesen_an_account_name = textwrap.shorten (line['AF Zugewiesen an Account-Name'],
                                                                   width=150, placeholder="..."),
-                af_gueltig_ab =         patch_datum (line['AF Gültig ab']),
-                af_gueltig_bis =         patch_datum (line['AF Gültig bis']),
-                af_zuweisungsdatum =     patch_datum (line['AF Zuweisungsdatum']),
+                af_gueltig_ab = patch_datum (line['AF Gültig ab']),
+                af_gueltig_bis = patch_datum (line['AF Gültig bis']),
+                af_zuweisungsdatum = patch_datum (line['AF Zuweisungsdatum']),
             )
             neuerRecord.save()
             import_datum.aktuell += 1
@@ -351,10 +350,10 @@ def import2(request):
         fehler = False
         with connection.cursor() as cursor:
             try:
-                cursor.callproc ("behandleUser") # diese SProc benötigt die Orga nicht als Parameter
+                cursor.callproc("behandleUser") # diese SProc benötigt die Orga nicht als Parameter
             except:
                 e = sys.exc_info()[0]
-                fehler = 'Error in import_schritt2(): {}'.format(e)
+                fehler = 'Fehler in import_schritt2(): {}'.format(e)
                 print('Fehler in import_schritt2, StoredProc behandleUser', fehler)
 
             cursor.close()
@@ -417,7 +416,7 @@ def import2_quittung(request):
                 e1 = sys.exc_info()[0]
                 e2 = sys.exc_info()[1]
                 fehler = 'Error in import_schritt3(): {} {}'.format(e1, e2)
-                print ('Fehler in import_schritt2, StoredProc behandleUser oder loescheDoppelteRechte oder ueberschreibeModelle', fehler)
+                print ('Fehler in import_schritt3, StoredProc behandleUser oder loescheDoppelteRechte oder ueberschreibeModelle', fehler)
 
             cursor.close()
             return fehler

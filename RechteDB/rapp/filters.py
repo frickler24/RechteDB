@@ -1,31 +1,35 @@
-from .models import TblGesamt, TblUserIDundName, TblUserhatrolle, TblRollehataf
 import django_filters
 
+from .models import TblGesamt
+from .models import TblUserIDundName
+from .models import TblUserhatrolle
+from .models import TblRollehataf
+
 class PanelFilter(django_filters.FilterSet):
-    tf =                             django_filters.CharFilter(lookup_expr='icontains')
-    tf_beschreibung =                django_filters.CharFilter(lookup_expr='icontains')
-    enthalten_in_af =                 django_filters.CharFilter(lookup_expr='icontains')
-    userid_name__name =             django_filters.CharFilter(lookup_expr='istartswith')
-    userid_name__userid =             django_filters.CharFilter(lookup_expr='istartswith')
-    geloescht =                     django_filters.BooleanFilter()
-    userid_name__geloescht =         django_filters.BooleanFilter()
-    userid_name__gruppe =             django_filters.CharFilter(lookup_expr='icontains')
-    userid_name__zi_organisation =     django_filters.CharFilter(lookup_expr='icontains')
-    modell__name_af_neu =             django_filters.CharFilter(lookup_expr='icontains')
-    modell__name_gf_neu =             django_filters.CharFilter(lookup_expr='icontains')
+    tf = django_filters.CharFilter(lookup_expr='icontains')
+    tf_beschreibung = django_filters.CharFilter(lookup_expr='icontains')
+    enthalten_in_af = django_filters.CharFilter(lookup_expr='icontains')
+    userid_name__name = django_filters.CharFilter(lookup_expr='istartswith')
+    userid_name__userid = django_filters.CharFilter(lookup_expr='istartswith')
+    geloescht = django_filters.BooleanFilter()
+    userid_name__geloescht = django_filters.BooleanFilter()
+    userid_name__gruppe = django_filters.CharFilter(lookup_expr='icontains')
+    userid_name__zi_organisation = django_filters.CharFilter(lookup_expr='iexact')
+    modell__name_af_neu = django_filters.CharFilter(lookup_expr='icontains')
+    modell__name_gf_neu = django_filters.CharFilter(lookup_expr='icontains')
 
     plattform_id__tf_technische_plattform =\
                                     django_filters.ChoiceFilter()
-    modell__gf_beschreibung =         django_filters.CharFilter(lookup_expr='icontains')
-    loeschdatum =                     django_filters.CharFilter(lookup_expr='icontains')
-    af_gueltig_ab =                 django_filters.CharFilter(lookup_expr='icontains')
-    af_gueltig_bis =                 django_filters.CharFilter(lookup_expr='icontains')
-    direct_connect =                 django_filters.CharFilter(lookup_expr='icontains')
-    af_zuweisungsdatum =             django_filters.CharFilter(lookup_expr='icontains')
-    tf_eigentuemer_org =             django_filters.CharFilter(lookup_expr='icontains')
-    gefunden =                         django_filters.BooleanFilter()
-    wiedergefunden =                 django_filters.CharFilter(lookup_expr='icontains')
-    letzte_aenderung =                 django_filters.CharFilter(lookup_expr='icontains')
+    modell__gf_beschreibung = django_filters.CharFilter(lookup_expr='icontains')
+    loeschdatum = django_filters.CharFilter(lookup_expr='icontains')
+    af_gueltig_ab = django_filters.CharFilter(lookup_expr='icontains')
+    af_gueltig_bis = django_filters.CharFilter(lookup_expr='icontains')
+    direct_connect = django_filters.CharFilter(lookup_expr='icontains')
+    af_zuweisungsdatum = django_filters.CharFilter(lookup_expr='icontains')
+    tf_eigentuemer_org = django_filters.CharFilter(lookup_expr='icontains')
+    gefunden = django_filters.BooleanFilter()
+    wiedergefunden = django_filters.CharFilter(lookup_expr='icontains')
+    letzte_aenderung = django_filters.CharFilter(lookup_expr='icontains')
 
     class Meta:
         model = TblGesamt
@@ -55,12 +59,12 @@ class PanelFilter(django_filters.FilterSet):
         ]
 
 class UseridRollenFilter(django_filters.FilterSet):
-    userid__name =                 django_filters.CharFilter(lookup_expr='istartswith')
-    userid__userid =             django_filters.CharFilter(lookup_expr='istartswith')
-    userid__geloescht =         django_filters.BooleanFilter()
-    userid__abteilung =         django_filters.CharFilter(lookup_expr='icontains')
-    userid__gruppe =             django_filters.CharFilter(lookup_expr='icontains')
-    userid__zi_organisation =     django_filters.CharFilter(lookup_expr='icontains')
+    userid__name = django_filters.CharFilter(lookup_expr='istartswith')
+    userid__userid = django_filters.CharFilter(lookup_expr='istartswith')
+    userid__geloescht = django_filters.BooleanFilter()
+    userid__abteilung = django_filters.CharFilter(lookup_expr='icontains')
+    userid__gruppe = django_filters.CharFilter(lookup_expr='icontains')
+    userid__zi_organisation = django_filters.CharFilter(lookup_expr='icontains')
 
 
     class Meta:
@@ -72,8 +76,8 @@ class UseridRollenFilter(django_filters.FilterSet):
         ]
 
 class UseridFilter(django_filters.FilterSet):
-    name =                         django_filters.CharFilter(lookup_expr='istartswith')
-    gruppe =                     django_filters.CharFilter(lookup_expr='icontains')
+    name = django_filters.CharFilter(lookup_expr='istartswith')
+    gruppe = django_filters.CharFilter(lookup_expr='icontains')
 
     class Meta:
         model = TblUserIDundName
@@ -107,9 +111,9 @@ class RollenFilter(django_filters.FilterSet):
 # Filter für das halbautomatische Selektieren über die Arbeitsplatzfunktion.
 # Wird insbesondere in der AF-Factory bei UhR genutzt
 class RolleAFFilter(django_filters.FilterSet):
-    rollenname =         django_filters.CharFilter(lookup_expr='istartswith')
-    af =                 django_filters.CharFilter(lookup_expr='istartswith')
-    af__af_name =         django_filters.CharFilter(lookup_expr='istartswith')
+    rollenname = django_filters.CharFilter(lookup_expr='istartswith')
+    af = django_filters.CharFilter(lookup_expr='istartswith')
+    af__af_name = django_filters.CharFilter(lookup_expr='istartswith')
 
     class Meta:
         model = TblRollehataf
@@ -119,4 +123,3 @@ class RolleAFFilter(django_filters.FilterSet):
             'af__af_name',
             'mussfeld',
         ]
-
