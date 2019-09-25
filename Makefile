@@ -128,7 +128,7 @@ rapptest:
         -e TZ='Europe/Berlin' \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB:/RechteDB \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB:/RechteDB/code \
-		rapp:latest sh -c "echo yes | /RechteDB/code/manage.py test -v2"
+		rapp:latest sh -c "echo yes | /RechteDB/code/manage.py test"
 
 rappprod:
 	docker run -d \
