@@ -128,6 +128,7 @@ BEGIN
         Einschließlich Herausfiltern der doppelten Zeilen
         (> 1% der Zeilen werden aus IIQ doppelt geliefert)
     */
+    drop table if exists qryF3_RechteNeuVonImportDuplikatfrei;
     create temporary table qryF3_RechteNeuVonImportDuplikatfrei as
         SELECT `AF zugewiesen an Account-name`         AS userid,
                CONCAT(`Nachname`,', ',`Vorname`)     AS name,
@@ -336,6 +337,7 @@ BEGIN
         Merke die als gelöscht markierten User in einer temoprären Tabelle,
         damit imm nächsten SAchritt das Join schnell funktioniert.
     */
+    drop table if exists tbl_tmpGeloeschte;
     create temporary table tbl_tmpGeloeschte as
         SELECT userid1
             FROM qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a
@@ -355,6 +357,7 @@ BEGIN
         Nun werden die wirklich neuen User an die userid-Tabelle angehängt
         (ehemals qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a2 u.a.)
     * /
+    drop table if exists qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a2;
     create temporary table qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a2 as
         SELECT userid1, name1, Ausdr1, Ausdr2, geloescht
             FROM qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a
@@ -455,6 +458,7 @@ BEGIN
 
     -- Lösche zunächst Plattform-Namen, die in der Gesamttabelle nicht mehr auftauchen
     -- (manchmal werden Plattformen einfach umbenannt)
+    drop table if exists bloed;
     CREATE TEMPORARY TABLE bloed as
         SELECT tblPlattform.`tf_technische_plattform` as x
             FROM tblPlattform
@@ -953,7 +957,7 @@ BEGIN
         Auch wenn das eigentlich ie vorkommen dürfte, passiert das dennoch ab und an.
         Hauptgruind sind falsch formatierte Eingatelisten.
     */
-
+    drop table if exists qryF3_DoppelteElementeFilterAusGesamtTabelle;
     CREATE temporary table qryF3_DoppelteElementeFilterAusGesamtTabelle as
         SELECT DISTINCT b.id,
             b.tf,
@@ -1195,6 +1199,7 @@ BEGIN
 
         In Access heißt die Query qryModellNichtGF_AF.
     */
+    drop table if exists auchBloed;
     CREATE TEMPORARY TABLE auchBloed
       SELECT     
               tblGesamt.id as diffID,

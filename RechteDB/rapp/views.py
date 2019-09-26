@@ -95,9 +95,9 @@ def home(request):
     num_active_userids = TblUserIDundName.objects.filter(geloescht=False).count
     num_plattforms = TblPlattform.objects.count
     num_iamba = TblGesamt.objects.filter(geloescht=False,
-                                         userid_name__abteilung__icontains='ZI-AI-BA',
+                                         userid_name__abteilung='ZI-AI-BA',
                                          userid_name__geloescht=False).count
-    num_userids_in_department = TblUserIDundName.objects.filter(geloescht=False, abteilung__icontains='ZI-AI-BA').count
+    num_userids_in_department = TblUserIDundName.objects.filter(geloescht=False, abteilung='ZI-AI-BA').count
     num_teams = TblOrga.objects.all().count
     num_active_rights = TblGesamt.objects.filter(geloescht=False).count
     stored_procedures = finde_procs_exakt()
@@ -325,63 +325,12 @@ def panelDownload(request):
     return response
 
 def magic_click(request):
+    def machwasintelligentes():
+        pass
     '''
     Ist nur eine Hülle, um Funktionen aufrufen zu können, die noch über keine Seite verfügen.
     :param request:
     :return:
     '''
-    findeNeueAFGF('rva_00763_web_entwickler')
+    machwasintelligentes()
     return home(request)
-
-
-def findeNeueAFGF(gesuchte_af):
-    '''
-    Finde alle AF/GF-Kombinationen zu einer AF in der Tabelle der erlaubten Kombinationen
-    Das wird am Anfang benötigt für den Fall, dass nur einzelne Teilkombinationen fehlen
-    Anschließend muss die AF_Liste gegebenenfalls ergänzt werden.
-
-    :param gesuchte_af: String mit der AF, zu der ggfs. die AF/GF-Kombinationen gesucht und ergänzt werden sollen.
-    :return: None oder Fehlerstring
-    '''
-
-    sql = '''
-        INSERT INTO `tblUEbersichtAF_GFs`
-            (`name_gf_neu`, `name_af_neu`, `kommentar`, `zielperson`, geloescht, `modelliert`)
-        
-            SELECT     `gf` as name_gf_neu,
-                `enthalten_in_af` as name_af_neu,
-                'Automatisch ergänzt' as kommentar,
-                'Alle' as zielperson,
-                0 as geloescht,
-                now() as modelliert
-            FROM `tblGesamt`
-            WHERE `enthalten_in_af` = \'{}\'
-                AND NOT geloescht = true
-            GROUP BY `enthalten_in_af`, `gf`
-        
-        ON DUPLICATE KEY UPDATE
-            `modelliert` = now(),
-            geloescht = 0;    
-    '''.format(gesuchte_af)
-
-    with connection.cursor() as cursor:
-        try:
-            cursor.execute (sql)
-        except:
-            e = sys.exc_info()[0]
-            fehler = 'Error in push_sp(): {}'.format(e)
-            return fehler
-        cursor.close()
-
-
-    with connection.cursor() as cursor:
-        try:
-            cursor.callproc("erzeuge_af_liste")  # diese SProc benötigt die Orga nicht als Parameter
-        except:
-            e = sys.exc_info()[0]
-            fehler = 'Fehler in findeNeueAFGF(): {}'.format(e)
-            print('Fehler Beim Erstellen der AFListe, StoredProc erzeuge_af_liste', fehler)
-            return fehler
-        cursor.close()
-    return None
-
