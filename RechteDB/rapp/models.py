@@ -658,22 +658,22 @@ class Qryf3Rechteneuvonimportduplikatfrei(models.Model):
         unique_together = (('userid', 'tf', 'enthalten_in_af', 'tf_technische_plattform', 'gf'),)
 
 class RACF_Rechte(models.Model):
-    id =                     models.AutoField(db_column='id', primary_key=True)
-    type =                     models.CharField(max_length=4, null=True)
-    group =                 models.CharField(max_length=10, db_index=True)
-    ressource_class =         models.CharField(max_length=16, db_column='class', null=True)
-    profil =                 models.CharField(max_length=128, db_index=True, null=True)
-    access =                 models.CharField(max_length=16, null=True)
-    test =                     models.IntegerField()
-    produktion =             models.IntegerField()
-    alter_control_update =    models.IntegerField()
-    datum =                 models.DateTimeField(default=timezone.now, null=True)
+    id = models.AutoField(db_column='id', primary_key=True)
+    type = models.CharField(max_length=4, null=True)
+    group = models.CharField(max_length=10)
+    ressource_class = models.CharField(max_length=16, db_column='class', null=True)
+    profil = models.CharField(max_length=128, db_index=True, null=True)
+    access = models.CharField(max_length=16, null=True)
+    test = models.IntegerField()
+    produktion = models.IntegerField()
+    alter_control_update = models.IntegerField()
+    datum = models.DateTimeField(default=timezone.now, null=True)
 
     class Meta:
         managed = True
         verbose_name = 'RACF-Rechte'
         verbose_name_plural = '40_RACF - Berechtigungen'
-        ordering = [ 'id', 'profil', ]
+        ordering = ['group', 'profil', ]
 
     def __str__(self) -> str:
         return str(self.id)
@@ -683,26 +683,26 @@ class RACF_Rechte(models.Model):
 # rv00458;ZI-AI-BA;Bestands-Anwendungen;XV13254;1001288;140329;ZI-AI;61901;OS0;Lutz Eichler;;
 
 class Orga_details(models.Model):
-    id =                     models.AutoField(primary_key=True)
-    abteilungsnummer =         models.CharField(max_length=32, null=True, db_index=True)
-    organisation =             models.CharField(max_length=100, db_index=True)
-    orgaBezeichnung =        models.CharField(max_length=100, null=True, db_index=True)
-    fk =                     models.CharField(max_length=32, null=True, db_index=True)
-    kostenstelle =            models.CharField(max_length=32, null=True)
-    orgID =                    models.IntegerField(null=True, db_index=True)
-    parentOrga =            models.CharField(max_length=32, null=True, db_index=True)
-    parentOrgID =            models.IntegerField(null=True)
-    orgaTyp =                models.CharField(max_length=32, null=True)
-    fkName =                models.CharField(max_length=32, null=True)
-    delegationEigentuemer =    models.CharField(max_length=32, null=True)
-    delegationFK =            models.CharField(max_length=32, null=True)
-    datum =                 models.DateTimeField(default=timezone.now, null=True)
+    id = models.AutoField(primary_key=True)
+    abteilungsnummer = models.CharField(max_length=32, null=True)
+    organisation = models.CharField(max_length=100)
+    orgaBezeichnung = models.CharField(max_length=100, null=True)
+    fk = models.CharField(max_length=32, null=True)
+    kostenstelle = models.CharField(max_length=32, null=True)
+    orgID = models.IntegerField(null=True)
+    parentOrga = models.CharField(max_length=32, null=True)
+    parentOrgID = models.IntegerField(null=True)
+    orgaTyp = models.CharField(max_length=32, null=True)
+    fkName = models.CharField(max_length=32, null=True)
+    delegationEigentuemer = models.CharField(max_length=32, null=True)
+    delegationFK = models.CharField(max_length=32, null=True)
+    datum = models.DateTimeField(default=timezone.now, null=True)
 
     class Meta:
         managed = True
         verbose_name = 'Orga-Details'
         verbose_name_plural = '50_Orga - Details'
-        ordering = [ 'id', 'organisation', 'orgID', 'parentOrga', 'fkName', ]
+        ordering = ['organisation', 'orgID', 'parentOrga', 'fkName', ]
 
     def __str__(self) -> str:
         return str(self.id)
@@ -710,19 +710,19 @@ class Orga_details(models.Model):
 # Versionshistorie der Daten-Importe; Darüber ist auch ein aktuell laufender Import feststellbar
 # Die beiden Felder max und aktuell dienen dem Anzeigen eins Fortschrittbalkens
 class Letzter_import(models.Model):
-    id =                     models.AutoField(primary_key=True)
-    start =                 models.DateTimeField(null=False)
-    user =                    models.CharField(max_length=100, null=True)
-    end =                     models.DateTimeField(null=True)
-    max =                     models.IntegerField(null=False)
-    aktuell =                 models.IntegerField(null=False)
-    schritt =                 models.IntegerField(null=False, default=1)
+    id = models.AutoField(primary_key=True)
+    start = models.DateTimeField(null=False)
+    user = models.CharField(max_length=100, null=True)
+    end = models.DateTimeField(null=True)
+    max = models.IntegerField(null=False)
+    aktuell = models.IntegerField(null=False)
+    schritt = models.IntegerField(null=False, default=1)
 
     class Meta:
         managed = True
         verbose_name = 'Letzter Import'
         verbose_name_plural = 'Letzte Importe'
-        ordering = [ 'id', 'start', 'end' ]
+        ordering = ['id', ]
 
 
 class Modellierung(models.Model):
@@ -733,25 +733,23 @@ class Modellierung(models.Model):
     Das kann dem späteren Erzeugen von Mails dienen, um User auf Möglichekiten hinzuweisen,
     sich von Direct Connects zu trennen.
     """
-    entitlement =                    models.CharField(max_length=50, null=True, db_index=True)
-    neue_beschreibung =                models.CharField(max_length=500, null=True)
-    plattform =                        models.CharField(max_length=30, null=True, db_index=True)
-    gf =                            models.CharField(max_length=50, null=False, db_index=True)
-    beschreibung_der_gf =            models.CharField(max_length=500, null=True)
-    af =                            models.CharField(max_length=50, null=False, db_index=True)
-    beschreibung_der_af =            models.CharField(max_length=500, null=True)
-    organisation_der_af =            models.CharField(max_length=100, null=True)
-    eigentuemer_der_af =            models.CharField(max_length=100, null=True)
-    aus_modellierung_entfernen =    models.CharField(max_length=100, null=True)
-    datei =                            models.CharField(max_length=100, null=True)
-    letzte_aenderung =                 models.DateTimeField(default=timezone.now, null=True)
+    entitlement = models.CharField(max_length=50, null=True, db_index=True)
+    neue_beschreibung = models.CharField(max_length=500, null=True)
+    plattform = models.CharField(max_length=30, null=True, db_index=True)
+    gf = models.CharField(max_length=50, null=False, db_index=True)
+    beschreibung_der_gf = models.CharField(max_length=500, null=True)
+    af = models.CharField(max_length=50, null=False, db_index=True)
+    beschreibung_der_af = models.CharField(max_length=500, null=True)
+    organisation_der_af = models.CharField(max_length=100, null=True)
+    eigentuemer_der_af = models.CharField(max_length=100, null=True)
+    aus_modellierung_entfernen = models.CharField(max_length=100, null=True)
+    datei = models.CharField(max_length=100, null=True)
+    letzte_aenderung = models.DateTimeField(default=timezone.now, null=True)
 
     class Meta:
         managed = True
         verbose_name = 'Modellierung AF GF TF'
         verbose_name_plural = '60_Modellierung AF GF TF'
-        #ordering = [ 'id', 'organisation', 'orgID', 'parentOrga', 'fkName', ]
-
 
 class Direktverbindungen(models.Model):
     """
@@ -762,21 +760,21 @@ class Direktverbindungen(models.Model):
     sich von Direct Connects zu trennen.
     Diese Tabelle muss geeignet mit der Tabelle Modellierung verknüpft werden
     """
-    organisation =                    models.CharField(max_length=30, null=False)
-    entscheidung =                    models.CharField(max_length=30, null=True)
-    entitlement =                    models.CharField(max_length=100, null=False, db_index=True)
-    applikation =                    models.CharField(max_length=20, null=True)
-    instanz =                        models.CharField(max_length=20, null=True)
-    identitaet =                    models.CharField(max_length=50, null=False, db_index=True)
-    manager =                        models.CharField(max_length=100, null=True)
-    vorname =                        models.CharField(max_length=100, null=False)
-    nachname =                        models.CharField(max_length=100, null=False)
-    account_name =                    models.CharField(max_length=50, null=False)
-    status =                        models.CharField(max_length=100, null=True)
-    typ =                            models.CharField(max_length=100, null=True)
-    nicht_anmailen =                models.CharField(max_length=8, null=True)
-    ansprechpartner =                models.CharField(max_length=100, null=True)
-    letzte_aenderung =                 models.DateTimeField(default=timezone.now, null=True)
+    organisation = models.CharField(max_length=30, null=False)
+    entscheidung = models.CharField(max_length=30, null=True)
+    entitlement = models.CharField(max_length=100, null=False, db_index=True)
+    applikation = models.CharField(max_length=20, null=True)
+    instanz = models.CharField(max_length=20, null=True)
+    identitaet = models.CharField(max_length=50, null=False, db_index=True)
+    manager = models.CharField(max_length=100, null=True)
+    vorname = models.CharField(max_length=100, null=False)
+    nachname = models.CharField(max_length=100, null=False)
+    account_name = models.CharField(max_length=50, null=False)
+    status = models.CharField(max_length=100, null=True)
+    typ = models.CharField(max_length=100, null=True)
+    nicht_anmailen = models.CharField(max_length=8, null=True)
+    ansprechpartner = models.CharField(max_length=100, null=True)
+    letzte_aenderung = models.DateTimeField(default=timezone.now, null=True)
 
     class Meta:
         managed = True
@@ -786,12 +784,12 @@ class Direktverbindungen(models.Model):
 
 
 class Manuelle_Berechtigung(models.Model):
-    name =                 models.CharField(max_length=50, null=False, db_index=True,)
-    verbundene_af =     models.ForeignKey('TblAfliste', models.PROTECT, null=True,)
-    ersteller =         models.CharField(max_length=50, null=True,)
-    letzte_aenderung =    models.DateTimeField(default=timezone.now)
-    statisch =             MDTextField()
-    relativ =             MDTextField()
+    name = models.CharField(max_length=50, null=False, unique=True,)
+    verbundene_af = models.ForeignKey('TblAfliste', models.PROTECT, null=True,)
+    ersteller = models.CharField(max_length=50, null=True,)
+    letzte_aenderung = models.DateTimeField(default=timezone.now)
+    statisch = MDTextField()
+    relativ = MDTextField()
 
     class Meta:
         managed = True

@@ -246,6 +246,7 @@ def import_csv(request):
         """
         fehler = False
         statistik = {}
+
         with connection.cursor() as cursor:
             try:
                 s = 1
@@ -261,10 +262,16 @@ def import_csv(request):
                 fehler = 'Error in import_schritt1(): {}'.format(e)
                 if s == 1:
                     print ('Fehler in import_schritt1, StoredProc "vorbereitung"', fehler)
+                    for e in sys.exc_info():
+                        print(e)
                 elif s == 2:
                     print ('Fehler in import_schritt1, StoredProc "neueUser"', fehler)
+                    for e in sys.exc_info():
+                        print(e)
                 else:
                     print('Fehler in import_schritt1, aber wo?', fehler, 's =', s)
+                    for e in sys.exc_info():
+                        print(e)
 
             cursor.close()
             return statistik, fehler
