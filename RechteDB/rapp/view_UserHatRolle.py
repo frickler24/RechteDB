@@ -680,6 +680,37 @@ def erzeuge_UhR_konzept(request, ansicht):
     # Erst mal die relevanten User-Listen holen - sie sind abhängig von Filtereinstellungen
     (namen_liste, panel_filter) = UhR_erzeuge_listen(request)
 
+    def representsInt(s):
+        try:
+            int(s)
+            return True
+        except ValueError:
+            return False
+
+    def erzeuge_ueberschrift():
+        name = request.GET.get('name', '')
+        teamnr = request.GET.get('orga', '')
+        if representsInt(teamnr):
+            team = TblOrga.objects.get(id=teamnr).team
+        else:
+            team = ''
+        gruppe = request.GET.get('gruppe', '')
+        if gruppe[-2:] == '--':     # Sonderzeichen für nicht-rekursive Auflösung von Organisationen
+            gruppe = gruppe[:-2]
+
+        retval = ''
+        if name != '':
+            retval = name
+        if team != '':
+            if retval != '':
+                retval += ', Team '
+            retval += team
+        if gruppe != '':
+            if retval != '':
+                retval += ', '
+            retval += gruppe
+        return retval
+
     if request.method == 'GET':
         (rollenMenge, userids, usernamen) = UhR_verdichte_daten(namen_liste)
     else:
@@ -701,6 +732,7 @@ def erzeuge_UhR_konzept(request, ansicht):
         'filter': panel_filter,
         'rollenMenge': rollenMenge,
         'version': version,
+        'ueberschrift': erzeuge_ueberschrift(),
     }
     if (ansicht):
         return render(request, 'rapp/panel_UhR_konzept.html', context)
@@ -766,10 +798,6 @@ def erzeuge_UhR_matrixdaten(panel_liste):
     def order(a):
         return a.rollenname.lower()  # Liefert das kleingeschriebene Element, nach dem sortiert werden soll
     return (sorted(usernamen), sorted(list(rollenmenge), key=order), rollen_je_username, teams_je_username)
-
-
-
-
 
 def panel_UhR_matrix(request):
     """
