@@ -687,6 +687,9 @@ def erzeuge_UhR_konzept(request, ansicht):
         except ValueError:
             return False
 
+    def erzeuge_datum():
+        return str(timezone.now())[:10]
+
     def erzeuge_ueberschrift():
         name = request.GET.get('name', '')
         teamnr = request.GET.get('orga', '')
@@ -733,6 +736,7 @@ def erzeuge_UhR_konzept(request, ansicht):
         'rollenMenge': rollenMenge,
         'version': version,
         'ueberschrift': erzeuge_ueberschrift(),
+        'stand': erzeuge_datum(),
     }
     if (ansicht):
         return render(request, 'rapp/panel_UhR_konzept.html', context)

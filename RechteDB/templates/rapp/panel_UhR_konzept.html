@@ -24,10 +24,10 @@
 					<p>{{ form.non_field_errors }}</p>
 				{% endif %}
 			</div>
-			<h1>
+			<h2>
 				Rollen und Arbeitsplatzfunktionen
 				{{ ueberschrift }}
-			</h1>
+			</h2>
 			<div class="container">
 				<div class="row justify-content-md-center">
 					<a href="{% url 'uhr_konzept_pdf' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
