@@ -428,9 +428,7 @@ def import2_quittung(request):
                 retval += cursor.callproc ("ueberschreibeModelle")
 
             except:
-                fehler = '''Fehler in import_schritt3, 
-                    StoredProc behandleUser oder loescheDoppelteRechte 
-                    oder ueberschreibeModelle: {}'''.format(e)
+                fehler = 'Fehler in import_schritt3, StoredProc behandleUser oder loescheDoppelteRechte oder ueberschreibeModelle: '
                 fehler = fehlerausgabe(fehler)
                 print (fehler)
 

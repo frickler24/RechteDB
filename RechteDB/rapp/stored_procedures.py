@@ -478,10 +478,11 @@ BEGIN
         ToDo: Checken, ob tbl_Gesamt_komplett irgendwo noch als Gesamttabelle aller userids benötigt wird, sonst löschen nach Nutzung
     */
 
-    drop table if exists tbl_Gesamt_komplett;
+    drop table if exists uids;
     create temporary table uids as
         select distinct userid as uid from tblRechteAMNeu;
 
+    drop table if exists tbl_Gesamt_komplett;
     create table tbl_Gesamt_komplett as
         SELECT tblGesamt.id,
                tblUserIDundName.userid,
