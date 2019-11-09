@@ -72,28 +72,6 @@ BEGIN
     */
 
     /*
-
-        Da einige der Importzeilen defekt sind und
-        damit der Import und due Ergebnismengen merkwürdig erscheinen,
-        hier der Suchstring für den vi:
-
-        /^`\^\d+;]
-
-        Alternativ Suche nach "der Protokolle" und drei Zeilenteile joinen
-        Dann suchen nach \Transfer\; und die Einzelnen Back-Slashes gegen doppelte tauschen  
-    */
-
-    /*
-
-    TRUNCATE `tblRechteNeuVonImport`;
-    LOAD DATA LOCAL INFILE '/tmp/phpbojCHf'     -- ACHTUNG ToDO Die Daten wirklich vom File einlesen
-        INSERT INTO TABLE `tblRechteNeuVonImport`
-        FIELDS TERMINATED BY ';' ENCLOSED BY '\"' ESCAPED BY '\\' LINES TERMINATED BY '\n'
-        IGNORE 1 LINES;
-    */
-
-
-    /*
         Seit IIQ werden die wirklichen useriden nicht mehr unter der Identität gehalten,
         sondern unter `AF zugewiesen an Account-name`. Das müssen wir in die userid
         umkopieren, wo nötig.
@@ -108,7 +86,6 @@ BEGIN
         Technische User wurden mit anderen useriden angezeigt, als XV86-er Nummern
         Das wird hier korrigiert.
     */
-
 
     UPDATE tblRechteNeuVonImport
         SET tblRechteNeuVonImport.`AF zugewiesen an Account-name` = `Identität`
@@ -217,12 +194,6 @@ BEGIN
         or `vip` Is Null or  `vip` = ''
         or `zufallsgenerator` Is Null or `zufallsgenerator` = '';
     */
-
-    /*
-        Erzeuge die Liste der erlaubten Arbeitsplatzfunktionen.
-        Sie wird später in der Rollenbehandlung benötigt.
-    */
-    CALL erzeuge_af_liste;
 
     /*
         Bis hierhin ging die Vorbereitung.
@@ -507,10 +478,11 @@ BEGIN
         ToDo: Checken, ob tbl_Gesamt_komplett irgendwo noch als Gesamttabelle aller userids benötigt wird, sonst löschen nach Nutzung
     */
 
-    drop table if exists tbl_Gesamt_komplett;
+    drop table if exists uids;
     create temporary table uids as
         select distinct userid as uid from tblRechteAMNeu;
 
+    drop table if exists tbl_Gesamt_komplett;
     create table tbl_Gesamt_komplett as
         SELECT tblGesamt.id,
                tblUserIDundName.userid,
@@ -1168,7 +1140,7 @@ END
 """
     return push_sp ('setzeNichtAIFlag', sp, procs_schon_geladen)
 
-def push_sp_macheAFListe(procs_schon_geladen):
+def push_sp_erzeugeAFListe(procs_schon_geladen):
     sp = """
 CREATE PROCEDURE erzeuge_af_liste()
 BEGIN
@@ -1405,7 +1377,7 @@ sps = {
     5: push_sp_behandleRechte,
     6: push_sp_loescheDoppelteRechte,
     7: push_sp_nichtai,
-    8: push_sp_macheAFListe,
+    8: push_sp_erzeugeAFListe,
     9: push_sp_ueberschreibeModelle,
     10: push_sp_directConnects,
 }
@@ -1442,7 +1414,7 @@ def handle_stored_procedures(request):
         daten['behandleRechte'] = push_sp_behandleRechte(procs_schon_geladen)
         daten['loescheDoppelteRechte'] = push_sp_loescheDoppelteRechte(procs_schon_geladen)
         daten['setzeNichtAIFlag'] = push_sp_nichtai(procs_schon_geladen) # Falls die Funktion jemals wieder benötigt wird
-        daten['erzeuge_af_liste'] = push_sp_macheAFListe(procs_schon_geladen)
+        daten['erzeuge_af_liste'] = push_sp_erzeugeAFListe(procs_schon_geladen)
         daten['ueberschreibeModelle'] = push_sp_ueberschreibeModelle(procs_schon_geladen)
         """
 
