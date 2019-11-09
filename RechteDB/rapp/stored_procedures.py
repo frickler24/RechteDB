@@ -442,7 +442,7 @@ BEGIN
             WHERE tblGesamt.plattform_id IS NULL;
 
     DELETE FROM tblPlattform
-    WHERE `tf_technische_plattform` IN (select x from bloed);
+    WHERE `tf_technische_plattform` IN (SELECT x FROM bloed);
 
     -- Ergänze alle Plattformen, die bislang nur in tblRechteAMNeu bekannt sind
     INSERT INTO tblPlattform (`tf_technische_plattform`)
@@ -495,6 +495,7 @@ BEGIN
                tblGesamt.tf,
                tblGesamt.`tf_beschreibung`,
                tblGesamt.`enthalten_in_af`,
+               tblGesamt.`af_beschreibung`,
                tblUEbersichtAF_GFs.`name_gf_neu`,
                tblUEbersichtAF_GFs.`name_af_neu`,
                tblGesamt.`tf_kritikalitaet`,
@@ -547,8 +548,6 @@ BEGIN
         ON      tblRechteAMNeu.tf = tblGesamt.tf
             AND tblRechteAMNeu.GF = tblGesamt.GF
             AND tblRechteAMNeu.`enthalten_in_af` = tblGesamt.`enthalten_in_af`
-            AND tblRechteAMNeu.zufallsgenerator = tblGesamt.zufallsgenerator
-            AND tblRechteAMNeu.`vip` = tblGesamt.`vip`
 
         INNER JOIN tblUserIDundName
         ON      tblUserIDundName.userid = tblRechteAMNeu.userid
@@ -561,30 +560,29 @@ BEGIN
     SET tblGesamt.gefunden = TRUE,
         tblGesamt.Wiedergefunden = Now(),
         tblRechteAMNeu.Gefunden = TRUE,
-        tblGesamt.`tf_beschreibung` = `tblRechteAMNeu`.`tf_beschreibung`,
-        tblGesamt.`tf_kritikalitaet` = `tblRechteAMNeu`.`tf_kritikalitaet`,
-        tblGesamt.`tf_eigentuemer_org` = `tblRechteAMNeu`.`tf_eigentuemer_org`,
-        tblGesamt.`af_gueltig_ab` = `tblRechteAMNeu`.`af_gueltig_ab`,
-        tblGesamt.`af_gueltig_bis` = `tblRechteAMNeu`.`af_gueltig_bis`,
-        tblGesamt.`direct_connect` = `tblRechteAMNeu`.`direct_connect`,
-        tblGesamt.`hk_tf_in_af` = `tblRechteAMNeu`.`hk_tf_in_af`,
-        tblGesamt.`gf_beschreibung` = `tblRechteAMNeu`.`gf_beschreibung`,
-        tblGesamt.`af_zuweisungsdatum` = `tblRechteAMNeu`.`af_zuweisungsdatum`
+        tblGesamt.`tf_beschreibung`     = `tblRechteAMNeu`.`tf_beschreibung`,
+        tblGesamt.`af_beschreibung`     = `tblRechteAMNeu`.`af_beschreibung`,
+        tblGesamt.`tf_kritikalitaet`    = `tblRechteAMNeu`.`tf_kritikalitaet`,
+        tblGesamt.`tf_eigentuemer_org`  = `tblRechteAMNeu`.`tf_eigentuemer_org`,
+        tblGesamt.`af_gueltig_ab`       = `tblRechteAMNeu`.`af_gueltig_ab`,
+        tblGesamt.`af_gueltig_bis`      = `tblRechteAMNeu`.`af_gueltig_bis`,
+        tblGesamt.`direct_connect`      = `tblRechteAMNeu`.`direct_connect`,
+        tblGesamt.`hk_tf_in_af`         = `tblRechteAMNeu`.`hk_tf_in_af`,
+        tblGesamt.`gf_beschreibung`     = `tblRechteAMNeu`.`gf_beschreibung`,
+        tblGesamt.`af_zuweisungsdatum`  = `tblRechteAMNeu`.`af_zuweisungsdatum`
 
     WHERE COALESCE(tblGesamt.`geloescht`, FALSE) = FALSE
         AND COALESCE(tblUserIDundName.`geloescht`, FALSE) = FALSE;
 
 
     /*
-        qryF2setzeGeaentderteAlteAF implementiert den Fall der geaenderten AF aber ansonsten gleichen Daten
+        Dies implementiert den Fall der geänderten AF aber ansonsten gleichen Daten
     */
 
     UPDATE tblRechteAMNeu
         INNER JOIN tblGesamt
         ON      tblRechteAMNeu.tf = tblGesamt.tf
             AND tblRechteAMNeu.GF = tblGesamt.GF
-            AND tblRechteAMNeu.zufallsgenerator = tblGesamt.zufallsgenerator
-            AND tblRechteAMNeu.`vip` = tblGesamt.`vip`
 
         INNER JOIN tblUserIDundName
         ON      tblUserIDundName.userid = tblRechteAMNeu.userid
@@ -610,13 +608,15 @@ BEGIN
         In die Historientabelle werden die zur Änderung vorgemerkten Einträge aus der Gesamttabelle kopiert.
     */
 
-    INSERT INTO tblGesamtHistorie (`userid_und_name_id`, tf, `tf_beschreibung`, `enthalten_in_af`, modell, `tf_kritikalitaet`,
+    INSERT INTO tblGesamtHistorie (`userid_und_name_id`, tf, `tf_beschreibung`, 
+                `enthalten_in_af`,`af_beschreibung`, modell, `tf_kritikalitaet`,
                 `tf_eigentuemer_org`, plattform_id, GF, `vip`, zufallsgenerator, geloescht, gefunden,
                 wiedergefunden, geaendert, neueaf, datum, `id_alt`, loeschdatum)
     SELECT tblGesamt.`userid_und_name_id`,
            tblGesamt.tf,
            tblGesamt.`tf_beschreibung`,
            tblGesamt.`enthalten_in_af`,
+           tblGesamt.`af_beschreibung`,
            tblGesamt.modell,
            tblGesamt.`tf_kritikalitaet`,
            tblGesamt.`tf_eigentuemer_org`,
@@ -638,15 +638,13 @@ BEGIN
 
     WHERE tblGesamt.`geaendert` = TRUE
            AND tblUserIDundName.`zi_organisation` LIKE orga;      -- ToDo: Wird die Einschränkung wirklich benötigt?
-           -- ToDo: Es sollte ja nicht kopiert, sondern verschoben werden. Es fehlt hier also das Löschen.
+    -- ToDo: Es sollte ja nicht kopiert, sondern verschoben werden. Es fehlt hier also das Löschen.
 
 
     /*
         Anschließend können die geaenderten Werte in die GesamtTabelle übernommen werden.
         Dazu wird der Inhalt des kommentarfelds in die AF-alt-Spalte eingetragen.
         Damit müsste das erledigt sein :-)
-
-        qryF5d_AktualisiereGeaenderteAF
     */
 
     -- ToDo: Später noch mal das geaendert-Flag zurücksetzen, dann entfällt das ToDo vorher...
@@ -654,7 +652,7 @@ BEGIN
     UPDATE tblUserIDundName
         INNER JOIN tblGesamt
         ON tblUserIDundName.id = tblGesamt.`userid_und_name_id`
-    SET tblGesamt.`enthalten_in_af` = `neueaf`
+    SET tblGesamt.`enthalten_in_af` = tblGesamt.`neueaf`
 
     WHERE tblGesamt.`geaendert` = TRUE
         AND tblUserIDundName.`zi_organisation` = orga;
@@ -718,13 +716,15 @@ BEGIN
         qryF5_HaengetfmitNeuenAFanGesamtTabelleAn
     */
 
-    INSERT INTO tblGesamt (tf, `tf_beschreibung`, `enthalten_in_af`, datum, modell, `userid_und_name_id`,
+    INSERT INTO tblGesamt (tf, `tf_beschreibung`, `enthalten_in_af`, `af_beschreibung`,  
+                datum, modell, `userid_und_name_id`,
                 plattform_id, Gefunden, `geaendert`, `tf_kritikalitaet`, `tf_eigentuemer_org`, GF, `vip`,
                 zufallsgenerator, `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
                 `gf_beschreibung`, `af_zuweisungsdatum`, letzte_aenderung)
     SELECT  tblRechteAMNeu.tf,
             tblRechteAMNeu.`tf_beschreibung`,
             tblRechteAMNeu.`enthalten_in_af`,
+            tblRechteAMNeu.`af_beschreibung`,
             Now() AS datumNeu,
             (
                 SELECT DISTINCT modell
@@ -767,10 +767,7 @@ BEGIN
         Dies können nur noch Rechte bislang unbekannter User
         oder unbekannte Rechte bekannter User sein.
         Dazu werden diese Rechte zunächst mit dem Flag "angehaengt_sonst" markiert:
-
-        qryF5_FlaggetfmitNeuenAFinImportTabelleUnbekannteUser
     */
-
 
     /*
     select * from tblRechteAMNeu
@@ -813,13 +810,15 @@ BEGIN
         qryF5_HaengetfvonNeuenUsernAnGesamtTabelleAn
     */
 
-    INSERT INTO tblGesamt (tf, `tf_beschreibung`, `enthalten_in_af`, datum, modell, `userid_und_name_id`,
+    INSERT INTO tblGesamt (tf, `tf_beschreibung`, `enthalten_in_af`,  `Af_beschreibung`,
+                datum, modell, `userid_und_name_id`,
                 plattform_id, Gefunden, `geaendert`, `tf_kritikalitaet`, `tf_eigentuemer_org`, geloescht, GF,
                 `vip`, zufallsgenerator, `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`,
                 `hk_tf_in_af`, `gf_beschreibung`, `af_zuweisungsdatum`, letzte_aenderung)
     SELECT  tblRechteAMNeu.tf,
             tblRechteAMNeu.`tf_beschreibung`,
             tblRechteAMNeu.`enthalten_in_af`,
+            tblRechteAMNeu.`af_beschreibung`,
             Now() AS datumNeu,
 
             (SELECT `id` FROM `tblUEbersichtAF_GFs` WHERE `name_af_neu` LIKE 'Neues Recht noch nicht eingruppiert') AS modellNeu,
@@ -861,12 +860,10 @@ BEGIN
         sondern wir nur den Tagesstand des Importabzugs kennen, wird ein separates loeschdatum gesetzt.
         Damit bleiben im Datensatz das Einstellungsdatum und das letzte Wiederfinde-datum erhalten, das muss reichen.
 
-        Die Abfrage greift nur auf tfs von Usern zurück, die sich auch in der Importtabelle befinden
+        Die Abfrage greift nur auf TFs von Usern zurück, die sich auch in der Importtabelle befinden
         (sonst würden u.U. Rechte von anderen User ebenfalls auf "geloescht" gesetzt).
-        Das führt dazu, dass tfs von nicht mehr existenten Usern hiervon nicht markiert werden.
+        Das führt dazu, dass TFs von nicht mehr existenten Usern hiervon nicht markiert werden.
         Dazu gibt es aber die Funktion "geloeschte User entfernen", die vorher genutzt wurde.
-
-        qryF8_SetzeLoeschFlagInGesamtTabelle
     */
 
     UPDATE tblUserIDundName
@@ -881,7 +878,11 @@ BEGIN
     SET tblGesamt.geloescht = TRUE,
         tblGesamt.loeschdatum = Now()
 
-    WHERE tblUserIDundName.userid IN (SELECT `userid` FROM `tblRechteAMNeu` WHERE `userid` = `tblUserIDundName`.`userid`);
+    WHERE tblUserIDundName.userid IN ( 
+            SELECT `userid` 
+            FROM `tblRechteAMNeu` 
+            WHERE `userid` = `tblUserIDundName`.`userid`
+        );
 
 
     /*
@@ -907,7 +908,7 @@ BEGIN
 
     /*
         Jetzt müssen zum Abschluss noch in denjenigen importierten Zeilen,
-        bei denen die tfs unbekannt sind, das modell auf "neues Recht" gesetzt werden.
+        bei denen die TFs unbekannt sind, das modell auf "neues Recht" gesetzt werden.
         Die sind daran zu erkennen, dass das modell NULL ist.
     */
 
