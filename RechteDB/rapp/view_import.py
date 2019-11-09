@@ -344,7 +344,7 @@ def import2(request):
 
         :return: Die Einträge
         """
-        return hole_alles('qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a')
+        return hole_alles('rapp_neue_user')
 
     def hole_geloeschteUser():
         """
@@ -352,7 +352,7 @@ def import2(request):
 
         :return: Die Einträge
         """
-        return hole_alles('qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a')
+        return hole_alles('rapp_geloeschte_user')
 
     def import_schritt2():
         """

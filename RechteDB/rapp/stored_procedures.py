@@ -236,8 +236,8 @@ BEGIN
         Dies geschieht aber erst im nächsten Schritt 'behandleUser'.
     */
 
-    drop table if exists qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a;
-    create table qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a as
+    drop table if exists rapp_neue_user;
+    create table rapp_neue_user as
         SELECT DISTINCT tblRechteAMNeu.userid as userid1,
                         tblRechteAMNeu.name as name1,
                         '35' AS Ausdr1,
@@ -261,8 +261,8 @@ BEGIN
         ToDo: Mal checken, ob wir die Tabelle wirklich materialisiert benötigen oder nicht (evtl. zur Ansicht?)
     */
 
-    drop table if exists qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a;
-    create table qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a as
+    drop table if exists rapp_geloeschte_user;
+    create table rapp_geloeschte_user as
     SELECT A.userid, A.name, A.`zi_organisation`
         FROM tblUserIDundName A
         WHERE   A.`zi_organisation` = orga
@@ -274,18 +274,18 @@ BEGIN
             A.`zi_organisation`
     ;
 
-    -- SELECT * from qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a;
+    -- SELECT * from rapp_geloeschte_user;
 
     -- Ein bisschen Statistik für den Anwender
     
-    -- select count(*) INTO anzahlNeueUser from qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a;
-    -- select count(*) INTO anzahlGeloeschteUser from qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a;
+    -- select count(*) INTO anzahlNeueUser from rapp_neue_user;
+    -- select count(*) INTO anzahlGeloeschteUser from rapp_geloeschte_user;
     -- select count(*) INTO anzahlGeleseneRechte from tblRechteNeuVonImport;
     -- select count(*) INTO anzahlRechteInAMneu from tblRechteAMNeu;
 
-    select 'Anzahl neuer User' as name, count(*) as wert from qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a 
+    select 'Anzahl neuer User' as name, count(*) as wert from rapp_neue_user 
     UNION
-    select 'Anzahl gelöschter User' as name, count(*) as wert from qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
+    select 'Anzahl gelöschter User' as name, count(*) as wert from rapp_geloeschte_user
     UNION
     select 'Anzahl gelesener Rechte' as name, count(*) as wert from tblRechteNeuVonImport
     UNION
@@ -310,7 +310,7 @@ BEGIN
     drop table if exists tbl_tmpGeloeschte;
     create temporary table tbl_tmpGeloeschte as
         SELECT userid1
-            FROM qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a
+            FROM rapp_neue_user
             WHERE `geloescht` = True;
 
     -- select * from tbl_tmpGeloeschte;
@@ -325,12 +325,12 @@ BEGIN
 
     /*
         Nun werden die wirklich neuen User an die userid-Tabelle angehängt
-        (ehemals qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a2 u.a.)
+        (ehemals rapp_neue_user_tmp u.a.)
     * /
-    drop table if exists qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a2;
-    create temporary table qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a2 as
+    drop table if exists rapp_neue_user_tmp;
+    create temporary table rapp_neue_user_tmp as
         SELECT userid1, name1, Ausdr1, Ausdr2, geloescht
-            FROM qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a
+            FROM rapp_neue_user
             WHERE (`geloescht` = FALSE or `geloescht` IS NULL)
                 AND (userid1 IS NOT NULL OR name1 IS NOT NULL);
 
@@ -339,18 +339,16 @@ BEGIN
                 name1,
                 Ausdr1 AS orga_id,
                 Ausdr2 AS `zi_organisation`
-            FROM qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a2;
+            FROM rapp_neue_user_tmp;
     */
     INSERT INTO tblUserIDundName (userid, name, orga_id, `zi_organisation`, geloescht, gruppe, abteilung )
         SELECT userid1, name1, Ausdr1 AS orga_id, Ausdr2 AS `zi_organisation`, 
                 False AS geloescht, "" as gruppe, "" as abteilung
-            FROM qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a
+            FROM rapp_neue_user
             WHERE COALESCE(`geloescht`, FALSE) = FALSE
                 AND (userid1 IS NOT NULL OR name1 IS NOT NULL);
 
-
     -- select * from tblUserIDundName;
-
 
     /*
         Bevor die alten User als geloescht markiert werden,
@@ -386,10 +384,10 @@ BEGIN
            `hk_tf_in_af`
         FROM `tblGesamt`
         INNER JOIN (tblUserIDundName
-                    inner join qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
-                    on qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a.userid = tblUserIDundName.userid)
+                    inner join rapp_geloeschte_user
+                    on rapp_geloeschte_user.userid = tblUserIDundName.userid)
             ON tblUserIDundName.id = `tblGesamt`.`userid_und_name_id`
-        WHERE tblUserIDundName.userid IN (SELECT userid FROM `qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a`)
+        WHERE tblUserIDundName.userid IN (SELECT userid FROM `rapp_geloeschte_user`)
             AND COALESCE(tblUserIDundName.`geloescht`, FALSE) = FALSE;
 
 
@@ -398,8 +396,8 @@ BEGIN
     UPDATE
         tblGesamt
         INNER JOIN (tblUserIDundName
-                    inner join qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
-                    on qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a.userid = tblUserIDundName.userid)
+                    inner join rapp_geloeschte_user
+                    on rapp_geloeschte_user.userid = tblUserIDundName.userid)
             ON tblGesamt.`userid_und_name_id` = tblUserIDundName.id
         SET tblGesamt.geloescht = TRUE,
             tblGesamt.`loeschdatum` = Now()
@@ -408,8 +406,8 @@ BEGIN
     -- Die zu löschenden User werden in der User-Tabelle nun auf "geloescht" gesetzt
 
     UPDATE tblUserIDundName
-        INNER JOIN qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
-            ON qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a.userid = tblUserIDundName.userid
+        INNER JOIN rapp_geloeschte_user
+            ON rapp_geloeschte_user.userid = tblUserIDundName.userid
         SET `geloescht` = TRUE
         WHERE COALESCE(`geloescht`, FALSE) = FALSE;
 
