@@ -312,7 +312,7 @@ class TblGesamt(models.Model):
                                           verbose_name='AF gültig bis')
     direct_connect = models.CharField(db_column='direct_connect', max_length=100, blank=True, null=True,
                                       verbose_name='Direktverbindung')
-    hoechste_kritikalitaet_tf_in_af = models.CharField(db_column='hk_tf_in_af', max_length=150, blank=True, null=True,
+    hoechste_kritikalitaet_tf_in_af = models.CharField(db_column='hk_tf_in_af', max_length=4, blank=True, null=True,
                                                        verbose_name='max. Krit. TF in AF')
     gf_beschreibung = models.CharField(db_column='gf_beschreibung', max_length=250, blank=True, null=True,
                                        verbose_name='GF Kurzbeschreibung')
@@ -331,6 +331,7 @@ class TblGesamt(models.Model):
     wertmodellvorpatch = models.TextField(db_column='wert_modell_vor_patch', blank=True, null=True)
     loeschdatum = models.DateTimeField(db_column='loeschdatum', blank=True, null=True, verbose_name='Löschdatum')
     letzte_aenderung = models.DateTimeField(auto_now=True)
+    af_beschreibung = models.TextField(max_length=2000, blank=True, null=True, default='Keine Beschreibung vorhanden')
 
     class Meta:
         managed = True
@@ -413,7 +414,7 @@ class TblGesamtHistorie(models.Model):
                                           verbose_name='AF gültig bis')
     direct_connect = models.CharField(db_column='direct_connect', max_length=100, blank=True, null=True,
                                       verbose_name='Direktverbindung')
-    hoechste_kritikalitaet_tf_in_af = models.CharField(db_column='hk_tf_in_af', max_length=150, blank=True, null=True,
+    hoechste_kritikalitaet_tf_in_af = models.CharField(db_column='hk_tf_in_af', max_length=4, blank=True, null=True,
                                                        verbose_name='max. Krit. TF in AF')
     gf_beschreibung = models.CharField(db_column='gf_beschreibung', max_length=300, blank=True, null=True,
                                        verbose_name='GF Kurzbeschreibung')
@@ -421,6 +422,7 @@ class TblGesamtHistorie(models.Model):
     patchdatum = models.DateTimeField(db_column='patchdatum', blank=True, null=True)
     wertmodellvorpatch = models.TextField(db_column='wert_modell_vor_patch', blank=True, null=True)
     letzte_aenderung = models.DateTimeField(blank=True, null=True)
+    af_beschreibung = models.TextField(max_length=2000, blank=True, null=True, default='--')
 
     class Meta:
         managed = True
@@ -462,8 +464,6 @@ class TblAfliste(models.Model):
 ###################################### Tblsubsysteme, Tblsachgebiete, TblDb2
 # Ein paar Hilfstabellen.
 # Die sind inhaltlich wahrscheinlich nicht super aktuell, helfen aber bei verschiedenen Fragen.
-# Leider müssen die Modelle und ihre Columns so heißen, wie ihre Übreschriften es vorgeben (kein SQL-Standard)
-
 class Tblsachgebiete(models.Model):
     sachgebiet = models.CharField(db_column='Sachgebiet', primary_key=True, max_length=32)
     definition = models.CharField(db_column='Definition', max_length=250, blank=True, null=True)
@@ -577,7 +577,7 @@ class Tblrechteneuvonimport(models.Model):
     tf_name = models.CharField(db_column='TF Name', max_length=100, blank=True, null=True)
     tf_beschreibung = models.CharField(db_column='TF Beschreibung', max_length=250, blank=True, null=True)
     af_anzeigename = models.CharField(db_column='AF Anzeigename', max_length=100, blank=True, null=True)
-    af_beschreibung = models.CharField(db_column='AF Beschreibung', max_length=250, blank=True, null=True)
+    af_beschreibung = models.CharField(db_column='AF Beschreibung', max_length=2000, blank=True, null=True)
     hoechste_kritikalitaet_tf_in_af = models.CharField(db_column='Höchste Kritikalität TF in AF', max_length=150,
                                                        blank=True, null=True)
     tf_eigentuemer_org = models.CharField(db_column='TF Eigentümer Org', max_length=150, blank=True, null=True)
@@ -625,6 +625,7 @@ class Tblrechteamneu(models.Model):
     angehaengt_bekannt = models.IntegerField(db_column='angehaengt_bekannt', blank=True, null=True)
     angehaengt_sonst = models.IntegerField(db_column='angehaengt_sonst', blank=True, null=True)
     doppelerkennung = models.IntegerField(blank=True, null=True)
+    af_beschreibung = models.TextField(max_length=2000, blank=True, null=True, default='')
 
     class Meta:
         managed = True
