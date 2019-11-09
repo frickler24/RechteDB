@@ -91,7 +91,6 @@ def letzter_schritt():
 
     return
 
-
 def patch_datum(deutsches_datum):
     """
     # Drehe das deutsche Datumsformat um in das amerikanische und hänge TZ-Info an
@@ -106,6 +105,17 @@ def patch_datum(deutsches_datum):
         return deutsches_datum        # Dann passt das Datumsformat nicht
     return  datum[2] + '-' + datum[1] + '-' + datum[0] + ' 00:00+0100'
 
+def fehlerausgabe(fehler):
+        """
+        Formatierte Ausgabe der Datenbakfehler
+        :param fehler: Der Fehlertext, wie er bisher besteht
+        :param e: Die System-Fehlerliste
+        :return: fehler, ergänzt um die Einträge der System-Fehlerliste
+        """
+        for e in sys.exc_info():
+            print(e)
+            fehler += "    " + format(e)
+        return fehler
 
 @login_required
 def import_csv(request):
@@ -133,7 +143,6 @@ def import_csv(request):
 
         :return: Nichts, außer Einträgen in zeiten[]
         """
-        # Löscht alle Einträge aus der Importtabelle sowie der Übertragungstabelle
         zeiten['leere_start'] = timezone.now()
         Tblrechteneuvonimport.objects.all().delete()
         Tblrechteamneu.objects.all().delete()
@@ -239,7 +248,7 @@ def import_csv(request):
 
     def import_schritt1(orga):
         """
-        # Führt die beiden ersten Stored Procedures vorbereitung() und neueUser() zum Datenimport aus
+        # Führt die ersten Stored Procedures vorbereitung(), erzeuge_af_liste() und neueUser() zum Datenimport aus
 
         :param orga: String der Organisation, für die die Daten eingelesen werden sollen (wichtig für User-ID-Match)
         :return: Statistik: was alles geändert werden soll; Fehlerinformation (False = kein Fehler)
@@ -250,11 +259,12 @@ def import_csv(request):
         with connection.cursor() as cursor:
             try:
                 s = 1
-                cursor.callproc ("vorbereitung")
-                s = 2
+                cursor.callproc("vorbereitung")
+                s += 1
+                cursor.callproc("erzeuge_af_liste")
+                s += 1
                 cursor.callproc ("neueUser", [orga, ])
                 tmp = cursor.fetchall()
-                # print (tmp)
                 for line in tmp:
                     statistik[line[0]] = line[1]
             except:
@@ -262,16 +272,14 @@ def import_csv(request):
                 fehler = 'Error in import_schritt1(): {}'.format(e)
                 if s == 1:
                     print ('Fehler in import_schritt1, StoredProc "vorbereitung"', fehler)
-                    for e in sys.exc_info():
-                        print(e)
                 elif s == 2:
+                    print('Fehler in import_schritt1, StoredProc "erzeuge_af_liste"', fehler)
+                elif s == 3:
                     print ('Fehler in import_schritt1, StoredProc "neueUser"', fehler)
-                    for e in sys.exc_info():
-                        print(e)
                 else:
-                    print('Fehler in import_schritt1, aber wo?', fehler, 's =', s)
-                    for e in sys.exc_info():
-                        print(e)
+                    print('Ohgottogott: Fehler in import_schritt1, aber wo?', fehler, 's =', s)
+
+                fehler = fehlerausgabe(fehler)
 
             cursor.close()
             return statistik, fehler
@@ -324,9 +332,9 @@ def import2(request):
                 cursor.execute (sql)
                 retval = cursor.fetchall()
             except:
-                e = sys.exc_info()[0]
                 fehler = 'Error in hole_alles(): {}'.format(e)
-
+                fehler = fehlerausgabe(fehler)
+                print(fehler)
             cursor.close()
             return retval, fehler
 
@@ -359,9 +367,9 @@ def import2(request):
             try:
                 cursor.callproc("behandleUser") # diese SProc benötigt die Orga nicht als Parameter
             except:
-                e = sys.exc_info()[0]
-                fehler = 'Fehler in import_schritt2(): {}'.format(e)
-                print('Fehler in import_schritt2, StoredProc behandleUser', fehler)
+                fehler = 'Fehler in import_schritt2, StoredProc behandleUser: {}'.format(e)
+                fehler = fehlerausgabe(fehler)
+                print(fehler)
 
             cursor.close()
             return fehler
@@ -420,10 +428,11 @@ def import2_quittung(request):
                 retval += cursor.callproc ("ueberschreibeModelle")
 
             except:
-                e1 = sys.exc_info()[0]
-                e2 = sys.exc_info()[1]
-                fehler = 'Error in import_schritt3(): {} {}'.format(e1, e2)
-                print ('Fehler in import_schritt3, StoredProc behandleUser oder loescheDoppelteRechte oder ueberschreibeModelle', fehler)
+                fehler = '''Fehler in import_schritt3, 
+                    StoredProc behandleUser oder loescheDoppelteRechte 
+                    oder ueberschreibeModelle: {}'''.format(e)
+                fehler = fehlerausgabe(fehler)
+                print (fehler)
 
             cursor.close()
             return fehler

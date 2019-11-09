@@ -49,4 +49,5 @@ other_files/RechteDB-20190726.sql
 other_files/RechteDB-20190908.sql
 other_files/0030_Direktverbindungen.py
 other_files/RechteDB-20190922.sql.gz
-
+RechteDB/.coverage
+RechteDB/cover

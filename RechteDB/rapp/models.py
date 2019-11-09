@@ -198,7 +198,7 @@ class TblOrga(models.Model):
 class TblUserIDundName(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
     userid = models.CharField(db_column='userid', max_length=32, unique=True)
-    name = models.CharField(db_column='name', max_length=75, db_index=True)
+    name = models.CharField(db_column='name', max_length=203, db_index=True)
     orga = models.ForeignKey('TblOrga', db_column='orga_id', on_delete=models.CASCADE,
                              verbose_name='Team', db_index=True)
     zi_organisation = models.CharField(db_column='zi_organisation', max_length=64,
@@ -572,8 +572,8 @@ class TblRacfGruppen(models.Model):
 class Tblrechteneuvonimport(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
     identitaet = models.CharField(db_column='Identität', max_length=150, blank=False, null=False, db_index=True)
-    nachname = models.CharField(db_column='Nachname', max_length=150, blank=True, null=True)
-    vorname = models.CharField(db_column='Vorname', max_length=150, blank=True, null=True)
+    nachname = models.CharField(db_column='Nachname', max_length=100, blank=True, null=True)
+    vorname = models.CharField(db_column='Vorname', max_length=100, blank=True, null=True)
     tf_name = models.CharField(db_column='TF Name', max_length=100, blank=True, null=True)
     tf_beschreibung = models.CharField(db_column='TF Beschreibung', max_length=250, blank=True, null=True)
     af_anzeigename = models.CharField(db_column='AF Anzeigename', max_length=100, blank=True, null=True)
@@ -629,32 +629,6 @@ class Tblrechteamneu(models.Model):
     class Meta:
         managed = True
         db_table = 'tblRechteAMNeu'
-        unique_together = (('userid', 'tf', 'enthalten_in_af', 'tf_technische_plattform', 'gf'),)
-
-class Qryf3Rechteneuvonimportduplikatfrei(models.Model):
-    userid = models.CharField(db_column='userid', max_length=32, blank=True, null=True)
-    name = models.CharField(db_column='name', max_length=100, blank=True, null=True)
-    tf = models.CharField(db_column='tf', max_length=100, blank=True, null=True, db_index=True)
-    tf_beschreibung = models.CharField(db_column='tf_beschreibung', max_length=250, blank=True, null=True)
-    enthalten_in_af = models.CharField(db_column='enthalten_in_af', max_length=100, blank=True, null=True,
-                                       db_index=True)
-    tf_kritikalitaet = models.CharField(db_column='tf_kritikalitaet', max_length=64, blank=True, null=True)
-    tf_eigentuemer_org = models.CharField(db_column='tf_eigentuemer_org', max_length=64, blank=True, null=True)
-    tf_technische_plattform = models.CharField(db_column='tf_technische_plattform', max_length=32,
-                                               blank=True, null=True, db_index=True)
-    gf = models.CharField(db_column='gf', max_length=100, blank=True, null=True, db_index=True)
-    vip_kennzeichen = models.CharField(db_column='vip', max_length=8, blank=True, null=True, db_index=True)
-    zufallsgenerator = models.CharField(db_column='zufallsgenerator', max_length=8, blank=True, null=True)
-    af_gueltig_ab = models.DateTimeField(db_column='af_gueltig_ab', blank=True, null=True)
-    af_gueltig_bis = models.DateTimeField(db_column='af_gueltig_bis', blank=True, null=True)
-    direct_connect = models.CharField(db_column='direct_connect', max_length=50, blank=True, null=True)
-    hoechste_kritikalitaet_tf_in_af = models.CharField(db_column='hk_tf_in_af', max_length=150, blank=True, null=True)
-    gf_beschreibung = models.CharField(db_column='gf_beschreibung', max_length=250, blank=True, null=True)
-    af_zuweisungsdatum = models.DateTimeField(db_column='af_zuweisungsdatum', blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = 'qryF3_RechteNeuVonImportDuplikatfrei'
         unique_together = (('userid', 'tf', 'enthalten_in_af', 'tf_technische_plattform', 'gf'),)
 
 class RACF_Rechte(models.Model):
