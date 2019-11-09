@@ -179,8 +179,7 @@ BEGIN
     UPDATE tblRechteAMNeu SET `tf_kritikalitaet` = 'ka' WHERE `tf_kritikalitaet` Is Null or  `tf_kritikalitaet` = '';
     UPDATE tblRechteAMNeu SET `tf_eigentuemer_org` = 'ka' WHERE `tf_eigentuemer_org` Is Null or  `tf_eigentuemer_org` = '';
     UPDATE tblRechteAMNeu SET `GF` = 'k.A.' WHERE GF Is Null or GF = '';
-    UPDATE tblRechteAMNeu SET `vip` = 'k.A.' WHERE `vip` Is Null or  `vip` = '';
-    UPDATE tblRechteAMNeu SET `zufallsgenerator` = 'k.A.' WHERE `zufallsgenerator` Is Null or `zufallsgenerator` = '';
+    UPDATE tblRechteAMNeu SET `hk_tf_in_af` = 'k.A.' WHERE `hk_tf_in_af` Is Null or `hk_tf_in_af` = '';
     UPDATE tblRechteAMNeu SET `af_beschreibung` = 'keine geliefert bekommmen' WHERE `af_beschreibung` Is Null or `af_beschreibung` = '';
 
 
@@ -365,7 +364,8 @@ BEGIN
                 `userid_und_name_id`, tf, `tf_beschreibung`, `enthalten_in_af`,
                 modell, `tf_kritikalitaet`, `tf_eigentuemer_org`, `af_zuweisungsdatum`,
                 plattform_id, GF, geloescht, gefunden, wiedergefunden, geaendert, 
-                loeschdatum, neueaf, datum, `id_alt`, `af_beschreibung`
+                loeschdatum, neueaf, datum, `id_alt`, 
+                `af_beschreibung`, `hk_tf_in_af`
             )
     SELECT `tblGesamt`.`userid_und_name_id`,
            `tblGesamt`.tf,
@@ -385,7 +385,8 @@ BEGIN
            `tblGesamt`.neueaf,
            `tblGesamt`.datum,
            `tblGesamt`.id,
-           `af_beschreibung`
+           `af_beschreibung`,
+           `hk_tf_in_af`
         FROM `tblGesamt`
         INNER JOIN (tblUserIDundName
                     inner join geloeschte_user
