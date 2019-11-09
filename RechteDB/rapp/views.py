@@ -230,6 +230,8 @@ def panel(request):
     panel_filter = PanelFilter(request.GET, queryset=panel_list)
     panel_list = panel_filter.qs
 
+    for x in panel_list:
+        print(x.hoechste_kritikalitaet_tf_in_af)
     (paginator, pages, pagesize) = pagination(request, panel_list, psize=20)
     context = {
         'paginator': paginator,

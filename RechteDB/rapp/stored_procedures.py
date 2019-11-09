@@ -72,7 +72,7 @@ BEGIN
     */
 
     /*
-        Seit IIQ werden die wirklichen useriden nicht mehr unter der Identität gehalten,
+        Seit IIQ werden die wirklichen UserIDen nicht mehr unter der Identität gehalten,
         sondern unter `AF zugewiesen an Account-name`. Das müssen wir in die userid
         umkopieren, wo nötig.
     */
@@ -105,25 +105,26 @@ BEGIN
         Einschließlich Herausfiltern der doppelten Zeilen
         (> 1% der Zeilen werden aus IIQ doppelt geliefert)
     */
-    drop table if exists qryF3_RechteNeuVonImportDuplikatfrei;
-    create temporary table qryF3_RechteNeuVonImportDuplikatfrei as
+    drop table if exists rapp_NeuVonImportDuplikatfrei;
+    create temporary table rapp_NeuVonImportDuplikatfrei as
         SELECT `AF zugewiesen an Account-name`         AS userid,
-               CONCAT(`Nachname`,', ',`Vorname`)     AS name,
-               `tf name`                             AS tf,
-               `tf beschreibung`                     AS tf_beschreibung,
-               `AF Anzeigename`                     AS enthalten_in_af,
-               `tf kritikalität`                     AS tf_kritikalitaet,
-               `tf eigentümer org`                     AS tf_eigentuemer_org,
-               `tf Applikation`                     AS tf_technische_plattform,
-               `GF name`                             AS GF,
-               'gibt es nicht mehr'                 AS vip,
-               'gibt es nicht mehr'                    AS zufallsgenerator,
-               `af gültig ab`                        AS af_gueltig_ab,
-               `af gültig bis`                        AS af_gueltig_bis,
-               `direct connect`                        AS direct_connect,
-               `höchste kritikalität tf in af`        AS hk_tf_in_af,
-               `gf beschreibung`                    AS gf_beschreibung,
-               `af zuweisungsdatum`                    AS af_zuweisungsdatum
+               CONCAT(`Nachname`,', ',`Vorname`) AS name,
+               `tf name`                         AS tf,
+               `tf beschreibung`                 AS tf_beschreibung,
+               `AF Anzeigename`                  AS enthalten_in_af,
+               `AF Beschreibung`                 AS af_beschreibung,
+               `tf kritikalität`                 AS tf_kritikalitaet,
+               `tf eigentümer org`               AS tf_eigentuemer_org,
+               `tf Applikation`                  AS tf_technische_plattform,
+               `GF name`                         AS GF,
+               'gibt es nicht mehr'              AS vip,
+               'gibt es nicht mehr'              AS zufallsgenerator,
+               `af gültig ab`                    AS af_gueltig_ab,
+               `af gültig bis`                   AS af_gueltig_bis,
+               `direct connect`                  AS direct_connect,
+               `höchste kritikalität tf in af`   AS hk_tf_in_af,
+               `gf beschreibung`                 AS gf_beschreibung,
+               `af zuweisungsdatum`              AS af_zuweisungsdatum
         FROM tblRechteNeuVonImport
         GROUP BY `userid`,
                  `tf`,
@@ -132,35 +133,38 @@ BEGIN
                  `GF`;
 
     /*
-        ALTER TABLE `RechteDB`.`qryF3_RechteNeuVonImportDuplikatfrei`
+        ALTER TABLE `RechteDB`.`rapp_NeuVonImportDuplikatfrei`
             ADD PRIMARY KEY (`userid`, `tf`(70), `enthalten_in_af`(30), `tf_technische_plattform`, `GF`);
     */
 
 
     TRUNCATE table tblRechteAMNeu;
-    INSERT INTO tblRechteAMNeu (userid, name, tf, `tf_beschreibung`, `enthalten_in_af`, `tf_kritikalitaet`,
+    INSERT INTO tblRechteAMNeu (userid, name, tf, `tf_beschreibung`, 
+                `enthalten_in_af`, `af_beschreibung`,
+                `tf_kritikalitaet`,
                 `tf_eigentuemer_org`, `tf_technische_plattform`, GF, `vip`, zufallsgenerator,
                 `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
                 `gf_beschreibung`, `af_zuweisungsdatum`, doppelerkennung)
-    SELECT qryF3_RechteNeuVonImportDuplikatfrei.userid,
-           qryF3_RechteNeuVonImportDuplikatfrei.name,
-           qryF3_RechteNeuVonImportDuplikatfrei.tf,
-           qryF3_RechteNeuVonImportDuplikatfrei.`tf_beschreibung`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`enthalten_in_af`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`tf_kritikalitaet`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`tf_eigentuemer_org`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`tf_technische_plattform`,
-           qryF3_RechteNeuVonImportDuplikatfrei.GF,
-           qryF3_RechteNeuVonImportDuplikatfrei.`vip`,
-           qryF3_RechteNeuVonImportDuplikatfrei.zufallsgenerator,
-           qryF3_RechteNeuVonImportDuplikatfrei.`af_gueltig_ab`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`af_gueltig_bis`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`direct_connect`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`hk_tf_in_af`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`gf_beschreibung`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`af_zuweisungsdatum`,
+    SELECT rapp_NeuVonImportDuplikatfrei.userid,
+           rapp_NeuVonImportDuplikatfrei.name,
+           rapp_NeuVonImportDuplikatfrei.tf,
+           rapp_NeuVonImportDuplikatfrei.`tf_beschreibung`,
+           rapp_NeuVonImportDuplikatfrei.`enthalten_in_af`,
+           rapp_NeuVonImportDuplikatfrei.`af_beschreibung`,
+           rapp_NeuVonImportDuplikatfrei.`tf_kritikalitaet`,
+           rapp_NeuVonImportDuplikatfrei.`tf_eigentuemer_org`,
+           rapp_NeuVonImportDuplikatfrei.`tf_technische_plattform`,
+           rapp_NeuVonImportDuplikatfrei.GF,
+           rapp_NeuVonImportDuplikatfrei.`vip`,
+           rapp_NeuVonImportDuplikatfrei.zufallsgenerator,
+           rapp_NeuVonImportDuplikatfrei.`af_gueltig_ab`,
+           rapp_NeuVonImportDuplikatfrei.`af_gueltig_bis`,
+           rapp_NeuVonImportDuplikatfrei.`direct_connect`,
+           rapp_NeuVonImportDuplikatfrei.`hk_tf_in_af`,
+           rapp_NeuVonImportDuplikatfrei.`gf_beschreibung`,
+           rapp_NeuVonImportDuplikatfrei.`af_zuweisungsdatum`,
            0
-    FROM qryF3_RechteNeuVonImportDuplikatfrei
+    FROM rapp_NeuVonImportDuplikatfrei
     ON DUPLICATE KEY UPDATE doppelerkennung=doppelerkennung+1;
 
     /*
@@ -190,8 +194,8 @@ BEGIN
         or `tf_kritikalitaet` Is Null or  `tf_kritikalitaet` = ''
         or `tf_eigentuemer_org` Is Null or  `tf_eigentuemer_org` = ''
         or GF Is Null or GF = ''
-        or `vip` Is Null or  `vip` = ''
-        or `zufallsgenerator` Is Null or `zufallsgenerator` = '';
+        or `hk_tf_in_af` Is Null or  `hk_tf_in_af` = ''
+        or `af_beschreibung` Is Null or `af_beschreibung` = '';
     */
 
     /*
@@ -277,12 +281,6 @@ BEGIN
     -- SELECT * from rapp_geloeschte_user;
 
     -- Ein bisschen Statistik für den Anwender
-    
-    -- select count(*) INTO anzahlNeueUser from rapp_neue_user;
-    -- select count(*) INTO anzahlGeloeschteUser from rapp_geloeschte_user;
-    -- select count(*) INTO anzahlGeleseneRechte from tblRechteNeuVonImport;
-    -- select count(*) INTO anzahlRechteInAMneu from tblRechteAMNeu;
-
     select 'Anzahl neuer User' as name, count(*) as wert from rapp_neue_user 
     UNION
     select 'Anzahl gelöschter User' as name, count(*) as wert from rapp_geloeschte_user
@@ -356,16 +354,18 @@ BEGIN
     */
 
     INSERT INTO tblGesamtHistorie (
-                `userid_und_name_id`, tf, `tf_beschreibung`, `enthalten_in_af`,
+                `userid_und_name_id`, tf, `tf_beschreibung`, 
+                `enthalten_in_af`, `af_beschreibung`, 
                 modell, `tf_kritikalitaet`, `tf_eigentuemer_org`, `af_zuweisungsdatum`,
                 plattform_id, GF, geloescht, gefunden, wiedergefunden, geaendert, 
                 loeschdatum, neueaf, datum, `id_alt`, 
-                `af_beschreibung`, `hk_tf_in_af`
+                `hk_tf_in_af`
             )
     SELECT `tblGesamt`.`userid_und_name_id`,
            `tblGesamt`.tf,
            `tblGesamt`.`tf_beschreibung`,
            `tblGesamt`.`enthalten_in_af`,
+           `tblGesamt`.`af_beschreibung`,
            `tblGesamt`.modell,
            `tblGesamt`.`tf_kritikalitaet`,
            `tblGesamt`.`tf_eigentuemer_org`,
@@ -380,7 +380,6 @@ BEGIN
            `tblGesamt`.neueaf,
            `tblGesamt`.datum,
            `tblGesamt`.id,
-           `af_beschreibung`,
            `hk_tf_in_af`
         FROM `tblGesamt`
         INNER JOIN (tblUserIDundName
@@ -410,9 +409,6 @@ BEGIN
             ON rapp_geloeschte_user.userid = tblUserIDundName.userid
         SET `geloescht` = TRUE
         WHERE COALESCE(`geloescht`, FALSE) = FALSE;
-
-    -- ToDo Es fehlt komplett das Löschen der historisierten Rechte für gerade geloeschte User
-
 END
 """
     return push_sp ('behandleUser', sp, procs_schon_geladen)
@@ -462,7 +458,7 @@ BEGIN
         tblGesamt.geaendert = FALSE
     WHERE tblGesamt.gefunden = TRUE OR tblGesamt.`geaendert` = TRUE;
 
-    -- Dies hier nur zur Sicherheit - eigentlich müssten die eh null sein
+    -- Dies hier nur zur Sicherheit - eigentlich müssten die null sein
     UPDATE tblRechteAMNeu
     SET tblRechteAMNeu.gefunden = FALSE,
         tblRechteAMNeu.geaendert = FALSE
@@ -470,21 +466,19 @@ BEGIN
         OR tblRechteAMNeu.geaendert = TRUE;
 
     /*
-        Nun wird die "flache" Tabelle "tbl_Gesamt_komplett" erzeugt.
+        Nun wird die "flache" Tabelle "rapp_Gesamt_komplett" erzeugt.
         Dort sind die Referenzen zu den derzeit existierenden, aktiven 
         User-, Berechtigungs- und Orga-Tabellen aufgelöst,
         allerdings in dieser Implementierung ausschließlich für die benötigten UserIDen
         (früher wirklich komplett).
-
-        ToDo: Checken, ob tbl_Gesamt_komplett irgendwo noch als Gesamttabelle aller userids benötigt wird, sonst löschen nach Nutzung
     */
 
     drop table if exists uids;
     create temporary table uids as
         select distinct userid as uid from tblRechteAMNeu;
 
-    drop table if exists tbl_Gesamt_komplett;
-    create table tbl_Gesamt_komplett as
+    drop table if exists rapp_Gesamt_komplett;
+    create temporary table rapp_Gesamt_komplett as
         SELECT tblGesamt.id,
                tblUserIDundName.userid,
                tblUserIDundName.name,
@@ -607,7 +601,8 @@ BEGIN
     INSERT INTO tblGesamtHistorie (`userid_und_name_id`, tf, `tf_beschreibung`, 
                 `enthalten_in_af`,`af_beschreibung`, modell, `tf_kritikalitaet`,
                 `tf_eigentuemer_org`, plattform_id, GF, `vip`, zufallsgenerator, geloescht, gefunden,
-                wiedergefunden, geaendert, neueaf, datum, `id_alt`, loeschdatum)
+                wiedergefunden, geaendert, neueaf, datum, `id_alt`, loeschdatum, `hk_tf_in_af`
+)
     SELECT tblGesamt.`userid_und_name_id`,
            tblGesamt.tf,
            tblGesamt.`tf_beschreibung`,
@@ -627,7 +622,9 @@ BEGIN
            tblGesamt.neueaf,
            tblGesamt.datum,
            tblGesamt.id,
-           tblGesamt.loeschdatum
+           tblGesamt.loeschdatum,
+           tblGesamt.`hk_tf_in_af`
+
     FROM tblUserIDundName
         INNER JOIN tblGesamt
         ON tblUserIDundName.id = tblGesamt.`userid_und_name_id`
@@ -676,14 +673,14 @@ BEGIN
     */
 
     UPDATE tblRechteAMNeu
-        INNER JOIN tbl_Gesamt_komplett
-        ON (tbl_Gesamt_komplett.zufallsgenerator = tblRechteAMNeu.zufallsgenerator)
-            AND (tbl_Gesamt_komplett.`vip` = tblRechteAMNeu.`vip`)
-            AND (tblRechteAMNeu.GF = tbl_Gesamt_komplett.GF)
-            AND (tblRechteAMNeu.`enthalten_in_af` = tbl_Gesamt_komplett.`enthalten_in_af`)
-            AND (tblRechteAMNeu.userid = tbl_Gesamt_komplett.userid)
-            AND (tblRechteAMNeu.tf = tbl_Gesamt_komplett.tf)
-            AND (tblRechteAMNeu.`tf_technische_plattform` = tbl_Gesamt_komplett.`tf_technische_plattform`)
+        INNER JOIN rapp_Gesamt_komplett
+        ON (rapp_Gesamt_komplett.zufallsgenerator = tblRechteAMNeu.zufallsgenerator)
+            AND (rapp_Gesamt_komplett.`vip` = tblRechteAMNeu.`vip`)
+            AND (tblRechteAMNeu.GF = rapp_Gesamt_komplett.GF)
+            AND (tblRechteAMNeu.`enthalten_in_af` = rapp_Gesamt_komplett.`enthalten_in_af`)
+            AND (tblRechteAMNeu.userid = rapp_Gesamt_komplett.userid)
+            AND (tblRechteAMNeu.tf = rapp_Gesamt_komplett.tf)
+            AND (tblRechteAMNeu.`tf_technische_plattform` = rapp_Gesamt_komplett.`tf_technische_plattform`)
         SET tblRechteAMNeu.`angehaengt_bekannt` = TRUE
         WHERE tblRechteAMNeu.Gefunden = TRUE
             AND tblRechteAMNeu.`geaendert` = FALSE;
@@ -692,14 +689,14 @@ BEGIN
         Zum Gucken:
 
     SELECT COUNT(*) FROM tblRechteAMNeu
-        INNER JOIN tbl_Gesamt_komplett
-        ON (tbl_Gesamt_komplett.zufallsgenerator = tblRechteAMNeu.zufallsgenerator)
-            AND (tbl_Gesamt_komplett.`vip` = tblRechteAMNeu.`vip`)
-            AND (tblRechteAMNeu.GF = tbl_Gesamt_komplett.GF)
-            AND (tblRechteAMNeu.`enthalten_in_af` = tbl_Gesamt_komplett.`enthalten_in_af`)
-            AND (tblRechteAMNeu.userid = tbl_Gesamt_komplett.userid)
-            AND (tblRechteAMNeu.tf = tbl_Gesamt_komplett.tf)
-            AND (tblRechteAMNeu.`tf_technische_plattform` = tbl_Gesamt_komplett.`tf_technische_plattform`)
+        INNER JOIN rapp_Gesamt_komplett
+        ON (rapp_Gesamt_komplett.zufallsgenerator = tblRechteAMNeu.zufallsgenerator)
+            AND (rapp_Gesamt_komplett.`vip` = tblRechteAMNeu.`vip`)
+            AND (tblRechteAMNeu.GF = rapp_Gesamt_komplett.GF)
+            AND (tblRechteAMNeu.`enthalten_in_af` = rapp_Gesamt_komplett.`enthalten_in_af`)
+            AND (tblRechteAMNeu.userid = rapp_Gesamt_komplett.userid)
+            AND (tblRechteAMNeu.tf = rapp_Gesamt_komplett.tf)
+            AND (tblRechteAMNeu.`tf_technische_plattform` = rapp_Gesamt_komplett.`tf_technische_plattform`)
         WHERE tblRechteAMNeu.Gefunden = TRUE
             AND tblRechteAMNeu.`geaendert` = FALSE;
     */
