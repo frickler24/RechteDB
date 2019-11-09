@@ -201,8 +201,6 @@ class GesamtlisteTests(TestCase):
             tf_eigentuemer_org =     'Keine Ahnung Org',
             plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
             gf =                     'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
-            vip_kennzeichen =         '',
-            zufallsgenerator =         '',
             af_gueltig_ab =         timezone.now() - timedelta(days=365),
             af_gueltig_bis =         timezone.now() + timedelta(days=365),
             direct_connect =         'no direct connect',
@@ -234,8 +232,6 @@ class GesamtlisteTests(TestCase):
             tf_eigentuemer_org =     'Keine Ahnung Org',
             plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
             gf =                     'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
-            vip_kennzeichen =         '',
-            zufallsgenerator =         '',
             af_gueltig_ab =         timezone.now() - timedelta(days=365),
             af_gueltig_bis =         timezone.now() + timedelta(days=365),
             direct_connect =         'no direct connect',
@@ -431,8 +427,6 @@ class PanelTests(TestCase):
             tf_eigentuemer_org =     'Keine Ahnung Org',
             plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
             gf =                     'rvg_00380_neueGF mit echt mehr Zeichen als üblich',
-            vip_kennzeichen =         '',
-            zufallsgenerator =         '',
             af_gueltig_ab =         timezone.now() - timedelta(days=365),
             af_gueltig_bis =         timezone.now() + timedelta(days=365),
             direct_connect =         'nein',
@@ -464,8 +458,6 @@ class PanelTests(TestCase):
             tf_eigentuemer_org =     'Keine Ahnung Org',
             plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
             gf =                     'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
-            vip_kennzeichen =         '',
-            zufallsgenerator =         '',
             af_gueltig_ab =         timezone.now() - timedelta(days=365),
             af_gueltig_bis =         timezone.now() + timedelta(days=365),
             direct_connect =         'nein',
@@ -497,8 +489,6 @@ class PanelTests(TestCase):
             tf_eigentuemer_org =     'Keine Ahnung Org',
             plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
             gf =                     'ka',
-            vip_kennzeichen =         '',
-            zufallsgenerator =         '',
             af_gueltig_ab =         timezone.now() - timedelta(days=365),
             af_gueltig_bis =         timezone.now() + timedelta(days=365),
             direct_connect =         'ja',
@@ -780,8 +770,6 @@ class PanelExportCSVTest(TestCase):
             tf_eigentuemer_org =     'Keine Ahnung Org',
             plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
             gf =                     'rvg_00380_neueGF mit echt mehr Zeichen als üblich',
-            vip_kennzeichen =         '',
-            zufallsgenerator =         '',
             af_gueltig_ab =         timezone.now() - timedelta(days=365),
             af_gueltig_bis =         timezone.now() + timedelta(days=365),
             direct_connect =         'no direct connect',
@@ -813,8 +801,6 @@ class PanelExportCSVTest(TestCase):
             tf_eigentuemer_org =     'Keine Ahnung Org',
             plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
             gf =                     'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
-            vip_kennzeichen =         '',
-            zufallsgenerator =         '',
             af_gueltig_ab =         timezone.now() - timedelta(days=365),
             af_gueltig_bis =         timezone.now() + timedelta(days=365),
             direct_connect =         'no direct connect',
@@ -838,8 +824,9 @@ class PanelExportCSVTest(TestCase):
     def test_panel_online_without_selection(self):
         url = reverse('panel_download')
         response = self.client.get(url)
+        # print(response.content)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Name\tTeam\tTF\tTF Beschreibung\tAF\tGF\tgf_beschreibung\tZI-Orga\tPlattform\tAF Neu\tGF Neu\tTF Kritikalität\tRecht aktiv\tUser aktiv\tloeschdatum\taf_gueltig_ab\taf_gueltig_bis\tdirect_connect\taf_zuweisungsdatum\ttf_eigentuemer_org\tgefunden\twiedergefunden\tletzte_aenderung", 1)
+        self.assertContains(response, "Name\tTeam\tTF\tTF Beschreibung\tAF\tAF Beschreibung\tHöchste Kritikalitaet TFin AF\tGF\tgf_beschreibung\tZI-Orga\tPlattform\tTF Kritikalität\tRecht aktiv\tUser aktiv\tloeschdatum\taf_gueltig_ab\taf_gueltig_bis\tdirect_connect\taf_zuweisungsdatum\ttf_eigentuemer_org\tgefunden\twiedergefunden\tletzte_aenderung\tAF Neu\tGF Neu\r", 1)
         self.assertContains(response, "Die superlange schnuckelige TF\tDie superlange schnuckelige TF-Beschreibung\t", 1)
         self.assertContains(response, "Die superlange schnuckelige TF2\tDie superlange schnuckelige TF-Beschreibung\t", 1)
         self.assertContains(response, "rva_00458_neue_AF auch mit mehr Zeichen als ", 3)
@@ -853,7 +840,7 @@ class PanelExportCSVTest(TestCase):
         url = '{0}{1}'.format(reverse('panel_download'), '?tf=TF2')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Name\tTeam\tTF\tTF Beschreibung\tAF\tGF\tgf_beschreibung\tZI-Orga\tPlattform\tAF Neu\tGF Neu\tTF Kritikalität\tRecht aktiv\tUser aktiv\tloeschdatum\taf_gueltig_ab\taf_gueltig_bis\tdirect_connect\taf_zuweisungsdatum\ttf_eigentuemer_org\tgefunden\twiedergefunden\tletzte_aenderung", 1)
+        self.assertContains(response, "Name\tTeam\tTF\tTF Beschreibung\tAF\tAF Beschreibung\tHöchste Kritikalitaet TFin AF\tGF\tgf_beschreibung\tZI-Orga\tPlattform\tTF Kritikalität\tRecht aktiv\tUser aktiv\tloeschdatum\taf_gueltig_ab\taf_gueltig_bis\tdirect_connect\taf_zuweisungsdatum\ttf_eigentuemer_org\tgefunden\twiedergefunden\tletzte_aenderung\tAF Neu\tGF Neu", 1)
         self.assertNotContains(response, "Die superlange schnuckelige TF\t")
         self.assertNotContains(response, "rva_00380_neue_AF auch mit mehr Zeichen als ")
         self.assertNotContains(response, "rvg_00380_neueAF mit echt mehr Zeichen als ")

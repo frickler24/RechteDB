@@ -230,8 +230,6 @@ def panel(request):
     panel_filter = PanelFilter(request.GET, queryset=panel_list)
     panel_list = panel_filter.qs
 
-    for x in panel_list:
-        print(x.hoechste_kritikalitaet_tf_in_af)
     (paginator, pages, pagesize) = pagination(request, panel_list, psize=20)
     context = {
         'paginator': paginator,
@@ -264,19 +262,20 @@ def panelDownload(request):
 
     writer = csv.writer(response, delimiter = '\t', quotechar = '"')
     writer.writerow([
+        'UserID',
         'Name',
         'Team',
         'TF',
         'TF Beschreibung',
         'AF',
+        'AF Beschreibung',
+        'Höchste Kritikalitaet TFin AF',
 
         'GF',
         'gf_beschreibung',
         'ZI-Orga',
         'Plattform',
-        'AF Neu',
 
-        'GF Neu',
         'TF Kritikalität',
         'Recht aktiv',
         'User aktiv',
@@ -290,24 +289,27 @@ def panelDownload(request):
 
         'gefunden',
         'wiedergefunden',
-        'letzte_aenderung'
+        'letzte_aenderung',
+        'AF Neu',
+        'GF Neu',
     ])
 
     for obj in panel_list:
         writer.writerow([
+            obj.userid_name.userid,
             obj.userid_name.name,
             obj.userid_name.orga.team,
             obj.tf,
             obj.tf_beschreibung,
             obj.enthalten_in_af,
+            obj.af_beschreibung,
+            obj.hoechste_kritikalitaet_tf_in_af,
 
             obj.gf,
             obj.gf_beschreibung,
             obj.userid_name.zi_organisation,
             obj.plattform.tf_technische_plattform,
-            obj.modell.name_af_neu,
 
-            obj.modell.name_gf_neu,
             obj.tf_kritikalitaet,
             not obj.geloescht,
             not obj.userid_name.geloescht,
@@ -322,6 +324,8 @@ def panelDownload(request):
             not not obj.gefunden,
             obj.wiedergefunden,
             obj.letzte_aenderung,
+            obj.modell.name_af_neu,
+            obj.modell.name_gf_neu,
         ])
 
     return response

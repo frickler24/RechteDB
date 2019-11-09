@@ -303,9 +303,6 @@ class TblGesamt(models.Model):
     plattform = models.ForeignKey('TblPlattform', db_column='plattform_id', on_delete=models.CASCADE,
                                   verbose_name='Plattform', db_index=True)
     gf = models.CharField(db_column='gf', max_length=100, blank=True, null=True, verbose_name='GF')
-    vip_kennzeichen = models.CharField(db_column='vip', max_length=32, blank=True, null=True, verbose_name='VIP')
-    zufallsgenerator = models.CharField(db_column='zufallsgenerator', max_length=32, blank=True, null=True,
-                                        verbose_name='Zufallsgenerator')
     af_gueltig_ab = models.DateTimeField(db_column='af_gueltig_ab', blank=True, null=True,
                                          verbose_name='AF gültig ab')
     af_gueltig_bis = models.DateTimeField(db_column='af_gueltig_bis', blank=True, null=True,
@@ -338,8 +335,7 @@ class TblGesamt(models.Model):
         db_table = 'tblGesamt'
         verbose_name = "Eintrag der Gesamttabelle (tblGesamt)"
         verbose_name_plural = "08_Gesamttabelle Übersicht (tblGesamt)"
-        index_together = (('userid_name', 'tf', 'enthalten_in_af', 'plattform',
-                           'gf', 'vip_kennzeichen', 'zufallsgenerator'),
+        index_together = (('userid_name', 'tf', 'enthalten_in_af', 'plattform', 'gf'),
                           ('gf', 'enthalten_in_af'),
                          )
         ordering = ['id'] # Ist erforderlich wegen Paginierter Anzeige
@@ -393,9 +389,6 @@ class TblGesamtHistorie(models.Model):
     plattform = models.ForeignKey('TblPlattform', db_column='plattform_id', on_delete=models.CASCADE,
                                   verbose_name='Plattform')  # Field name made lowercase.
     gf = models.CharField(db_column='gf', max_length=100, blank=True, null=True, verbose_name='GF')
-    vip_kennzeichen = models.CharField(db_column='vip', max_length=32, blank=True, null=True, verbose_name='VIP')
-    zufallsgenerator = models.CharField(db_column='zufallsgenerator', max_length=32, blank=True, null=True,
-                                        verbose_name='Zufallsgenerator')
     datum = models.DateTimeField(db_column='datum', verbose_name='Recht gefunden am')
     geloescht = models.IntegerField(db_column='geloescht', blank=True, null=True, verbose_name='gelöscht')
     gefunden = models.IntegerField(blank=True, null=True)
@@ -612,8 +605,6 @@ class Tblrechteamneu(models.Model):
     tf_technische_plattform = models.CharField(db_column='tf_technische_plattform', max_length=64, blank=True,
                                                null=True, db_index=True)
     gf = models.CharField(db_column='gf', max_length=100, blank=True, null=True, db_index=True)
-    vip_kennzeichen = models.CharField(db_column='vip', max_length=32, blank=True, null=True)
-    zufallsgenerator = models.CharField(db_column='zufallsgenerator', max_length=32, blank=True, null=True)
     af_gueltig_ab = models.DateTimeField(db_column='af_gueltig_ab', blank=True, null=True)
     af_gueltig_bis = models.DateTimeField(db_column='af_gueltig_bis', blank=True, null=True)
     direct_connect = models.CharField(db_column='direct_connect', max_length=50, blank=True, null=True)

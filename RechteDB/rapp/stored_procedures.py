@@ -117,8 +117,6 @@ BEGIN
                `tf eigentümer org`               AS tf_eigentuemer_org,
                `tf Applikation`                  AS tf_technische_plattform,
                `GF name`                         AS GF,
-               'gibt es nicht mehr'              AS vip,
-               'gibt es nicht mehr'              AS zufallsgenerator,
                `af gültig ab`                    AS af_gueltig_ab,
                `af gültig bis`                   AS af_gueltig_bis,
                `direct connect`                  AS direct_connect,
@@ -142,7 +140,7 @@ BEGIN
     INSERT INTO tblRechteAMNeu (userid, name, tf, `tf_beschreibung`, 
                 `enthalten_in_af`, `af_beschreibung`,
                 `tf_kritikalitaet`,
-                `tf_eigentuemer_org`, `tf_technische_plattform`, GF, `vip`, zufallsgenerator,
+                `tf_eigentuemer_org`, `tf_technische_plattform`, GF, 
                 `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
                 `gf_beschreibung`, `af_zuweisungsdatum`, doppelerkennung)
     SELECT rapp_NeuVonImportDuplikatfrei.userid,
@@ -155,8 +153,6 @@ BEGIN
            rapp_NeuVonImportDuplikatfrei.`tf_eigentuemer_org`,
            rapp_NeuVonImportDuplikatfrei.`tf_technische_plattform`,
            rapp_NeuVonImportDuplikatfrei.GF,
-           rapp_NeuVonImportDuplikatfrei.`vip`,
-           rapp_NeuVonImportDuplikatfrei.zufallsgenerator,
            rapp_NeuVonImportDuplikatfrei.`af_gueltig_ab`,
            rapp_NeuVonImportDuplikatfrei.`af_gueltig_bis`,
            rapp_NeuVonImportDuplikatfrei.`direct_connect`,
@@ -492,8 +488,6 @@ BEGIN
                tblGesamt.`tf_eigentuemer_org`,
                tblPlattform.`tf_technische_plattform`,
                tblGesamt.GF,
-               tblGesamt.`vip`,
-               tblGesamt.zufallsgenerator,
                tblGesamt.modell,
                tblUserIDundName.orga_id,
                tblUserIDundName.`zi_organisation`,
@@ -594,13 +588,12 @@ BEGIN
         ;
 
     /*
-        qryF5c_HistorisiereGeaenderteEintraege
         In die Historientabelle werden die zur Änderung vorgemerkten Einträge aus der Gesamttabelle kopiert.
     */
 
     INSERT INTO tblGesamtHistorie (`userid_und_name_id`, tf, `tf_beschreibung`, 
                 `enthalten_in_af`,`af_beschreibung`, modell, `tf_kritikalitaet`,
-                `tf_eigentuemer_org`, plattform_id, GF, `vip`, zufallsgenerator, geloescht, gefunden,
+                `tf_eigentuemer_org`, plattform_id, GF, geloescht, gefunden,
                 wiedergefunden, geaendert, neueaf, datum, `id_alt`, loeschdatum, `hk_tf_in_af`
 )
     SELECT tblGesamt.`userid_und_name_id`,
@@ -613,8 +606,6 @@ BEGIN
            tblGesamt.`tf_eigentuemer_org`,
            tblGesamt.plattform_id,
            tblGesamt.GF,
-           tblGesamt.`vip`,
-           tblGesamt.zufallsgenerator,
            tblGesamt.geloescht,
            tblGesamt.gefunden,
            Now() AS Ausdr1,
@@ -674,9 +665,7 @@ BEGIN
 
     UPDATE tblRechteAMNeu
         INNER JOIN rapp_Gesamt_komplett
-        ON (rapp_Gesamt_komplett.zufallsgenerator = tblRechteAMNeu.zufallsgenerator)
-            AND (rapp_Gesamt_komplett.`vip` = tblRechteAMNeu.`vip`)
-            AND (tblRechteAMNeu.GF = rapp_Gesamt_komplett.GF)
+        ON (tblRechteAMNeu.GF = rapp_Gesamt_komplett.GF)
             AND (tblRechteAMNeu.`enthalten_in_af` = rapp_Gesamt_komplett.`enthalten_in_af`)
             AND (tblRechteAMNeu.userid = rapp_Gesamt_komplett.userid)
             AND (tblRechteAMNeu.tf = rapp_Gesamt_komplett.tf)
@@ -690,9 +679,7 @@ BEGIN
 
     SELECT COUNT(*) FROM tblRechteAMNeu
         INNER JOIN rapp_Gesamt_komplett
-        ON (rapp_Gesamt_komplett.zufallsgenerator = tblRechteAMNeu.zufallsgenerator)
-            AND (rapp_Gesamt_komplett.`vip` = tblRechteAMNeu.`vip`)
-            AND (tblRechteAMNeu.GF = rapp_Gesamt_komplett.GF)
+        ON (tblRechteAMNeu.GF = rapp_Gesamt_komplett.GF)
             AND (tblRechteAMNeu.`enthalten_in_af` = rapp_Gesamt_komplett.`enthalten_in_af`)
             AND (tblRechteAMNeu.userid = rapp_Gesamt_komplett.userid)
             AND (tblRechteAMNeu.tf = rapp_Gesamt_komplett.tf)
@@ -711,8 +698,8 @@ BEGIN
 
     INSERT INTO tblGesamt (tf, `tf_beschreibung`, `enthalten_in_af`, `af_beschreibung`,  
                 datum, modell, `userid_und_name_id`,
-                plattform_id, Gefunden, `geaendert`, `tf_kritikalitaet`, `tf_eigentuemer_org`, GF, `vip`,
-                zufallsgenerator, `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
+                plattform_id, Gefunden, `geaendert`, `tf_kritikalitaet`, `tf_eigentuemer_org`, GF,
+                `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
                 `gf_beschreibung`, `af_zuweisungsdatum`, letzte_aenderung)
     SELECT  tblRechteAMNeu.tf,
             tblRechteAMNeu.`tf_beschreibung`,
@@ -740,8 +727,6 @@ BEGIN
             tblRechteAMNeu.`tf_kritikalitaet`,
             tblRechteAMNeu.`tf_eigentuemer_org`,
             tblRechteAMNeu.GF,
-            tblRechteAMNeu.`vip`,
-            tblRechteAMNeu.zufallsgenerator,
             tblRechteAMNeu.`af_gueltig_ab`,
             tblRechteAMNeu.`af_gueltig_bis`,
             tblRechteAMNeu.`direct_connect`,
@@ -806,7 +791,7 @@ BEGIN
     INSERT INTO tblGesamt (tf, `tf_beschreibung`, `enthalten_in_af`,  `Af_beschreibung`,
                 datum, modell, `userid_und_name_id`,
                 plattform_id, Gefunden, `geaendert`, `tf_kritikalitaet`, `tf_eigentuemer_org`, geloescht, GF,
-                `vip`, zufallsgenerator, `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`,
+                `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`,
                 `hk_tf_in_af`, `gf_beschreibung`, `af_zuweisungsdatum`, letzte_aenderung)
     SELECT  tblRechteAMNeu.tf,
             tblRechteAMNeu.`tf_beschreibung`,
@@ -827,8 +812,6 @@ BEGIN
             tblRechteAMNeu.`tf_eigentuemer_org`,
             FALSE AS Ausdr3,
             tblRechteAMNeu.GF,
-            tblRechteAMNeu.`vip`,
-            tblRechteAMNeu.zufallsgenerator,
             tblRechteAMNeu.`af_gueltig_ab`,
             tblRechteAMNeu.`af_gueltig_bis`,
             tblRechteAMNeu.`direct_connect`,
@@ -936,9 +919,7 @@ BEGIN
             b.geloescht as UserGeloescht,
             tblUserIDundName.userid,
             tblUserIDundName.name,
-            a.GF,
-            a.vip,
-            a.zufallsgenerator
+            a.GF
 
             FROM tblGesamt AS b,
                 tblUserIDundName
@@ -948,8 +929,6 @@ BEGIN
                 AND COALESCE(a.geloescht, FALSE) = FALSE
                 AND COALESCE(a.geloescht, FALSE) = FALSE
                 AND a.GF = b.gf
-                AND a.vip = b.vip
-                AND a.zufallsgenerator = b.zufallsgenerator
                 AND a.userid_und_name_id =b.userid_und_name_id
                 AND a.tf = b.tf
                 AND a.enthalten_in_af = b.enthalten_in_af

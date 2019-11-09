@@ -81,15 +81,16 @@ class GesamtAdmin(ImportExportModelAdmin):
     # Braucht so eigentlich niemand...
     fieldsets = [
         ('Standard-Informationen', {'fields': ['userid_name', 'tf', 'tf_beschreibung',
-                                                   'enthalten_in_af', 'modell',
-                                                'plattform', 'gf', 'af_gueltig_bis', 'direct_connect',
-                                                'af_zuweisungsdatum', 'datum', 'geloescht', ]}),
+                                               'enthalten_in_af',
+                                               'af_beschreibung',
+                                               'plattform', 'gf', 'af_gueltig_bis',
+                                               'modell', 'direct_connect',
+                                               'af_zuweisungsdatum', 'datum', 'geloescht', ]}),
         ('Detail-Informationen  ', {'fields': ['tf_kritikalitaet', 'tf_eigentuemer_org',
-                                                   'vip_kennzeichen', 'zufallsgenerator',
-                                                'af_gueltig_ab', 'hoechste_kritikalitaet_tf_in_af', 'gf_beschreibung',
-                                                'gefunden', 'wiedergefunden', 'geaendert', 'neueaf', 'nicht_ai',
-                                                'patchdatum', 'wertmodellvorpatch', 'loeschdatum', ],
-                                                'classes': ['collapse']}),
+                                               'af_gueltig_ab', 'hoechste_kritikalitaet_tf_in_af', 'gf_beschreibung',
+                                               'gefunden', 'wiedergefunden', 'geaendert', 'neueaf', 'nicht_ai',
+                                               'patchdatum', 'wertmodellvorpatch', 'loeschdatum', ],
+                                               'classes': ['collapse']}),
     ]
     list_display = ('id', 'userid_name', 'tf', 'tf_beschreibung', 'enthalten_in_af', 'gf',
         'plattform', 'get_direct_connect', 'get_active',
@@ -98,7 +99,7 @@ class GesamtAdmin(ImportExportModelAdmin):
     list_display_links = ('id', )
     list_editable = ('tf', 'tf_beschreibung', 'enthalten_in_af', 'plattform', 'gf', )
     search_fields = ['id', 'userid_name__name', 'tf',
-                    'tf_beschreibung', #'enthalten_in_af', 'plattform', 'gf',
+                    'tf_beschreibung', 'af_beschreibung'
     ]
 
     list_per_page = 50
@@ -209,7 +210,7 @@ class TblGesamtHistorie(admin.ModelAdmin):
 
     list_display = ('id', 'id_alt', 'userid_name', 'tf', 'tf_beschreibung', 'enthalten_in_af', 'gf',
                     'modell', 'tf_kritikalitaet', 'tf_eigentuemer_org', 'plattform',
-                    'vip_kennzeichen', 'zufallsgenerator', 'datum', 'geloescht', 'gefunden', 'wiedergefunden', 'geaendert', 'neueaf',
+                    'datum', 'geloescht', 'gefunden', 'wiedergefunden', 'geaendert', 'neueaf',
                     'loeschdatum', )
 
     search_fields = ['id_alt__id', 'userid_name__name', 'tf', 'tf_beschreibung', 'enthalten_in_af',]
