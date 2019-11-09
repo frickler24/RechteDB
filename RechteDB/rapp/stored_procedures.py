@@ -107,23 +107,24 @@ BEGIN
     */
     drop table if exists qryF3_RechteNeuVonImportDuplikatfrei;
     create temporary table qryF3_RechteNeuVonImportDuplikatfrei as
-        SELECT `AF zugewiesen an Account-name`         AS userid,
-               CONCAT(`Nachname`,', ',`Vorname`)     AS name,
-               `tf name`                             AS tf,
-               `tf beschreibung`                     AS tf_beschreibung,
-               `AF Anzeigename`                     AS enthalten_in_af,
-               `tf kritikalität`                     AS tf_kritikalitaet,
-               `tf eigentümer org`                     AS tf_eigentuemer_org,
-               `tf Applikation`                     AS tf_technische_plattform,
-               `GF name`                             AS GF,
-               'gibt es nicht mehr'                 AS vip,
-               'gibt es nicht mehr'                    AS zufallsgenerator,
-               `af gültig ab`                        AS af_gueltig_ab,
-               `af gültig bis`                        AS af_gueltig_bis,
-               `direct connect`                        AS direct_connect,
-               `höchste kritikalität tf in af`        AS hk_tf_in_af,
-               `gf beschreibung`                    AS gf_beschreibung,
-               `af zuweisungsdatum`                    AS af_zuweisungsdatum
+        SELECT `AF zugewiesen an Account-name`   AS userid,
+               CONCAT(`Nachname`,', ',`Vorname`) AS name,
+               `TF Name`                         AS tf,
+               `TF Beschreibung`                 AS tf_beschreibung,
+               `AF Anzeigename`                  AS enthalten_in_af,
+               `AF Beschreibung`                 AS af_beschreibung,
+               `TF Kritikalität`                 AS tf_kritikalitaet,
+               `TF Eigentümer Org`               AS tf_eigentuemer_org,
+               `TF Applikation`                  AS tf_technische_plattform,
+               `GF Name`                         AS GF,
+               'gibt es nicht mehr'              AS vip,
+               'gibt es nicht mehr'              AS zufallsgenerator,
+               `AF Gültig ab`                    AS af_gueltig_ab,
+               `AF Gültig bis`                   AS af_gueltig_bis,
+               `Direct Connect`                  AS direct_connect,
+               `Höchste Kritikalität TF in AF`   AS hk_tf_in_af,
+               `GF Beschreibung`                 AS gf_beschreibung,
+               `AF Zuweisungsdatum`              AS af_zuweisungsdatum
         FROM tblRechteNeuVonImport
         GROUP BY `userid`,
                  `tf`,
@@ -141,7 +142,7 @@ BEGIN
     INSERT INTO tblRechteAMNeu (userid, name, tf, `tf_beschreibung`, `enthalten_in_af`, `tf_kritikalitaet`,
                 `tf_eigentuemer_org`, `tf_technische_plattform`, GF, `vip`, zufallsgenerator,
                 `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
-                `gf_beschreibung`, `af_zuweisungsdatum`, doppelerkennung)
+                `gf_beschreibung`, `af_zuweisungsdatum`, doppelerkennung, af_beschreibung)
     SELECT qryF3_RechteNeuVonImportDuplikatfrei.userid,
            qryF3_RechteNeuVonImportDuplikatfrei.name,
            qryF3_RechteNeuVonImportDuplikatfrei.tf,
@@ -159,7 +160,8 @@ BEGIN
            qryF3_RechteNeuVonImportDuplikatfrei.`hk_tf_in_af`,
            qryF3_RechteNeuVonImportDuplikatfrei.`gf_beschreibung`,
            qryF3_RechteNeuVonImportDuplikatfrei.`af_zuweisungsdatum`,
-           0
+           0,
+           qryF3_RechteNeuVonImportDuplikatfrei.`af_beschreibung`
     FROM qryF3_RechteNeuVonImportDuplikatfrei
     ON DUPLICATE KEY UPDATE doppelerkennung=doppelerkennung+1;
 
@@ -179,6 +181,7 @@ BEGIN
     UPDATE tblRechteAMNeu SET `GF` = 'k.A.' WHERE GF Is Null or GF = '';
     UPDATE tblRechteAMNeu SET `vip` = 'k.A.' WHERE `vip` Is Null or  `vip` = '';
     UPDATE tblRechteAMNeu SET `zufallsgenerator` = 'k.A.' WHERE `zufallsgenerator` Is Null or `zufallsgenerator` = '';
+    UPDATE tblRechteAMNeu SET `af_beschreibung` = 'keine geliefert bekommmen' WHERE `af_beschreibung` Is Null or `af_beschreibung` = '';
 
 
     /*
@@ -237,8 +240,8 @@ BEGIN
         Dies geschieht aber erst im nächsten Schritt 'behandleUser'.
     */
 
-    drop table if exists qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a;
-    create table qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a as
+    drop table if exists neue_user;
+    create table neue_user as
         SELECT DISTINCT tblRechteAMNeu.userid as userid1,
                         tblRechteAMNeu.name as name1,
                         '35' AS Ausdr1,
@@ -262,8 +265,8 @@ BEGIN
         ToDo: Mal checken, ob wir die Tabelle wirklich materialisiert benötigen oder nicht (evtl. zur Ansicht?)
     */
 
-    drop table if exists qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a;
-    create table qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a as
+    drop table if exists geloeschte_user;
+    create table geloeschte_user as
     SELECT A.userid, A.name, A.`zi_organisation`
         FROM tblUserIDundName A
         WHERE   A.`zi_organisation` = orga
@@ -275,18 +278,18 @@ BEGIN
             A.`zi_organisation`
     ;
 
-    -- SELECT * from qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a;
+    -- SELECT * from geloeschte_user;
 
     -- Ein bisschen Statistik für den Anwender
     
-    -- select count(*) INTO anzahlNeueUser from qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a;
-    -- select count(*) INTO anzahlGeloeschteUser from qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a;
+    -- select count(*) INTO anzahlNeueUser from neue_user;
+    -- select count(*) INTO anzahlGeloeschteUser from geloeschte_user;
     -- select count(*) INTO anzahlGeleseneRechte from tblRechteNeuVonImport;
     -- select count(*) INTO anzahlRechteInAMneu from tblRechteAMNeu;
 
-    select 'Anzahl neuer User' as name, count(*) as wert from qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a 
+    select 'Anzahl neuer User' as name, count(*) as wert from neue_user 
     UNION
-    select 'Anzahl gelöschter User' as name, count(*) as wert from qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
+    select 'Anzahl gelöschter User' as name, count(*) as wert from geloeschte_user
     UNION
     select 'Anzahl gelesener Rechte' as name, count(*) as wert from tblRechteNeuVonImport
     UNION
@@ -329,9 +332,9 @@ BEGIN
         (ehemals qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a2 u.a.)
     * /
     drop table if exists qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a2;
-    create temporary table qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a2 as
+    create temporary table neue_user_tmp as
         SELECT userid1, name1, Ausdr1, Ausdr2, geloescht
-            FROM qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a
+            FROM neue_user
             WHERE (`geloescht` = FALSE or `geloescht` IS NULL)
                 AND (userid1 IS NOT NULL OR name1 IS NOT NULL);
 
@@ -340,7 +343,7 @@ BEGIN
                 name1,
                 Ausdr1 AS orga_id,
                 Ausdr2 AS `zi_organisation`
-            FROM qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a2;
+            FROM neue_user_tmp;
     */
     INSERT INTO tblUserIDundName (userid, name, orga_id, `zi_organisation`, geloescht, gruppe, abteilung )
         SELECT userid1, name1, Ausdr1 AS orga_id, Ausdr2 AS `zi_organisation`, 
@@ -361,7 +364,8 @@ BEGIN
     INSERT INTO tblGesamtHistorie (
                 `userid_und_name_id`, tf, `tf_beschreibung`, `enthalten_in_af`,
                 modell, `tf_kritikalitaet`, `tf_eigentuemer_org`, `af_zuweisungsdatum`,
-                plattform_id, GF, geloescht, gefunden, wiedergefunden, geaendert, loeschdatum, neueaf, datum, `id_alt`
+                plattform_id, GF, geloescht, gefunden, wiedergefunden, geaendert, 
+                loeschdatum, neueaf, datum, `id_alt`, `af_beschreibung`
             )
     SELECT `tblGesamt`.`userid_und_name_id`,
            `tblGesamt`.tf,
@@ -380,13 +384,14 @@ BEGIN
            Now() AS Ausdr1,
            `tblGesamt`.neueaf,
            `tblGesamt`.datum,
-           `tblGesamt`.id
+           `tblGesamt`.id,
+           `af_beschreibung`
         FROM `tblGesamt`
         INNER JOIN (tblUserIDundName
-                    inner join qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
-                    on qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a.userid = tblUserIDundName.userid)
+                    inner join geloeschte_user
+                    on geloeschte_user.userid = tblUserIDundName.userid)
             ON tblUserIDundName.id = `tblGesamt`.`userid_und_name_id`
-        WHERE tblUserIDundName.userid IN (SELECT userid FROM `qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a`)
+        WHERE tblUserIDundName.userid IN (SELECT userid FROM `geloeschte_user`)
             AND COALESCE(tblUserIDundName.`geloescht`, FALSE) = FALSE;
 
 
@@ -395,8 +400,8 @@ BEGIN
     UPDATE
         tblGesamt
         INNER JOIN (tblUserIDundName
-                    inner join qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
-                    on qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a.userid = tblUserIDundName.userid)
+                    inner join geloeschte_user
+                    on geloeschte_user.userid = tblUserIDundName.userid)
             ON tblGesamt.`userid_und_name_id` = tblUserIDundName.id
         SET tblGesamt.geloescht = TRUE,
             tblGesamt.`loeschdatum` = Now()
@@ -405,8 +410,8 @@ BEGIN
     -- Die zu löschenden User werden in der User-Tabelle nun auf "geloescht" gesetzt
 
     UPDATE tblUserIDundName
-        INNER JOIN qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
-            ON qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a.userid = tblUserIDundName.userid
+        INNER JOIN geloeschte_user
+            ON geloeschte_user.userid = tblUserIDundName.userid
         SET `geloescht` = TRUE
         WHERE COALESCE(`geloescht`, FALSE) = FALSE;
 
