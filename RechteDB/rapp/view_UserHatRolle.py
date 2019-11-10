@@ -1,6 +1,4 @@
 from __future__ import unicode_literals
-# Create your views here.
-
 
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
@@ -11,7 +9,6 @@ from django.shortcuts import render, redirect
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.utils.encoding import smart_str
 import csv
-import copy
 
 from .filters import RollenFilter, UseridFilter
 from .xhtml2 import render_to_pdf
@@ -23,10 +20,7 @@ from .models import TblGesamt
 from .models import TblRollehataf
 from .models import TblUserhatrolle
 from .models import TblOrga
-from .models import TblAfliste
-from .models import TblRollen
-# from django.contrib.auth.decorators import login_required
-# from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import RACF_Rechte
 
 from .templatetags.gethash import finde
 from django.utils import timezone
@@ -112,7 +106,7 @@ class UhRUpdate(UpdateView):
         # print (url)
         return url
 
-def UhR_erzeuge_listen(request):
+def UhR_erzeuge_gefiltere_namensliste(request):
     """
     Finde alle relevanten Informationen zur aktuellen Selektion: UserIDs und zugehörige Orga
 
@@ -121,7 +115,7 @@ def UhR_erzeuge_listen(request):
     Geliefert werden nur die XV-Nummern zu den Namen (diese muss es je Namen zwingend geben)
 
     Die dort gefundene Treffermenge wird angereichert um die relevanten Daten aus TblUserHatRolle.
-    Hier werden allerdings alle UserIDen zurückgeliefert je Name.
+    Hier werden alle UserIDen zurückgeliefert je Name.
     Von dort aus gibt eine ForeignKey-Verbindung zu TblRollen.
 
     Problematisch ist noch die Verbindung zwischen TblRollen und TblRollaHatAf,
@@ -135,7 +129,6 @@ def UhR_erzeuge_listen(request):
     panel_liste = TblUserIDundName.objects.filter(geloescht=False).order_by('name')
     panel_filter = UseridFilter(request.GET, queryset=panel_liste)
     namen_liste = panel_filter.qs.filter(userid__istartswith="xv").select_related("orga")
-    # panel_liste = panel_filter.qs.filter(userid__istartswith="xv").select_related("orga")
 
     """
     # Ein paar Testzugriffe über das komplette Modell
@@ -178,7 +171,7 @@ def UhR_erzeuge_listen(request):
 
 def UhR_erzeuge_listen_ohne_rollen(request):
     """
-    Liefert zusätzlich zu den Daten aus UhR_erzeuge_listen noch eine leere Rollenliste,
+    Liefert zusätzlich zu den Daten aus UhR_erzeuge_gefiltere_namensliste noch eine leere Rollenliste,
     damit das Suchfeld angezeigt wird
     :param request:
     :return: namen_liste, panel_liste, panel_filter, rollen_liste, rollen_filter
@@ -189,12 +182,12 @@ def UhR_erzeuge_listen_ohne_rollen(request):
     rollen_filter = RollenFilter(request.GET, queryset=rollen_liste)
 
     # Und nun die eigentlich wichtigen Daten holen
-    (namen_liste, panel_filter) = UhR_erzeuge_listen(request)
+    (namen_liste, panel_filter) = UhR_erzeuge_gefiltere_namensliste(request)
     return (namen_liste, panel_filter, rollen_liste, rollen_filter)
 
 def UhR_erzeuge_listen_mit_rollen(request):
     """
-    Liefert zusätzlich zu den Daten aus UhR_erzeuge_listen noch die dazu gehörenden Rollen.
+    Liefert zusätzlich zu den Daten aus UhR_erzeuge_gefiltere_namensliste noch die dazu gehörenden Rollen.
     Ausgangspunkt sind die Rollen, nach denen gesucht werden soll.
     Daran hängen UserIDs, die wiederum geeignet gefilter werden nach den zu findenden Usern
 
@@ -217,7 +210,7 @@ def UhR_erzeuge_listen_mit_rollen(request):
             .order_by('rollenname')
     rollen_filter = RollenFilter(request.GET, queryset=rollen_liste)
 
-    (namen_liste, panel_filter) = UhR_erzeuge_listen(request)
+    (namen_liste, panel_filter) = UhR_erzeuge_gefiltere_namensliste(request)
 
     return (namen_liste, panel_filter, rollen_liste, rollen_filter)
 
@@ -395,17 +388,7 @@ def hole_af_mengen(userids, gesuchte_rolle):
 
     """
 
-    if gesuchte_rolle is None or gesuchte_rolle == "-":
-        such_af = TblRollehataf.objects.all()\
-            .values('af__af_name')\
-            .distinct()\
-            .order_by('af__af_name')
-    else:
-        such_af = TblRollehataf.objects\
-            .filter(rollenname__rollenname__icontains = gesuchte_rolle)\
-            .values('af__af_name')\
-            .distinct()\
-            .order_by('af__af_name')
+    such_af = liefere_af_zu_rolle(gesuchte_rolle)
 
     af_dict = {}
     for name in dict(userids):
@@ -433,6 +416,26 @@ def hole_af_mengen(userids, gesuchte_rolle):
             af_menge = set([af.enthalten_in_af for af in af_liste])
             af_dict[userid] = af_menge
     return af_dict
+
+def liefere_af_zu_rolle(gesuchte_rolle):
+    """
+    Hole die Einträge in TblRolleHatAF, die zu einer engegebenen Rolle passen.
+    Wurde None oder "-" übergeben als Rollenname, liefere die Liste für alle Rollen
+    :param gesuchte_rolle: EIN Rollenname oder None oder "-"
+    :return: Trefferergebnis der Abfrage
+    """
+    if gesuchte_rolle is None or gesuchte_rolle == "-":
+        such_af = TblRollehataf.objects.all() \
+            .values('af__af_name') \
+            .distinct() \
+            .order_by('af__af_name')
+    else:
+        such_af = TblRollehataf.objects \
+            .filter(rollenname__rollenname__icontains=gesuchte_rolle) \
+            .values('af__af_name') \
+            .distinct() \
+            .order_by('af__af_name')
+    return such_af
 
 def suche_nach_none_wert(bekannte_rollen):
     """
@@ -491,9 +494,6 @@ def UhR_verdichte_daten(panel_liste):
               (keine Doppelnennungen von Rollen,
               aber ggfs. Mehrfachnennungen von AFen,
               wenn sie in Rollen mehrfach enthalten sind)
-
-    Ergebnis ist Liste von
-
     """
     usernamen = set()
     userids = set()
@@ -677,9 +677,6 @@ def erzeuge_UhR_konzept(request, ansicht):
     :return: Gerendertes HTML
     """
 
-    # Erst mal die relevanten User-Listen holen - sie sind abhängig von Filtereinstellungen
-    (namen_liste, panel_filter) = UhR_erzeuge_listen(request)
-
     def representsInt(s):
         try:
             int(s)
@@ -714,12 +711,8 @@ def erzeuge_UhR_konzept(request, ansicht):
             retval += gruppe
         return retval
 
-    if request.method == 'GET':
-        (rollenMenge, userids, usernamen) = UhR_verdichte_daten(namen_liste)
-    else:
-        (rollenMenge, userids, usernamen) = (set(), set(), set())
-
-    if request.GET.get('display') == '1':
+    def logging(request, rollenMenge, userids, usernamen):
+        if request.GET.get('display') == '1':
             print('rollenMenge')
             print(rollenMenge)
 
@@ -731,9 +724,121 @@ def erzeuge_UhR_konzept(request, ansicht):
             for a in usernamen:
                 print(a)
 
+    def erzeuge_pdf_header(request, pdf):
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = erzeuge_pdf_namen(request)
+        content = "inline; filename={}".format(filename)
+        download = request.GET.get("download")
+        if download:
+            content = "attachment; filename={}".format(filename)
+        response['Content-Disposition'] = content
+        return response
+
+    def element_noch_nicht_vorhanden(menge, element):
+        """
+        Suche nach Einträgen in der übergebenen Menge,
+        die - ausser der Klein-/Großschreibung -
+        identisch mmit dem Suchstring sind
+        :param menge: Die bereits vorhandene Menge
+        :param element: Der Suchstring
+        :return: True, wenn das Element noch nicht vorhanden ist, sonst False
+        """
+        suche = element.lower()
+        for e in menge:
+            if e.lower() == suche:
+                return False
+        return True
+
+    def liefere_racf_zu_tfs(tf_menge):
+        """
+        Liefert zu einer TF-Menge die Menge der dazugehörenden RACF-Profile
+
+        :param tf_menge: Die Menge der TFen, zu denen die RACF-Profile geliefert werden sollen
+        :return: Die RACF-Profile als Hash (racf[TF] = RACF-Info
+        """
+        racf_liste = RACF_Rechte.objects \
+            .filter(group__in=tf_menge) \
+            .order_by('group', 'profil') \
+            .values()
+        print('RACF-Liste = {}'.format(racf_liste))
+
+        return racf_liste
+        racf_menge = set([group[''] for group in racf_liste])
+        for tf in tf_liste:
+            if element_noch_nicht_vorhanden(tf_menge, tf['tf']):
+                tf_menge.add(tf['tf'])
+
+        for tf in tf_menge:
+            print(tf)
+
+        return tf_menge
+
+
+    def liefere_db2_liste(tf_liste):
+        return set()
+
+    def liefere_tf_zu_afs(af_menge):
+        """
+        Liefert zu einer AF-Liste die Menge der dazugehörenden TFen
+
+        Aus historischen Grü+nden erhalten wir dieselben TFen in verschiedenen
+        Case-Schreibweisen.
+        Beispiel:
+            CN=A_CONNECTDIRECT,OU=Sicherheitsgruppen,OU=gruppen,DC=RUV,DC=DE
+            CN=A_CONNECTDIRECT,OU=Sicherheitsgruppen,OU=Gruppen,DC=RUV,DC=DE
+        Deshalb suchen wir zunächst nach dem einzufügenden Element in Klein-Schreibweise
+        und fügen es nur dann dem Ergbnis hinzu, wenn es noch nicht existiert.
+        Damit wir die jeweils jüngste Schreibweise zurückliefern,
+        erfolgt in der Query bereits eine Sortierung nach dem Datum des Auffindens.
+
+        :param af_menge: Die Mmegne der AFen, zu denen die TF-Menge geliefert werden soll
+        :return: Die TF-Menge
+        """
+
+        tf_liste = TblGesamt.objects \
+            .exclude(userid_name_id__geloescht=True) \
+            .exclude(geloescht=True) \
+            .filter(enthalten_in_af__in=af_menge) \
+            .order_by('-gefunden', '-wiedergefunden') \
+            .values('tf')
+
+        tf_menge = set()
+        for tf in tf_liste:
+            if element_noch_nicht_vorhanden(tf_menge, tf['tf']):
+                tf_menge.add(tf['tf'])
+
+        for tf in tf_menge:
+            print(tf)
+
+        return tf_menge
+
+    def liefere_tf_liste(rollenMenge):
+        af_menge = set()
+        for rolle in rollenMenge:
+            af_liste = liefere_af_zu_rolle(rolle)
+            af_menge.update(set([af['af__af_name'] for af in af_liste]))
+        tf_menge = liefere_tf_zu_afs(af_menge)
+        return tf_menge
+
+    # Erst mal die relevanten User-Listen holen - sie sind abhängig von Filtereinstellungen
+    (namen_liste, panel_filter) = UhR_erzeuge_gefiltere_namensliste(request)
+
+    if request.method == 'GET':
+        (rollenMenge, userids, usernamen) = UhR_verdichte_daten(namen_liste)
+    else:
+        (rollenMenge, userids, usernamen) = (set(), set(), set())
+    logging(request, rollenMenge, userids, usernamen)
+
+    tf_menge = liefere_tf_liste(rollenMenge)
+    racf_menge = liefere_racf_zu_tfs(tf_menge)
+    for x in racf_menge:
+        print(x['group'], x['profil'])
+
     context = {
         'filter': panel_filter,
         'rollenMenge': rollenMenge,
+        'tf_menge': tf_menge,
+        'racf_menge': racf_menge,
         'version': version,
         'ueberschrift': erzeuge_ueberschrift(),
         'stand': erzeuge_datum(),
@@ -743,15 +848,10 @@ def erzeuge_UhR_konzept(request, ansicht):
 
     pdf = render_to_pdf('rapp/panel_UhR_konzept_pdf.html', context)
     if pdf:
-        response = HttpResponse(pdf, content_type='application/pdf')
-        filename = erzeuge_pdf_namen(request)
-        content = "inline; filename={}".format(filename)
-        download = request.GET.get("download")
-        if download:
-            content = "attachment; filename={}".format(filename)
-        response['Content-Disposition'] = content
-        return response
+        return erzeuge_pdf_header(request, pdf)
     return HttpResponse("Fehlerhafte PDF-Generierung in erzeuge_UhR_konzept")
+
+
 
 # Funktionen zum Erstellen des Funktionsmatrix
 def erzeuge_UhR_matrixdaten(panel_liste):
@@ -811,7 +911,7 @@ def panel_UhR_matrix(request):
     """
 
     # Erst mal die relevanten User-Listen holen - sie sind abhängig von Filtereinstellungen
-    (namen_liste, panel_filter) = UhR_erzeuge_listen(request)
+    (namen_liste, panel_filter) = UhR_erzeuge_gefiltere_namensliste(request)
 
     if request.method == 'GET':
         (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(namen_liste)
@@ -867,7 +967,7 @@ def panel_UhR_matrix_csv(request, flag = False):
     if request.method != 'GET':
         return HttpResponse("Fehlerhafte CSV-Generierung in panel_UhR_matrix_csv")
 
-    (namen_liste, _) = UhR_erzeuge_listen(request)
+    (namen_liste, _) = UhR_erzeuge_gefiltere_namensliste(request)
     (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(namen_liste)
 
     response = HttpResponse(content_type="text/tsv")

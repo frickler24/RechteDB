@@ -514,7 +514,8 @@ class TblDb2(models.Model):
     def __str__(self) -> str:
         return str(self.id)
 
-class TblRacfGruppen(models.Model):
+# ToDo: Nach ausführlichen Tests löschen
+class kanndaswegTblRacfGruppen(models.Model):
     group = models.CharField(db_column='Group', primary_key=True, max_length=150)
     test = models.IntegerField(db_column='Test', blank=True, null=True)
     produktion = models.IntegerField(db_column='Produktion', blank=True, null=True)

@@ -14,7 +14,7 @@ from mdeditor.widgets import MDEditorWidget
 from rapp.models import TblUebersichtAfGfs, TblUserIDundName, TblOrga, TblPlattform, \
                         TblGesamt, TblGesamtHistorie, Tblrechteneuvonimport, \
                         TblRollen, TblAfliste, TblUserhatrolle, TblRollehataf, \
-                        Tblsubsysteme, Tblsachgebiete, TblDb2, TblRacfGruppen, \
+                        Tblsubsysteme, Tblsachgebiete, TblDb2, \
                         RACF_Rechte, Orga_details, \
                         Modellierung, Direktverbindungen, \
                         Manuelle_Berechtigung
@@ -342,12 +342,14 @@ class Db2(admin.ModelAdmin):
 # Wahrscheinlich kann die DB mal entsorgt werden.
 # Sie war ursprünglich entwickelt worden, um die Frage der SE zu beantworten,
 # welche Rechte in Produktion Schreibrechte sind.
+"""
 # ToDo Tabelle RacfGruppen entsorgen, wenn sie bis Jahresmitte 2019 nicht mehr benötigt wurde
 #@admin.register(TblRacfGruppen)
 class RacfGruppen(admin.ModelAdmin):
     alle = ['group', 'test', 'get_produktion', 'get_readonly', 'get_db2_only', 'stempel', ]
     search_fields = alle
     list_display = alle
+"""
 
 @admin.register(RACF_Rechte)
 class RACF_Rechte(admin.ModelAdmin):
