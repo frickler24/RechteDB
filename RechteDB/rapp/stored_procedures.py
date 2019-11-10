@@ -173,7 +173,7 @@ BEGIN
     UPDATE tblRechteAMNeu SET `tf_beschreibung` = 'ka' WHERE `tf_beschreibung` Is Null Or `tf_beschreibung` = '';
     UPDATE tblRechteAMNeu SET `enthalten_in_af` = 'ka' WHERE `enthalten_in_af` Is Null or `enthalten_in_af`  ='';
     UPDATE tblRechteAMNeu SET `tf` = 'Kein name' WHERE `tf` Is Null or `tf`  = '';
-    UPDATE tblRechteAMNeu SET `tf_technische_plattform` = 'Kein name' WHERE `tf_technische_plattform` Is Null or `tf_technische_plattform`  = '';
+    UPDATE tblRechteAMNeu SET `tf_technische_plattform` = 'Kein Name' WHERE `tf_technische_plattform` Is Null or `tf_technische_plattform`  = '';
     UPDATE tblRechteAMNeu SET `tf_kritikalitaet` = 'ka' WHERE `tf_kritikalitaet` Is Null or  `tf_kritikalitaet` = '';
     UPDATE tblRechteAMNeu SET `tf_eigentuemer_org` = 'ka' WHERE `tf_eigentuemer_org` Is Null or  `tf_eigentuemer_org` = '';
     UPDATE tblRechteAMNeu SET `GF` = 'k.A.' WHERE GF Is Null or GF = '';
