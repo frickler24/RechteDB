@@ -771,11 +771,39 @@ def liefere_db2_liste(tf_menge):
     return None
 
 
+def liefere_win_lw_Liste(tf_menge):
+    return None
+
+
+def kurze_tf_liste(aftf_dict):
+    """
+    Liefert zu einem AFTF_Dict die Menge der enthaltenen TFen
+
+    Aus historischen Gründen erhalten wir dieselben TFen in verschiedenen
+    Case-Schreibweisen.
+    Beispiel:
+        CN=A_CONNECTDIRECT,OU=Sicherheitsgruppen,OU=gruppen,DC=RUV,DC=DE
+        CN=A_CONNECTDIRECT,OU=Sicherheitsgruppen,OU=Gruppen,DC=RUV,DC=DE
+    Deshalb suchen wir zunächst nach dem einzufügenden Element in Klein-Schreibweise
+    und fügen es nur dann dem Ergbnis hinzu, wenn es noch nicht existiert.
+
+    :param af_menge: Ein Dictionary AF->TF, zu denen die TF-Menge geliefert werden soll
+    :return: Die TF-Liste
+    """
+
+    tfInAF = list()
+    for af in aftf_dict.values():
+        for tf in af:
+            if element_noch_nicht_vorhanden(tfInAF, tf['tf']):
+                tfInAF.append(tf)
+    return tfInAF
+
+
 def liefere_tf_zu_afs(af_menge):
     """
     Liefert zu einer AF-Liste die Menge der dazugehörenden TFen
 
-    Aus historischen Grü+nden erhalten wir dieselben TFen in verschiedenen
+    Aus historischen Gründen erhalten wir dieselben TFen in verschiedenen
     Case-Schreibweisen.
     Beispiel:
         CN=A_CONNECTDIRECT,OU=Sicherheitsgruppen,OU=gruppen,DC=RUV,DC=DE
@@ -786,7 +814,7 @@ def liefere_tf_zu_afs(af_menge):
     erfolgt in der Query bereits eine Sortierung nach dem Datum des Auffindens.
 
     :param af_menge: Die Mmegne der AFen, zu denen die TF-Menge geliefert werden soll
-    :return: Die TF-Menge
+    :return: Menge der den Rollen zugeordneten TFen als Dict aftfDict[AF] = TF_Querysyset
     """
 
     tf_liste = TblGesamt.objects \
@@ -795,7 +823,9 @@ def liefere_tf_zu_afs(af_menge):
         .exclude(tf='Kein Name') \
         .filter(enthalten_in_af__in=af_menge) \
         .order_by('-gefunden', '-wiedergefunden') \
-        .values('tf',
+        .values('enthalten_in_af',
+                'af_beschreibung',
+                'tf',
                 'tf_beschreibung',
                 'tf_kritikalitaet',
                 'tf_eigentuemer_org',
@@ -803,12 +833,19 @@ def liefere_tf_zu_afs(af_menge):
                 'direct_connect'
                 )
 
-    retval = list()
-    for tf in tf_liste:
-        if element_noch_nicht_vorhanden(retval, tf['tf']):
-            retval.append(tf)
+    retvalDict = {}
+    afset = set([af['enthalten_in_af'] for af in tf_liste])
+    for af in afset:
+        tfInAF = list()
 
-    return retval
+        for tf in tf_liste:
+            if tf['enthalten_in_af'] != af:
+                continue
+            if element_noch_nicht_vorhanden(tfInAF, tf['tf']):
+                tfInAF.append(tf)
+        retvalDict[af] = tfInAF
+    # print('Gesamtliste = {}'.format(retvalDict))
+    return retvalDict
 
 
 def liefere_tf_liste(rollenMenge):
@@ -816,15 +853,17 @@ def liefere_tf_liste(rollenMenge):
     Liefet zu einer Menge an Rollen die zugehörenden TFen.
     Dies geschieht zunächst über die Ermittlung der Arbeitsplatzfunktionen,
     die für die angegebenen Rollen definiert sind.
+    In der Anzeige müssen die jeweiligen TFs zu ihren AFs dargestellt werden können,
+    das ist besonders bei redundant mmodellierten TFen relevant.
     :param rollenMenge:
-    :return: Menge der den Rollen zugeordneten TFen
+    :return: Menge der den Rollen zugeordneten TFen als Dict aftfDict[AF] = TF_Querysyset
     """
     af_menge = set()
     for rolle in rollenMenge:
         af_liste = liefere_af_zu_rolle(rolle)
         af_menge.update(set([af['af__af_name'] for af in af_liste]))
-    tf_menge = liefere_tf_zu_afs(af_menge)
-    return tf_menge
+    aftf_dict = liefere_tf_zu_afs(af_menge)
+    return aftf_dict
 
 
 # Erzeuge das Berechtigungskonzept für Anzeige und PDF
@@ -860,16 +899,20 @@ def erzeuge_UhR_konzept(request, ansicht):
 
     logging(request, rollenMenge, userids, usernamen)
 
-    tf_menge = liefere_tf_liste(rollenMenge)
-    racf_liste = liefere_racf_zu_tfs(tf_menge)
-    db2_liste = liefere_db2_liste(tf_menge)
+    aftf_dict = liefere_tf_liste(rollenMenge)
+    tf_liste = kurze_tf_liste(aftf_dict)
+    print(tf_liste)
+    racf_liste = liefere_racf_zu_tfs(tf_liste)
+    db2_liste = liefere_db2_liste(tf_liste)
+    win_lw_Liste = liefere_win_lw_Liste(tf_liste)
 
     context = {
         'filter': panel_filter,
         'rollenMenge': rollenMenge,
-        'tf_menge': tf_menge,
+        'aftf_dict': aftf_dict,
         'racf_liste': racf_liste,
         'db2_liste': db2_liste,
+        'win_lw_Liste': win_lw_Liste,
         'version': version,
         'ueberschrift': erzeuge_ueberschrift(request),
         'stand': erzeuge_datum(),

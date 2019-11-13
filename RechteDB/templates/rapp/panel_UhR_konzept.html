@@ -110,8 +110,9 @@
 					</tbody>
 				</table>
 
-				{% if tf_menge %}
+				{% if aftf_dict %}
 					<h2 id="TFen">Auflistung der Technischen Funktionen (TF)</h2>
+					<p>{{ aftf_dict }}</p>
 					<table class="table table-striped table-sm">
 						<thead>
 							<tr class="bg-primary text-left">
@@ -137,7 +138,7 @@
 						</tbody>
 					</table>
 				{% else %}
-					<div>Keine TF-Menge geliefert</div>
+					<div>Keine TF-Menge (aftf_dict) geliefert</div>
 				{% endif %}
 
 				{% if racf_liste %}

@@ -641,13 +641,11 @@ class RACF_Rechte(models.Model):
         verbose_name = 'RACF-Rechte'
         verbose_name_plural = '40_RACF - Berechtigungen'
         ordering = ['group', 'profil', ]
+        index_together = (('group', 'profil'),) # Zum schnelleren Update bei Neulieferung
 
     def __str__(self) -> str:
         return str(self.id)
 
-# Technische Abteilungsnummer;Organisation;Organisationsbezeichnung;Wirkende FK;Kostenstelle (wirkend);Org ID;
-# Parent Organization;Parent Organization ID;Organization Type;FK-Name;Org Delegation Eigentümer-Genehmiger;Delegation FK-Genehmiger
-# rv00458;ZI-AI-BA;Bestands-Anwendungen;XV13254;1001288;140329;ZI-AI;61901;OS0;Lutz Eichler;;
 
 class Orga_details(models.Model):
     id = models.AutoField(primary_key=True)
