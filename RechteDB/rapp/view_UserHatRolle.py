@@ -799,7 +799,7 @@ def kurze_tf_liste(aftf_dict):
     return tfInAF
 
 
-def liefere_tf_zu_afs(af_menge):
+def liefere_tf_zu_afs(af_menge, userids):
     """
     Liefert zu einer AF-Liste die Menge der dazugehörenden TFen
 
@@ -814,7 +814,8 @@ def liefere_tf_zu_afs(af_menge):
     erfolgt in der Query bereits eine Sortierung nach dem Datum des Auffindens.
 
     :param af_menge: Die Mmegne der AFen, zu denen die TF-Menge geliefert werden soll
-    :return: Menge der den Rollen zugeordneten TFen als Dict aftfDict[AF] = TF_Querysyset
+    :param userids: Die Liste der Userids zum feineren Slektieren der Einträge in der Gesamttabelle
+    :return: Menge der den Rollen zugeordneten TFen als Dict aftfDict[AF] => TF_Querysyset
     """
 
     tf_liste = TblGesamt.objects \
@@ -822,6 +823,7 @@ def liefere_tf_zu_afs(af_menge):
         .exclude(geloescht=True) \
         .exclude(tf='Kein Name') \
         .filter(enthalten_in_af__in=af_menge) \
+        .filter(userid_name__userid__in=userids) \
         .order_by('-gefunden', '-wiedergefunden') \
         .values('enthalten_in_af',
                 'af_beschreibung',
@@ -830,7 +832,8 @@ def liefere_tf_zu_afs(af_menge):
                 'tf_kritikalitaet',
                 'tf_eigentuemer_org',
                 'plattform__tf_technische_plattform',
-                'direct_connect'
+                'direct_connect',
+                'hoechste_kritikalitaet_tf_in_af'
                 )
 
     retvalDict = {}
@@ -850,7 +853,7 @@ def liefere_tf_zu_afs(af_menge):
     return retvalDict
 
 
-def liefere_tf_liste(rollenMenge):
+def liefere_tf_liste(rollenMenge, userids):
     """
     Liefet zu einer Menge an Rollen die zugehörenden TFen.
     Dies geschieht zunächst über die Ermittlung der Arbeitsplatzfunktionen,
@@ -860,23 +863,65 @@ def liefere_tf_liste(rollenMenge):
     :param rollenMenge:
     :return: Menge der den Rollen zugeordneten TFen als Dict aftfDict[AF] = TF_Querysyset
     """
+    af_menge = liefere_af_menge(rollenMenge)
+    aftf_dict = liefere_tf_zu_afs(af_menge, userids)
+    return aftf_dict
+
+
+def liefere_af_menge(rollenMenge):
+    """
+    Liefert die Menge der AFen, die von einer Menge an Rollen adressiert wird
+    :param rollenMenge: Die Menge an Rollen, zu denen die AFen gesucht werden
+    :return: af_menge aller gefundener AFen
+    """
     af_menge = set()
     for rolle in rollenMenge:
         af_liste = liefere_af_zu_rolle(rolle)
         af_menge.update(set([af['af__af_name'] for af in af_liste]))
-    aftf_dict = liefere_tf_zu_afs(af_menge)
-    return aftf_dict
+    return af_menge
 
 
-def liefere_af_kritikalitaet(aftf_dict):
-    return None
-    hoechste_kritikalitaet_tf_in_af = set()
+def liefere_af_kritikalitaet(rollenMenge, userids):
+    """
+    Für die Menge der gegebenen Rollen liefer die Liste der jeweils höchsten TF-Kritikalitäten.
+    Achtung: Bei veralteten Daten in der Gesamt-Tabelle kann es sein, dass diese Informationen
+    ebenfalls nicht mehr korrekt sind. Deshalb erfolgt eine Filterung nach UserIDen,
+    um ausschließlich aktuelle Werte in der Gesamt-Tabelle zu selektieren.
 
-    for af in aftf_dict.values():
-        for tf in af:
-            if element_noch_nicht_vorhanden(tfInAF, tf['tf']):
-                tfInAF.append(tf)
-    return tfInAF
+    :param rollenMenge: Hierüber wird die LIste der AFen ermmittelt, die adressiert werden sollen
+    :param userids: Dies dient der Reduzierung der Treffermenge (nur die gefundenen AF/TF-Kombination zu den UserIDs)
+    :return: Das Dict der AF => Höchste_Kritikalität_der_TF_in_der_AF laut dem IIQ-Feld
+    """
+    # .filter(userid_name__userid__in=userids) \
+
+    af_menge = liefere_af_menge(rollenMenge)
+    krit_liste = TblGesamt.objects \
+        .exclude(userid_name_id__geloescht=True) \
+        .exclude(geloescht=True) \
+        .exclude(tf='Kein Name') \
+        .filter(enthalten_in_af__in=af_menge) \
+        .order_by('enthalten_in_af') \
+        .values('enthalten_in_af',
+                'hoechste_kritikalitaet_tf_in_af'
+        )
+
+    hoechste_kritikalitaet_tf_in_af = {}
+
+    for krit in krit_liste:
+        print(krit['enthalten_in_af'], ' ->', krit['hoechste_kritikalitaet_tf_in_af'])
+        if krit['enthalten_in_af'] in hoechste_kritikalitaet_tf_in_af:
+            if hoechste_kritikalitaet_tf_in_af[krit['enthalten_in_af']] != krit['hoechste_kritikalitaet_tf_in_af']:
+                print('FEHLER: Unterschiedliche höchste Kritikalitäten TF in AF für AF {}: {} und {}'.format(
+                    krit['enthalten_in_af'],
+                    hoechste_kritikalitaet_tf_in_af[krit['enthalten_in_af']],
+                    krit['hoechste_kritikalitaet_tf_in_af']
+                    )
+                )
+                hoechste_kritikalitaet_tf_in_af[krit['enthalten_in_af']] = 'ungültig'
+                break
+        hoechste_kritikalitaet_tf_in_af[krit['enthalten_in_af']] = krit['hoechste_kritikalitaet_tf_in_af']
+    print(hoechste_kritikalitaet_tf_in_af)
+    return hoechste_kritikalitaet_tf_in_af
 
 
 # Erzeuge das Berechtigungskonzept für Anzeige und PDF
@@ -912,9 +957,9 @@ def erzeuge_UhR_konzept(request, ansicht):
 
     logging(request, rollenMenge, userids, usernamen)
 
-    aftf_dict = liefere_tf_liste(rollenMenge)
+    aftf_dict = liefere_tf_liste(rollenMenge, userids)
     tf_liste = kurze_tf_liste(aftf_dict)
-    af_kritikalitaet = liefere_af_kritikalitaet(aftf_dict)
+    af_kritikalitaet = liefere_af_kritikalitaet(rollenMenge, userids)
     racf_liste = liefere_racf_zu_tfs(tf_liste)
     db2_liste = liefere_db2_liste(tf_liste)
     win_lw_Liste = liefere_win_lw_Liste(tf_liste)

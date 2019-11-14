@@ -10,6 +10,13 @@ def hash(h, key):
 		return h[key]
 	return h
 
+@register.filter
+def strhash(h, key):
+	key = str(key)
+	if key in h:
+		return h[key]
+	return 'nicht gefunden: {}'.format(key)
+
 # Liefert einen Wert eines 2-teiligen Hashes für die Templates
 @register.filter
 def hash2(_1, _2):
