@@ -49,128 +49,26 @@
 					   class="btn btn-outline-primary btn-sm" role="button"
 					   target="_self">Zu den Db2-Informationen
 					</a>
+					&nbsp;
+					<a href="#WinLW"
+					   class="btn btn-outline-primary btn-sm" role="button"
+					   target="_self">Zu den Laufwerks-Informationen
+					</a>
 				</div>
 			</div>
 			<div>
-				<table class="table table-striped table-sm">
-					<thead>
-						<tr class="bg-primary text-left">
-							<th colspan="3">Rollenname</th>
-							<th colspan="1">Beschreibung</th>
-							<th colspan="1">System</th>
-						</tr>
-						<tr my-0 py-0> {# Erzeuge die Tabelle mit 5 Spalten, damit wir nachher geschachtelte Sichten erhalten #}
-							<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
-						</tr>
-					</thead>
-					<tbody>
-						{% for rolle in rollenMenge %}
-							<tr>
-								<td colspan="3">
-									{{ rolle.rollenname }}
-								</td>
-								<td>
-									{{ rolle.rollenbeschreibung }}
-								</td>
-								<td>
-									{{ rolle.system }}
-								</td>
-							</tr>
-							<tr>
-								<td>&nbsp;</td>
-								<td colspan="4">
-									<div class="row">
-										<div class="form-control bg-light text-success col-4">AF</div>
-										<div class="form-control bg-light text-success col-1 text-center">Muss</div>
-										<div class="form-control bg-light text-success col-1 text-center">Einsatz</div>
-										<div class="form-control bg-light text-success col-5">Anmerkung zur AF</div>
-										{% for meineaf in rolle.tblrollehataf_set.all %}
-											<div class="form-control col-4">{{ meineaf.af }}</div>
-											<div class="form-control col-1 text-center">
-												{% if meineaf.mussfeld %}
-													<img src="{% static 'checkbox-checked.png' %}"
-														 alt="checkbox checked" height="15" width="15">
-												{% else %}
-													<img src="{% static 'checkbox-blank.png' %}"
-														 alt="checkbox checked" height="15" width="15">
-												{% endif %}
-											</div>
-											<div class="form-control select col-1 text-center">
-												<small>{{ meineaf.get_einsatz_display }}</small>
-											</div>
-											<div class="form-control col-5">{{ meineaf.bemerkung }}</div>
-										{% empty %}
-											<div class="form-control text-danger col-12">Rolle ist keine AF zugeordnet</div>
-										{% endfor rolle.tblrollehataf_set.all %}
-									</div>
-								</td>
-							</tr>
-							<tr><td>&nbsp;</td></tr>
-						{% endfor rollenMenge %}
-					</tbody>
-				</table>
+				{% include "rapp/uhr_rollen_table.html" %}
 
 				{% if aftf_dict %}
 					<h2 id="TFen">Auflistung der Technischen Funktionen (TF)</h2>
-					<p>{{ aftf_dict }}</p>
-					<table class="table table-striped table-sm">
-						<thead>
-							<tr class="bg-primary text-left">
-								<th width="25%">Name</th>
-								<th width="40%">Beschreibung</th>
-								<th width="5%">TF-Kritikalität</th>
-								<th width="10%">Eigentümer-Orga</th>
-								<th width="5%">Plattform</th>
-								<th width="5%">Direct Connect</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for tf in tf_menge|dictsort:"tf"  %}
-								<tr>
-									<td>{{ tf.tf }}</td>
-									<td>{{ tf.tf_beschreibung }}</td>
-									<td>{{ tf.tf_kritikalitaet }}</td>
-									<td>{{ tf.tf_eigentuemer_org }}</td>
-									<td>{{ tf.plattform__tf_technische_plattform }}</td>
-									<td>{{ tf.direct_connect }}</td>
-								</tr>
-							{% endfor rollenMenge %}
-						</tbody>
-					</table>
+					{% include "rapp/uhr_aftf_table.html" %}
 				{% else %}
 					<div>Keine TF-Menge (aftf_dict) geliefert</div>
 				{% endif %}
 
 				{% if racf_liste %}
 					<h2 id="RACF">Auflistung der RACF-Profile</h2>
-					<table class="table table-striped table-sm">
-						<thead>
-							<tr class="bg-primary text-left">
-								<th width="20%">Name</th>
-								<th width="5%">Klasse</th>
-								<th width="55%">Profil</th>
-								<th width="10%">Zugriff</th>
-								<th width="5%">Test</th>
-								<th width="5%">Produktion</th>
-								<th width="5%">Änderung</th>
-								<th width="5%">Typ</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for g in racf_liste|dictsort:"group" %}
-								<tr id="RACF_{{ g.group }}">
-									<td>{% ifchanged g.group %}{{ g.group }}{% endifchanged %}
-									<td>{{ g.ressource_class }}</td>
-									<td>{{ g.profil }}</td>
-									<td>{{ g.access }}</td>
-									<td>{{ g.test }}</td>
-									<td>{{ g.produktion }}</td>
-									<td>{{ g.alter_control_update }}</td>
-									<td>{{ g.type }}</td>
-								</tr>
-							{% endfor rollenMenge %}
-						</tbody>
-					</table>
+					{% include "rapp/uhr_racf_table.html" %}
 				{% else %}
 					<div>Keine RACF-Liste geliefert</div>
 				{% endif %}

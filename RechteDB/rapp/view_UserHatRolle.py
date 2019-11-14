@@ -839,12 +839,14 @@ def liefere_tf_zu_afs(af_menge):
         tfInAF = list()
 
         for tf in tf_liste:
+            # Betrachte nur die TFe für die aktuelle AF
             if tf['enthalten_in_af'] != af:
                 continue
+            # leider ist tf nicht "set-fähig"
             if element_noch_nicht_vorhanden(tfInAF, tf['tf']):
                 tfInAF.append(tf)
         retvalDict[af] = tfInAF
-    # print('Gesamtliste = {}'.format(retvalDict))
+        # print('ratvalDict = {}'.format(retvalDict))
     return retvalDict
 
 
@@ -864,6 +866,17 @@ def liefere_tf_liste(rollenMenge):
         af_menge.update(set([af['af__af_name'] for af in af_liste]))
     aftf_dict = liefere_tf_zu_afs(af_menge)
     return aftf_dict
+
+
+def liefere_af_kritikalitaet(aftf_dict):
+    return None
+    hoechste_kritikalitaet_tf_in_af = set()
+
+    for af in aftf_dict.values():
+        for tf in af:
+            if element_noch_nicht_vorhanden(tfInAF, tf['tf']):
+                tfInAF.append(tf)
+    return tfInAF
 
 
 # Erzeuge das Berechtigungskonzept für Anzeige und PDF
@@ -901,7 +914,7 @@ def erzeuge_UhR_konzept(request, ansicht):
 
     aftf_dict = liefere_tf_liste(rollenMenge)
     tf_liste = kurze_tf_liste(aftf_dict)
-    print(tf_liste)
+    af_kritikalitaet = liefere_af_kritikalitaet(aftf_dict)
     racf_liste = liefere_racf_zu_tfs(tf_liste)
     db2_liste = liefere_db2_liste(tf_liste)
     win_lw_Liste = liefere_win_lw_Liste(tf_liste)
@@ -910,6 +923,7 @@ def erzeuge_UhR_konzept(request, ansicht):
         'filter': panel_filter,
         'rollenMenge': rollenMenge,
         'aftf_dict': aftf_dict,
+        'af_kritikalitaet': af_kritikalitaet,
         'racf_liste': racf_liste,
         'db2_liste': db2_liste,
         'win_lw_Liste': win_lw_Liste,
