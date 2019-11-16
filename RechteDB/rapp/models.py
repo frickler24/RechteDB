@@ -327,7 +327,7 @@ class TblGesamt(models.Model):
     patchdatum = models.DateTimeField(db_column='patchdatum', blank=True, null=True)
     wertmodellvorpatch = models.TextField(db_column='wert_modell_vor_patch', blank=True, null=True)
     loeschdatum = models.DateTimeField(db_column='loeschdatum', blank=True, null=True, verbose_name='Löschdatum')
-    letzte_aenderung = models.DateTimeField(auto_now=True)
+    letzte_aenderung = models.DateTimeField(auto_now=True, db_index=True)
     af_beschreibung = models.TextField(max_length=2000, blank=True, null=True, default='Keine Beschreibung vorhanden')
 
     class Meta:

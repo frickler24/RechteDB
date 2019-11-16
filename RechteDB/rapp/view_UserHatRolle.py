@@ -900,27 +900,26 @@ def liefere_af_kritikalitaet(rollenMenge, userids):
         .exclude(geloescht=True) \
         .exclude(tf='Kein Name') \
         .filter(enthalten_in_af__in=af_menge) \
-        .order_by('enthalten_in_af') \
+        .order_by('enthalten_in_af', '-letzte_aenderung') \
         .values('enthalten_in_af',
-                'hoechste_kritikalitaet_tf_in_af'
+                'hoechste_kritikalitaet_tf_in_af',
+                'letzte_aenderung',
         )
 
+    # Merke den jeweils jüngsten Eintrag je AF, ignoriere Case
     hoechste_kritikalitaet_tf_in_af = {}
-
+    letzter_eintrag = ''
     for krit in krit_liste:
-        print(krit['enthalten_in_af'], ' ->', krit['hoechste_kritikalitaet_tf_in_af'])
-        if krit['enthalten_in_af'] in hoechste_kritikalitaet_tf_in_af:
-            if hoechste_kritikalitaet_tf_in_af[krit['enthalten_in_af']] != krit['hoechste_kritikalitaet_tf_in_af']:
-                print('FEHLER: Unterschiedliche höchste Kritikalitäten TF in AF für AF {}: {} und {}'.format(
-                    krit['enthalten_in_af'],
-                    hoechste_kritikalitaet_tf_in_af[krit['enthalten_in_af']],
-                    krit['hoechste_kritikalitaet_tf_in_af']
-                    )
-                )
-                hoechste_kritikalitaet_tf_in_af[krit['enthalten_in_af']] = 'ungültig'
-                break
-        hoechste_kritikalitaet_tf_in_af[krit['enthalten_in_af']] = krit['hoechste_kritikalitaet_tf_in_af']
-    print(hoechste_kritikalitaet_tf_in_af)
+        """
+        print(krit['enthalten_in_af'], ' ->', krit['hoechste_kritikalitaet_tf_in_af'],
+            'letzte_aenderung =', krit['letzte_aenderung'],
+            'Letzter Eintrag war', letzter_eintrag
+        )
+        """
+        if krit['enthalten_in_af'].lower() != letzter_eintrag:
+            hoechste_kritikalitaet_tf_in_af[krit['enthalten_in_af']] \
+                = str(krit['hoechste_kritikalitaet_tf_in_af']).lower()
+            letzter_eintrag = str(krit['enthalten_in_af']).lower()
     return hoechste_kritikalitaet_tf_in_af
 
 

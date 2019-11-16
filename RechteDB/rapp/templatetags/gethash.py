@@ -12,7 +12,7 @@ def hash(h, key):
 
 @register.filter
 def strhash(h, key):
-	key = str(key)
+	key = str(key).lower()
 	if key in h:
 		return h[key]
 	return 'nicht gefunden: {}'.format(key)

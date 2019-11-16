@@ -1323,7 +1323,7 @@ class UserRolleAFTests(TestCase):
         self.assertContains(response, 'href="{0}?"'.format(pdf_url))
         self.assertContains(response, 'Erste Neue Rolle', 1)
         self.assertContains(response, 'Zweite Neue Rolle', 1)
-        self.assertContains(response, 'rva_01219_beta91_job_abst', 3)
+        self.assertContains(response, 'rva_01219_beta91_job_abst', 6)
         self.assertContains(response, 'Das ist eine Testrolle', 1)
         self.assertContains(response, 'Das ist auch eine Testrolle', 1)
         self.assertContains(response, 'Testsystem', 1)

@@ -355,7 +355,7 @@ BEGIN
                 modell, `tf_kritikalitaet`, `tf_eigentuemer_org`, `af_zuweisungsdatum`,
                 plattform_id, GF, geloescht, gefunden, wiedergefunden, geaendert, 
                 loeschdatum, neueaf, datum, `id_alt`, 
-                `hk_tf_in_af`
+                `hk_tf_in_af`, `letzte_aenderung`
             )
     SELECT `tblGesamt`.`userid_und_name_id`,
            `tblGesamt`.tf,
@@ -376,7 +376,8 @@ BEGIN
            `tblGesamt`.neueaf,
            `tblGesamt`.datum,
            `tblGesamt`.id,
-           `hk_tf_in_af`
+           `hk_tf_in_af`,
+           `tblGesamt`.`letzte_aenderung`
         FROM `tblGesamt`
         INNER JOIN (tblUserIDundName
                     inner join rapp_geloeschte_user
@@ -498,7 +499,8 @@ BEGIN
                tblGesamt.`gf_beschreibung`,
                tblGesamt.`af_zuweisungsdatum`,
                tblGesamt.datum,
-               tblGesamt.`geloescht`
+               tblGesamt.`geloescht`,
+               tblGesamt.`letzte_aenderung`
         FROM tblGesamt
             INNER JOIN tblUEbersichtAF_GFs
             ON tblGesamt.modell = tblUEbersichtAF_GFs.id
@@ -553,7 +555,8 @@ BEGIN
         tblGesamt.`direct_connect`      = `tblRechteAMNeu`.`direct_connect`,
         tblGesamt.`hk_tf_in_af`         = `tblRechteAMNeu`.`hk_tf_in_af`,
         tblGesamt.`gf_beschreibung`     = `tblRechteAMNeu`.`gf_beschreibung`,
-        tblGesamt.`af_zuweisungsdatum`  = `tblRechteAMNeu`.`af_zuweisungsdatum`
+        tblGesamt.`af_zuweisungsdatum`  = `tblRechteAMNeu`.`af_zuweisungsdatum`,
+        tblGesamt.`letzte_aenderung`    = now()
 
     WHERE COALESCE(tblGesamt.`geloescht`, FALSE) = FALSE
         AND COALESCE(tblUserIDundName.`geloescht`, FALSE) = FALSE;
@@ -578,7 +581,8 @@ BEGIN
 
     SET tblGesamt.geaendert = TRUE,
         tblRechteAMNeu.geaendert = TRUE,
-        tblGesamt.neueaf = `tblRechteAMNeu`.`enthalten_in_af`
+        tblGesamt.neueaf = `tblRechteAMNeu`.`enthalten_in_af`,
+        tblGesamt.letzte_aenderung = now()
 
     WHERE   tblGesamt.`enthalten_in_af` <> tblRechteAMNeu.`enthalten_in_af`
         AND tblGesamt.gefunden = FALSE
@@ -1012,7 +1016,7 @@ BEGIN
     */
 
 
-    -- qryF7_GesamtNachtfunduserid liefert eine Rechteliste der aktiven User aus der Gesamttabelle
+    -- Liefert eine Rechteliste der aktiven User aus der Gesamttabelle
     drop table if exists qryF7_GesamtNachtfunduserid;
     create table qryF7_GesamtNachtfunduserid AS
         SELECT tblOrga.`team`,
