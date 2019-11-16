@@ -56,22 +56,11 @@
 					</a>
 				</div>
 			</div>
-			<div>
+
+			<div id="accordion">
 				{% include "rapp/uhr_rollen_table.html" %}
-
-				{% if aftf_dict %}
-					<h2 id="TFen">Auflistung der Technischen Funktionen (TF)</h2>
-					{% include "rapp/uhr_aftf_table.html" %}
-				{% else %}
-					<div>Keine TF-Menge (aftf_dict) geliefert</div>
-				{% endif %}
-
-				{% if racf_liste %}
-					<h2 id="RACF">Auflistung der RACF-Profile</h2>
-					{% include "rapp/uhr_racf_table.html" %}
-				{% else %}
-					<div>Keine RACF-Liste geliefert</div>
-				{% endif %}
+				{% include "rapp/uhr_aftf_table.html" %}
+				{% include "rapp/uhr_racf_table.html" %}
 			</div>
 		{% else %}
 			<div class="col-12 mt-4">
