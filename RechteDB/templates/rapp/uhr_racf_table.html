@@ -14,7 +14,7 @@
 
         <div id="collapseRACF" class="collapse" aria-labelledby="headingRACF" data-parent="#accordion">
             <div class="card-body">
-                <h2 id="TFen">Auflistung der RACF-Profile</h2>
+                <h3>Auflistung der RACF-Profile</h3>
                 <table class="table table-striped table-sm">
                     <thead>
                         <tr class="bg-primary text-left">
@@ -40,7 +40,7 @@
                                 <td>{{ g.alter_control_update }}</td>
                                 <td>{{ g.type }}</td>
                             </tr>
-                        {% endfor rollenMenge %}
+                        {% endfor racf_liste %}
                     </tbody>
                 </table>
             </div>

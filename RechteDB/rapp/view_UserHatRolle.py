@@ -21,6 +21,7 @@ from .models import TblRollehataf
 from .models import TblUserhatrolle
 from .models import TblOrga
 from .models import RACF_Rechte
+from .models import TblDb2
 
 from .templatetags.gethash import finde
 from django.utils import timezone
@@ -756,7 +757,7 @@ def liefere_racf_zu_tfs(tf_menge):
 
     :param tf_menge: Die Menge der TFen, zu denen die RACF-Profile geliefert werden sollen.
                      Es handelt sich um ein Queryset mit mehreren Elementen je Index,
-                     deshalb das Umsortieren amm Anfang.
+                     deshalb das Umsortieren am Anfang.
     :return: Die RACF-Profile als Hash (racf[TF] = RACF-Info
     """
     suchmenge = set(t['tf'] for t in tf_menge)
@@ -768,7 +769,20 @@ def liefere_racf_zu_tfs(tf_menge):
 
 
 def liefere_db2_liste(tf_menge):
-    return None
+    """
+    Liefert zu einer TF-Menge die Menge der dazugehörenden Db2-Grantees
+
+    :param tf_menge: Die Menge der TFen, zu denen die Db2-Grantee geliefert werden sollen.
+                     Es handelt sich um ein Queryset mit mehreren Elementen je Index,
+                     deshalb das Umsortieren am Anfang.
+    :return: Die RACF-Profile als Hash (racf[TF] = RACF-Info
+    """
+    suchmenge = set(t['tf'] for t in tf_menge)
+    db2_liste = TblDb2.objects \
+        .filter(grantee__in=suchmenge) \
+        .order_by('grantee', 'source', 'table') \
+        .values()
+    return db2_liste
 
 
 def liefere_win_lw_Liste(tf_menge):
@@ -808,8 +822,8 @@ def liefere_tf_zu_afs(af_menge, userids):
     Beispiel:
         CN=A_CONNECTDIRECT,OU=Sicherheitsgruppen,OU=gruppen,DC=RUV,DC=DE
         CN=A_CONNECTDIRECT,OU=Sicherheitsgruppen,OU=Gruppen,DC=RUV,DC=DE
-    Deshalb suchen wir zunächst nach dem einzufügenden Element in Klein-Schreibweise
-    und fügen es nur dann dem Ergbnis hinzu, wenn es noch nicht existiert.
+    Deshalb suchen wir nach dem einzufügenden Element nur in Klein-Schreibweise
+    und fügen es nur dann dem Ergbnis in Original-Schreibweise hinzu, wenn es noch nicht existiert.
     Damit wir die jeweils jüngste Schreibweise zurückliefern,
     erfolgt in der Query bereits eine Sortierung nach dem Datum des Auffindens.
 
