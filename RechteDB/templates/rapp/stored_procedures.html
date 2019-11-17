@@ -40,12 +40,12 @@
 
         <form method="post" name="import" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
-            {% for zeile in daten %}
-                <div class="form-group form-group-sm col-12 {% if not test123 %}bg-success{% else %}bg-danger{% endif %}">
+            {% for zeile, val in daten.items %}
+                <div class="form-group form-group-sm col-12 {% if not val %}bg-success{% else %}bg-danger{% endif %}">
                     <ul>
                         <li>
-                            {{ zeile }} war {% if test123 %}nicht {% endif %}erfolgreich.
-                            {% if test123 %}{{ test123 }}{% endif %}
+                            {{ zeile }} war {% if val %}nicht {% endif %}erfolgreich.
+                            {% if val %}<br />{{ val }}{% endif %}
                         </li>
                     </ul>
                 </div>

@@ -10,6 +10,36 @@ import sys
 from django.contrib.auth.decorators import login_required
 
 
+def check_sp(name):
+    sp = """
+    SELECT routine_name
+    FROM information_schema.routines
+    WHERE routine_type = 'PROCEDURE'
+        AND routine_name = '{}'
+    """.format(name)
+
+    fehler = ''
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute('select DATABASE()')
+            routine_schema = cursor.fetchone()
+            sp = "{} AND routine_schema = '{}'".format(sp, routine_schema[0])
+            anzahl = cursor.execute(sp)
+
+            if anzahl != 1:
+                fehler += 'Mismatch SQL-Answer in check_sp: 1 != {}'.format(anzahl)
+        except:
+            e = sys.exc_info()[0]
+            fehler = 'Details: {}'.format(e)
+
+        cursor.close()
+
+        if fehler != '':
+            fehler = 'Error in check_sp(): {}'.format(fehler)
+            print(fehler)
+        return fehler
+
+
 def push_sp(name, sp, procs_schon_geladen):
     """
     Speichere eine als Parameter übergebene Stored Procedure
@@ -19,19 +49,20 @@ def push_sp(name, sp, procs_schon_geladen):
     :return: Fehler (False = kein Fehler)
     """
     # ToDo Das Löschen wirft Warnings im MySQL-Treiber, wenn die SP gar nicht existiert. -> Liste lesen und checken
-    fehler = False
+    fehler = ''
     loeschstring = 'DROP PROCEDURE IF EXISTS {}'.format(name)
     with connection.cursor() as cursor:
         try:
             if procs_schon_geladen:
-                cursor.execute (loeschstring)
-            cursor.execute (sp)
+                cursor.execute(loeschstring)
+            cursor.execute(sp)
         except:
             e = sys.exc_info()[0]
             fehler = 'Error in push_sp(): {}'.format(e)
 
         cursor.close()
-        return fehler
+        return fehler + check_sp(name)
+
 
 def push_sp_test(procs_schon_geladen):
     sp = """
@@ -40,13 +71,14 @@ BEGIN
   SELECT COUNT(*) FROM `tblRechteNeuVonImport`;
 END
 """
-    return push_sp ('anzahl_import_elemente', sp, procs_schon_geladen)
+    return push_sp('anzahl_import_elemente', sp, procs_schon_geladen)
+
 
 def call_sp_test():
     fehler = False
     with connection.cursor() as cursor:
         try:
-            cursor.execute ("CALL anzahl_import_elemente")
+            cursor.execute("CALL anzahl_import_elemente")
             liste = cursor.fetchone()
         except:
             e = sys.exc_info()[0]
@@ -54,6 +86,7 @@ def call_sp_test():
 
         cursor.close()
         return fehler or not liste[0] >= 0
+
 
 def push_sp_vorbereitung(procs_schon_geladen):
     sp = """
@@ -203,7 +236,8 @@ BEGIN
     */
 END
 """
-    return push_sp ('vorbereitung', sp, procs_schon_geladen)
+    return push_sp('vorbereitung', sp, procs_schon_geladen)
+
 
 def push_sp_neueUser(procs_schon_geladen):
     sp = """
@@ -290,7 +324,8 @@ BEGIN
     ;
 END
 """
-    return push_sp ('neueUser', sp, procs_schon_geladen)
+    return push_sp('neueUser', sp, procs_schon_geladen)
+
 
 def push_sp_behandleUser(procs_schon_geladen):
     sp = """
@@ -408,7 +443,8 @@ BEGIN
         WHERE COALESCE(`geloescht`, FALSE) = FALSE;
 END
 """
-    return push_sp ('behandleUser', sp, procs_schon_geladen)
+    return push_sp('behandleUser', sp, procs_schon_geladen)
+
 
 def push_sp_behandleRechte(procs_schon_geladen):
     sp = """
@@ -904,7 +940,8 @@ BEGIN
 */
 END
 """
-    return push_sp ('behandleRechte', sp, procs_schon_geladen)
+    return push_sp('behandleRechte', sp, procs_schon_geladen)
+
 
 def push_sp_loescheDoppelteRechte(procs_schon_geladen):
     sp = """
@@ -955,7 +992,8 @@ BEGIN
     END IF;
 END
 """
-    return push_sp ('loescheDoppelteRechte', sp, procs_schon_geladen)
+    return push_sp('loescheDoppelteRechte', sp, procs_schon_geladen)
+
 
 def push_sp_nichtai(procs_schon_geladen):
     sp = """
@@ -1120,7 +1158,8 @@ BEGIN
 
 END
 """
-    return push_sp ('setzeNichtAIFlag', sp, procs_schon_geladen)
+    return push_sp('setzeNichtAIFlag', sp, procs_schon_geladen)
+
 
 def push_sp_erzeugeAFListe(procs_schon_geladen):
     sp = """
@@ -1137,7 +1176,8 @@ BEGIN
         GROUP BY tblUEbersichtAF_GFs.`name_af_neu`;
 END
 """
-    return push_sp ('erzeuge_af_liste', sp, procs_schon_geladen)
+    return push_sp('erzeuge_af_liste', sp, procs_schon_geladen)
+
 
 def push_sp_ueberschreibeModelle(procs_schon_geladen):
     sp = """
@@ -1173,7 +1213,8 @@ BEGIN
     SET tblGesamt.modell = auchBloed.freigegebenes_Modell;
 END
 """
-    return push_sp ('ueberschreibeModelle', sp, procs_schon_geladen)
+    return push_sp('ueberschreibeModelle', sp, procs_schon_geladen)
+
 
 def push_sp_directConnects(procs_schon_geladen):
     sp = """
@@ -1326,7 +1367,7 @@ BEGIN
     ;
 END
 """
-    return push_sp ('directConnects', sp, procs_schon_geladen)
+    return push_sp('directConnects', sp, procs_schon_geladen)
 
 
 # Suche nach Stored Procedures in der aktuellen Datenbank
@@ -1335,7 +1376,7 @@ def anzahl_procs():
     anzahl = 0  # Wenn die Zahl der Einträge bei SHOW > 0 ist, müssen die Procs jeweils gelöscht werden
     with connection.cursor() as cursor:
         try:
-            cursor.execute ("show procedure status where db like (select DATABASE())")
+            cursor.execute("show procedure status where db like (select DATABASE())")
             anzahl = cursor.rowcount
         except:
             e = sys.exc_info()[0]
@@ -1344,12 +1385,15 @@ def anzahl_procs():
         cursor.close()
     return anzahl
 
+
 def finde_procs():
     finde_procs_exakt()
     return anzahl_procs() > 0
 
+
 def finde_procs_exakt():
     return anzahl_procs() == soll_procs()
+
 
 sps = {
     1: push_sp_test,
@@ -1364,8 +1408,10 @@ sps = {
     10: push_sp_directConnects,
 }
 
+
 def soll_procs():
     return len(sps)
+
 
 @login_required
 def handle_stored_procedures(request):
@@ -1377,29 +1423,17 @@ def handle_stored_procedures(request):
 
         daten['anzahl_import_elemente'] = sps[1](procs_schon_geladen)
         daten['call_anzahl_import_elemente'] = call_sp_test()
-        daten['vorbereitung']             = sps[2](procs_schon_geladen)
-        daten['neueUser']                 = sps[3](procs_schon_geladen)
-        daten['behandleUser']             = sps[4](procs_schon_geladen)
-        daten['behandleRechte']         = sps[5](procs_schon_geladen)
-        daten['loescheDoppelteRechte']     = sps[6](procs_schon_geladen)
-        daten['setzeNichtAIFlag']         = sps[7](procs_schon_geladen) # Falls die Funktion jemals wieder benötigt wird
-        daten['erzeuge_af_liste']         = sps[8](procs_schon_geladen)
-        daten['ueberschreibeModelle']     = sps[9](procs_schon_geladen)
-        daten['directConnects']         = sps[10](procs_schon_geladen)
+        daten['vorbereitung'] = sps[2](procs_schon_geladen)
+        daten['neueUser'] = sps[3](procs_schon_geladen)
+        daten['behandleUser'] = sps[4](procs_schon_geladen)
+        daten['behandleRechte'] = sps[5](procs_schon_geladen)
+        daten['loescheDoppelteRechte'] = sps[6](procs_schon_geladen)
+        daten['setzeNichtAIFlag'] = sps[7](procs_schon_geladen)  # Falls die Funktion jemals wieder benötigt wird
+        daten['erzeuge_af_liste'] = sps[8](procs_schon_geladen)
+        daten['ueberschreibeModelle'] = sps[9](procs_schon_geladen)
+        daten['directConnects'] = sps[10](procs_schon_geladen)
 
-        """
-        daten['anzahl_import_elemente'] = push_sp_test(procs_schon_geladen)
-        daten['call_anzahl_import_elemente'] = call_sp_test()
-        daten['vorbereitung'] = push_sp_vorbereitung(procs_schon_geladen)
-        daten['neueUser'] = push_sp_neueUser(procs_schon_geladen)
-        daten['behandleUser'] = push_sp_behandleUser(procs_schon_geladen)
-        daten['behandleRechte'] = push_sp_behandleRechte(procs_schon_geladen)
-        daten['loescheDoppelteRechte'] = push_sp_loescheDoppelteRechte(procs_schon_geladen)
-        daten['setzeNichtAIFlag'] = push_sp_nichtai(procs_schon_geladen) # Falls die Funktion jemals wieder benötigt wird
-        daten['erzeuge_af_liste'] = push_sp_erzeugeAFListe(procs_schon_geladen)
-        daten['ueberschreibeModelle'] = push_sp_ueberschreibeModelle(procs_schon_geladen)
-        """
-
+        print(daten)
     context = {
         'daten': daten,
     }
