@@ -21,25 +21,31 @@
     </head>
     <body>
         <h1>
-            Rollen und Arbeitsplatzfunktionen
+            Rollen, Arbeitsplatzfunktionen und Detailinformationen
             {{ ueberschrift }}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            Stand: {{ stand }}
+            Stand: {% now "d.m.Y H:i e" %}
         </h1>
 
         {% if rollenMenge %}
+			<h2>Liste der Rollen und ihrer Arbeitsplatzfunktionen (AF)</h2>
             {% for rolle in rollenMenge %}
                 <div>
 					<hr />
                     <table repeat="0" id="RolleUndAF">
                         <thead>
                             <tr>
-                                <th colspan="5" style="text-align: left;"><br />Rollennname</th>
-                                <th colspan="5" style="text-align: left;"><br />Beschreibung</th>
+                                <th colspan="4" style="text-align: left;"><br />Rollennname</th>
+                                <th colspan="6" style="text-align: left;"><br />Beschreibung</th>
                                 <th colspan="2" style="text-align: left;"><br />System</th>
                             </tr>
                         </thead>
                         <tbody>
+                        <tr>
+                            <td colspan="4">{{ rolle.rollenname }}</td>
+                            <td colspan="6">{{ rolle.rollenbeschreibung }}</td>
+                            <td colspan="2">{{ rolle.system }}</td>
+                        </tr>
                             <tr>
                                 <td>&nbsp;</td>
                                 <td colspan="11">
@@ -122,8 +128,10 @@
 				</p>
 			</div>
 		{% endif %}
+		<div><p>&nbsp;</p></div>
 
 		{% if aftf_dict %}
+			<p style="font-size: 10px; margin: 500px;">&nbsp;</p>
 			<h2>Liste der Arbeitsplatzfunktionen und ihrer Technischen Funktionen (TF)</h2>
 			<div id="AFTF_liste">
 			   {% for af, tf_dict in aftf_dict.items %}
@@ -152,13 +160,15 @@
 		{% else %}
 			<div class="text-danger">
 				<p>
-					Keine AF / TF - Informationen gefunden
+					Keine AF / TF - Informationen
 				</p>
 			</div>
 		{% endif %}
+		<div><p>&nbsp;</p></div>
 
 		{% if racf_liste %}
-			<h2>Auflistung der RACF-Profile</h2>
+			<div><p style="font-size: 10px; margin: 500px;">&nbsp;</p></div>
+			<h2>2. Auflistung der RACF-Profile</h2>
 
 			<div id="AFTF_liste">
 				{% for g in racf_liste|dictsort:"group" %}
@@ -184,11 +194,14 @@
 				<hr />
 			</div>
 		{% else %}
-			<div>Keine RACF-Liste geliefert</div>
+			<div>Keine RACF - Informationen</div>
 		{% endif %}
+		<div><p>&nbsp;</p></div>
 
 		{% if db2_liste %}
-			<h2>Auflistung der Db2-Grantees und zugehörender Tabellen</h2>
+			<div><p style="font-size: 10px; margin: 500px;">&nbsp;</p></div>
+			<p style="font-size: 10px; margin: 800px;">&nbsp;</p>
+			<h2>3. Auflistung der Db2-Grantees und zugehörender Tabellen</h2>
 
 			<div id="Db2_liste">
 				{% for grant in db2_liste %}
@@ -215,7 +228,7 @@
 					</p>
 				{% endfor db2_liste %}
 		{% else %}
-			<div>Keine Db2-Liste geliefert</div>
+			<div>Keine Db2 - Informationen</div>
 		{% endif %}
 
 		<div id="footerContent">

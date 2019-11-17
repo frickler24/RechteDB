@@ -994,7 +994,6 @@ def erzeuge_UhR_konzept(request, ansicht):
         'win_lw_Liste': win_lw_Liste,
         'version': version,
         'ueberschrift': erzeuge_ueberschrift(request),
-        'stand': erzeuge_datum(),
     }
     if (ansicht):
         return render(request, 'rapp/panel_UhR_konzept.html', context)
