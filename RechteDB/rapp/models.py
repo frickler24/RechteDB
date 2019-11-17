@@ -291,7 +291,7 @@ class TblGesamt(models.Model):
     userid_name = models.ForeignKey('TblUserIDundName', db_column='userid_und_name_id',
                                     on_delete=models.CASCADE)
     tf = models.CharField(db_column='tf', max_length=100, verbose_name='TF', db_index=True)
-    tf_beschreibung = models.CharField(db_column='tf_beschreibung', max_length=250, blank=True, null=True,
+    tf_beschreibung = models.CharField(db_column='tf_beschreibung', max_length=500, blank=True, null=True,
                                        verbose_name='TF-Beschreibung')
     enthalten_in_af = models.CharField(db_column='enthalten_in_af', max_length=100, blank=True, null=True,
                                        verbose_name='AF', db_index=True)
@@ -377,7 +377,7 @@ class TblGesamtHistorie(models.Model):
     id_alt = models.IntegerField(db_column='id_alt', blank=False, null=False, db_index=True)
     userid_name = models.ForeignKey('TblUserIDundName', models.PROTECT, db_column='userid_und_name_id', to_field='id', )
     tf = models.CharField(db_column='tf', max_length=100, verbose_name='TF')
-    tf_beschreibung = models.CharField(db_column='tf_beschreibung', max_length=300, blank=True, null=True,
+    tf_beschreibung = models.CharField(db_column='tf_beschreibung', max_length=500, blank=True, null=True,
                                        verbose_name='TF-Beschreibung')
     enthalten_in_af = models.CharField(db_column='enthalten_in_af', max_length=100, blank=True, null=True,
                                        verbose_name='AF')
@@ -569,7 +569,7 @@ class Tblrechteneuvonimport(models.Model):
     nachname = models.CharField(db_column='Nachname', max_length=100, blank=True, null=True)
     vorname = models.CharField(db_column='Vorname', max_length=100, blank=True, null=True)
     tf_name = models.CharField(db_column='TF Name', max_length=100, blank=True, null=True)
-    tf_beschreibung = models.CharField(db_column='TF Beschreibung', max_length=250, blank=True, null=True)
+    tf_beschreibung = models.CharField(db_column='TF Beschreibung', max_length=500, blank=True, null=True)
     af_anzeigename = models.CharField(db_column='AF Anzeigename', max_length=100, blank=True, null=True)
     af_beschreibung = models.CharField(db_column='AF Beschreibung', max_length=2000, blank=True, null=True)
     hoechste_kritikalitaet_tf_in_af = models.CharField(db_column='Höchste Kritikalität TF in AF', max_length=150,
@@ -598,7 +598,7 @@ class Tblrechteamneu(models.Model):
     userid = models.CharField(db_column='userid', max_length=50, blank=True, null=True)
     name = models.CharField(db_column='name', max_length=100, blank=True, null=True)
     tf = models.CharField(db_column='tf', max_length=100, blank=True, null=True, db_index=True)
-    tf_beschreibung = models.CharField(db_column='tf_beschreibung', max_length=250, blank=True, null=True)
+    tf_beschreibung = models.CharField(db_column='tf_beschreibung', max_length=500, blank=True, null=True)
     enthalten_in_af = models.CharField(db_column='enthalten_in_af', max_length=100, blank=True, null=True,
                                        db_index=True)
     tf_kritikalitaet = models.CharField(db_column='tf_kritikalitaet', max_length=64, blank=True, null=True)

@@ -836,6 +836,7 @@ def liefere_tf_zu_afs(af_menge, userids):
         .exclude(userid_name_id__geloescht=True) \
         .exclude(geloescht=True) \
         .exclude(tf='Kein Name') \
+        .exclude(tf='TF existiert nicht mehr') \
         .filter(enthalten_in_af__in=af_menge) \
         .filter(userid_name__userid__in=userids) \
         .order_by('-gefunden', '-wiedergefunden') \
@@ -973,9 +974,15 @@ def erzeuge_UhR_konzept(request, ansicht):
     aftf_dict = liefere_tf_liste(rollenMenge, userids)
     tf_liste = kurze_tf_liste(aftf_dict)
     af_kritikalitaet = liefere_af_kritikalitaet(rollenMenge, userids)
-    racf_liste = liefere_racf_zu_tfs(tf_liste)
-    db2_liste = liefere_db2_liste(tf_liste)
-    win_lw_Liste = liefere_win_lw_Liste(tf_liste)
+
+    if request.GET.get('episch', 0) == '1':
+        racf_liste = liefere_racf_zu_tfs(tf_liste)
+        db2_liste = liefere_db2_liste(tf_liste)
+        win_lw_Liste = liefere_win_lw_Liste(tf_liste)
+    else:     # Die Riesenlisten werden nur auf Anforderung aus dem UI erzeugt
+        racf_liste = None
+        db2_liste = None
+        win_lw_Liste = None
 
     context = {
         'filter': panel_filter,

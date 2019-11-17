@@ -30,29 +30,11 @@
 			</h2>
 			<div class="container">
 				<div class="row justify-content-md-center">
-					<a href="{% url 'uhr_konzept_pdf' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
+					<a href="{% url 'uhr_konzept_pdf' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}episch=1"
 					   class="btn btn-outline-primary btn-sm" role="button"
 					   target="_blank">Erzeuge PDF
-					</a>
-					&nbsp;
-					<a href="#TFen"
-					   class="btn btn-outline-primary btn-sm" role="button"
-					   target="_self">Zu den TFen
-					</a>
-					&nbsp;
-					<a href="#RACF"
-					   class="btn btn-outline-primary btn-sm" role="button"
-					   target="_self">Zu den RACF-Profilen
-					</a>
-					&nbsp;
-					<a href="#Db2"
-					   class="btn btn-outline-primary btn-sm" role="button"
-					   target="_self">Zu den Db2-Informationen
-					</a>
-					&nbsp;
-					<a href="#WinLW"
-					   class="btn btn-outline-primary btn-sm" role="button"
-					   target="_self">Zu den Laufwerks-Informationen
+						(episch, mehrere Minuten,
+						Sie können zu diesem Tab zurückkehren und weiterarbeiten)
 					</a>
 				</div>
 			</div>

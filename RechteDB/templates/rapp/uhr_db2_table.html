@@ -1,4 +1,4 @@
-{% if aftf_dict %}
+{% if db2_liste %}
     <div class="card">
         <div class="card-header" id="headingDb2">
             <h5 class="mb-0">
@@ -7,7 +7,7 @@
                         data-target="#collapseDb2"
                         aria-expanded="false"
                         aria-controls="collapseDb2">
-                    Auflistung der Db2-Grantees und zugehörender Tabellen
+                    Auflistung der Db2-Grantees und zugehörender Tabellen ({{ db2_liste|length }} Elemente)
                 </button>
             </h5>
         </div>

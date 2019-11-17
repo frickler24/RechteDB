@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load gethash %}
 {% load static %}
 <html lang="de">
     <head>
@@ -19,7 +20,6 @@
         </style>
     </head>
     <body>
-
         <h1>
             Rollen und Arbeitsplatzfunktionen
             {{ ueberschrift }}
@@ -30,37 +30,27 @@
         {% if rollenMenge %}
             {% for rolle in rollenMenge %}
                 <div>
+					<hr />
                     <table repeat="0" id="RolleUndAF">
                         <thead>
                             <tr>
-                                <th colspan="2" style="text-align: left;"><br />Rollennname</th>
-                                <th colspan="2" style="text-align: left;"><br />Beschreibung</th>
-                                <th colspan="1" style="text-align: left;"><br />System</th>
+                                <th colspan="5" style="text-align: left;"><br />Rollennname</th>
+                                <th colspan="5" style="text-align: left;"><br />Beschreibung</th>
+                                <th colspan="2" style="text-align: left;"><br />System</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>&nbsp;</td></tr>
-                            <tr>
-                                <td colspan="2">
-                                    {{ rolle.rollenname }}
-                                </td>
-                                <td colspan="2">
-                                    {{ rolle.rollenbeschreibung }}
-                                </td>
-                                <td colspan="1">
-                                    {{ rolle.system }}
-                                </td>
-                            </tr>
                             <tr>
                                 <td>&nbsp;</td>
-                                <td colspan="4">
+                                <td colspan="11">
                                     <table repeat="0" id="pdfdruck2">
                                         <thead>
                                             <tr>
-                                                <td width="30%"><strong>AF</strong></td>
-                                                <td width="5%"><strong>Muss</strong></td>
-                                                <td width="15%"><strong>Einsatz</strong></td>
-                                                <td width="50%"><strong>Anmerkung zur AF</strong></td>
+												<td width="30%"><strong>AF</strong></td>
+												<td width="10%"><strong>Muss</strong></td>
+												<td width="10%"><strong>Einsatz</strong></td>
+												<td width="10%"><strong>AF-Kritik.</strong></td>
+												<td width="40%"><strong>Anmerkung zur AF</strong></td>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -76,14 +66,15 @@
 								<table repeat="0" id="pdfdruck">
 									<tr>
 										<td>&nbsp;</td>
-										<td colspan="4">
+										<td colspan="11">
 											<table repeat="1" id="pdfdruck2">
 												<thead>
 													<tr>
 														<td width="30%"><strong>AF</strong></td>
-														<td width="5%"><strong>Muss</strong></td>
-														<td width="15%"><strong>Einsatz</strong></td>
-														<td width="50%"><strong>Anmerkung zur AF</strong></td>
+														<td width="10%"><strong>Muss</strong></td>
+														<td width="10%"><strong>Einsatz</strong></td>
+ 			                                            <td width="10%"><strong>AF-Kritik.</strong></td>
+ 														<td width="40%"><strong>Anmerkung zur AF</strong></td>
 													</tr>
 												</thead>
 												<tbody>
@@ -99,9 +90,13 @@
 																	 alt="checkbox checked" height="10" width="10">
 															{% endif %}
 														</td>
-														<td class="text-center">
+														<td>
 															<small>{{ meineaf.get_einsatz_display }}</small>
 														</td>
+														<td class="text-center">
+															<small>{{ af_kritikalitaet | strhash:meineaf.af }}</small>
+                                        				</td>
+
 														<td>{{ meineaf.bemerkung }}</td>
 													</tr>
 												{% empty %}
@@ -118,8 +113,8 @@
 							</tbody>
 						</table>
 					</div>
-					<p>&nbsp</p>
 			{% endfor RollenMenge %}
+			<hr />
 		{% else %}
 			<div class="text-danger">
 				<p>
@@ -128,93 +123,101 @@
 			</div>
 		{% endif %}
 
-		{% if tf_menge %}
-			{% comment hier geht die Liste der TFen los, die ist aber noch falsch %}{% endcomment %}
-			<h1>Liste der Arbeitsplatzfunktionen und ihrer Technischen Funktionen (TF)</h1>
-			<div>
-				<table repeat="0" id="TF">
-					<thead>
-						<tr>
-							<th width="5%" style="text-align: left">Name</th>
-							<th width="54%" style="text-align: left">Beschreibung</th>
-							<th width="8%" style="text-align: left">TF Kriti- kalität</th>
-							<th width="15%" style="text-align: left">Eigentümer Orga</th>
-							<th width="10%" style="text-align: left">Plattform</th>
-							<th width="8%" style="text-align: left">Direct Connect</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for tf in tf_menge|dictsort:"tf" %}
-							{% if forloop.counter0 > 0 and forloop.counter0|divisibleby:45 %}
-									</tbody>
-								</table>
-								<table repeat="0" id="TF">
-									<thead>
-										<tr>
-											<th width="5%" style="text-align: left">Name</th>
-											<th width="54%" style="text-align: left">Beschreibung</th>
-											<th width="8%" style="text-align: left">TF Kriti- kalität</th>
-											<th width="15%" style="text-align: left">Eigentümer Orga</th>
-											<th width="10%" style="text-align: left">Plattform</th>
-											<th width="8%" style="text-align: left">Direct Connect</th>
-										</tr>
-									</thead>
-									<tbody>
-							{% endif %}
-							<tr>
-								<td>{{ tf.tf }}</td>
-							</tr>
-							<tr><td>&nbsp;</td>
-								<td>{{ tf.tf_beschreibung }}</td>
-								<td>{{ tf.tf_kritikalitaet }}</td>
-								<td>{{ tf.tf_eigentuemer_org }}</td>
-								<td>{{ tf.plattform__tf_technische_plattform }}</td>
-								<td>{{ tf.direct_connect }}</td>
-							</tr>
-						{% empty %}
-							<div class="text-danger">
-								<p>
-									Keine TF-Menge gefunden
-								</p>
-							</div>
-						{% endfor tf_menge %}
-					</tbody>
-				</table>
+		{% if aftf_dict %}
+			<h2>Liste der Arbeitsplatzfunktionen und ihrer Technischen Funktionen (TF)</h2>
+			<div id="AFTF_liste">
+			   {% for af, tf_dict in aftf_dict.items %}
+					<hr />
+					<p id="AFTF_{{af}}" style="font-size: 6px; margin: 3px;">
+						{% for tf in tf_dict|dictsort:"tf" %}
+							<strong>AF: '{{ af }}'</strong>,
+							Beschr.: <strong>'{{ tf.tf_beschreibung }}'</strong>,
+							<br />
+							&nbsp; &nbsp; &nbsp;
+							TF: '{{ tf.tf }}',
+							&nbsp; &nbsp;
+							TF-Krit.: 		'{{ tf.tf_kritikalitaet }}',
+							&nbsp; &nbsp;
+							TF-Eigentümer: 	'{{ tf.tf_eigentuemer_org }}',
+							&nbsp; &nbsp;
+							Plattform: 		'{{ tf.plattform__tf_technische_plattform }}',
+							&nbsp; &nbsp;
+							Direct Connect: '{{ tf.direct_connect }}',
+							<br />
+						{% endfor tf_dict %}
+					</p>
+				{% endfor aftf_dict %}
 				<hr />
+			</div>
+		{% else %}
+			<div class="text-danger">
+				<p>
+					Keine AF / TF - Informationen gefunden
+				</p>
 			</div>
 		{% endif %}
 
-
-		{% comment hier geht die RACF - Liste los %}{% endcomment %}
-
 		{% if racf_liste %}
-			<h1>Liste der RACF-Profile der genutzten TFen</h1>
-			<div id="RACF_{{ g.group }}">
-				<p style="font-size:10px; margin: 1px;">
-					TF &nbsp;
-					Class &nbsp;
-					Test &nbsp;
-					Prod &nbsp;
-					Type &nbsp;
-					Profile &nbsp;
-					Access
-				</p>
+			<h2>Auflistung der RACF-Profile</h2>
+
+			<div id="AFTF_liste">
 				{% for g in racf_liste|dictsort:"group" %}
-					{% ifchanged g.group %}<p style="font-size:3px; margin: 0px;">&nbsp;</p>{% endifchanged %}
-					<p style="font-size:6px; line-height:90%; margin: 0px;">
-						{{ g.group }} &nbsp;
-						{{ g.ressource_class }} &nbsp;
-						{{ g.test }} &nbsp;
-						{{ g.produktion }} &nbsp;
-						{{ g.alter_control_update }} &nbsp;
-						{{ g.type }}
-						{{ g.profil }} &nbsp;
-						{{ g.access }} &nbsp;
+					{% ifchanged g.group %}<hr />{% endifchanged %}
+					<p id="RACF_{{g.group}}" style="font-size: 6px; line-height: 1; margin: -1rem;">
+						<strong>Name (Group): '{{ g.group }}'</strong>,
+						&nbsp; &nbsp;
+						Klasse: {{ g.ressource_class }},
+						&nbsp; &nbsp;
+						Zugriff: {{ g.access }},
+						&nbsp; &nbsp;
+						Test: {{ g.test }},
+						&nbsp; &nbsp;
+						Produktion: {{ g.produktion }},
+						&nbsp; &nbsp;
+						Änderung: {{ g.alter_control_update }},
+						&nbsp; &nbsp;
+						Typ: '{{ g.type }}',
+						&nbsp; &nbsp;
+						<strong>Profil: '{{ g.profil }}'</strong>
 					</p>
 				{% endfor racf_liste %}
 				<hr />
 			</div>
+		{% else %}
+			<div>Keine RACF-Liste geliefert</div>
 		{% endif %}
+
+		{% if db2_liste %}
+			<h2>Auflistung der Db2-Grantees und zugehörender Tabellen</h2>
+
+			<div id="Db2_liste">
+				{% for grant in db2_liste %}
+					{% ifchanged grant.grantee %}<hr />{% endifchanged %}
+					<p id="RACF_{{grant.grantee}}" style="font-size: 6px; line-height: 1; margin: -1rem;">
+						<strong>Name TF (Grantee):	'{{ grant.grantee }}'</strong>,
+						&nbsp; &nbsp;
+						<strong>Umgebung: 			{{ grant.source }}</strong>,
+						&nbsp; &nbsp;
+						<strong>Tabelle: 			{{ grant.table }}</strong>,
+						&nbsp; &nbsp;
+						Creator: 					{{ grant.creator }},
+						&nbsp; &nbsp;
+						Grantor: 					{{ grant.grantor }},
+						&nbsp; &nbsp;
+						GrantedTS: 					{{ grant.grantedts }},
+						&nbsp; &nbsp;
+						{% if grant.selectauth %}SELECT={{ grant.selectauth }},{% endif %}
+						{% if grant.insertauth %}INSERT={{ grant.insertauth }},{% endif %}
+						{% if grant.updateauth %}UPDATE={{ grant.updateauth }},{% endif %}
+						{% if grant.deleteauth %}DELETE={{ grant.deleteauth }},{% endif %}
+						{% if grant.alterauth  %}ALTER={{  grant.alterauth }},{% endif %}
+						{% if grant.indexauth  %}INDEX={{  grant.indexauth }}{% endif %}
+					</p>
+				{% endfor db2_liste %}
+		{% else %}
+			<div>Keine Db2-Liste geliefert</div>
+		{% endif %}
+
 		<div id="footerContent">
 			{% block page_foot %}
 				Page <pdf:pagenumber>

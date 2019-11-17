@@ -173,7 +173,7 @@ def import_csv(request):
                 nachname = textwrap.shorten (line['Nachname'], width=150, placeholder="..."),
                 vorname = textwrap.shorten (line['Vorname'], width=150, placeholder="..."),
                 tf_name = textwrap.shorten (line['TF Name'], width=100, placeholder="..."),
-                tf_beschreibung = textwrap.shorten (line['TF Beschreibung'], width=250, placeholder="..."),
+                tf_beschreibung = textwrap.shorten (line['TF Beschreibung'], width=500, placeholder="..."),
                 af_anzeigename = textwrap.shorten (line['AF Anzeigename'], width=100, placeholder="..."),
                 af_beschreibung = textwrap.shorten (line['AF Beschreibung'], width=250, placeholder="..."),
                 hoechste_kritikalitaet_tf_in_af = textwrap.shorten (line['Höchste Kritikalität TF in AF'],
