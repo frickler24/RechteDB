@@ -1433,7 +1433,6 @@ def handle_stored_procedures(request):
         daten['ueberschreibeModelle'] = sps[9](procs_schon_geladen)
         daten['directConnects'] = sps[10](procs_schon_geladen)
 
-        print(daten)
     context = {
         'daten': daten,
     }
