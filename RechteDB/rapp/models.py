@@ -291,7 +291,7 @@ class TblGesamt(models.Model):
     userid_name = models.ForeignKey('TblUserIDundName', db_column='userid_und_name_id',
                                     on_delete=models.CASCADE)
     tf = models.CharField(db_column='tf', max_length=100, verbose_name='TF', db_index=True)
-    tf_beschreibung = models.CharField(db_column='tf_beschreibung', max_length=250, blank=True, null=True,
+    tf_beschreibung = models.CharField(db_column='tf_beschreibung', max_length=500, blank=True, null=True,
                                        verbose_name='TF-Beschreibung')
     enthalten_in_af = models.CharField(db_column='enthalten_in_af', max_length=100, blank=True, null=True,
                                        verbose_name='AF', db_index=True)
@@ -303,16 +303,13 @@ class TblGesamt(models.Model):
     plattform = models.ForeignKey('TblPlattform', db_column='plattform_id', on_delete=models.CASCADE,
                                   verbose_name='Plattform', db_index=True)
     gf = models.CharField(db_column='gf', max_length=100, blank=True, null=True, verbose_name='GF')
-    vip_kennzeichen = models.CharField(db_column='vip', max_length=32, blank=True, null=True, verbose_name='VIP')
-    zufallsgenerator = models.CharField(db_column='zufallsgenerator', max_length=32, blank=True, null=True,
-                                        verbose_name='Zufallsgenerator')
     af_gueltig_ab = models.DateTimeField(db_column='af_gueltig_ab', blank=True, null=True,
                                          verbose_name='AF gültig ab')
     af_gueltig_bis = models.DateTimeField(db_column='af_gueltig_bis', blank=True, null=True,
                                           verbose_name='AF gültig bis')
     direct_connect = models.CharField(db_column='direct_connect', max_length=100, blank=True, null=True,
                                       verbose_name='Direktverbindung')
-    hoechste_kritikalitaet_tf_in_af = models.CharField(db_column='hk_tf_in_af', max_length=150, blank=True, null=True,
+    hoechste_kritikalitaet_tf_in_af = models.CharField(db_column='hk_tf_in_af', max_length=4, blank=True, null=True,
                                                        verbose_name='max. Krit. TF in AF')
     gf_beschreibung = models.CharField(db_column='gf_beschreibung', max_length=250, blank=True, null=True,
                                        verbose_name='GF Kurzbeschreibung')
@@ -330,15 +327,15 @@ class TblGesamt(models.Model):
     patchdatum = models.DateTimeField(db_column='patchdatum', blank=True, null=True)
     wertmodellvorpatch = models.TextField(db_column='wert_modell_vor_patch', blank=True, null=True)
     loeschdatum = models.DateTimeField(db_column='loeschdatum', blank=True, null=True, verbose_name='Löschdatum')
-    letzte_aenderung = models.DateTimeField(auto_now=True)
+    letzte_aenderung = models.DateTimeField(auto_now=True, db_index=True)
+    af_beschreibung = models.TextField(max_length=2000, blank=True, null=True, default='Keine Beschreibung vorhanden')
 
     class Meta:
         managed = True
         db_table = 'tblGesamt'
         verbose_name = "Eintrag der Gesamttabelle (tblGesamt)"
         verbose_name_plural = "08_Gesamttabelle Übersicht (tblGesamt)"
-        index_together = (('userid_name', 'tf', 'enthalten_in_af', 'plattform',
-                           'gf', 'vip_kennzeichen', 'zufallsgenerator'),
+        index_together = (('userid_name', 'tf', 'enthalten_in_af', 'plattform', 'gf'),
                           ('gf', 'enthalten_in_af'),
                          )
         ordering = ['id'] # Ist erforderlich wegen Paginierter Anzeige
@@ -380,7 +377,7 @@ class TblGesamtHistorie(models.Model):
     id_alt = models.IntegerField(db_column='id_alt', blank=False, null=False, db_index=True)
     userid_name = models.ForeignKey('TblUserIDundName', models.PROTECT, db_column='userid_und_name_id', to_field='id', )
     tf = models.CharField(db_column='tf', max_length=100, verbose_name='TF')
-    tf_beschreibung = models.CharField(db_column='tf_beschreibung', max_length=300, blank=True, null=True,
+    tf_beschreibung = models.CharField(db_column='tf_beschreibung', max_length=500, blank=True, null=True,
                                        verbose_name='TF-Beschreibung')
     enthalten_in_af = models.CharField(db_column='enthalten_in_af', max_length=100, blank=True, null=True,
                                        verbose_name='AF')
@@ -392,9 +389,6 @@ class TblGesamtHistorie(models.Model):
     plattform = models.ForeignKey('TblPlattform', db_column='plattform_id', on_delete=models.CASCADE,
                                   verbose_name='Plattform')  # Field name made lowercase.
     gf = models.CharField(db_column='gf', max_length=100, blank=True, null=True, verbose_name='GF')
-    vip_kennzeichen = models.CharField(db_column='vip', max_length=32, blank=True, null=True, verbose_name='VIP')
-    zufallsgenerator = models.CharField(db_column='zufallsgenerator', max_length=32, blank=True, null=True,
-                                        verbose_name='Zufallsgenerator')
     datum = models.DateTimeField(db_column='datum', verbose_name='Recht gefunden am')
     geloescht = models.IntegerField(db_column='geloescht', blank=True, null=True, verbose_name='gelöscht')
     gefunden = models.IntegerField(blank=True, null=True)
@@ -413,7 +407,7 @@ class TblGesamtHistorie(models.Model):
                                           verbose_name='AF gültig bis')
     direct_connect = models.CharField(db_column='direct_connect', max_length=100, blank=True, null=True,
                                       verbose_name='Direktverbindung')
-    hoechste_kritikalitaet_tf_in_af = models.CharField(db_column='hk_tf_in_af', max_length=150, blank=True, null=True,
+    hoechste_kritikalitaet_tf_in_af = models.CharField(db_column='hk_tf_in_af', max_length=4, blank=True, null=True,
                                                        verbose_name='max. Krit. TF in AF')
     gf_beschreibung = models.CharField(db_column='gf_beschreibung', max_length=300, blank=True, null=True,
                                        verbose_name='GF Kurzbeschreibung')
@@ -421,6 +415,7 @@ class TblGesamtHistorie(models.Model):
     patchdatum = models.DateTimeField(db_column='patchdatum', blank=True, null=True)
     wertmodellvorpatch = models.TextField(db_column='wert_modell_vor_patch', blank=True, null=True)
     letzte_aenderung = models.DateTimeField(blank=True, null=True)
+    af_beschreibung = models.TextField(max_length=2000, blank=True, null=True, default='--')
 
     class Meta:
         managed = True
@@ -462,8 +457,6 @@ class TblAfliste(models.Model):
 ###################################### Tblsubsysteme, Tblsachgebiete, TblDb2
 # Ein paar Hilfstabellen.
 # Die sind inhaltlich wahrscheinlich nicht super aktuell, helfen aber bei verschiedenen Fragen.
-# Leider müssen die Modelle und ihre Columns so heißen, wie ihre Übreschriften es vorgeben (kein SQL-Standard)
-
 class Tblsachgebiete(models.Model):
     sachgebiet = models.CharField(db_column='Sachgebiet', primary_key=True, max_length=32)
     definition = models.CharField(db_column='Definition', max_length=250, blank=True, null=True)
@@ -521,7 +514,8 @@ class TblDb2(models.Model):
     def __str__(self) -> str:
         return str(self.id)
 
-class TblRacfGruppen(models.Model):
+# ToDo: Nach ausführlichen Tests löschen
+class kanndaswegTblRacfGruppen(models.Model):
     group = models.CharField(db_column='Group', primary_key=True, max_length=150)
     test = models.IntegerField(db_column='Test', blank=True, null=True)
     produktion = models.IntegerField(db_column='Produktion', blank=True, null=True)
@@ -575,9 +569,9 @@ class Tblrechteneuvonimport(models.Model):
     nachname = models.CharField(db_column='Nachname', max_length=100, blank=True, null=True)
     vorname = models.CharField(db_column='Vorname', max_length=100, blank=True, null=True)
     tf_name = models.CharField(db_column='TF Name', max_length=100, blank=True, null=True)
-    tf_beschreibung = models.CharField(db_column='TF Beschreibung', max_length=250, blank=True, null=True)
+    tf_beschreibung = models.CharField(db_column='TF Beschreibung', max_length=500, blank=True, null=True)
     af_anzeigename = models.CharField(db_column='AF Anzeigename', max_length=100, blank=True, null=True)
-    af_beschreibung = models.CharField(db_column='AF Beschreibung', max_length=250, blank=True, null=True)
+    af_beschreibung = models.CharField(db_column='AF Beschreibung', max_length=2000, blank=True, null=True)
     hoechste_kritikalitaet_tf_in_af = models.CharField(db_column='Höchste Kritikalität TF in AF', max_length=150,
                                                        blank=True, null=True)
     tf_eigentuemer_org = models.CharField(db_column='TF Eigentümer Org', max_length=150, blank=True, null=True)
@@ -604,7 +598,7 @@ class Tblrechteamneu(models.Model):
     userid = models.CharField(db_column='userid', max_length=50, blank=True, null=True)
     name = models.CharField(db_column='name', max_length=100, blank=True, null=True)
     tf = models.CharField(db_column='tf', max_length=100, blank=True, null=True, db_index=True)
-    tf_beschreibung = models.CharField(db_column='tf_beschreibung', max_length=250, blank=True, null=True)
+    tf_beschreibung = models.CharField(db_column='tf_beschreibung', max_length=500, blank=True, null=True)
     enthalten_in_af = models.CharField(db_column='enthalten_in_af', max_length=100, blank=True, null=True,
                                        db_index=True)
     tf_kritikalitaet = models.CharField(db_column='tf_kritikalitaet', max_length=64, blank=True, null=True)
@@ -612,8 +606,6 @@ class Tblrechteamneu(models.Model):
     tf_technische_plattform = models.CharField(db_column='tf_technische_plattform', max_length=64, blank=True,
                                                null=True, db_index=True)
     gf = models.CharField(db_column='gf', max_length=100, blank=True, null=True, db_index=True)
-    vip_kennzeichen = models.CharField(db_column='vip', max_length=32, blank=True, null=True)
-    zufallsgenerator = models.CharField(db_column='zufallsgenerator', max_length=32, blank=True, null=True)
     af_gueltig_ab = models.DateTimeField(db_column='af_gueltig_ab', blank=True, null=True)
     af_gueltig_bis = models.DateTimeField(db_column='af_gueltig_bis', blank=True, null=True)
     direct_connect = models.CharField(db_column='direct_connect', max_length=50, blank=True, null=True)
@@ -625,6 +617,7 @@ class Tblrechteamneu(models.Model):
     angehaengt_bekannt = models.IntegerField(db_column='angehaengt_bekannt', blank=True, null=True)
     angehaengt_sonst = models.IntegerField(db_column='angehaengt_sonst', blank=True, null=True)
     doppelerkennung = models.IntegerField(blank=True, null=True)
+    af_beschreibung = models.TextField(max_length=2000, blank=True, null=True, default='')
 
     class Meta:
         managed = True
@@ -648,13 +641,11 @@ class RACF_Rechte(models.Model):
         verbose_name = 'RACF-Rechte'
         verbose_name_plural = '40_RACF - Berechtigungen'
         ordering = ['group', 'profil', ]
+        index_together = (('group', 'profil'),) # Zum schnelleren Update bei Neulieferung
 
     def __str__(self) -> str:
         return str(self.id)
 
-# Technische Abteilungsnummer;Organisation;Organisationsbezeichnung;Wirkende FK;Kostenstelle (wirkend);Org ID;
-# Parent Organization;Parent Organization ID;Organization Type;FK-Name;Org Delegation Eigentümer-Genehmiger;Delegation FK-Genehmiger
-# rv00458;ZI-AI-BA;Bestands-Anwendungen;XV13254;1001288;140329;ZI-AI;61901;OS0;Lutz Eichler;;
 
 class Orga_details(models.Model):
     id = models.AutoField(primary_key=True)

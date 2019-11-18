@@ -28,14 +28,13 @@ class GesamtExporterModel(resources.ModelResource):
             'userid_name__name', 'userid_name__userid',
 
             'tf', 'tf_beschreibung', 'plattform', 'plattform__tf_technische_plattform', 'direct_connect',
-            'enthalten_in_af', 'gf',
+            'enthalten_in_af', 'af_beschreibung', 'gf', 'gf_beschreibung',
 
             'af_gueltig_ab', 'af_gueltig_bis',
             'af_zuweisungsdatum', 'datum',
 
             'tf_kritikalitaet', 'tf_eigentuemer_org',
-            'vip_kennzeichen', 'zufallsgenerator',
-            'hoechste_kritikalitaet_tf_in_af', 'gf_beschreibung',
+            'hoechste_kritikalitaet_tf_in_af',
             'gefunden', 'wiedergefunden', 'geaendert', 'neueaf', 'nicht_ai',
             'patchdatum', 'wertmodellvorpatch', 'geloescht', 'loeschdatum',
 

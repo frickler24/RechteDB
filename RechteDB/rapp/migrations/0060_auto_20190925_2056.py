@@ -12,6 +12,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterIndexTogether(
             name='tblgesamt',
-            index_together={('userid_name', 'tf', 'enthalten_in_af', 'plattform', 'gf', 'vip_kennzeichen', 'zufallsgenerator'), ('modell', 'enthalten_in_af', 'gf')},
+            index_together={('userid_name', 'tf', 'enthalten_in_af', 'plattform', 'gf'), ('modell', 'enthalten_in_af', 'gf')},
         ),
     ]

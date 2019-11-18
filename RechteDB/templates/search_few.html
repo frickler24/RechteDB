@@ -30,11 +30,16 @@
 					</div>
 				{% endcomment %}
 					<div class="form-group form-group-sm col col-md-auto mt-3 pt-3">
-						<button type="submit" class="btn btn-primary btn-sm">Suche</button>
+						<button type="submit" class="btn btn-outline-primary btn-sm">Suche</button>
 					</div>
 					<div class="form-group form-group-sm col col-md-auto mt-3 pt-3">
-						<a href="{% url 'uhr_konzept' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}"
-							class="btn btn-outline-success btn-sm" role="button">Konzept
+						<a href="{% url 'uhr_konzept' %}?{% for key,value in request.GET.items %}{% if key != 'episch' %}{{key}}={{value}}&{%endif%}{%endfor%}episch=0"
+							class="btn btn-outline-success btn-sm" role="button">Konzept (kurz)
+						</a>
+					</div>
+					<div class="form-group form-group-sm col col-md-auto mt-3 pt-3">
+						<a href="{% url 'uhr_konzept' %}?{% for key,value in request.GET.items %}{% if key != 'episch' %}{{key}}={{value}}&{%endif%}{%endfor%}episch=1"
+							class="btn btn-outline-warning btn-sm" role="button">Konzept (episch)
 						</a>
 					</div>
 					<div class="form-group form-group-sm col col-md-auto mt-3 pt-3">

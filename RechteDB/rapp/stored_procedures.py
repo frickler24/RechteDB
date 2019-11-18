@@ -10,6 +10,36 @@ import sys
 from django.contrib.auth.decorators import login_required
 
 
+def check_sp(name):
+    sp = """
+    SELECT routine_name
+    FROM information_schema.routines
+    WHERE routine_type = 'PROCEDURE'
+        AND routine_name = '{}'
+    """.format(name)
+
+    fehler = ''
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute('select DATABASE()')
+            routine_schema = cursor.fetchone()
+            sp = "{} AND routine_schema = '{}'".format(sp, routine_schema[0])
+            anzahl = cursor.execute(sp)
+
+            if anzahl != 1:
+                fehler += 'Mismatch SQL-Answer in check_sp: 1 != {}'.format(anzahl)
+        except:
+            e = sys.exc_info()[0]
+            fehler = 'Details: {}'.format(e)
+
+        cursor.close()
+
+        if fehler != '':
+            fehler = 'Error in check_sp(): {}'.format(fehler)
+            print(fehler)
+        return fehler
+
+
 def push_sp(name, sp, procs_schon_geladen):
     """
     Speichere eine als Parameter übergebene Stored Procedure
@@ -19,19 +49,20 @@ def push_sp(name, sp, procs_schon_geladen):
     :return: Fehler (False = kein Fehler)
     """
     # ToDo Das Löschen wirft Warnings im MySQL-Treiber, wenn die SP gar nicht existiert. -> Liste lesen und checken
-    fehler = False
+    fehler = ''
     loeschstring = 'DROP PROCEDURE IF EXISTS {}'.format(name)
     with connection.cursor() as cursor:
         try:
             if procs_schon_geladen:
-                cursor.execute (loeschstring)
-            cursor.execute (sp)
+                cursor.execute(loeschstring)
+            cursor.execute(sp)
         except:
             e = sys.exc_info()[0]
             fehler = 'Error in push_sp(): {}'.format(e)
 
         cursor.close()
-        return fehler
+        return fehler + check_sp(name)
+
 
 def push_sp_test(procs_schon_geladen):
     sp = """
@@ -40,13 +71,14 @@ BEGIN
   SELECT COUNT(*) FROM `tblRechteNeuVonImport`;
 END
 """
-    return push_sp ('anzahl_import_elemente', sp, procs_schon_geladen)
+    return push_sp('anzahl_import_elemente', sp, procs_schon_geladen)
+
 
 def call_sp_test():
     fehler = False
     with connection.cursor() as cursor:
         try:
-            cursor.execute ("CALL anzahl_import_elemente")
+            cursor.execute("CALL anzahl_import_elemente")
             liste = cursor.fetchone()
         except:
             e = sys.exc_info()[0]
@@ -54,6 +86,7 @@ def call_sp_test():
 
         cursor.close()
         return fehler or not liste[0] >= 0
+
 
 def push_sp_vorbereitung(procs_schon_geladen):
     sp = """
@@ -72,7 +105,7 @@ BEGIN
     */
 
     /*
-        Seit IIQ werden die wirklichen useriden nicht mehr unter der Identität gehalten,
+        Seit IIQ werden die wirklichen UserIDen nicht mehr unter der Identität gehalten,
         sondern unter `AF zugewiesen an Account-name`. Das müssen wir in die userid
         umkopieren, wo nötig.
     */
@@ -105,25 +138,24 @@ BEGIN
         Einschließlich Herausfiltern der doppelten Zeilen
         (> 1% der Zeilen werden aus IIQ doppelt geliefert)
     */
-    drop table if exists qryF3_RechteNeuVonImportDuplikatfrei;
-    create temporary table qryF3_RechteNeuVonImportDuplikatfrei as
+    drop table if exists rapp_NeuVonImportDuplikatfrei;
+    create temporary table rapp_NeuVonImportDuplikatfrei as
         SELECT `AF zugewiesen an Account-name`         AS userid,
-               CONCAT(`Nachname`,', ',`Vorname`)     AS name,
-               `tf name`                             AS tf,
-               `tf beschreibung`                     AS tf_beschreibung,
-               `AF Anzeigename`                     AS enthalten_in_af,
-               `tf kritikalität`                     AS tf_kritikalitaet,
-               `tf eigentümer org`                     AS tf_eigentuemer_org,
-               `tf Applikation`                     AS tf_technische_plattform,
-               `GF name`                             AS GF,
-               'gibt es nicht mehr'                 AS vip,
-               'gibt es nicht mehr'                    AS zufallsgenerator,
-               `af gültig ab`                        AS af_gueltig_ab,
-               `af gültig bis`                        AS af_gueltig_bis,
-               `direct connect`                        AS direct_connect,
-               `höchste kritikalität tf in af`        AS hk_tf_in_af,
-               `gf beschreibung`                    AS gf_beschreibung,
-               `af zuweisungsdatum`                    AS af_zuweisungsdatum
+               CONCAT(`Nachname`,', ',`Vorname`) AS name,
+               `tf name`                         AS tf,
+               `tf beschreibung`                 AS tf_beschreibung,
+               `AF Anzeigename`                  AS enthalten_in_af,
+               `AF Beschreibung`                 AS af_beschreibung,
+               `tf kritikalität`                 AS tf_kritikalitaet,
+               `tf eigentümer org`               AS tf_eigentuemer_org,
+               `tf Applikation`                  AS tf_technische_plattform,
+               `GF name`                         AS GF,
+               `af gültig ab`                    AS af_gueltig_ab,
+               `af gültig bis`                   AS af_gueltig_bis,
+               `direct connect`                  AS direct_connect,
+               `höchste kritikalität tf in af`   AS hk_tf_in_af,
+               `gf beschreibung`                 AS gf_beschreibung,
+               `af zuweisungsdatum`              AS af_zuweisungsdatum
         FROM tblRechteNeuVonImport
         GROUP BY `userid`,
                  `tf`,
@@ -132,35 +164,36 @@ BEGIN
                  `GF`;
 
     /*
-        ALTER TABLE `RechteDB`.`qryF3_RechteNeuVonImportDuplikatfrei`
+        ALTER TABLE `RechteDB`.`rapp_NeuVonImportDuplikatfrei`
             ADD PRIMARY KEY (`userid`, `tf`(70), `enthalten_in_af`(30), `tf_technische_plattform`, `GF`);
     */
 
 
     TRUNCATE table tblRechteAMNeu;
-    INSERT INTO tblRechteAMNeu (userid, name, tf, `tf_beschreibung`, `enthalten_in_af`, `tf_kritikalitaet`,
-                `tf_eigentuemer_org`, `tf_technische_plattform`, GF, `vip`, zufallsgenerator,
+    INSERT INTO tblRechteAMNeu (userid, name, tf, `tf_beschreibung`, 
+                `enthalten_in_af`, `af_beschreibung`,
+                `tf_kritikalitaet`,
+                `tf_eigentuemer_org`, `tf_technische_plattform`, GF, 
                 `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
                 `gf_beschreibung`, `af_zuweisungsdatum`, doppelerkennung)
-    SELECT qryF3_RechteNeuVonImportDuplikatfrei.userid,
-           qryF3_RechteNeuVonImportDuplikatfrei.name,
-           qryF3_RechteNeuVonImportDuplikatfrei.tf,
-           qryF3_RechteNeuVonImportDuplikatfrei.`tf_beschreibung`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`enthalten_in_af`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`tf_kritikalitaet`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`tf_eigentuemer_org`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`tf_technische_plattform`,
-           qryF3_RechteNeuVonImportDuplikatfrei.GF,
-           qryF3_RechteNeuVonImportDuplikatfrei.`vip`,
-           qryF3_RechteNeuVonImportDuplikatfrei.zufallsgenerator,
-           qryF3_RechteNeuVonImportDuplikatfrei.`af_gueltig_ab`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`af_gueltig_bis`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`direct_connect`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`hk_tf_in_af`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`gf_beschreibung`,
-           qryF3_RechteNeuVonImportDuplikatfrei.`af_zuweisungsdatum`,
+    SELECT rapp_NeuVonImportDuplikatfrei.userid,
+           rapp_NeuVonImportDuplikatfrei.name,
+           rapp_NeuVonImportDuplikatfrei.tf,
+           rapp_NeuVonImportDuplikatfrei.`tf_beschreibung`,
+           rapp_NeuVonImportDuplikatfrei.`enthalten_in_af`,
+           rapp_NeuVonImportDuplikatfrei.`af_beschreibung`,
+           rapp_NeuVonImportDuplikatfrei.`tf_kritikalitaet`,
+           rapp_NeuVonImportDuplikatfrei.`tf_eigentuemer_org`,
+           rapp_NeuVonImportDuplikatfrei.`tf_technische_plattform`,
+           rapp_NeuVonImportDuplikatfrei.GF,
+           rapp_NeuVonImportDuplikatfrei.`af_gueltig_ab`,
+           rapp_NeuVonImportDuplikatfrei.`af_gueltig_bis`,
+           rapp_NeuVonImportDuplikatfrei.`direct_connect`,
+           rapp_NeuVonImportDuplikatfrei.`hk_tf_in_af`,
+           rapp_NeuVonImportDuplikatfrei.`gf_beschreibung`,
+           rapp_NeuVonImportDuplikatfrei.`af_zuweisungsdatum`,
            0
-    FROM qryF3_RechteNeuVonImportDuplikatfrei
+    FROM rapp_NeuVonImportDuplikatfrei
     ON DUPLICATE KEY UPDATE doppelerkennung=doppelerkennung+1;
 
     /*
@@ -173,13 +206,12 @@ BEGIN
     UPDATE tblRechteAMNeu SET `tf_beschreibung` = 'ka' WHERE `tf_beschreibung` Is Null Or `tf_beschreibung` = '';
     UPDATE tblRechteAMNeu SET `enthalten_in_af` = 'ka' WHERE `enthalten_in_af` Is Null or `enthalten_in_af`  ='';
     UPDATE tblRechteAMNeu SET `tf` = 'Kein name' WHERE `tf` Is Null or `tf`  = '';
-    UPDATE tblRechteAMNeu SET `tf_technische_plattform` = 'Kein name' WHERE `tf_technische_plattform` Is Null or `tf_technische_plattform`  = '';
+    UPDATE tblRechteAMNeu SET `tf_technische_plattform` = 'Kein Name' WHERE `tf_technische_plattform` Is Null or `tf_technische_plattform`  = '';
     UPDATE tblRechteAMNeu SET `tf_kritikalitaet` = 'ka' WHERE `tf_kritikalitaet` Is Null or  `tf_kritikalitaet` = '';
     UPDATE tblRechteAMNeu SET `tf_eigentuemer_org` = 'ka' WHERE `tf_eigentuemer_org` Is Null or  `tf_eigentuemer_org` = '';
     UPDATE tblRechteAMNeu SET `GF` = 'k.A.' WHERE GF Is Null or GF = '';
-    UPDATE tblRechteAMNeu SET `vip` = 'k.A.' WHERE `vip` Is Null or  `vip` = '';
-    UPDATE tblRechteAMNeu SET `zufallsgenerator` = 'k.A.' WHERE `zufallsgenerator` Is Null or `zufallsgenerator` = '';
-
+    UPDATE tblRechteAMNeu SET `hk_tf_in_af` = 'k.A.' WHERE `hk_tf_in_af` Is Null or `hk_tf_in_af` = '';
+    UPDATE tblRechteAMNeu SET `af_beschreibung` = 'keine geliefert bekommmen' WHERE `af_beschreibung` Is Null or `af_beschreibung` = '';
 
     /*
     -- Sollte nun 0 ergeben:
@@ -191,8 +223,8 @@ BEGIN
         or `tf_kritikalitaet` Is Null or  `tf_kritikalitaet` = ''
         or `tf_eigentuemer_org` Is Null or  `tf_eigentuemer_org` = ''
         or GF Is Null or GF = ''
-        or `vip` Is Null or  `vip` = ''
-        or `zufallsgenerator` Is Null or `zufallsgenerator` = '';
+        or `hk_tf_in_af` Is Null or  `hk_tf_in_af` = ''
+        or `af_beschreibung` Is Null or `af_beschreibung` = '';
     */
 
     /*
@@ -204,7 +236,8 @@ BEGIN
     */
 END
 """
-    return push_sp ('vorbereitung', sp, procs_schon_geladen)
+    return push_sp('vorbereitung', sp, procs_schon_geladen)
+
 
 def push_sp_neueUser(procs_schon_geladen):
     sp = """
@@ -237,8 +270,8 @@ BEGIN
         Dies geschieht aber erst im nächsten Schritt 'behandleUser'.
     */
 
-    drop table if exists qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a;
-    create table qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a as
+    drop table if exists rapp_neue_user;
+    create table rapp_neue_user as
         SELECT DISTINCT tblRechteAMNeu.userid as userid1,
                         tblRechteAMNeu.name as name1,
                         '35' AS Ausdr1,
@@ -262,8 +295,8 @@ BEGIN
         ToDo: Mal checken, ob wir die Tabelle wirklich materialisiert benötigen oder nicht (evtl. zur Ansicht?)
     */
 
-    drop table if exists qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a;
-    create table qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a as
+    drop table if exists rapp_geloeschte_user;
+    create table rapp_geloeschte_user as
     SELECT A.userid, A.name, A.`zi_organisation`
         FROM tblUserIDundName A
         WHERE   A.`zi_organisation` = orga
@@ -275,18 +308,12 @@ BEGIN
             A.`zi_organisation`
     ;
 
-    -- SELECT * from qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a;
+    -- SELECT * from rapp_geloeschte_user;
 
     -- Ein bisschen Statistik für den Anwender
-    
-    -- select count(*) INTO anzahlNeueUser from qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a;
-    -- select count(*) INTO anzahlGeloeschteUser from qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a;
-    -- select count(*) INTO anzahlGeleseneRechte from tblRechteNeuVonImport;
-    -- select count(*) INTO anzahlRechteInAMneu from tblRechteAMNeu;
-
-    select 'Anzahl neuer User' as name, count(*) as wert from qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a 
+    select 'Anzahl neuer User' as name, count(*) as wert from rapp_neue_user 
     UNION
-    select 'Anzahl gelöschter User' as name, count(*) as wert from qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
+    select 'Anzahl gelöschter User' as name, count(*) as wert from rapp_geloeschte_user
     UNION
     select 'Anzahl gelesener Rechte' as name, count(*) as wert from tblRechteNeuVonImport
     UNION
@@ -297,7 +324,8 @@ BEGIN
     ;
 END
 """
-    return push_sp ('neueUser', sp, procs_schon_geladen)
+    return push_sp('neueUser', sp, procs_schon_geladen)
+
 
 def push_sp_behandleUser(procs_schon_geladen):
     sp = """
@@ -311,7 +339,7 @@ BEGIN
     drop table if exists tbl_tmpGeloeschte;
     create temporary table tbl_tmpGeloeschte as
         SELECT userid1
-            FROM qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a
+            FROM rapp_neue_user
             WHERE `geloescht` = True;
 
     -- select * from tbl_tmpGeloeschte;
@@ -326,12 +354,12 @@ BEGIN
 
     /*
         Nun werden die wirklich neuen User an die userid-Tabelle angehängt
-        (ehemals qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a2 u.a.)
+        (ehemals rapp_neue_user_tmp u.a.)
     * /
-    drop table if exists qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a2;
-    create temporary table qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a2 as
+    drop table if exists rapp_neue_user_tmp;
+    create temporary table rapp_neue_user_tmp as
         SELECT userid1, name1, Ausdr1, Ausdr2, geloescht
-            FROM qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a
+            FROM rapp_neue_user
             WHERE (`geloescht` = FALSE or `geloescht` IS NULL)
                 AND (userid1 IS NOT NULL OR name1 IS NOT NULL);
 
@@ -340,18 +368,16 @@ BEGIN
                 name1,
                 Ausdr1 AS orga_id,
                 Ausdr2 AS `zi_organisation`
-            FROM qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a2;
+            FROM rapp_neue_user_tmp;
     */
     INSERT INTO tblUserIDundName (userid, name, orga_id, `zi_organisation`, geloescht, gruppe, abteilung )
         SELECT userid1, name1, Ausdr1 AS orga_id, Ausdr2 AS `zi_organisation`, 
                 False AS geloescht, "" as gruppe, "" as abteilung
-            FROM qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a
+            FROM rapp_neue_user
             WHERE COALESCE(`geloescht`, FALSE) = FALSE
                 AND (userid1 IS NOT NULL OR name1 IS NOT NULL);
 
-
     -- select * from tblUserIDundName;
-
 
     /*
         Bevor die alten User als geloescht markiert werden,
@@ -359,14 +385,18 @@ BEGIN
     */
 
     INSERT INTO tblGesamtHistorie (
-                `userid_und_name_id`, tf, `tf_beschreibung`, `enthalten_in_af`,
+                `userid_und_name_id`, tf, `tf_beschreibung`, 
+                `enthalten_in_af`, `af_beschreibung`, 
                 modell, `tf_kritikalitaet`, `tf_eigentuemer_org`, `af_zuweisungsdatum`,
-                plattform_id, GF, geloescht, gefunden, wiedergefunden, geaendert, loeschdatum, neueaf, datum, `id_alt`
+                plattform_id, GF, geloescht, gefunden, wiedergefunden, geaendert, 
+                loeschdatum, neueaf, datum, `id_alt`, 
+                `hk_tf_in_af`, `letzte_aenderung`
             )
     SELECT `tblGesamt`.`userid_und_name_id`,
            `tblGesamt`.tf,
            `tblGesamt`.`tf_beschreibung`,
            `tblGesamt`.`enthalten_in_af`,
+           `tblGesamt`.`af_beschreibung`,
            `tblGesamt`.modell,
            `tblGesamt`.`tf_kritikalitaet`,
            `tblGesamt`.`tf_eigentuemer_org`,
@@ -380,13 +410,15 @@ BEGIN
            Now() AS Ausdr1,
            `tblGesamt`.neueaf,
            `tblGesamt`.datum,
-           `tblGesamt`.id
+           `tblGesamt`.id,
+           `hk_tf_in_af`,
+           `tblGesamt`.`letzte_aenderung`
         FROM `tblGesamt`
         INNER JOIN (tblUserIDundName
-                    inner join qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
-                    on qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a.userid = tblUserIDundName.userid)
+                    inner join rapp_geloeschte_user
+                    on rapp_geloeschte_user.userid = tblUserIDundName.userid)
             ON tblUserIDundName.id = `tblGesamt`.`userid_und_name_id`
-        WHERE tblUserIDundName.userid IN (SELECT userid FROM `qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a`)
+        WHERE tblUserIDundName.userid IN (SELECT userid FROM `rapp_geloeschte_user`)
             AND COALESCE(tblUserIDundName.`geloescht`, FALSE) = FALSE;
 
 
@@ -395,8 +427,8 @@ BEGIN
     UPDATE
         tblGesamt
         INNER JOIN (tblUserIDundName
-                    inner join qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
-                    on qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a.userid = tblUserIDundName.userid)
+                    inner join rapp_geloeschte_user
+                    on rapp_geloeschte_user.userid = tblUserIDundName.userid)
             ON tblGesamt.`userid_und_name_id` = tblUserIDundName.id
         SET tblGesamt.geloescht = TRUE,
             tblGesamt.`loeschdatum` = Now()
@@ -405,16 +437,14 @@ BEGIN
     -- Die zu löschenden User werden in der User-Tabelle nun auf "geloescht" gesetzt
 
     UPDATE tblUserIDundName
-        INNER JOIN qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
-            ON qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a.userid = tblUserIDundName.userid
+        INNER JOIN rapp_geloeschte_user
+            ON rapp_geloeschte_user.userid = tblUserIDundName.userid
         SET `geloescht` = TRUE
         WHERE COALESCE(`geloescht`, FALSE) = FALSE;
-
-    -- ToDo Es fehlt komplett das Löschen der historisierten Rechte für gerade geloeschte User
-
 END
 """
-    return push_sp ('behandleUser', sp, procs_schon_geladen)
+    return push_sp('behandleUser', sp, procs_schon_geladen)
+
 
 def push_sp_behandleRechte(procs_schon_geladen):
     sp = """
@@ -437,7 +467,7 @@ BEGIN
             WHERE tblGesamt.plattform_id IS NULL;
 
     DELETE FROM tblPlattform
-    WHERE `tf_technische_plattform` IN (select x from bloed);
+    WHERE `tf_technische_plattform` IN (SELECT x FROM bloed);
 
     -- Ergänze alle Plattformen, die bislang nur in tblRechteAMNeu bekannt sind
     INSERT INTO tblPlattform (`tf_technische_plattform`)
@@ -461,7 +491,7 @@ BEGIN
         tblGesamt.geaendert = FALSE
     WHERE tblGesamt.gefunden = TRUE OR tblGesamt.`geaendert` = TRUE;
 
-    -- Dies hier nur zur Sicherheit - eigentlich müssten die eh null sein
+    -- Dies hier nur zur Sicherheit - eigentlich müssten die null sein
     UPDATE tblRechteAMNeu
     SET tblRechteAMNeu.gefunden = FALSE,
         tblRechteAMNeu.geaendert = FALSE
@@ -469,35 +499,32 @@ BEGIN
         OR tblRechteAMNeu.geaendert = TRUE;
 
     /*
-        Nun wird die "flache" Tabelle "tbl_Gesamt_komplett" erzeugt.
+        Nun wird die "flache" Tabelle "rapp_Gesamt_komplett" erzeugt.
         Dort sind die Referenzen zu den derzeit existierenden, aktiven 
         User-, Berechtigungs- und Orga-Tabellen aufgelöst,
         allerdings in dieser Implementierung ausschließlich für die benötigten UserIDen
         (früher wirklich komplett).
-
-        ToDo: Checken, ob tbl_Gesamt_komplett irgendwo noch als Gesamttabelle aller userids benötigt wird, sonst löschen nach Nutzung
     */
 
     drop table if exists uids;
     create temporary table uids as
         select distinct userid as uid from tblRechteAMNeu;
 
-    drop table if exists tbl_Gesamt_komplett;
-    create table tbl_Gesamt_komplett as
+    drop table if exists rapp_Gesamt_komplett;
+    create temporary table rapp_Gesamt_komplett as
         SELECT tblGesamt.id,
                tblUserIDundName.userid,
                tblUserIDundName.name,
                tblGesamt.tf,
                tblGesamt.`tf_beschreibung`,
                tblGesamt.`enthalten_in_af`,
+               tblGesamt.`af_beschreibung`,
                tblUEbersichtAF_GFs.`name_gf_neu`,
                tblUEbersichtAF_GFs.`name_af_neu`,
                tblGesamt.`tf_kritikalitaet`,
                tblGesamt.`tf_eigentuemer_org`,
                tblPlattform.`tf_technische_plattform`,
                tblGesamt.GF,
-               tblGesamt.`vip`,
-               tblGesamt.zufallsgenerator,
                tblGesamt.modell,
                tblUserIDundName.orga_id,
                tblUserIDundName.`zi_organisation`,
@@ -508,7 +535,8 @@ BEGIN
                tblGesamt.`gf_beschreibung`,
                tblGesamt.`af_zuweisungsdatum`,
                tblGesamt.datum,
-               tblGesamt.`geloescht`
+               tblGesamt.`geloescht`,
+               tblGesamt.`letzte_aenderung`
         FROM tblGesamt
             INNER JOIN tblUEbersichtAF_GFs
             ON tblGesamt.modell = tblUEbersichtAF_GFs.id
@@ -542,8 +570,6 @@ BEGIN
         ON      tblRechteAMNeu.tf = tblGesamt.tf
             AND tblRechteAMNeu.GF = tblGesamt.GF
             AND tblRechteAMNeu.`enthalten_in_af` = tblGesamt.`enthalten_in_af`
-            AND tblRechteAMNeu.zufallsgenerator = tblGesamt.zufallsgenerator
-            AND tblRechteAMNeu.`vip` = tblGesamt.`vip`
 
         INNER JOIN tblUserIDundName
         ON      tblUserIDundName.userid = tblRechteAMNeu.userid
@@ -556,30 +582,30 @@ BEGIN
     SET tblGesamt.gefunden = TRUE,
         tblGesamt.Wiedergefunden = Now(),
         tblRechteAMNeu.Gefunden = TRUE,
-        tblGesamt.`tf_beschreibung` = `tblRechteAMNeu`.`tf_beschreibung`,
-        tblGesamt.`tf_kritikalitaet` = `tblRechteAMNeu`.`tf_kritikalitaet`,
-        tblGesamt.`tf_eigentuemer_org` = `tblRechteAMNeu`.`tf_eigentuemer_org`,
-        tblGesamt.`af_gueltig_ab` = `tblRechteAMNeu`.`af_gueltig_ab`,
-        tblGesamt.`af_gueltig_bis` = `tblRechteAMNeu`.`af_gueltig_bis`,
-        tblGesamt.`direct_connect` = `tblRechteAMNeu`.`direct_connect`,
-        tblGesamt.`hk_tf_in_af` = `tblRechteAMNeu`.`hk_tf_in_af`,
-        tblGesamt.`gf_beschreibung` = `tblRechteAMNeu`.`gf_beschreibung`,
-        tblGesamt.`af_zuweisungsdatum` = `tblRechteAMNeu`.`af_zuweisungsdatum`
+        tblGesamt.`tf_beschreibung`     = `tblRechteAMNeu`.`tf_beschreibung`,
+        tblGesamt.`af_beschreibung`     = `tblRechteAMNeu`.`af_beschreibung`,
+        tblGesamt.`tf_kritikalitaet`    = `tblRechteAMNeu`.`tf_kritikalitaet`,
+        tblGesamt.`tf_eigentuemer_org`  = `tblRechteAMNeu`.`tf_eigentuemer_org`,
+        tblGesamt.`af_gueltig_ab`       = `tblRechteAMNeu`.`af_gueltig_ab`,
+        tblGesamt.`af_gueltig_bis`      = `tblRechteAMNeu`.`af_gueltig_bis`,
+        tblGesamt.`direct_connect`      = `tblRechteAMNeu`.`direct_connect`,
+        tblGesamt.`hk_tf_in_af`         = `tblRechteAMNeu`.`hk_tf_in_af`,
+        tblGesamt.`gf_beschreibung`     = `tblRechteAMNeu`.`gf_beschreibung`,
+        tblGesamt.`af_zuweisungsdatum`  = `tblRechteAMNeu`.`af_zuweisungsdatum`,
+        tblGesamt.`letzte_aenderung`    = now()
 
     WHERE COALESCE(tblGesamt.`geloescht`, FALSE) = FALSE
         AND COALESCE(tblUserIDundName.`geloescht`, FALSE) = FALSE;
 
 
     /*
-        qryF2setzeGeaentderteAlteAF implementiert den Fall der geaenderten AF aber ansonsten gleichen Daten
+        Dies implementiert den Fall der geänderten AF aber ansonsten gleichen Daten
     */
 
     UPDATE tblRechteAMNeu
         INNER JOIN tblGesamt
         ON      tblRechteAMNeu.tf = tblGesamt.tf
             AND tblRechteAMNeu.GF = tblGesamt.GF
-            AND tblRechteAMNeu.zufallsgenerator = tblGesamt.zufallsgenerator
-            AND tblRechteAMNeu.`vip` = tblGesamt.`vip`
 
         INNER JOIN tblUserIDundName
         ON      tblUserIDundName.userid = tblRechteAMNeu.userid
@@ -591,7 +617,8 @@ BEGIN
 
     SET tblGesamt.geaendert = TRUE,
         tblRechteAMNeu.geaendert = TRUE,
-        tblGesamt.neueaf = `tblRechteAMNeu`.`enthalten_in_af`
+        tblGesamt.neueaf = `tblRechteAMNeu`.`enthalten_in_af`,
+        tblGesamt.letzte_aenderung = now()
 
     WHERE   tblGesamt.`enthalten_in_af` <> tblRechteAMNeu.`enthalten_in_af`
         AND tblGesamt.gefunden = FALSE
@@ -601,24 +628,24 @@ BEGIN
         ;
 
     /*
-        qryF5c_HistorisiereGeaenderteEintraege
         In die Historientabelle werden die zur Änderung vorgemerkten Einträge aus der Gesamttabelle kopiert.
     */
 
-    INSERT INTO tblGesamtHistorie (`userid_und_name_id`, tf, `tf_beschreibung`, `enthalten_in_af`, modell, `tf_kritikalitaet`,
-                `tf_eigentuemer_org`, plattform_id, GF, `vip`, zufallsgenerator, geloescht, gefunden,
-                wiedergefunden, geaendert, neueaf, datum, `id_alt`, loeschdatum)
+    INSERT INTO tblGesamtHistorie (`userid_und_name_id`, tf, `tf_beschreibung`, 
+                `enthalten_in_af`,`af_beschreibung`, modell, `tf_kritikalitaet`,
+                `tf_eigentuemer_org`, plattform_id, GF, geloescht, gefunden,
+                wiedergefunden, geaendert, neueaf, datum, `id_alt`, loeschdatum, `hk_tf_in_af`
+)
     SELECT tblGesamt.`userid_und_name_id`,
            tblGesamt.tf,
            tblGesamt.`tf_beschreibung`,
            tblGesamt.`enthalten_in_af`,
+           tblGesamt.`af_beschreibung`,
            tblGesamt.modell,
            tblGesamt.`tf_kritikalitaet`,
            tblGesamt.`tf_eigentuemer_org`,
            tblGesamt.plattform_id,
            tblGesamt.GF,
-           tblGesamt.`vip`,
-           tblGesamt.zufallsgenerator,
            tblGesamt.geloescht,
            tblGesamt.gefunden,
            Now() AS Ausdr1,
@@ -626,22 +653,22 @@ BEGIN
            tblGesamt.neueaf,
            tblGesamt.datum,
            tblGesamt.id,
-           tblGesamt.loeschdatum
+           tblGesamt.loeschdatum,
+           tblGesamt.`hk_tf_in_af`
+
     FROM tblUserIDundName
         INNER JOIN tblGesamt
         ON tblUserIDundName.id = tblGesamt.`userid_und_name_id`
 
     WHERE tblGesamt.`geaendert` = TRUE
            AND tblUserIDundName.`zi_organisation` LIKE orga;      -- ToDo: Wird die Einschränkung wirklich benötigt?
-           -- ToDo: Es sollte ja nicht kopiert, sondern verschoben werden. Es fehlt hier also das Löschen.
+    -- ToDo: Es sollte ja nicht kopiert, sondern verschoben werden. Es fehlt hier also das Löschen.
 
 
     /*
         Anschließend können die geaenderten Werte in die GesamtTabelle übernommen werden.
         Dazu wird der Inhalt des kommentarfelds in die AF-alt-Spalte eingetragen.
         Damit müsste das erledigt sein :-)
-
-        qryF5d_AktualisiereGeaenderteAF
     */
 
     -- ToDo: Später noch mal das geaendert-Flag zurücksetzen, dann entfällt das ToDo vorher...
@@ -649,7 +676,7 @@ BEGIN
     UPDATE tblUserIDundName
         INNER JOIN tblGesamt
         ON tblUserIDundName.id = tblGesamt.`userid_und_name_id`
-    SET tblGesamt.`enthalten_in_af` = `neueaf`
+    SET tblGesamt.`enthalten_in_af` = tblGesamt.`neueaf`
 
     WHERE tblGesamt.`geaendert` = TRUE
         AND tblUserIDundName.`zi_organisation` = orga;
@@ -677,14 +704,12 @@ BEGIN
     */
 
     UPDATE tblRechteAMNeu
-        INNER JOIN tbl_Gesamt_komplett
-        ON (tbl_Gesamt_komplett.zufallsgenerator = tblRechteAMNeu.zufallsgenerator)
-            AND (tbl_Gesamt_komplett.`vip` = tblRechteAMNeu.`vip`)
-            AND (tblRechteAMNeu.GF = tbl_Gesamt_komplett.GF)
-            AND (tblRechteAMNeu.`enthalten_in_af` = tbl_Gesamt_komplett.`enthalten_in_af`)
-            AND (tblRechteAMNeu.userid = tbl_Gesamt_komplett.userid)
-            AND (tblRechteAMNeu.tf = tbl_Gesamt_komplett.tf)
-            AND (tblRechteAMNeu.`tf_technische_plattform` = tbl_Gesamt_komplett.`tf_technische_plattform`)
+        INNER JOIN rapp_Gesamt_komplett
+        ON (tblRechteAMNeu.GF = rapp_Gesamt_komplett.GF)
+            AND (tblRechteAMNeu.`enthalten_in_af` = rapp_Gesamt_komplett.`enthalten_in_af`)
+            AND (tblRechteAMNeu.userid = rapp_Gesamt_komplett.userid)
+            AND (tblRechteAMNeu.tf = rapp_Gesamt_komplett.tf)
+            AND (tblRechteAMNeu.`tf_technische_plattform` = rapp_Gesamt_komplett.`tf_technische_plattform`)
         SET tblRechteAMNeu.`angehaengt_bekannt` = TRUE
         WHERE tblRechteAMNeu.Gefunden = TRUE
             AND tblRechteAMNeu.`geaendert` = FALSE;
@@ -693,14 +718,12 @@ BEGIN
         Zum Gucken:
 
     SELECT COUNT(*) FROM tblRechteAMNeu
-        INNER JOIN tbl_Gesamt_komplett
-        ON (tbl_Gesamt_komplett.zufallsgenerator = tblRechteAMNeu.zufallsgenerator)
-            AND (tbl_Gesamt_komplett.`vip` = tblRechteAMNeu.`vip`)
-            AND (tblRechteAMNeu.GF = tbl_Gesamt_komplett.GF)
-            AND (tblRechteAMNeu.`enthalten_in_af` = tbl_Gesamt_komplett.`enthalten_in_af`)
-            AND (tblRechteAMNeu.userid = tbl_Gesamt_komplett.userid)
-            AND (tblRechteAMNeu.tf = tbl_Gesamt_komplett.tf)
-            AND (tblRechteAMNeu.`tf_technische_plattform` = tbl_Gesamt_komplett.`tf_technische_plattform`)
+        INNER JOIN rapp_Gesamt_komplett
+        ON (tblRechteAMNeu.GF = rapp_Gesamt_komplett.GF)
+            AND (tblRechteAMNeu.`enthalten_in_af` = rapp_Gesamt_komplett.`enthalten_in_af`)
+            AND (tblRechteAMNeu.userid = rapp_Gesamt_komplett.userid)
+            AND (tblRechteAMNeu.tf = rapp_Gesamt_komplett.tf)
+            AND (tblRechteAMNeu.`tf_technische_plattform` = rapp_Gesamt_komplett.`tf_technische_plattform`)
         WHERE tblRechteAMNeu.Gefunden = TRUE
             AND tblRechteAMNeu.`geaendert` = FALSE;
     */
@@ -713,13 +736,15 @@ BEGIN
         qryF5_HaengetfmitNeuenAFanGesamtTabelleAn
     */
 
-    INSERT INTO tblGesamt (tf, `tf_beschreibung`, `enthalten_in_af`, datum, modell, `userid_und_name_id`,
-                plattform_id, Gefunden, `geaendert`, `tf_kritikalitaet`, `tf_eigentuemer_org`, GF, `vip`,
-                zufallsgenerator, `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
+    INSERT INTO tblGesamt (tf, `tf_beschreibung`, `enthalten_in_af`, `af_beschreibung`,  
+                datum, modell, `userid_und_name_id`,
+                plattform_id, Gefunden, `geaendert`, `tf_kritikalitaet`, `tf_eigentuemer_org`, GF,
+                `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
                 `gf_beschreibung`, `af_zuweisungsdatum`, letzte_aenderung)
     SELECT  tblRechteAMNeu.tf,
             tblRechteAMNeu.`tf_beschreibung`,
             tblRechteAMNeu.`enthalten_in_af`,
+            tblRechteAMNeu.`af_beschreibung`,
             Now() AS datumNeu,
             (
                 SELECT DISTINCT modell
@@ -742,8 +767,6 @@ BEGIN
             tblRechteAMNeu.`tf_kritikalitaet`,
             tblRechteAMNeu.`tf_eigentuemer_org`,
             tblRechteAMNeu.GF,
-            tblRechteAMNeu.`vip`,
-            tblRechteAMNeu.zufallsgenerator,
             tblRechteAMNeu.`af_gueltig_ab`,
             tblRechteAMNeu.`af_gueltig_bis`,
             tblRechteAMNeu.`direct_connect`,
@@ -762,10 +785,7 @@ BEGIN
         Dies können nur noch Rechte bislang unbekannter User
         oder unbekannte Rechte bekannter User sein.
         Dazu werden diese Rechte zunächst mit dem Flag "angehaengt_sonst" markiert:
-
-        qryF5_FlaggetfmitNeuenAFinImportTabelleUnbekannteUser
     */
-
 
     /*
     select * from tblRechteAMNeu
@@ -808,13 +828,15 @@ BEGIN
         qryF5_HaengetfvonNeuenUsernAnGesamtTabelleAn
     */
 
-    INSERT INTO tblGesamt (tf, `tf_beschreibung`, `enthalten_in_af`, datum, modell, `userid_und_name_id`,
+    INSERT INTO tblGesamt (tf, `tf_beschreibung`, `enthalten_in_af`,  `Af_beschreibung`,
+                datum, modell, `userid_und_name_id`,
                 plattform_id, Gefunden, `geaendert`, `tf_kritikalitaet`, `tf_eigentuemer_org`, geloescht, GF,
-                `vip`, zufallsgenerator, `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`,
+                `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`,
                 `hk_tf_in_af`, `gf_beschreibung`, `af_zuweisungsdatum`, letzte_aenderung)
     SELECT  tblRechteAMNeu.tf,
             tblRechteAMNeu.`tf_beschreibung`,
             tblRechteAMNeu.`enthalten_in_af`,
+            tblRechteAMNeu.`af_beschreibung`,
             Now() AS datumNeu,
 
             (SELECT `id` FROM `tblUEbersichtAF_GFs` WHERE `name_af_neu` LIKE 'Neues Recht noch nicht eingruppiert') AS modellNeu,
@@ -830,8 +852,6 @@ BEGIN
             tblRechteAMNeu.`tf_eigentuemer_org`,
             FALSE AS Ausdr3,
             tblRechteAMNeu.GF,
-            tblRechteAMNeu.`vip`,
-            tblRechteAMNeu.zufallsgenerator,
             tblRechteAMNeu.`af_gueltig_ab`,
             tblRechteAMNeu.`af_gueltig_bis`,
             tblRechteAMNeu.`direct_connect`,
@@ -856,12 +876,10 @@ BEGIN
         sondern wir nur den Tagesstand des Importabzugs kennen, wird ein separates loeschdatum gesetzt.
         Damit bleiben im Datensatz das Einstellungsdatum und das letzte Wiederfinde-datum erhalten, das muss reichen.
 
-        Die Abfrage greift nur auf tfs von Usern zurück, die sich auch in der Importtabelle befinden
+        Die Abfrage greift nur auf TFs von Usern zurück, die sich auch in der Importtabelle befinden
         (sonst würden u.U. Rechte von anderen User ebenfalls auf "geloescht" gesetzt).
-        Das führt dazu, dass tfs von nicht mehr existenten Usern hiervon nicht markiert werden.
+        Das führt dazu, dass TFs von nicht mehr existenten Usern hiervon nicht markiert werden.
         Dazu gibt es aber die Funktion "geloeschte User entfernen", die vorher genutzt wurde.
-
-        qryF8_SetzeLoeschFlagInGesamtTabelle
     */
 
     UPDATE tblUserIDundName
@@ -876,7 +894,11 @@ BEGIN
     SET tblGesamt.geloescht = TRUE,
         tblGesamt.loeschdatum = Now()
 
-    WHERE tblUserIDundName.userid IN (SELECT `userid` FROM `tblRechteAMNeu` WHERE `userid` = `tblUserIDundName`.`userid`);
+    WHERE tblUserIDundName.userid IN ( 
+            SELECT `userid` 
+            FROM `tblRechteAMNeu` 
+            WHERE `userid` = `tblUserIDundName`.`userid`
+        );
 
 
     /*
@@ -902,7 +924,7 @@ BEGIN
 
     /*
         Jetzt müssen zum Abschluss noch in denjenigen importierten Zeilen,
-        bei denen die tfs unbekannt sind, das modell auf "neues Recht" gesetzt werden.
+        bei denen die TFs unbekannt sind, das modell auf "neues Recht" gesetzt werden.
         Die sind daran zu erkennen, dass das modell NULL ist.
     */
 
@@ -918,7 +940,8 @@ BEGIN
 */
 END
 """
-    return push_sp ('behandleRechte', sp, procs_schon_geladen)
+    return push_sp('behandleRechte', sp, procs_schon_geladen)
+
 
 def push_sp_loescheDoppelteRechte(procs_schon_geladen):
     sp = """
@@ -937,9 +960,7 @@ BEGIN
             b.geloescht as UserGeloescht,
             tblUserIDundName.userid,
             tblUserIDundName.name,
-            a.GF,
-            a.vip,
-            a.zufallsgenerator
+            a.GF
 
             FROM tblGesamt AS b,
                 tblUserIDundName
@@ -949,8 +970,6 @@ BEGIN
                 AND COALESCE(a.geloescht, FALSE) = FALSE
                 AND COALESCE(a.geloescht, FALSE) = FALSE
                 AND a.GF = b.gf
-                AND a.vip = b.vip
-                AND a.zufallsgenerator = b.zufallsgenerator
                 AND a.userid_und_name_id =b.userid_und_name_id
                 AND a.tf = b.tf
                 AND a.enthalten_in_af = b.enthalten_in_af
@@ -973,7 +992,8 @@ BEGIN
     END IF;
 END
 """
-    return push_sp ('loescheDoppelteRechte', sp, procs_schon_geladen)
+    return push_sp('loescheDoppelteRechte', sp, procs_schon_geladen)
+
 
 def push_sp_nichtai(procs_schon_geladen):
     sp = """
@@ -1034,7 +1054,7 @@ BEGIN
     */
 
 
-    -- qryF7_GesamtNachtfunduserid liefert eine Rechteliste der aktiven User aus der Gesamttabelle
+    -- Liefert eine Rechteliste der aktiven User aus der Gesamttabelle
     drop table if exists qryF7_GesamtNachtfunduserid;
     create table qryF7_GesamtNachtfunduserid AS
         SELECT tblOrga.`team`,
@@ -1138,7 +1158,8 @@ BEGIN
 
 END
 """
-    return push_sp ('setzeNichtAIFlag', sp, procs_schon_geladen)
+    return push_sp('setzeNichtAIFlag', sp, procs_schon_geladen)
+
 
 def push_sp_erzeugeAFListe(procs_schon_geladen):
     sp = """
@@ -1155,7 +1176,8 @@ BEGIN
         GROUP BY tblUEbersichtAF_GFs.`name_af_neu`;
 END
 """
-    return push_sp ('erzeuge_af_liste', sp, procs_schon_geladen)
+    return push_sp('erzeuge_af_liste', sp, procs_schon_geladen)
+
 
 def push_sp_ueberschreibeModelle(procs_schon_geladen):
     sp = """
@@ -1191,7 +1213,8 @@ BEGIN
     SET tblGesamt.modell = auchBloed.freigegebenes_Modell;
 END
 """
-    return push_sp ('ueberschreibeModelle', sp, procs_schon_geladen)
+    return push_sp('ueberschreibeModelle', sp, procs_schon_geladen)
+
 
 def push_sp_directConnects(procs_schon_geladen):
     sp = """
@@ -1344,7 +1367,7 @@ BEGIN
     ;
 END
 """
-    return push_sp ('directConnects', sp, procs_schon_geladen)
+    return push_sp('directConnects', sp, procs_schon_geladen)
 
 
 # Suche nach Stored Procedures in der aktuellen Datenbank
@@ -1353,7 +1376,7 @@ def anzahl_procs():
     anzahl = 0  # Wenn die Zahl der Einträge bei SHOW > 0 ist, müssen die Procs jeweils gelöscht werden
     with connection.cursor() as cursor:
         try:
-            cursor.execute ("show procedure status where db like (select DATABASE())")
+            cursor.execute("show procedure status where db like (select DATABASE())")
             anzahl = cursor.rowcount
         except:
             e = sys.exc_info()[0]
@@ -1362,12 +1385,15 @@ def anzahl_procs():
         cursor.close()
     return anzahl
 
+
 def finde_procs():
     finde_procs_exakt()
     return anzahl_procs() > 0
 
+
 def finde_procs_exakt():
     return anzahl_procs() == soll_procs()
+
 
 sps = {
     1: push_sp_test,
@@ -1382,8 +1408,10 @@ sps = {
     10: push_sp_directConnects,
 }
 
+
 def soll_procs():
     return len(sps)
+
 
 @login_required
 def handle_stored_procedures(request):
@@ -1395,28 +1423,15 @@ def handle_stored_procedures(request):
 
         daten['anzahl_import_elemente'] = sps[1](procs_schon_geladen)
         daten['call_anzahl_import_elemente'] = call_sp_test()
-        daten['vorbereitung']             = sps[2](procs_schon_geladen)
-        daten['neueUser']                 = sps[3](procs_schon_geladen)
-        daten['behandleUser']             = sps[4](procs_schon_geladen)
-        daten['behandleRechte']         = sps[5](procs_schon_geladen)
-        daten['loescheDoppelteRechte']     = sps[6](procs_schon_geladen)
-        daten['setzeNichtAIFlag']         = sps[7](procs_schon_geladen) # Falls die Funktion jemals wieder benötigt wird
-        daten['erzeuge_af_liste']         = sps[8](procs_schon_geladen)
-        daten['ueberschreibeModelle']     = sps[9](procs_schon_geladen)
-        daten['directConnects']         = sps[10](procs_schon_geladen)
-
-        """
-        daten['anzahl_import_elemente'] = push_sp_test(procs_schon_geladen)
-        daten['call_anzahl_import_elemente'] = call_sp_test()
-        daten['vorbereitung'] = push_sp_vorbereitung(procs_schon_geladen)
-        daten['neueUser'] = push_sp_neueUser(procs_schon_geladen)
-        daten['behandleUser'] = push_sp_behandleUser(procs_schon_geladen)
-        daten['behandleRechte'] = push_sp_behandleRechte(procs_schon_geladen)
-        daten['loescheDoppelteRechte'] = push_sp_loescheDoppelteRechte(procs_schon_geladen)
-        daten['setzeNichtAIFlag'] = push_sp_nichtai(procs_schon_geladen) # Falls die Funktion jemals wieder benötigt wird
-        daten['erzeuge_af_liste'] = push_sp_erzeugeAFListe(procs_schon_geladen)
-        daten['ueberschreibeModelle'] = push_sp_ueberschreibeModelle(procs_schon_geladen)
-        """
+        daten['vorbereitung'] = sps[2](procs_schon_geladen)
+        daten['neueUser'] = sps[3](procs_schon_geladen)
+        daten['behandleUser'] = sps[4](procs_schon_geladen)
+        daten['behandleRechte'] = sps[5](procs_schon_geladen)
+        daten['loescheDoppelteRechte'] = sps[6](procs_schon_geladen)
+        daten['setzeNichtAIFlag'] = sps[7](procs_schon_geladen)  # Falls die Funktion jemals wieder benötigt wird
+        daten['erzeuge_af_liste'] = sps[8](procs_schon_geladen)
+        daten['ueberschreibeModelle'] = sps[9](procs_schon_geladen)
+        daten['directConnects'] = sps[10](procs_schon_geladen)
 
     context = {
         'daten': daten,

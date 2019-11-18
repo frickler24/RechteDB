@@ -173,7 +173,7 @@ def import_csv(request):
                 nachname = textwrap.shorten (line['Nachname'], width=150, placeholder="..."),
                 vorname = textwrap.shorten (line['Vorname'], width=150, placeholder="..."),
                 tf_name = textwrap.shorten (line['TF Name'], width=100, placeholder="..."),
-                tf_beschreibung = textwrap.shorten (line['TF Beschreibung'], width=250, placeholder="..."),
+                tf_beschreibung = textwrap.shorten (line['TF Beschreibung'], width=500, placeholder="..."),
                 af_anzeigename = textwrap.shorten (line['AF Anzeigename'], width=100, placeholder="..."),
                 af_beschreibung = textwrap.shorten (line['AF Beschreibung'], width=250, placeholder="..."),
                 hoechste_kritikalitaet_tf_in_af = textwrap.shorten (line['Höchste Kritikalität TF in AF'],
@@ -344,7 +344,7 @@ def import2(request):
 
         :return: Die Einträge
         """
-        return hole_alles('qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a')
+        return hole_alles('rapp_neue_user')
 
     def hole_geloeschteUser():
         """
@@ -352,7 +352,7 @@ def import2(request):
 
         :return: Die Einträge
         """
-        return hole_alles('qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a')
+        return hole_alles('rapp_geloeschte_user')
 
     def import_schritt2():
         """

@@ -137,26 +137,28 @@
 				<th>Team</th>
 				<th>TF</th>
 				<th>AF</th>
+				<th>AF-Beschreibung</th>
+				<th>Max Krit in AF</th>
+				<th>TF Beschreibung</th>
 				<th>GF</th>
+				<th>GF-Beschreibung</th>
 				<th>ZI-Orga</th>
 				<th>Plattform</th>
-				<th>AF Neu</th>
-				<th>GF Neu</th>
-				<th>TF Beschreibung</th>
-				<th>TF Kritikalität</th>
+				<th>TF-Kritikalität</th>
 				<th>Recht aktiv</th>
 				<th>User aktiv</th>
 
-				<th>gf_beschreibung</th>
 				<th>loeschdatum</th>
-				<th>af_gueltig_ab</th>
-				<th>af_gueltig_bis</th>
-				<th>direct_connect</th>
-				<th>af_zuweisungsdatum</th>
-				<th>tf_eigentuemer_org</th>
+				<th>AF gültig ab</th>
+				<th>AF gültig bis</th>
+				<th>Direct Connect</th>
+				<th>AF Zuweisungsdatum</th>
+				<th>TF-Eigentümer-Orga</th>
 				<th>gefunden</th>
 				<th>wiedergefunden</th>
-				<th>letzte_aenderung</th>
+				<th>letzte Änderung</th>
+				<th>AF Neu</th>
+				<th>GF Neu</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -166,12 +168,13 @@
                     <td class="vllzulangertext knappeTabelle">{{ row.userid_name.orga }}</td>
 					<td class="vllzulangertext knappeTabelle">{{ row.tf }}</td>
 					<td class="vllzulangertext knappeTabelle">{{ row.enthalten_in_af }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.af_beschreibung }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.hoechste_kritikalitaet_tf_in_af }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.tf_beschreibung }}</td>
 					<td class="vllzulangertext knappeTabelle">{{ row.gf }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.gf_beschreibung | lower }}</td>
                     <td class="vllzulangertext knappeTabelle">{{ row.userid_name.zi_organisation }}</td>
 					<td class="vllzulangertext knappeTabelle">{{ row.plattform }}</td>
-					<td class="vllzulangertext knappeTabelle">{{ row.modell.name_af_neu }}</td>
-					<td class="vllzulangertext knappeTabelle">{{ row.modell.name_gf_neu }}</td>
-					<td class="vllzulangertext knappeTabelle">{{ row.tf_beschreibung }}</td>
 					<td class="vllzulangertext knappeTabelle">{{ row.tf_kritikalitaet | lower }}</td>
 
                     {# Das "Gelöscht"-Flag wird als aktiv angezeigt und damit invertiert als Grafik #}
@@ -198,7 +201,6 @@
                         {% endif %}
                     </td>
 
-					<td class="vllzulangertext knappeTabelle">{{ row.gf_beschreibung | lower }}</td>
 					<td class="vllzulangertext knappeTabelle">{{ row.loeschdatum | lower }}</td>
 					<td class="vllzulangertext knappeTabelle">{{ row.af_gueltig_ab | lower }}</td>
 					<td class="vllzulangertext knappeTabelle">{{ row.af_gueltig_bis | lower }}</td>
@@ -208,6 +210,8 @@
 					<td class="vllzulangertext knappeTabelle">{{ row.gefunden | lower }}</td>
 					<td class="vllzulangertext knappeTabelle">{{ row.wiedergefunden | lower }}</td>
 					<td class="vllzulangertext knappeTabelle">{{ row.letzte_aenderung | lower }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.modell.name_af_neu }}</td>
+					<td class="vllzulangertext knappeTabelle">{{ row.modell.name_gf_neu }}</td>
 				</tr>
 			{% empty %}
 				<tr>

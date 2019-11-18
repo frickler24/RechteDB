@@ -194,14 +194,13 @@ class GesamtlisteTests(TestCase):
             tf =                     'Die superlange schnuckelige TF',
             tf_beschreibung =         'Die superlange schnuckelige TF-Beschreibung',
             enthalten_in_af =         'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            af_beschreibung =         'Die geniale AF-Beschreibung',
             modell =                 TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
                                                                    name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
             tf_kritikalitaet =         'Superkritisch sich ist das auch schon zu lang',
             tf_eigentuemer_org =     'Keine Ahnung Org',
             plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
             gf =                     'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
-            vip_kennzeichen =         '',
-            zufallsgenerator =         '',
             af_gueltig_ab =         timezone.now() - timedelta(days=365),
             af_gueltig_bis =         timezone.now() + timedelta(days=365),
             direct_connect =         'no direct connect',
@@ -226,14 +225,13 @@ class GesamtlisteTests(TestCase):
             tf =                     'Die superlange schnuckelige TF2',
             tf_beschreibung =         'Die superlange schnuckelige TF-Beschreibung',
             enthalten_in_af =         'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            af_beschreibung =         'Auch eine geniale AF-Beschreibung',
             modell =                 TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
                                                                    name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
             tf_kritikalitaet =         'Superkritisch sich ist das auch schon zu lang',
             tf_eigentuemer_org =     'Keine Ahnung Org',
             plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
             gf =                     'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
-            vip_kennzeichen =         '',
-            zufallsgenerator =         '',
             af_gueltig_ab =         timezone.now() - timedelta(days=365),
             af_gueltig_bis =         timezone.now() + timedelta(days=365),
             direct_connect =         'no direct connect',
@@ -422,14 +420,13 @@ class PanelTests(TestCase):
             tf =                     'Die superlange schnuckelige TF',
             tf_beschreibung =         'Die superlange schnuckelige TF-Beschreibung',
             enthalten_in_af =         'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            af_beschreibung =         'Die geniale AF-Beschreibung',
             modell =                 TblUebersichtAfGfs.objects.get(name_af_neu='rva_00380_neue_AF auch mit mehr Zeichen als üblich',
                                                                    name_gf_neu='rvg_00380_neueAF mit echt mehr Zeichen als üblich'),
             tf_kritikalitaet =         'Superkritisch sich ist das auch schon zu lang',
             tf_eigentuemer_org =     'Keine Ahnung Org',
             plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
             gf =                     'rvg_00380_neueGF mit echt mehr Zeichen als üblich',
-            vip_kennzeichen =         '',
-            zufallsgenerator =         '',
             af_gueltig_ab =         timezone.now() - timedelta(days=365),
             af_gueltig_bis =         timezone.now() + timedelta(days=365),
             direct_connect =         'nein',
@@ -454,14 +451,13 @@ class PanelTests(TestCase):
             tf =                     'Die superlange schnuckelige TF2',
             tf_beschreibung =         'Die superlange schnuckelige TF-Beschreibung',
             enthalten_in_af =         'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            af_beschreibung =         'Auch eine geniale AF-Beschreibung',
             modell =                 TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
                                                                    name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
             tf_kritikalitaet =         'Superkritisch sich ist das auch schon zu lang',
             tf_eigentuemer_org =     'Keine Ahnung Org',
             plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
             gf =                     'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
-            vip_kennzeichen =         '',
-            zufallsgenerator =         '',
             af_gueltig_ab =         timezone.now() - timedelta(days=365),
             af_gueltig_bis =         timezone.now() + timedelta(days=365),
             direct_connect =         'nein',
@@ -486,14 +482,13 @@ class PanelTests(TestCase):
             tf =                     'Die direct connection TF3',
             tf_beschreibung =         'Die superlange schnuckelige TF-Beschreibung',
             enthalten_in_af =         'ka',
+            af_beschreibung =         'Die dritte geniale AF-Beschreibung',
             modell =                 TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
                                                                    name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
             tf_kritikalitaet =         'Superkritisch sich ist das auch schon zu lang',
             tf_eigentuemer_org =     'Keine Ahnung Org',
             plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
             gf =                     'ka',
-            vip_kennzeichen =         '',
-            zufallsgenerator =         '',
             af_gueltig_ab =         timezone.now() - timedelta(days=365),
             af_gueltig_bis =         timezone.now() + timedelta(days=365),
             direct_connect =         'ja',
@@ -768,14 +763,13 @@ class PanelExportCSVTest(TestCase):
             tf =                     'Die superlange schnuckelige TF',
             tf_beschreibung =         'Die superlange schnuckelige TF-Beschreibung',
             enthalten_in_af =         'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            af_beschreibung =         'Die geniale AF-Beschreibung',
             modell =                 TblUebersichtAfGfs.objects.get(name_af_neu='rva_00380_neue_AF auch mit mehr Zeichen als üblich',
                                                                    name_gf_neu='rvg_00380_neueAF mit echt mehr Zeichen als üblich'),
             tf_kritikalitaet =         'Superkritisch sich ist das auch schon zu lang',
             tf_eigentuemer_org =     'Keine Ahnung Org',
             plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
             gf =                     'rvg_00380_neueGF mit echt mehr Zeichen als üblich',
-            vip_kennzeichen =         '',
-            zufallsgenerator =         '',
             af_gueltig_ab =         timezone.now() - timedelta(days=365),
             af_gueltig_bis =         timezone.now() + timedelta(days=365),
             direct_connect =         'no direct connect',
@@ -800,14 +794,13 @@ class PanelExportCSVTest(TestCase):
             tf =                     'Die superlange schnuckelige TF2',
             tf_beschreibung =         'Die superlange schnuckelige TF-Beschreibung',
             enthalten_in_af =         'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            af_beschreibung =         'Auch eine geniale AF-Beschreibung',
             modell =                 TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
                                                                    name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
             tf_kritikalitaet =         'Superkritisch sich ist das auch schon zu lang',
             tf_eigentuemer_org =     'Keine Ahnung Org',
             plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
             gf =                     'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
-            vip_kennzeichen =         '',
-            zufallsgenerator =         '',
             af_gueltig_ab =         timezone.now() - timedelta(days=365),
             af_gueltig_bis =         timezone.now() + timedelta(days=365),
             direct_connect =         'no direct connect',
@@ -831,8 +824,9 @@ class PanelExportCSVTest(TestCase):
     def test_panel_online_without_selection(self):
         url = reverse('panel_download')
         response = self.client.get(url)
+        # print(response.content)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Name\tTeam\tTF\tTF Beschreibung\tAF\tGF\tgf_beschreibung\tZI-Orga\tPlattform\tAF Neu\tGF Neu\tTF Kritikalität\tRecht aktiv\tUser aktiv\tloeschdatum\taf_gueltig_ab\taf_gueltig_bis\tdirect_connect\taf_zuweisungsdatum\ttf_eigentuemer_org\tgefunden\twiedergefunden\tletzte_aenderung", 1)
+        self.assertContains(response, "Name\tTeam\tTF\tTF Beschreibung\tAF\tAF Beschreibung\tHöchste Kritikalitaet TFin AF\tGF\tgf_beschreibung\tZI-Orga\tPlattform\tTF Kritikalität\tRecht aktiv\tUser aktiv\tloeschdatum\taf_gueltig_ab\taf_gueltig_bis\tdirect_connect\taf_zuweisungsdatum\ttf_eigentuemer_org\tgefunden\twiedergefunden\tletzte_aenderung\tAF Neu\tGF Neu\r", 1)
         self.assertContains(response, "Die superlange schnuckelige TF\tDie superlange schnuckelige TF-Beschreibung\t", 1)
         self.assertContains(response, "Die superlange schnuckelige TF2\tDie superlange schnuckelige TF-Beschreibung\t", 1)
         self.assertContains(response, "rva_00458_neue_AF auch mit mehr Zeichen als ", 3)
@@ -846,7 +840,7 @@ class PanelExportCSVTest(TestCase):
         url = '{0}{1}'.format(reverse('panel_download'), '?tf=TF2')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Name\tTeam\tTF\tTF Beschreibung\tAF\tGF\tgf_beschreibung\tZI-Orga\tPlattform\tAF Neu\tGF Neu\tTF Kritikalität\tRecht aktiv\tUser aktiv\tloeschdatum\taf_gueltig_ab\taf_gueltig_bis\tdirect_connect\taf_zuweisungsdatum\ttf_eigentuemer_org\tgefunden\twiedergefunden\tletzte_aenderung", 1)
+        self.assertContains(response, "Name\tTeam\tTF\tTF Beschreibung\tAF\tAF Beschreibung\tHöchste Kritikalitaet TFin AF\tGF\tgf_beschreibung\tZI-Orga\tPlattform\tTF Kritikalität\tRecht aktiv\tUser aktiv\tloeschdatum\taf_gueltig_ab\taf_gueltig_bis\tdirect_connect\taf_zuweisungsdatum\ttf_eigentuemer_org\tgefunden\twiedergefunden\tletzte_aenderung\tAF Neu\tGF Neu", 1)
         self.assertNotContains(response, "Die superlange schnuckelige TF\t")
         self.assertNotContains(response, "rva_00380_neue_AF auch mit mehr Zeichen als ")
         self.assertNotContains(response, "rvg_00380_neueAF mit echt mehr Zeichen als ")
@@ -1142,6 +1136,7 @@ class UserRolleAFTests(TestCase):
             tf =                 'foo-TF',
             tf_beschreibung =     'TF-Beschreibung für foo-TF',
             enthalten_in_af =     'Sollte die AF rva_01219_beta91_job_abst sein',
+            af_beschreibung =         'Die geniale AF-Beschreibung',
             modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
             plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
             gf =                 'GF-foo',
@@ -1156,6 +1151,7 @@ class UserRolleAFTests(TestCase):
             tf =                 'foo-TF-gelöscht',
             tf_beschreibung =     'TF-Beschreibung für foo-TF-gelöscht',
             enthalten_in_af =     'Sollte die AF rva_01219_beta91_job_abst sein',
+            af_beschreibung =     'Auch eine geniale AF-Beschreibung',
             modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
             plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
             gf =                 'GF-foo',
@@ -1310,7 +1306,8 @@ class UserRolleAFTests(TestCase):
         url = reverse('user_rolle_af')
         konzept_url = reverse('uhr_konzept')
         response = self.client.get(url)
-        self.assertContains(response, 'href="{0}?"'.format(konzept_url))
+        self.assertContains(response, 'href="{0}?episch=0"'.format(konzept_url), 1)
+        self.assertContains(response, 'href="{0}?episch=1"'.format(konzept_url), 1)
     def test_panel_view_contains_link_to_matrix_view(self):
         url = reverse('user_rolle_af')
         konzept_url = reverse('uhr_matrix')
@@ -1324,10 +1321,10 @@ class UserRolleAFTests(TestCase):
         url = reverse('uhr_konzept')
         pdf_url = reverse('uhr_konzept_pdf')
         response = self.client.get(url)
-        self.assertContains(response, 'href="{0}?"'.format(pdf_url))
+        self.assertContains(response, 'href="{0}?episch=1"'.format(pdf_url), 1)
         self.assertContains(response, 'Erste Neue Rolle', 1)
         self.assertContains(response, 'Zweite Neue Rolle', 1)
-        self.assertContains(response, 'rva_01219_beta91_job_abst', 3)
+        self.assertContains(response, 'rva_01219_beta91_job_abst', 6)
         self.assertContains(response, 'Das ist eine Testrolle', 1)
         self.assertContains(response, 'Das ist auch eine Testrolle', 1)
         self.assertContains(response, 'Testsystem', 1)
@@ -1547,6 +1544,7 @@ class UserRolleVariantsTest(TestCase):
             tf =                 'foo-TF',
             tf_beschreibung =     'TF-Beschreibung für foo-TF',
             enthalten_in_af =     'rva_01219_beta91_job_abst',
+            af_beschreibung =     'Die geniale AF-Beschreibung',
             modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
             plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
             gf =                 'GF-foo',
@@ -1558,6 +1556,7 @@ class UserRolleVariantsTest(TestCase):
             tf =                 'foo-TF',
             tf_beschreibung =     'TF-Beschreibung für foo-TF',
             enthalten_in_af =     'rva_01219_beta91_job_abst',
+            af_beschreibung =     'Auch eine geniale AF-Beschreibung',
             modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
             plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
             gf =                 'GF-foo',
@@ -1573,6 +1572,7 @@ class UserRolleVariantsTest(TestCase):
             tf =                 'foo-TF-gelöscht',
             tf_beschreibung =     'TF-Beschreibung für foo-TF-gelöscht',
             enthalten_in_af =     'rva_01219_beta91_job_abst',
+            af_beschreibung =     'Die dritte geniale AF-Beschreibung',
             modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
             plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
             gf =                 'GF-foo',
@@ -1606,7 +1606,7 @@ class UserRolleVariantsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "xv13254")
         self.assertNotContains(response, "xv00042")
-        self.assertContains(response, "xv00023", 5)
+        self.assertContains(response, "xv00023", 6)
 
     def test_panel_04_view_with_valid_role_star(self):
         url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=*')
@@ -1846,6 +1846,7 @@ class UserRolleNurNeueAFTest(TestCase):
             tf =                 'foo-TF',
             tf_beschreibung =     'TF-Beschreibung für foo-TF',
             enthalten_in_af =     'rva_01219_beta91_job_abst',
+            af_beschreibung =         'Die geniale AF-Beschreibung',
             modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
             plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
             gf =                 'GF-foo',
@@ -1858,6 +1859,7 @@ class UserRolleNurNeueAFTest(TestCase):
             tf =                 'foo-TF',
             tf_beschreibung =     'TF-Beschreibung für foo-TF',
             enthalten_in_af =     'rva_01219_beta91_job_abst',
+            af_beschreibung =         'Auch eine geniale AF-Beschreibung',
             modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
             plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
             gf =                 'GF-foo',
@@ -1873,6 +1875,7 @@ class UserRolleNurNeueAFTest(TestCase):
             tf =                 'foo-TF-gelöscht',
             tf_beschreibung =     'TF-Beschreibung für foo-TF-gelöscht',
             enthalten_in_af =     'rva_01219_beta91_job_abst',
+            af_beschreibung =         'Die dritte geniale AF-Beschreibung',
             modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
             plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
             gf =                 'GF-foo',
@@ -1886,6 +1889,7 @@ class UserRolleNurNeueAFTest(TestCase):
             tf =                 'eine_TF_in_rva_01219_beta91_job_abst',
             tf_beschreibung =     'TF-Beschreibung für eine_TF_in_rva_01219_beta91_job_abst',
             enthalten_in_af =     'rva_01219_beta91_job_abst',
+            af_beschreibung =         'Die viertegeniale AF-Beschreibung',
             modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
             plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
             gf =                 'rvg_01219_beta91_job_abst',
@@ -1957,7 +1961,7 @@ class UserRolleNurNeueAFTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "xv13254")
         self.assertNotContains(response, "xv00042")
-        self.assertContains(response, "xv00023", 12)
+        self.assertContains(response, "xv00023", 13)
         self.assertContains(response, "nicht vergeben", 1)
         self.assertContains(response, "Erste Neue Rolle", 1)
         self.assertContains(response, "Zweite Neue Rolle", 1)
@@ -1970,7 +1974,7 @@ class UserRolleNurNeueAFTest(TestCase):
         url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=-&name=UseR_xv13254&gruppe=BA-ls')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "xv13254", 5)
+        self.assertContains(response, "xv13254", 6)
         self.assertNotContains(response, "xv00042")
         self.assertNotContains(response, "xv00023")
         self.assertNotContains(response, "nicht vergeben")
@@ -2155,6 +2159,7 @@ class UserRolleExportCSVTest(TestCase):
             tf =                 'foo-TF',
             tf_beschreibung =     'TF-Beschreibung für foo-TF',
             enthalten_in_af =     'Sollte die AF rva_01219_beta91_job_abst sein',
+            af_beschreibung =         'Die geniale AF-Beschreibung',
             modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
             plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
             gf =                 'GF-foo',
@@ -2170,6 +2175,7 @@ class UserRolleExportCSVTest(TestCase):
             tf =                 'foo-TF-gelöscht',
             tf_beschreibung =     'TF-Beschreibung für foo-TF-gelöscht',
             enthalten_in_af =     'Sollte die AF rva_01219_beta91_job_abst sein',
+            af_beschreibung =         'Auch eine geniale AF-Beschreibung',
             modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
             plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
             gf =                 'GF-foo',
@@ -2482,6 +2488,7 @@ class NeuAFGFTest(TestCase):
             tf =                 'foo-TF',
             tf_beschreibung =     'TF-Beschreibung für foo-TF',
             enthalten_in_af =     'AF-foo in tblÜbersichtAFGF',
+            af_beschreibung =         'Die geniale AF-Beschreibung',
             gf =                 'GF-foo in tblÜbersichtAFGF',
             modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
             plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
@@ -2494,6 +2501,7 @@ class NeuAFGFTest(TestCase):
             tf =                 'foo-TF2',
             tf_beschreibung =     'TF-Beschreibung für foo-TF',
             enthalten_in_af =     'AF-foo in tblÜbersichtAFGF',
+            af_beschreibung =         'Auch eine geniale AF-Beschreibung',
             gf =                 'GF-foo2 in tblÜbersichtAFGF',
             modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
             plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
@@ -2507,6 +2515,7 @@ class NeuAFGFTest(TestCase):
             tf_beschreibung =     'TF-Beschreibung für foo-TF',
             gf =                 'GF-foo2 in tblÜbersichtAFGF',
             enthalten_in_af =     'AF-foo2 in tblÜbersichtAFGF',
+            af_beschreibung =         'Die dritte geniale AF-Beschreibung',
             modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
             plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
             datum =             timezone.now(),
@@ -2519,6 +2528,7 @@ class NeuAFGFTest(TestCase):
             tf =                 'foo-TF-gelöscht',
             tf_beschreibung =     'TF-Beschreibung für foo-TF-gelöscht',
             enthalten_in_af =     'AF-foo-gelöscht in tblÜbersichtAFGF',
+            af_beschreibung =         'Die 4. geniale AF-Beschreibung',
             gf =                 'GF-foo-gelöscht in tblÜbersichtAFGF',
             modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
             plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),

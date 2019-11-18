@@ -51,3 +51,4 @@ other_files/0030_Direktverbindungen.py
 other_files/RechteDB-20190922.sql.gz
 RechteDB/.coverage
 RechteDB/cover
+other_files/rapp_racf_rechte.sql
