@@ -23,6 +23,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='tbluseridundname',
             name='name',
-            field=models.CharField(db_column='name', db_index=True, max_length=203),
+            field=models.CharField(db_column='name', db_index=True, max_length=191),
         ),
     ]
