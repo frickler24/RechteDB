@@ -198,7 +198,7 @@ class TblOrga(models.Model):
 class TblUserIDundName(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
     userid = models.CharField(db_column='userid', max_length=32, unique=True)
-    name = models.CharField(db_column='name', max_length=203, db_index=True)
+    name = models.CharField(db_column='name', max_length=191, db_index=True)
     orga = models.ForeignKey('TblOrga', db_column='orga_id', on_delete=models.CASCADE,
                              verbose_name='Team', db_index=True)
     zi_organisation = models.CharField(db_column='zi_organisation', max_length=64,
