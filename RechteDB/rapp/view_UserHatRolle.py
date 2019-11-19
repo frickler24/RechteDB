@@ -210,7 +210,7 @@ def UhR_erzeuge_listen_mit_rollen(request):
 
     # Hole erst mal die Menge an Rollen, die namentlich passen
     suchstring = request.GET.get('rollenname', 'nix')
-    if suchstring == "*" or suchstring == "-":  # ToDo: Das ist ätzend, das ist doch factory-relevant!
+    if suchstring == "*" or suchstring == "-":
         rollen_liste = TblUserhatrolle.objects.all().order_by('rollenname').order_by('rollenname')
     else:
         rollen_liste = TblUserhatrolle.objects \
@@ -221,6 +221,19 @@ def UhR_erzeuge_listen_mit_rollen(request):
     (namen_liste, panel_filter) = UhR_erzeuge_gefiltere_namensliste(request)
 
     return (namen_liste, panel_filter, rollen_liste, rollen_filter)
+
+
+def liefere_nicht_benoetigte_afen(namen_liste, rollen_liste):
+    """
+    Diese Funktion dient dazu, überflüssige AFen in Rollendefinitionen zu erkennen
+    Erzeuge Deltaliste zwischen der Sollvorgabe der Rollenmenge
+    und der Menge der vorhandenen Arbeitsplatzfunktionen.
+
+    :param namen_liste: Liste der Namen, die derzeit selektiert sind.
+    :param rollen_liste: die Liste der Rollen, die den Nammen in der Namen_liste aktuell zugeordnet sind
+    :return: Dict rollenname -> (AF-Namensliste)
+    """
+    pass
 
 
 def hole_userids_zum_namen(selektierter_name):
@@ -421,7 +434,6 @@ def hole_af_mengen(userids, gesuchte_rolle):
                 af_liste = TblGesamt.objects.filter(userid_name_id__userid=userid) \
                     .filter(geloescht=False) \
                     .exclude(enthalten_in_af__in=unerwuenschte_af)
-                # ToDo: Hier könnte vielleicht auch ein values('enthalten_in_af') helfen, mit distinct()
             else:
                 af_liste = TblGesamt.objects.filter(userid_name_id__userid=userid) \
                     .filter(geloescht=False) \
@@ -604,14 +616,26 @@ class RollenListenUhr(UhR):
         (namen_liste, panel_filter, rollen_liste, rollen_filter) = \
             UhR_erzeuge_listen_mit_rollen(request)
 
+        form = ShowUhRForm(request.GET)
         gesuchte_rolle = request.GET.get('rollenname', None)
         if gesuchte_rolle == "*":  # Das ist die Wildcard-Suche, um den Modus in der Oberfläche auszuwählen
             gesuchte_rolle = None
 
+        # Finde alle AFen in den verwendeten Rollen, die keinem der User zugewieen sind
+        if gesuchte_rolle == "+":
+            af_liste = liefere_nicht_benoetigte_afen(namen_liste, rollen_liste)
+            context = {
+                'form': form,
+                'rollen_liste': rollen_liste,
+                'namen_liste': namen_liste,
+                'af_liste': af_liste,
+                'version': version,
+            }
+            return render(request, 'rapp/panel_UhR_ueberfluessige_af.html', context)
+
         (userids, af_per_uid, vorhanden, optional) \
             = UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle)
 
-        form = ShowUhRForm(request.GET)
         context = {
             'filter': panel_filter, 'form': form,
             'rollen_liste': rollen_liste, 'rollen_filter': rollen_filter,
