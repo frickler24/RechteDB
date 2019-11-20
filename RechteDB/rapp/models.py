@@ -11,10 +11,11 @@
 from __future__ import unicode_literals
 from django.db import models
 from django.utils.html import format_html
-from django.urls import reverse        # Used to generate URLs by reversing the URL patterns
+from django.urls import reverse  # Used to generate URLs by reversing the URL patterns
 from django.utils import timezone
 from django.db import connection
 from mdeditor.fields import MDTextField
+
 
 # Die drei Rollentabellen sowie die AF-Liste hängen inhaltlich zusammen
 # Die Definition der Rollen
@@ -35,6 +36,7 @@ class TblRollen(models.Model):
     def __str__(self) -> str:
         return str(self.rollenname)
 
+
 # Meta-Tabelle, welche Arbeitsplatzfunktion in welcher Rolle enthalten ist (n:m Beziehung)
 #
 # Die drei ursprünglichen Einzelfelder nurXV, XABCV und DV wurden zusammengefast zu einer Col: einsatz:
@@ -43,17 +45,17 @@ class TblRollen(models.Model):
 #    einsatz = 2:     Gültig für alles außer DV-User
 #    einsatz = 1:    Nur gültig für DV-User
 class TblRollehataf(models.Model):
-    EINSATZ_NONE  = 0
+    EINSATZ_NONE = 0
     EINSATZ_NURDV = 1
     EINSATZ_XABCV = 2
     EINSATZ_NURXV = 4
-    EINSATZ_ABCV  = 8
+    EINSATZ_ABCV = 8
     EINSATZ_CHOICES = (
-        (EINSATZ_NONE,  'nicht zugewiesen'),
+        (EINSATZ_NONE, 'nicht zugewiesen'),
         (EINSATZ_NURDV, 'Nur DV-User'),
         (EINSATZ_XABCV, 'XV, AV, BV, CV'),
         (EINSATZ_NURXV, 'nur XV-User'),
-        (EINSATZ_ABCV,  'AV, BV, CV'),
+        (EINSATZ_ABCV, 'AV, BV, CV'),
     )
 
     rollenmappingid = models.AutoField(db_column='rollenmappingid', primary_key=True, verbose_name='ID')
@@ -77,10 +79,12 @@ class TblRollehataf(models.Model):
 
     def get_muss(self):
         return self.mussfeld
+
     get_muss.boolean = True
     get_muss.admin_order_field = 'mussfeld'
     get_muss.short_description = 'Muss'
     mussfeld.boolean = True
+
 
 # Referenz der User auf die ihnen zur Verfügung stehenden Rollen
 class TblUserhatrolle(models.Model):
@@ -95,10 +99,10 @@ class TblUserhatrolle(models.Model):
                                db_column='userid', verbose_name='UserID, Name')
     rollenname = models.ForeignKey('TblRollen', models.PROTECT, db_column='rollenname')
     schwerpunkt_vertretung = \
-                            models.CharField(db_column='schwerpunkt_vertretung',
-                                             max_length=100, blank=True, null=True,
-                                             choices=SCHWERPUNKT_TYPE
-                            )
+        models.CharField(db_column='schwerpunkt_vertretung',
+                         max_length=100, blank=True, null=True,
+                         choices=SCHWERPUNKT_TYPE
+                         )
     bemerkung = models.TextField(db_column='bemerkung', blank=True, null=True)
     letzte_aenderung = models.DateTimeField(db_column='letzte_aenderung',
                                             default=timezone.now, blank=True, db_index=True)
@@ -108,14 +112,15 @@ class TblUserhatrolle(models.Model):
         db_table = 'tbl_UserHatRolle'
         verbose_name = "User und Ihre Rollen"
         verbose_name_plural = "01_User und Ihre Rollen (tbl_UserHatRolle)"
-        ordering = [ 'userid__name', '-userid__userid', 'schwerpunkt_vertretung', 'rollenname', ]
+        ordering = ['userid__name', '-userid__userid', 'schwerpunkt_vertretung', 'rollenname', ]
         unique_together = (('userid', 'rollenname'),)
 
     def __str__(self) -> str:
         return str(self.userundrollenid)
 
-    def get_rollenbeschreibung (self):
+    def get_rollenbeschreibung(self):
         return str(self.rollenname.rollenbeschreibung)
+
     get_rollenbeschreibung.short_description = 'Rollenbeschreibung'
 
     def get_absolute_url(self):
@@ -133,6 +138,7 @@ class TblUserhatrolle(models.Model):
     def get_absolute_delete_url(self):
         # Returns the url to access a particular instance of the model.
         return reverse('user_rolle_af-delete', args=[str(self.userundrollenid)])
+
 
 # Tabelle enthält die aktuell genehmigten (modellierten und in Modellierung befindlichen) AF + GF-Kombinationen
 class TblUebersichtAfGfs(models.Model):
@@ -155,7 +161,7 @@ class TblUebersichtAfGfs(models.Model):
     class Meta:
         managed = True
         db_table = 'tblUEbersichtAF_GFs'
-        unique_together = (('name_gf_neu', 'name_af_neu'), )
+        unique_together = (('name_gf_neu', 'name_af_neu'),)
         verbose_name = "Erlaubte AF/GF-Kombination"
         verbose_name_plural = "04_Erlaubte AF/GF-Kombinationen-Übersicht (tblUebersichtAF_GFs)"
         ordering = ['-id']
@@ -166,11 +172,13 @@ class TblUebersichtAfGfs(models.Model):
     geloescht.boolean = True
     kannweg.boolean = True
 
+
 # Die Tabelle enthält die Teambeschreibungen. Das eigentliche Team ist das Feld "team"
 class TblOrga(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
     team = models.CharField(db_column='team', max_length=64, blank=False, null=False)
     themeneigentuemer = models.CharField(db_column='themeneigentuemer', max_length=64, blank=False, null=False)
+
     class Meta:
         managed = True
         db_table = 'tblOrga'
@@ -181,18 +189,23 @@ class TblOrga(models.Model):
 
     def __str__(self) -> str:
         return self.team
+
     def get_absolute_url(self):
         # Returns the url for the item.
         return reverse('teamliste', args=[])
+
     def get_absolute_update_url(self):
         # Returns the url to access a particular instance of the model.
         return reverse('team-update', args=[str(self.id)])
+
     def get_absolute_delete_url(self):
         # Returns the url to access a particular instance of the model.
         return reverse('team-delete', args=[str(self.id)])
+
     def get_absolute_create_url(self):
         # Returns the url to open the create-instance of the model (no ID given, the element does not exist yet).
         return reverse('team-create', args=[])
+
 
 # Die Namen aller aktiven und gelöschten UserIDen und der dazugehörenden Namen (Realnamen und Technische User)
 class TblUserIDundName(models.Model):
@@ -223,6 +236,7 @@ class TblUserIDundName(models.Model):
 
     def get_active(self):
         return not self.geloescht
+
     get_active.boolean = True
     get_active.admin_order_field = 'geloescht'
     get_active.short_description = 'aktiv'
@@ -235,7 +249,8 @@ class TblUserIDundName(models.Model):
             '21610B' if (self.get_active()) else "B40404",
             self.name,
         )
-    colored_name.admin_order_field= 'name'
+
+    colored_name.admin_order_field = 'name'
     colored_name.short_description = 'Name, Vorname'
 
     def get_absolute_url(self):
@@ -261,6 +276,7 @@ class TblUserIDundName(models.Model):
         # Returns the url to open the create-instance of the model (no ID given, the element does not exist yet).
         return reverse('user-create', args=[])
 
+
 # Diese Funktion gehört inhaltlich zu tblUserIDundName, aber nicht in die Klasse (wird in form.py genutzt)
 def hole_organisationen():
     # Liefert eine Liste an Tupeln mit Choices für die Orga-Auswahl zurück. Die Liste stammt aus tblUserIDundName.
@@ -268,6 +284,7 @@ def hole_organisationen():
         cursor.execute("SELECT DISTINCT zi_organisation FROM tblUserIDundName")
         rows = cursor.fetchall()
         return [('Bitte Organisation wählen', 'Bitte Organisation wählen')] + [(r[0], r[0]) for r in rows]
+
 
 # Die verschiedenen technischne Plattformen (RACF, CICS, Unix, Win, AD, LDAP, test/Prod usw.)
 class TblPlattform(models.Model):
@@ -284,6 +301,7 @@ class TblPlattform(models.Model):
 
     def __str__(self) -> str:
         return self.tf_technische_plattform
+
 
 # tblGesamt enthält alle Daten zu TFs in GFs in AFs für jeden User und seine UserIDen
 class TblGesamt(models.Model):
@@ -337,39 +355,45 @@ class TblGesamt(models.Model):
         verbose_name_plural = "08_Gesamttabelle Übersicht (tblGesamt)"
         index_together = (('userid_name', 'tf', 'enthalten_in_af', 'plattform', 'gf'),
                           ('gf', 'enthalten_in_af'),
-                         )
-        ordering = ['id'] # Ist erforderlich wegen Paginierter Anzeige
+                          )
+        ordering = ['id']  # Ist erforderlich wegen Paginierter Anzeige
 
     def __str__(self) -> str:
         return str(self.id)
 
     def get_active(self):
         return not self.geloescht
+
     get_active.boolean = True
     get_active.admin_order_field = 'geloescht'
     get_active.short_description = 'aktiv'
 
     def get_gefunden(self):
         return self.gefunden
+
     get_gefunden.boolean = True
 
     def get_geaendert(self):
         return self.geaendert
+
     geaendert.boolean = True
 
     def get_direct_connect(self):
         return self.direct_connect == 'Ja'
+
     get_direct_connect.boolean = True
     get_direct_connect.admin_order_field = 'direct_connect'
     get_direct_connect.short_description = 'direkt'
 
     def get_ai(self):
         return not self.nicht_ai
+
     get_ai.boolean = True
 
     def get_absolute_url(self):
         # Returns the url to access a particular instance of the model.
         return reverse('gesamt-detail', args=[str(self.id)])
+
 
 # tblGesamtHistorie enthält alle Daten zu TFs in GFs in AFs für jeden User und seine UserIDen, wenn der User (mal) gelöscht wurde
 class TblGesamtHistorie(models.Model):
@@ -426,6 +450,7 @@ class TblGesamtHistorie(models.Model):
     def __str__(self) -> str:
         return str(self.id)
 
+
 # Dies ist nur eine Hilfstabelle.
 # Sie besteht aus dem `tblÜbersichtAF_GFs`.`Name AF Neu` für alle Felder, bei denen `modelliert` nicht null ist.
 # (das automatisch ergänzte Datum wird nicht benötigt, hier könnte auch das `modelliert`genommen werden)
@@ -454,6 +479,7 @@ class TblAfliste(models.Model):
     def __str__(self) -> str:
         return str(self.af_name)
 
+
 ###################################### Tblsubsysteme, Tblsachgebiete, TblDb2
 # Ein paar Hilfstabellen.
 # Die sind inhaltlich wahrscheinlich nicht super aktuell, helfen aber bei verschiedenen Fragen.
@@ -472,6 +498,7 @@ class Tblsachgebiete(models.Model):
         verbose_name_plural = "97_Übersicht Sachgebiete (tbl_Sachgebiete)"
         ordering = ['sachgebiet']
 
+
 class Tblsubsysteme(models.Model):
     sgss = models.CharField(db_column='sgss', primary_key=True, max_length=32)
     definition = models.CharField(db_column='Definition', max_length=250, blank=True, null=True)
@@ -485,7 +512,8 @@ class Tblsubsysteme(models.Model):
         db_table = 'tblSubsysteme'
         verbose_name = "Subsystem"
         verbose_name_plural = "96_Übersicht Subsysteme (tbl_Subsysteme)"
-        ordering = [ 'sgss' ]
+        ordering = ['sgss']
+
 
 class TblDb2(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
@@ -509,10 +537,11 @@ class TblDb2(models.Model):
         db_table = 'tbl_DB2'
         verbose_name = 'DB2-Berechtigung'
         verbose_name_plural = '30_DB2 - Berechtigungen (Tbl_DB2)'
-        ordering = [ 'id', ]
+        ordering = ['id', ]
 
     def __str__(self) -> str:
         return str(self.id)
+
 
 # ToDo: Nach ausführlichen Tests löschen
 class kanndaswegTblRacfGruppen(models.Model):
@@ -535,27 +564,32 @@ class kanndaswegTblRacfGruppen(models.Model):
 
     def get_test(self):
         return int(self.test)
+
     get_test.boolean = True
     get_test.admin_order_field = 'test'
     get_test.short_description = 'Test'
 
     def get_produktion(self):
         return int(self.produktion)
+
     get_produktion.boolean = True
     get_produktion.admin_order_field = 'produktion'
     get_produktion.short_description = 'Produktion'
 
     def get_readonly(self):
         return int(self.readonly)
+
     get_readonly.boolean = True
     get_readonly.admin_order_field = 'readonly'
     get_readonly.short_description = 'Read only'
 
     def get_db2_only(self):
         return int(self.db2_only)
+
     get_db2_only.boolean = True
     get_db2_only.admin_order_field = 'db2_only'
     get_db2_only.short_description = 'DB2 only'
+
 
 ###################################### Tblsubsysteme, Tblsachgebiete, TblDb2
 # Tabellen für den Import neuer Listen
@@ -591,7 +625,8 @@ class Tblrechteneuvonimport(models.Model):
         db_table = 'tblRechteNeuVonImport'
         verbose_name = 'Importiere neue Daten (tblRechteNeuVonImport)'
         verbose_name_plural = 'Importiere neue Daten (tblRechteNeuVonImport)'
-        ordering = [ 'id', ]
+        ordering = ['id', ]
+
 
 class Tblrechteamneu(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
@@ -624,6 +659,7 @@ class Tblrechteamneu(models.Model):
         db_table = 'tblRechteAMNeu'
         unique_together = (('userid', 'tf', 'enthalten_in_af', 'tf_technische_plattform', 'gf'),)
 
+
 class RACF_Rechte(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
     type = models.CharField(max_length=4, null=True)
@@ -641,7 +677,7 @@ class RACF_Rechte(models.Model):
         verbose_name = 'RACF-Rechte'
         verbose_name_plural = '40_RACF - Berechtigungen'
         ordering = ['group', 'profil', ]
-        index_together = (('group', 'profil'),) # Zum schnelleren Update bei Neulieferung
+        index_together = (('group', 'profil'),)  # Zum schnelleren Update bei Neulieferung
 
     def __str__(self) -> str:
         return str(self.id)
@@ -671,6 +707,7 @@ class Orga_details(models.Model):
 
     def __str__(self) -> str:
         return str(self.id)
+
 
 # Versionshistorie der Daten-Importe; Darüber ist auch ein aktuell laufender Import feststellbar
 # Die beiden Felder max und aktuell dienen dem Anzeigen eins Fortschrittbalkens
@@ -716,6 +753,7 @@ class Modellierung(models.Model):
         verbose_name = 'Modellierung AF GF TF'
         verbose_name_plural = '60_Modellierung AF GF TF'
 
+
 class Direktverbindungen(models.Model):
     """
     Tabelle aus dem Export für die TF-Rezertifizierung.
@@ -749,9 +787,9 @@ class Direktverbindungen(models.Model):
 
 
 class Manuelle_Berechtigung(models.Model):
-    name = models.CharField(max_length=50, null=False, unique=True,)
-    verbundene_af = models.ForeignKey('TblAfliste', models.PROTECT, null=True,)
-    ersteller = models.CharField(max_length=50, null=True,)
+    name = models.CharField(max_length=50, null=False, unique=True, )
+    verbundene_af = models.ForeignKey('TblAfliste', models.PROTECT, null=True, )
+    ersteller = models.CharField(max_length=50, null=True, )
     letzte_aenderung = models.DateTimeField(default=timezone.now)
     statisch = MDTextField()
     relativ = MDTextField()

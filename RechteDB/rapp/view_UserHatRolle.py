@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect
 
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.utils.encoding import smart_str
+from django.db.models import Count
 import csv
 
 from .filters import RollenFilter, UseridFilter
@@ -140,14 +141,14 @@ def UhR_erzeuge_gefiltere_namensliste(request):
     # Ein paar Testzugriffe über das komplette Modell
     #   Hier ist die korrekte Hierarchie abgebildet von UserID bis AF:
     #   TblUserIDundName enthält Userid
-    #       TblUserHatRolle hat FK 'userid' auf TblUserIDundName
+    #       TblUserHatRolle hat Foreign Key 'userid' auf TblUserIDundName
     #       -> tbluserhatrolle_set.all auf eine aktuelle UserID-row liefert die Menge der relevanten Rollen
     #           Rolle hat ForeignKey 'rollenname' auf TblRolle und erhält damit die nicht-User-spezifischen Rollen-Parameter
     #               TblRolleHatAF hat ebenfalls einen ForeignKey 'rollennname' auf TblRollen
     #               -> rollenname.tblrollehataf_set.all liefert für eine konkrete Rolle die Liste der zugehörigen AF-Detailinformationen
     #
     #        TblGesamt hat FK 'userid_name' auf TblUserIDundName
-    #        -> .tblgesamt_set.filter(geloescht = False) liefert die akiven Arbeitsplatzfunktionen
+    #        -> .tblgesamt_set.filter(geloescht = False) liefert die aktiven Arbeitsplatzfunktionen
     #
 
     user = TblUserIDundName.objects.filter(userid = 'XV13254')[0]
@@ -223,18 +224,39 @@ def UhR_erzeuge_listen_mit_rollen(request):
     return (namen_liste, panel_filter, rollen_liste, rollen_filter)
 
 
-def liefere_nicht_benoetigte_afen(namen_liste, rollen_liste):
+def hole_unnoetigte_afen(namen_liste):
     """
     Diese Funktion dient dazu, überflüssige AFen in Rollendefinitionen zu erkennen
     Erzeuge Deltaliste zwischen der Sollvorgabe der Rollenmenge
     und der Menge der vorhandenen Arbeitsplatzfunktionen.
 
     :param namen_liste: Liste der Namen, die derzeit selektiert sind.
-    :param rollen_liste: die Liste der Rollen, die den Nammen in der Namen_liste aktuell zugeordnet sind
-    :return: Dict rollenname -> (AF-Namensliste)
+    :return: Queryset mit Treffern, beinhaltet Rollennamen und AF
     """
-    pass
 
+    # Zunächst wird das Soll der User-Rollen ermittelt
+    soll_rollen = TblUserhatrolle.objects \
+        .filter(userid__name__in=namen_liste.values('name')) \
+        .values('userid__name', 'rollenname')
+
+    # Nun das Ist der AFen je User:
+    ist_afen = TblGesamt.objects \
+        .exclude(geloescht=True) \
+        .exclude(userid_name__geloescht=True) \
+        .filter(userid_name__name__in=namen_liste.values('name')) \
+        .values('enthalten_in_af').annotate(dcount=Count('enthalten_in_af'))
+
+    # Und das Delta: Ziehe alle IST-AFen von den Soll-AFen ab und liefere das Delta zurück
+    delta = TblRollehataf.objects \
+        .filter(rollenname__in=soll_rollen.values('rollenname')) \
+        .exclude(af__af_name__in=ist_afen.values('enthalten_in_af')) \
+        .order_by('rollenname__rollenname', 'af', ) \
+        .values(
+        'rollenname__rollenname',
+        'af__af_name',
+    )
+
+    return delta
 
 def hole_userids_zum_namen(selektierter_name):
     """
@@ -623,10 +645,10 @@ class RollenListenUhr(UhR):
 
         # Finde alle AFen in den verwendeten Rollen, die keinem der User zugewieen sind
         if gesuchte_rolle == "+":
-            af_liste = liefere_nicht_benoetigte_afen(namen_liste, rollen_liste)
+            af_liste = hole_unnoetigte_afen(namen_liste)
             context = {
-                'form': form,
-                'rollen_liste': rollen_liste,
+                'filter': panel_filter, 'form': form,
+                'rollen_liste': rollen_liste, 'rollen_filter': rollen_filter,
                 'namen_liste': namen_liste,
                 'af_liste': af_liste,
                 'version': version,
