@@ -153,102 +153,102 @@ class GesamtlisteTests(TestCase):
             )
 
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =            'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
-            name_af_neu =            'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
-            kommentar =                'Kein Kommentar',
-            zielperson =            'Lutz',
-            af_text =                'Das ist der AF-normaltext',
-            gf_text =                 'Das ist der AF-normaltext',
-            af_langtext =             'Das ist der AF-Laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaang-Text',
-            af_ausschlussgruppen =    'Das soll niemand außer mir bekommen!!!',
-            af_einschlussgruppen =    'das soll die ganze Welt erhalten können',
+            name_gf_neu = 'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
+            name_af_neu = 'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            kommentar = 'Kein Kommentar',
+            zielperson = 'Lutz',
+            af_text = 'Das ist der AF-normaltext',
+            gf_text = 'Das ist der AF-normaltext',
+            af_langtext = 'Das ist der AF-Laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaang-Text',
+            af_ausschlussgruppen = 'Das soll niemand außer mir bekommen!!!',
+            af_einschlussgruppen = 'das soll die ganze Welt erhalten können',
             af_sonstige_vergabehinweise = 'Keine Hinweise',
-            geloescht =                False,
-            kannweg =                 False,
-            modelliert =             timezone.now(),
+            geloescht = False,
+            kannweg = False,
+            modelliert = timezone.now(),
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =            'rvg_00500_neueGF mit echt mehr Zeichen als üblich',
-            name_af_neu =            'rva_00500_neue_AF auch mit mehr Zeichen als üblich',
+            name_gf_neu = 'rvg_00500_neueGF mit echt mehr Zeichen als üblich',
+            name_af_neu = 'rva_00500_neue_AF auch mit mehr Zeichen als üblich',
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =            'rvg_00380_neueGF mit echt mehr Zeichen als üblich',
-            name_af_neu =            'rva_00380_neue_AF auch mit mehr Zeichen als üblich',
+            name_gf_neu = 'rvg_00380_neueGF mit echt mehr Zeichen als üblich',
+            name_af_neu = 'rva_00380_neue_AF auch mit mehr Zeichen als üblich',
         )
 
         for i in range(10, 20):
             TblUserIDundName.objects.create(
-                userid =             'xv100{}'.format(i),
-                name =                 'User_xv100{}'.format(i),
-                orga =                 TblOrga.objects.get(team = 'Django-Team-{}'.format(i)),
-                zi_organisation =    'AI-BA',
-                geloescht =         False,
-                abteilung =         'ZI-AI-BA',
-                gruppe =             'ZI-AI-BA-PS',
+                userid = 'xv100{}'.format(i),
+                name = 'User_xv100{}'.format(i),
+                orga = TblOrga.objects.get(team = 'Django-Team-{}'.format(i)),
+                zi_organisation = 'AI-BA',
+                geloescht = False,
+                abteilung = 'ZI-AI-BA',
+                gruppe = 'ZI-AI-BA-PS',
             )
 
         TblPlattform.objects.create(tf_technische_plattform = 'RACFP')
 
         TblGesamt.objects.create(
-            userid_name =             TblUserIDundName.objects.get(userid = 'xv10011'),
-            tf =                     'Die superlange schnuckelige TF',
-            tf_beschreibung =         'Die superlange schnuckelige TF-Beschreibung',
-            enthalten_in_af =         'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
-            af_beschreibung =         'Die geniale AF-Beschreibung',
-            modell =                 TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            userid_name = TblUserIDundName.objects.get(userid = 'xv10011'),
+            tf = 'Die superlange schnuckelige TF',
+            tf_beschreibung = 'Die superlange schnuckelige TF-Beschreibung',
+            enthalten_in_af = 'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            af_beschreibung = 'Die geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
                                                                    name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
-            tf_kritikalitaet =         'Superkritisch sich ist das auch schon zu lang',
-            tf_eigentuemer_org =     'Keine Ahnung Org',
-            plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
-            gf =                     'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
-            af_gueltig_ab =         timezone.now() - timedelta(days=365),
-            af_gueltig_bis =         timezone.now() + timedelta(days=365),
-            direct_connect =         'no direct connect',
+            tf_kritikalitaet = 'Superkritisch sich ist das auch schon zu lang',
+            tf_eigentuemer_org = 'Keine Ahnung Org',
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
+            gf = 'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
+            af_gueltig_ab = timezone.now() - timedelta(days=365),
+            af_gueltig_bis = timezone.now() + timedelta(days=365),
+            direct_connect = 'no direct connect',
             hoechste_kritikalitaet_tf_in_af = 'u',
-            gf_beschreibung =         'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
-            af_zuweisungsdatum =     timezone.now() - timedelta(days=200),
-            datum =                 timezone.now() - timedelta(days=500),
-            geloescht =             False,
-            gefunden =                 True,
-            wiedergefunden =         timezone.now(),
-            geaendert =             False,
-            neueaf =                 '',
-            nicht_ai =                 False,
-            patchdatum =             None,
-            wertmodellvorpatch =    'Hier kommt nix rein',
-            loeschdatum =             None,
-            letzte_aenderung =        None
+            gf_beschreibung = 'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
+            af_zuweisungsdatum = timezone.now() - timedelta(days=200),
+            datum = timezone.now() - timedelta(days=500),
+            geloescht = False,
+            gefunden = True,
+            wiedergefunden = timezone.now(),
+            geaendert = False,
+            neueaf = '',
+            nicht_ai = False,
+            patchdatum = None,
+            wertmodellvorpatch = 'Hier kommt nix rein',
+            loeschdatum = None,
+            letzte_aenderung = None
         )
 
         TblGesamt.objects.create(
-            userid_name =             TblUserIDundName.objects.get(userid = 'xv10012'),
-            tf =                     'Die superlange schnuckelige TF2',
-            tf_beschreibung =         'Die superlange schnuckelige TF-Beschreibung',
-            enthalten_in_af =         'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
-            af_beschreibung =         'Auch eine geniale AF-Beschreibung',
-            modell =                 TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            userid_name = TblUserIDundName.objects.get(userid = 'xv10012'),
+            tf = 'Die superlange schnuckelige TF2',
+            tf_beschreibung = 'Die superlange schnuckelige TF-Beschreibung',
+            enthalten_in_af = 'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            af_beschreibung = 'Auch eine geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
                                                                    name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
-            tf_kritikalitaet =         'Superkritisch sich ist das auch schon zu lang',
-            tf_eigentuemer_org =     'Keine Ahnung Org',
-            plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
-            gf =                     'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
-            af_gueltig_ab =         timezone.now() - timedelta(days=365),
-            af_gueltig_bis =         timezone.now() + timedelta(days=365),
-            direct_connect =         'no direct connect',
+            tf_kritikalitaet = 'Superkritisch sich ist das auch schon zu lang',
+            tf_eigentuemer_org = 'Keine Ahnung Org',
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
+            gf = 'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
+            af_gueltig_ab = timezone.now() - timedelta(days=365),
+            af_gueltig_bis = timezone.now() + timedelta(days=365),
+            direct_connect = 'no direct connect',
             hoechste_kritikalitaet_tf_in_af = 'u',
-            gf_beschreibung =         'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
-            af_zuweisungsdatum =     timezone.now() - timedelta(days=200),
-            datum =                 timezone.now() - timedelta(days=500),
-            geloescht =             False,
-            gefunden =                 True,
-            wiedergefunden =         timezone.now(),
-            geaendert =             False,
-            neueaf =                 '',
-            nicht_ai =                 False,
-            patchdatum =             None,
-            wertmodellvorpatch =    'Hier kommt nix rein',
-            loeschdatum =             None,
-            letzte_aenderung =        None
+            gf_beschreibung = 'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
+            af_zuweisungsdatum = timezone.now() - timedelta(days=200),
+            datum = timezone.now() - timedelta(days=500),
+            geloescht = False,
+            gefunden = True,
+            wiedergefunden = timezone.now(),
+            geaendert = False,
+            neueaf = '',
+            nicht_ai = False,
+            patchdatum = None,
+            wertmodellvorpatch = 'Hier kommt nix rein',
+            loeschdatum = None,
+            letzte_aenderung = None
         )
 
     def test_gesamtliste_view_status_code(self):
@@ -319,37 +319,37 @@ class CreateUserTests(TestCase):
         TblOrga.objects.create(team = 'Django-Team', themeneigentuemer = 'Ihmchen')
 
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =            'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
-            name_af_neu =            'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
-            kommentar =                'Kein Kommentar',
-            zielperson =            'Lutz',
-            af_text =                'Das ist der AF-normaltext',
-            gf_text =                 'Das ist der GF-normaltext',
-            af_langtext =             'Das ist der AF-Laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaang-Text',
-            af_ausschlussgruppen =    'Das soll niemand außer mir bekommen!!!',
-            af_einschlussgruppen =    'das soll die ganze Welt erhalten können',
+            name_gf_neu = 'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
+            name_af_neu = 'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            kommentar = 'Kein Kommentar',
+            zielperson = 'Lutz',
+            af_text = 'Das ist der AF-normaltext',
+            gf_text = 'Das ist der GF-normaltext',
+            af_langtext = 'Das ist der AF-Laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaang-Text',
+            af_ausschlussgruppen = 'Das soll niemand außer mir bekommen!!!',
+            af_einschlussgruppen = 'das soll die ganze Welt erhalten können',
             af_sonstige_vergabehinweise = 'Keine Hinweise',
-            geloescht =                False,
-            kannweg =                 False,
-            modelliert =             timezone.now(),
+            geloescht = False,
+            kannweg = False,
+            modelliert = timezone.now(),
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =            'rvg_00500_neueAF mit echt mehr Zeichen als üblich',
-            name_af_neu =            'rva_00500_neue_AF auch mit mehr Zeichen als üblich',
+            name_gf_neu = 'rvg_00500_neueAF mit echt mehr Zeichen als üblich',
+            name_af_neu = 'rva_00500_neue_AF auch mit mehr Zeichen als üblich',
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =            'rvg_00380_neueAF mit echt mehr Zeichen als üblich',
-            name_af_neu =            'rva_00380_neue_AF auch mit mehr Zeichen als üblich',
+            name_gf_neu = 'rvg_00380_neueAF mit echt mehr Zeichen als üblich',
+            name_af_neu = 'rva_00380_neue_AF auch mit mehr Zeichen als üblich',
         )
 
         TblUserIDundName.objects.create(
-            userid =             'xv10010',
-            name =                 'User_xv10010',
-            orga =                 TblOrga.objects.get(team = 'Django-Team'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-PS',
+            userid = 'xv10010',
+            name = 'User_xv10010',
+            orga = TblOrga.objects.get(team = 'Django-Team'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-PS',
         )
 
     def test_create_user_view_success_status_code(self):
@@ -380,132 +380,132 @@ class PanelTests(TestCase):
         )
 
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =            'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
-            name_af_neu =            'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
-            kommentar =                'Kein Kommentar',
-            zielperson =            'Lutz',
-            af_text =                'Das ist der AF-normaltext',
-            gf_text =                 'Das ist der GF-normaltext',
-            af_langtext =             'Das ist der AF-Laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaang-Text',
-            af_ausschlussgruppen =    'Das soll niemand außer mir bekommen!!!',
-            af_einschlussgruppen =    'das soll die ganze Welt erhalten können',
+            name_gf_neu = 'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
+            name_af_neu = 'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            kommentar = 'Kein Kommentar',
+            zielperson = 'Lutz',
+            af_text = 'Das ist der AF-normaltext',
+            gf_text = 'Das ist der GF-normaltext',
+            af_langtext = 'Das ist der AF-Laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaang-Text',
+            af_ausschlussgruppen = 'Das soll niemand außer mir bekommen!!!',
+            af_einschlussgruppen = 'das soll die ganze Welt erhalten können',
             af_sonstige_vergabehinweise = 'Keine Hinweise',
-            geloescht =                False,
-            kannweg =                 False,
-            modelliert =             timezone.now(),
+            geloescht = False,
+            kannweg = False,
+            modelliert = timezone.now(),
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =            'rvg_00500_neueAF mit echt mehr Zeichen als üblich',
-            name_af_neu =            'rva_00500_neue_AF auch mit mehr Zeichen als üblich',
+            name_gf_neu = 'rvg_00500_neueAF mit echt mehr Zeichen als üblich',
+            name_af_neu = 'rva_00500_neue_AF auch mit mehr Zeichen als üblich',
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =            'rvg_00380_neueAF mit echt mehr Zeichen als üblich',
-            name_af_neu =            'rva_00380_neue_AF auch mit mehr Zeichen als üblich',
+            name_gf_neu = 'rvg_00380_neueAF mit echt mehr Zeichen als üblich',
+            name_af_neu = 'rva_00380_neue_AF auch mit mehr Zeichen als üblich',
         )
 
         TblUserIDundName.objects.create(
-            userid =             'xv10099',
-            name =                 'User_xv10099',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-PS',
+            userid = 'xv10099',
+            name = 'User_xv10099',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-PS',
         )
 
         TblPlattform.objects.create(tf_technische_plattform = 'RACFP')
 
         TblGesamt.objects.create(
-            userid_name =             TblUserIDundName.objects.get(userid = 'xv10099'),
-            tf =                     'Die superlange schnuckelige TF',
-            tf_beschreibung =         'Die superlange schnuckelige TF-Beschreibung',
-            enthalten_in_af =         'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
-            af_beschreibung =         'Die geniale AF-Beschreibung',
-            modell =                 TblUebersichtAfGfs.objects.get(name_af_neu='rva_00380_neue_AF auch mit mehr Zeichen als üblich',
+            userid_name = TblUserIDundName.objects.get(userid = 'xv10099'),
+            tf = 'Die superlange schnuckelige TF',
+            tf_beschreibung = 'Die superlange schnuckelige TF-Beschreibung',
+            enthalten_in_af = 'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            af_beschreibung = 'Die geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_af_neu='rva_00380_neue_AF auch mit mehr Zeichen als üblich',
                                                                    name_gf_neu='rvg_00380_neueAF mit echt mehr Zeichen als üblich'),
-            tf_kritikalitaet =         'Superkritisch sich ist das auch schon zu lang',
-            tf_eigentuemer_org =     'Keine Ahnung Org',
-            plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
-            gf =                     'rvg_00380_neueGF mit echt mehr Zeichen als üblich',
-            af_gueltig_ab =         timezone.now() - timedelta(days=365),
-            af_gueltig_bis =         timezone.now() + timedelta(days=365),
-            direct_connect =         'nein',
+            tf_kritikalitaet = 'Superkritisch sich ist das auch schon zu lang',
+            tf_eigentuemer_org = 'Keine Ahnung Org',
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
+            gf = 'rvg_00380_neueGF mit echt mehr Zeichen als üblich',
+            af_gueltig_ab = timezone.now() - timedelta(days=365),
+            af_gueltig_bis = timezone.now() + timedelta(days=365),
+            direct_connect = 'nein',
             hoechste_kritikalitaet_tf_in_af = 'u',
-            gf_beschreibung =         'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
-            af_zuweisungsdatum =     timezone.now() - timedelta(days=200),
-            datum =                 timezone.now() - timedelta(days=500),
-            geloescht =             False,
-            gefunden =                 True,
-            wiedergefunden =         timezone.now(),
-            geaendert =             False,
-            neueaf =                 '',
-            nicht_ai =                 False,
-            patchdatum =             None,
-            wertmodellvorpatch =    'Hier kommt nix rein',
-            loeschdatum =             None,
-            letzte_aenderung =        None
+            gf_beschreibung = 'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
+            af_zuweisungsdatum = timezone.now() - timedelta(days=200),
+            datum = timezone.now() - timedelta(days=500),
+            geloescht = False,
+            gefunden = True,
+            wiedergefunden = timezone.now(),
+            geaendert = False,
+            neueaf = '',
+            nicht_ai = False,
+            patchdatum = None,
+            wertmodellvorpatch = 'Hier kommt nix rein',
+            loeschdatum = None,
+            letzte_aenderung = None
         )
 
         TblGesamt.objects.create(
-            userid_name =             TblUserIDundName.objects.get(userid = 'xv10099'),
-            tf =                     'Die superlange schnuckelige TF2',
-            tf_beschreibung =         'Die superlange schnuckelige TF-Beschreibung',
-            enthalten_in_af =         'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
-            af_beschreibung =         'Auch eine geniale AF-Beschreibung',
-            modell =                 TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            userid_name = TblUserIDundName.objects.get(userid = 'xv10099'),
+            tf = 'Die superlange schnuckelige TF2',
+            tf_beschreibung = 'Die superlange schnuckelige TF-Beschreibung',
+            enthalten_in_af = 'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            af_beschreibung = 'Auch eine geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
                                                                    name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
-            tf_kritikalitaet =         'Superkritisch sich ist das auch schon zu lang',
-            tf_eigentuemer_org =     'Keine Ahnung Org',
-            plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
-            gf =                     'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
-            af_gueltig_ab =         timezone.now() - timedelta(days=365),
-            af_gueltig_bis =         timezone.now() + timedelta(days=365),
-            direct_connect =         'nein',
+            tf_kritikalitaet = 'Superkritisch sich ist das auch schon zu lang',
+            tf_eigentuemer_org = 'Keine Ahnung Org',
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
+            gf = 'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
+            af_gueltig_ab = timezone.now() - timedelta(days=365),
+            af_gueltig_bis = timezone.now() + timedelta(days=365),
+            direct_connect = 'nein',
             hoechste_kritikalitaet_tf_in_af = 'u',
-            gf_beschreibung =         'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
-            af_zuweisungsdatum =     timezone.now() - timedelta(days=200),
-            datum =                 timezone.now() - timedelta(days=500),
-            geloescht =             False,
-            gefunden =                 True,
-            wiedergefunden =         timezone.now(),
-            geaendert =             False,
-            neueaf =                 '',
-            nicht_ai =                 False,
-            patchdatum =             None,
-            wertmodellvorpatch =    'Hier kommt nix rein',
-            loeschdatum =             None,
-            letzte_aenderung =        None
+            gf_beschreibung = 'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
+            af_zuweisungsdatum = timezone.now() - timedelta(days=200),
+            datum = timezone.now() - timedelta(days=500),
+            geloescht = False,
+            gefunden = True,
+            wiedergefunden = timezone.now(),
+            geaendert = False,
+            neueaf = '',
+            nicht_ai = False,
+            patchdatum = None,
+            wertmodellvorpatch = 'Hier kommt nix rein',
+            loeschdatum = None,
+            letzte_aenderung = None
         )
 
         TblGesamt.objects.create(
-            userid_name=         TblUserIDundName.objects.get(userid = 'xv10099'),
-            tf =                     'Die direct connection TF3',
-            tf_beschreibung =         'Die superlange schnuckelige TF-Beschreibung',
-            enthalten_in_af =         'ka',
-            af_beschreibung =         'Die dritte geniale AF-Beschreibung',
-            modell =                 TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            userid_name= TblUserIDundName.objects.get(userid = 'xv10099'),
+            tf = 'Die direct connection TF3',
+            tf_beschreibung = 'Die superlange schnuckelige TF-Beschreibung',
+            enthalten_in_af = 'ka',
+            af_beschreibung = 'Die dritte geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
                                                                    name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
-            tf_kritikalitaet =         'Superkritisch sich ist das auch schon zu lang',
-            tf_eigentuemer_org =     'Keine Ahnung Org',
-            plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
-            gf =                     'ka',
-            af_gueltig_ab =         timezone.now() - timedelta(days=365),
-            af_gueltig_bis =         timezone.now() + timedelta(days=365),
-            direct_connect =         'ja',
+            tf_kritikalitaet = 'Superkritisch sich ist das auch schon zu lang',
+            tf_eigentuemer_org = 'Keine Ahnung Org',
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
+            gf = 'ka',
+            af_gueltig_ab = timezone.now() - timedelta(days=365),
+            af_gueltig_bis = timezone.now() + timedelta(days=365),
+            direct_connect = 'ja',
             hoechste_kritikalitaet_tf_in_af = 'u',
-            gf_beschreibung =         '',
-            af_zuweisungsdatum =     None,
-            datum =                 timezone.now() - timedelta(days=500),
-            geloescht =             False,
-            gefunden =                 True,
-            wiedergefunden =         timezone.now(),
-            geaendert =             False,
-            neueaf =                 '',
-            nicht_ai =                 False,
-            patchdatum =             None,
-            wertmodellvorpatch =    'Hier kommt nix rein',
-            loeschdatum =             None,
-            letzte_aenderung =        None
+            gf_beschreibung = '',
+            af_zuweisungsdatum = None,
+            datum = timezone.now() - timedelta(days=500),
+            geloescht = False,
+            gefunden = True,
+            wiedergefunden = timezone.now(),
+            geaendert = False,
+            neueaf = '',
+            nicht_ai = False,
+            patchdatum = None,
+            wertmodellvorpatch = 'Hier kommt nix rein',
+            loeschdatum = None,
+            letzte_aenderung = None
         )
 
     # Ist die Seite da?
@@ -723,101 +723,101 @@ class PanelExportCSVTest(TestCase):
         )
 
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =            'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
-            name_af_neu =            'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
-            kommentar =                'Kein Kommentar',
-            zielperson =            'Lutz',
-            af_text =                'Das ist der AF-normaltext',
-            gf_text =                 'Das ist der GF-normaltext',
-            af_langtext =             'Das ist der AF-Laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaang-Text',
-            af_ausschlussgruppen =    'Das soll niemand außer mir bekommen!!!',
-            af_einschlussgruppen =    'das soll die ganze Welt erhalten können',
+            name_gf_neu = 'rvg_00458_neueGF mit echt mehr Zeichen als üblich',
+            name_af_neu = 'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            kommentar = 'Kein Kommentar',
+            zielperson = 'Lutz',
+            af_text = 'Das ist der AF-normaltext',
+            gf_text = 'Das ist der GF-normaltext',
+            af_langtext = 'Das ist der AF-Laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaang-Text',
+            af_ausschlussgruppen = 'Das soll niemand außer mir bekommen!!!',
+            af_einschlussgruppen = 'das soll die ganze Welt erhalten können',
             af_sonstige_vergabehinweise = 'Keine Hinweise',
-            geloescht =                False,
-            kannweg =                 False,
-            modelliert =             timezone.now(),
+            geloescht = False,
+            kannweg = False,
+            modelliert = timezone.now(),
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =            'rvg_00500_neueAF mit echt mehr Zeichen als üblich',
-            name_af_neu =            'rva_00500_neue_AF auch mit mehr Zeichen als üblich',
+            name_gf_neu = 'rvg_00500_neueAF mit echt mehr Zeichen als üblich',
+            name_af_neu = 'rva_00500_neue_AF auch mit mehr Zeichen als üblich',
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =            'rvg_00380_neueAF mit echt mehr Zeichen als üblich',
-            name_af_neu =            'rva_00380_neue_AF auch mit mehr Zeichen als üblich',
+            name_gf_neu = 'rvg_00380_neueAF mit echt mehr Zeichen als üblich',
+            name_af_neu = 'rva_00380_neue_AF auch mit mehr Zeichen als üblich',
         )
 
         TblUserIDundName.objects.create(
-            userid =             'xv10099',
-            name =                 'User_xv10099',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-PS',
+            userid = 'xv10099',
+            name = 'User_xv10099',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-PS',
         )
 
         TblPlattform.objects.create(tf_technische_plattform = 'RACFP')
 
         TblGesamt.objects.create(
-            userid_name =             TblUserIDundName.objects.get(userid = 'xv10099'),
-            tf =                     'Die superlange schnuckelige TF',
-            tf_beschreibung =         'Die superlange schnuckelige TF-Beschreibung',
-            enthalten_in_af =         'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
-            af_beschreibung =         'Die geniale AF-Beschreibung',
-            modell =                 TblUebersichtAfGfs.objects.get(name_af_neu='rva_00380_neue_AF auch mit mehr Zeichen als üblich',
+            userid_name = TblUserIDundName.objects.get(userid = 'xv10099'),
+            tf = 'Die superlange schnuckelige TF',
+            tf_beschreibung = 'Die superlange schnuckelige TF-Beschreibung',
+            enthalten_in_af = 'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            af_beschreibung = 'Die geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_af_neu='rva_00380_neue_AF auch mit mehr Zeichen als üblich',
                                                                    name_gf_neu='rvg_00380_neueAF mit echt mehr Zeichen als üblich'),
-            tf_kritikalitaet =         'Superkritisch sich ist das auch schon zu lang',
-            tf_eigentuemer_org =     'Keine Ahnung Org',
-            plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
-            gf =                     'rvg_00380_neueGF mit echt mehr Zeichen als üblich',
-            af_gueltig_ab =         timezone.now() - timedelta(days=365),
-            af_gueltig_bis =         timezone.now() + timedelta(days=365),
-            direct_connect =         'no direct connect',
+            tf_kritikalitaet = 'Superkritisch sich ist das auch schon zu lang',
+            tf_eigentuemer_org = 'Keine Ahnung Org',
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
+            gf = 'rvg_00380_neueGF mit echt mehr Zeichen als üblich',
+            af_gueltig_ab = timezone.now() - timedelta(days=365),
+            af_gueltig_bis = timezone.now() + timedelta(days=365),
+            direct_connect = 'no direct connect',
             hoechste_kritikalitaet_tf_in_af = 'u',
-            gf_beschreibung =         'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
-            af_zuweisungsdatum =     timezone.now() - timedelta(days=200),
-            datum =                 timezone.now() - timedelta(days=500),
-            geloescht =             False,
-            gefunden =                 True,
-            wiedergefunden =         timezone.now(),
-            geaendert =             False,
-            neueaf =                 '',
-            nicht_ai =                 False,
-            patchdatum =             None,
-            wertmodellvorpatch =    'Hier kommt nix rein',
-            loeschdatum =             None,
-            letzte_aenderung =        None
+            gf_beschreibung = 'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
+            af_zuweisungsdatum = timezone.now() - timedelta(days=200),
+            datum = timezone.now() - timedelta(days=500),
+            geloescht = False,
+            gefunden = True,
+            wiedergefunden = timezone.now(),
+            geaendert = False,
+            neueaf = '',
+            nicht_ai = False,
+            patchdatum = None,
+            wertmodellvorpatch = 'Hier kommt nix rein',
+            loeschdatum = None,
+            letzte_aenderung = None
         )
 
         TblGesamt.objects.create(
-            userid_name =             TblUserIDundName.objects.get(userid = 'xv10099'),
-            tf =                     'Die superlange schnuckelige TF2',
-            tf_beschreibung =         'Die superlange schnuckelige TF-Beschreibung',
-            enthalten_in_af =         'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
-            af_beschreibung =         'Auch eine geniale AF-Beschreibung',
-            modell =                 TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            userid_name = TblUserIDundName.objects.get(userid = 'xv10099'),
+            tf = 'Die superlange schnuckelige TF2',
+            tf_beschreibung = 'Die superlange schnuckelige TF-Beschreibung',
+            enthalten_in_af = 'rva_00458_neue_AF auch mit mehr Zeichen als üblich',
+            af_beschreibung = 'Auch eine geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
                                                                    name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
-            tf_kritikalitaet =         'Superkritisch sich ist das auch schon zu lang',
-            tf_eigentuemer_org =     'Keine Ahnung Org',
-            plattform =             TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
-            gf =                     'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
-            af_gueltig_ab =         timezone.now() - timedelta(days=365),
-            af_gueltig_bis =         timezone.now() + timedelta(days=365),
-            direct_connect =         'no direct connect',
+            tf_kritikalitaet = 'Superkritisch sich ist das auch schon zu lang',
+            tf_eigentuemer_org = 'Keine Ahnung Org',
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'RACFP'),
+            gf = 'rvg_00458_neueAF mit echt mehr Zeichen als üblich',
+            af_gueltig_ab = timezone.now() - timedelta(days=365),
+            af_gueltig_bis = timezone.now() + timedelta(days=365),
+            direct_connect = 'no direct connect',
             hoechste_kritikalitaet_tf_in_af = 'u',
-            gf_beschreibung =         'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
-            af_zuweisungsdatum =     timezone.now() - timedelta(days=200),
-            datum =                 timezone.now() - timedelta(days=500),
-            geloescht =             False,
-            gefunden =                 True,
-            wiedergefunden =         timezone.now(),
-            geaendert =             False,
-            neueaf =                 '',
-            nicht_ai =                 False,
-            patchdatum =             None,
-            wertmodellvorpatch =    'Hier kommt nix rein',
-            loeschdatum =             None,
-            letzte_aenderung =        None
+            gf_beschreibung = 'Die superlange, mindestens 250 Zeichen umfassende GF-Beschreibung. Hier könnte man auch mal nach CRLF suchen',
+            af_zuweisungsdatum = timezone.now() - timedelta(days=200),
+            datum = timezone.now() - timedelta(days=500),
+            geloescht = False,
+            gefunden = True,
+            wiedergefunden = timezone.now(),
+            geaendert = False,
+            neueaf = '',
+            nicht_ai = False,
+            patchdatum = None,
+            wertmodellvorpatch = 'Hier kommt nix rein',
+            loeschdatum = None,
+            letzte_aenderung = None
         )
 
     # Eine leere Auswahl
@@ -860,105 +860,105 @@ class UserRolleAFTestsGeneratePDF(TestCase):
         )
 
         TblAfliste.objects.create (
-            af_name =             'rva_01219_beta91_job_abst',
-            neu_ab =             timezone.now(),
+            af_name = 'rva_01219_beta91_job_abst',
+            neu_ab = timezone.now(),
         )
 
         TblAfliste.objects.create (
-            af_name =             'rva_01219_beta91_job_abst_nicht_zugewiesen',
-            neu_ab =             timezone.now(),
+            af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen',
+            neu_ab = timezone.now(),
         )
 
         # Drei User: XV und DV aktiv, AV gelöscht
         TblUserIDundName.objects.create (
-            userid =             'xv13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-PS',
+            userid = 'xv13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-PS',
         )
         TblUserIDundName.objects.create (
-            userid =             'dv13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-PS',
+            userid = 'dv13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-PS',
         )
         TblUserIDundName.objects.create (
-            userid =             'av13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         True,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-PS',
+            userid = 'av13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = True,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-PS',
         )
 
         # Zwei Rollen, die auf den XV-User vergeben werden
         TblRollen.objects.create (
-            rollenname =         'Erste Neue Rolle',
-            system =            'Testsystem',
+            rollenname = 'Erste Neue Rolle',
+            system = 'Testsystem',
             rollenbeschreibung = 'Das ist eine Testrolle',
         )
         TblRollen.objects.create (
-            rollenname =         'Zweite Neue Rolle',
-            system =            'Irgendein System',
+            rollenname = 'Zweite Neue Rolle',
+            system = 'Irgendein System',
             rollenbeschreibung = 'Das ist auch eine Testrolle',
         )
 
         # Drei AF-Zuordnungen
         TblRollehataf.objects.create (
-            mussfeld =            True,
-            einsatz =            TblRollehataf.EINSATZ_XABCV,
-            bemerkung =         'Irgend eine halbwegs sinnvolle Beschreibung',
-            af =                 TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
-            rollenname =         TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
+            mussfeld = True,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
+            rollenname = TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
         )
         TblRollehataf.objects.create (
-            mussfeld =            True,
-            einsatz =            TblRollehataf.EINSATZ_XABCV,
-            bemerkung =         'Irgend eine halbwegs sinnvolle Beschreibung',
-            af =                 TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen'),
-            rollenname =         TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
+            mussfeld = True,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen'),
+            rollenname = TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
         )
         TblRollehataf.objects.create (
-            mussfeld =            False,
-            einsatz =            TblRollehataf.EINSATZ_XABCV,
-            bemerkung =         'Auch irgend eine halbwegs sinnvolle Beschreibung',
-            af =                 TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
-            rollenname =         TblRollen.objects.get(rollenname= 'Zweite Neue Rolle'),
+            mussfeld = False,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Auch irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
+            rollenname = TblRollen.objects.get(rollenname= 'Zweite Neue Rolle'),
         )
 
         # Dem XV-User werden zwei Rollen zugewiesen, dem AV- und DV-User keine
         TblUserhatrolle.objects.create(
-            userid =             TblUserIDundName.objects.get(userid = 'xv13254'),
-            rollenname =         TblRollen.objects.first(),
+            userid = TblUserIDundName.objects.get(userid = 'xv13254'),
+            rollenname = TblRollen.objects.first(),
             schwerpunkt_vertretung = 'Schwerpunkt',
-            bemerkung =         'Das ist eine Testrolle für ZI-AI-BA-PS',
-            letzte_aenderung=     timezone.now(),
+            bemerkung = 'Das ist eine Testrolle für ZI-AI-BA-PS',
+            letzte_aenderung= timezone.now(),
         )
         TblUserhatrolle.objects.create(
-            userid =             TblUserIDundName.objects.get(userid = 'xv13254'),
-            rollenname =         TblRollen.objects.get(rollenname = 'Zweite Neue Rolle'),
+            userid = TblUserIDundName.objects.get(userid = 'xv13254'),
+            rollenname = TblRollen.objects.get(rollenname = 'Zweite Neue Rolle'),
             schwerpunkt_vertretung = 'Vertretung',
-            bemerkung =         'Das ist auch eine Testrolle für ZI-AI-BA-PS',
-            letzte_aenderung=     timezone.now(),
+            bemerkung = 'Das ist auch eine Testrolle für ZI-AI-BA-PS',
+            letzte_aenderung= timezone.now(),
         )
 
         # Die nächsten beiden Objekte werden für tblGesamt als ForeignKey benötigt
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =         "GF-foo in tblÜbersichtAFGF",
-            name_af_neu =        "AF-foo in tblÜbersichtAFGF",
-            zielperson =         'Fester BesterTester'
+            name_gf_neu = "GF-foo in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =         "GF-foo-gelöscht in tblÜbersichtAFGF",
-            name_af_neu =        "AF-foo-gelöscht in tblÜbersichtAFGF",
-            zielperson =         'Fester BesterTester'
+            name_gf_neu = "GF-foo-gelöscht in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo-gelöscht in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
         )
         TblPlattform.objects.create(
             tf_technische_plattform = 'Test-Plattform'
@@ -968,29 +968,29 @@ class UserRolleAFTestsGeneratePDF(TestCase):
         # für einen bestimmten User festzustellen, ob er über eine definierte AF verfügt
         # und diese auch auf aktiv gesetzt ist
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'xv13254'),
-            tf =                 'foo-TF',
-            tf_beschreibung =     'TF-Beschreibung für foo-TF',
-            enthalten_in_af =     'Sollte die AF rva_01219_beta91_job_abst sein',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            gf =                 'GF-foo',
-            datum =             timezone.now(),
-            geloescht =         False,
+            userid_name = TblUserIDundName.objects.get(userid = 'xv13254'),
+            tf = 'foo-TF',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF',
+            enthalten_in_af = 'Sollte die AF rva_01219_beta91_job_abst sein',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now(),
+            geloescht = False,
         )
 
         # und hier noch ein bereits gelöschtes Recht auf TF-Ebene.
         # ToDo Noch eine komplette AF mit allen GFs als gelöscht markiert vorbereiten
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'xv13254'),
-            tf =                 'foo-TF-gelöscht',
-            tf_beschreibung =     'TF-Beschreibung für foo-TF-gelöscht',
-            enthalten_in_af =     'Sollte die AF rva_01219_beta91_job_abst sein',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            gf =                 'GF-foo',
-            datum =             timezone.now() - timedelta(days=365),
-            geloescht =         True,
+            userid_name = TblUserIDundName.objects.get(userid = 'xv13254'),
+            tf = 'foo-TF-gelöscht',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF-gelöscht',
+            enthalten_in_af = 'Sollte die AF rva_01219_beta91_job_abst sein',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now() - timedelta(days=365),
+            geloescht = True,
         )
     def test_panel_view_use_konzept_pdf(self):
         print()    # weil das PDF immer irgend eine Warnung ausgibt
@@ -1014,115 +1014,115 @@ class UserRolleAFTests(TestCase):
         )
 
         TblAfliste.objects.create (
-            af_name =             'rva_01219_beta91_job_abst',
-            neu_ab =             timezone.now(),
+            af_name = 'rva_01219_beta91_job_abst',
+            neu_ab = timezone.now(),
         )
 
         TblAfliste.objects.create (
-            af_name =             'rva_01219_beta91_job_abst_nu',
-            neu_ab =             timezone.now(),
+            af_name = 'rva_01219_beta91_job_abst_nu',
+            neu_ab = timezone.now(),
         )
 
         TblAfliste.objects.create (
-            af_name =             'rva_01219_beta91_job_abst_nicht_zugewiesen',
-            neu_ab =             timezone.now(),
+            af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen',
+            neu_ab = timezone.now(),
         )
 
         # Drei User: XV und DV aktiv, AV gelöscht
         TblUserIDundName.objects.create (
-            userid =             'xv13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-PS',
+            userid = 'xv13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-PS',
         )
         TblUserIDundName.objects.create (
-            userid =             'dv13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-PS',
+            userid = 'dv13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-PS',
         )
         TblUserIDundName.objects.create (
-            userid =             'av13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         True,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-PS',
+            userid = 'av13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = True,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-PS',
         )
 
         # Zwei Rollen, die auf den XV-User vergeben werden
         TblRollen.objects.create (
-            rollenname =         'Erste Neue Rolle',
-            system =            'Testsystem',
+            rollenname = 'Erste Neue Rolle',
+            system = 'Testsystem',
             rollenbeschreibung = 'Das ist eine Testrolle',
         )
         TblRollen.objects.create (
-            rollenname =         'Zweite Neue Rolle',
-            system =            'Irgendein System',
+            rollenname = 'Zweite Neue Rolle',
+            system = 'Irgendein System',
             rollenbeschreibung = 'Das ist auch eine Testrolle',
         )
 
         # Drei AF-Zuordnungen
         TblRollehataf.objects.create (
-            mussfeld =            True,
-            einsatz =            TblRollehataf.EINSATZ_XABCV,
-            bemerkung =         'Irgend eine halbwegs sinnvolle Beschreibung',
-            af =                 TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
-            rollenname =         TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
+            mussfeld = True,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
+            rollenname = TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
         )
         TblRollehataf.objects.create (
-            mussfeld =            True,
-            einsatz =            TblRollehataf.EINSATZ_XABCV,
-            bemerkung =         'Irgend eine halbwegs sinnvolle Beschreibung',
-            af =                 TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen'),
-            rollenname =         TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
+            mussfeld = True,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen'),
+            rollenname = TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
         )
         TblRollehataf.objects.create (
-            mussfeld =            False,
-            einsatz =            TblRollehataf.EINSATZ_XABCV,
-            bemerkung =         'Auch irgend eine halbwegs sinnvolle Beschreibung',
-            af =                 TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
-            rollenname =         TblRollen.objects.get(rollenname= 'Zweite Neue Rolle'),
+            mussfeld = False,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Auch irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
+            rollenname = TblRollen.objects.get(rollenname= 'Zweite Neue Rolle'),
         )
 
         # Dem XV-User werden zwei Rollen zugewiesen, dem AV- und DV-User keine
         TblUserhatrolle.objects.create(
-            userid =             TblUserIDundName.objects.get(userid = 'xv13254'),
-            rollenname =         TblRollen.objects.first(),
+            userid = TblUserIDundName.objects.get(userid = 'xv13254'),
+            rollenname = TblRollen.objects.first(),
             schwerpunkt_vertretung = 'Schwerpunkt',
-            bemerkung =         'Das ist eine Testrolle für ZI-AI-BA-PS',
-            letzte_aenderung=     timezone.now(),
+            bemerkung = 'Das ist eine Testrolle für ZI-AI-BA-PS',
+            letzte_aenderung= timezone.now(),
         )
         TblUserhatrolle.objects.create(
-            userid =             TblUserIDundName.objects.get(userid = 'xv13254'),
-            rollenname =         TblRollen.objects.get(rollenname = 'Zweite Neue Rolle'),
+            userid = TblUserIDundName.objects.get(userid = 'xv13254'),
+            rollenname = TblRollen.objects.get(rollenname = 'Zweite Neue Rolle'),
             schwerpunkt_vertretung = 'Vertretung',
-            bemerkung =         'Das ist auch eine Testrolle für ZI-AI-BA-PS',
-            letzte_aenderung=     timezone.now(),
+            bemerkung = 'Das ist auch eine Testrolle für ZI-AI-BA-PS',
+            letzte_aenderung= timezone.now(),
         )
 
         # Die nächsten beiden Objekte werden für tblGesamt als ForeignKey benötigt
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =         "GF-foo in tblÜbersichtAFGF",
-            name_af_neu =        "AF-foo in tblÜbersichtAFGF",
-            zielperson =         'Fester BesterTester'
+            name_gf_neu = "GF-foo in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =         "GF-foo-gelöscht in tblÜbersichtAFGF",
-            name_af_neu =        "AF-foo-gelöscht in tblÜbersichtAFGF",
-            zielperson =         'Fester BesterTester'
+            name_gf_neu = "GF-foo-gelöscht in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo-gelöscht in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =         "rvg_01219_beta91_job_abst_nu",
-            name_af_neu =        "rva_01219_beta91_job_abst_nu",
-            zielperson =         'Fester BesterTester'
+            name_gf_neu = "rvg_01219_beta91_job_abst_nu",
+            name_af_neu = "rva_01219_beta91_job_abst_nu",
+            zielperson = 'Fester BesterTester'
         )
         TblPlattform.objects.create(
             tf_technische_plattform = 'Test-Plattform'
@@ -1132,31 +1132,31 @@ class UserRolleAFTests(TestCase):
         # für einen bestimmten User festzustellen, ob er über eine definierte AF verfügt
         # und diese auch auf aktiv gesetzt ist
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'xv13254'),
-            tf =                 'foo-TF',
-            tf_beschreibung =     'TF-Beschreibung für foo-TF',
-            enthalten_in_af =     'Sollte die AF rva_01219_beta91_job_abst sein',
-            af_beschreibung =         'Die geniale AF-Beschreibung',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            gf =                 'GF-foo',
-            datum =             timezone.now(),
-            geloescht =         False,
+            userid_name = TblUserIDundName.objects.get(userid = 'xv13254'),
+            tf = 'foo-TF',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF',
+            enthalten_in_af = 'Sollte die AF rva_01219_beta91_job_abst sein',
+            af_beschreibung = 'Die geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now(),
+            geloescht = False,
         )
 
         # und hier noch ein bereits gelöschtes Recht auf TF-Ebene.
         # ToDo Noch eine komplette AF mit allen GFs als gelöscht markiert vorbereiten
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'xv13254'),
-            tf =                 'foo-TF-gelöscht',
-            tf_beschreibung =     'TF-Beschreibung für foo-TF-gelöscht',
-            enthalten_in_af =     'Sollte die AF rva_01219_beta91_job_abst sein',
-            af_beschreibung =     'Auch eine geniale AF-Beschreibung',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            gf =                 'GF-foo',
-            datum =             timezone.now() - timedelta(days=365),
-            geloescht =         True,
+            userid_name = TblUserIDundName.objects.get(userid = 'xv13254'),
+            tf = 'foo-TF-gelöscht',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF-gelöscht',
+            enthalten_in_af = 'Sollte die AF rva_01219_beta91_job_abst sein',
+            af_beschreibung = 'Auch eine geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now() - timedelta(days=365),
+            geloescht = True,
         )
 
     # Ist die Seite da?
@@ -1401,136 +1401,136 @@ class UserRolleVariantsTest(TestCase):
         )
 
         TblAfliste.objects.create (
-            af_name =             'rva_01219_beta91_job_abst',
-            neu_ab =             timezone.now(),
+            af_name = 'rva_01219_beta91_job_abst',
+            neu_ab = timezone.now(),
         )
 
         TblAfliste.objects.create (
-            af_name =             'rva_01219_beta91_job_abst_nicht_zugewiesen',
-            neu_ab =             timezone.now(),
+            af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen',
+            neu_ab = timezone.now(),
         )
 
         # Drei UserIDen für eine Identität: XV und DV aktiv, AV gelöscht
         TblUserIDundName.objects.create (
-            userid =             'xv13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-LS',
+            userid = 'xv13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
         )
         TblUserIDundName.objects.create (
-            userid =             'dv13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-LS',
+            userid = 'dv13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
         )
         TblUserIDundName.objects.create (
-            userid =             'av13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         True,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-LS',
+            userid = 'av13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = True,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
         )
 
         # Eine UserID für eine weitere Identität: XV aktiv
         TblUserIDundName.objects.create (
-            userid =             'xv00042',
-            name =                 'User_xv00042',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-LS',
+            userid = 'xv00042',
+            name = 'User_xv00042',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
         )
 
         # Eine UserID für eine weitere Identität: XV aktiv: Für diesen User gibt es noch keine eingetragene Rolle
         TblUserIDundName.objects.create (
-            userid =             'xv00023',
-            name =                 'User_xv00023',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-LS',
+            userid = 'xv00023',
+            name = 'User_xv00023',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
         )
 
         # Zwei Rollen, die auf den ersten XV-User vergeben werden, die zweite wird auch dem m2. User vergeben
         TblRollen.objects.create (
-            rollenname =         'Erste Neue Rolle',
-            system =            'Testsystem',
+            rollenname = 'Erste Neue Rolle',
+            system = 'Testsystem',
             rollenbeschreibung = 'Das ist eine Testrolle',
         )
         TblRollen.objects.create (
-            rollenname =         'Zweite Neue Rolle',
-            system =            'Irgendein System',
+            rollenname = 'Zweite Neue Rolle',
+            system = 'Irgendein System',
             rollenbeschreibung = 'Das ist auch eine Testrolle',
         )
 
         # Drei AF-Zuordnungen zu Rollen
         TblRollehataf.objects.create (
-            mussfeld =            True,
-            einsatz =            TblRollehataf.EINSATZ_XABCV,
-            bemerkung =         'Irgend eine halbwegs sinnvolle Beschreibung',
-            af =                 TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
-            rollenname =         TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
+            mussfeld = True,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
+            rollenname = TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
         )
         TblRollehataf.objects.create (
-            mussfeld =            True,
-            einsatz =            TblRollehataf.EINSATZ_XABCV,
-            bemerkung =         'Irgend eine halbwegs sinnvolle Beschreibung',
-            af =                 TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen'),
-            rollenname =         TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
+            mussfeld = True,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen'),
+            rollenname = TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
         )
         TblRollehataf.objects.create (
-            mussfeld =            False,
-            einsatz =            TblRollehataf.EINSATZ_XABCV,
-            bemerkung =         'Auch irgend eine halbwegs sinnvolle Beschreibung',
-            af =                 TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
-            rollenname =         TblRollen.objects.get(rollenname= 'Zweite Neue Rolle'),
+            mussfeld = False,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Auch irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
+            rollenname = TblRollen.objects.get(rollenname= 'Zweite Neue Rolle'),
         )
 
         # User 12354_ Dem XV-User werden zwei Rollen zugewiesen, dem AV- und DV-User keine
         TblUserhatrolle.objects.create(
-            userid =             TblUserIDundName.objects.get(userid = 'xv13254'),
-            rollenname =         TblRollen.objects.first(),
+            userid = TblUserIDundName.objects.get(userid = 'xv13254'),
+            rollenname = TblRollen.objects.first(),
             schwerpunkt_vertretung = 'Schwerpunkt',
-            bemerkung =         'Das ist eine Testrolle für ZI-AI-BA-LS',
-            letzte_aenderung=     timezone.now(),
+            bemerkung = 'Das ist eine Testrolle für ZI-AI-BA-LS',
+            letzte_aenderung= timezone.now(),
         )
         TblUserhatrolle.objects.create(
-            userid =             TblUserIDundName.objects.get(userid = 'xv13254'),
-            rollenname =         TblRollen.objects.get(rollenname = 'Zweite Neue Rolle'),
+            userid = TblUserIDundName.objects.get(userid = 'xv13254'),
+            rollenname = TblRollen.objects.get(rollenname = 'Zweite Neue Rolle'),
             schwerpunkt_vertretung = 'Vertretung',
-            bemerkung =         'Das ist auch eine Testrolle für ZI-AI-BA-LS',
-            letzte_aenderung=     timezone.now(),
+            bemerkung = 'Das ist auch eine Testrolle für ZI-AI-BA-LS',
+            letzte_aenderung= timezone.now(),
         )
         # Dem zweiten User 00042 wird nur eine Rolle zugeordnet
         TblUserhatrolle.objects.create(
-            userid =             TblUserIDundName.objects.get(userid = 'xv00042'),
-            rollenname =         TblRollen.objects.first(),
+            userid = TblUserIDundName.objects.get(userid = 'xv00042'),
+            rollenname = TblRollen.objects.first(),
             schwerpunkt_vertretung = 'Schwerpunkt',
-            bemerkung =         'Das ist eine Testrolle für ZI-AI-BA-LS',
-            letzte_aenderung=     timezone.now(),
+            bemerkung = 'Das ist eine Testrolle für ZI-AI-BA-LS',
+            letzte_aenderung= timezone.now(),
         )
         # Und dem dritten User 00023 keine Rolle
 
         # Die nächsten beiden Objekte werden für tblGesamt als ForeignKey benötigt
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =         "GF-foo in tblÜbersichtAFGF",
-            name_af_neu =        "AF-foo in tblÜbersichtAFGF",
-            zielperson =         'Fester BesterTester'
+            name_gf_neu = "GF-foo in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =         "GF-foo-gelöscht in tblÜbersichtAFGF",
-            name_af_neu =        "AF-foo-gelöscht in tblÜbersichtAFGF",
-            zielperson =         'Fester BesterTester'
+            name_gf_neu = "GF-foo-gelöscht in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo-gelöscht in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
         )
         TblPlattform.objects.create(
             tf_technische_plattform = 'Test-Plattform'
@@ -1540,44 +1540,44 @@ class UserRolleVariantsTest(TestCase):
         # für einen bestimmten User festzustellen, ob er über eine definierte AF verfügt
         # und diese auch auf aktiv gesetzt ist
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'xv13254'),
-            tf =                 'foo-TF',
-            tf_beschreibung =     'TF-Beschreibung für foo-TF',
-            enthalten_in_af =     'rva_01219_beta91_job_abst',
-            af_beschreibung =     'Die geniale AF-Beschreibung',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            gf =                 'GF-foo',
-            datum =             timezone.now(),
-            geloescht =         False,
+            userid_name = TblUserIDundName.objects.get(userid = 'xv13254'),
+            tf = 'foo-TF',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF',
+            enthalten_in_af = 'rva_01219_beta91_job_abst',
+            af_beschreibung = 'Die geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now(),
+            geloescht = False,
         )
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'xv00042'),
-            tf =                 'foo-TF',
-            tf_beschreibung =     'TF-Beschreibung für foo-TF',
-            enthalten_in_af =     'rva_01219_beta91_job_abst',
-            af_beschreibung =     'Auch eine geniale AF-Beschreibung',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            gf =                 'GF-foo',
-            datum =             timezone.now(),
-            geloescht =         False,
+            userid_name = TblUserIDundName.objects.get(userid = 'xv00042'),
+            tf = 'foo-TF',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF',
+            enthalten_in_af = 'rva_01219_beta91_job_abst',
+            af_beschreibung = 'Auch eine geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now(),
+            geloescht = False,
         )
 
         # und hier noch ein bereits gelöschtes Recht auf TF-Ebene.
         # ToDo Noch eine komplette AF mit allen GFs als gelöscht markiert vorbereiten
         # ToDo Noch eine komplette AF mit GF und TFD in anderer Rolle vorbereiten
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'xv13254'),
-            tf =                 'foo-TF-gelöscht',
-            tf_beschreibung =     'TF-Beschreibung für foo-TF-gelöscht',
-            enthalten_in_af =     'rva_01219_beta91_job_abst',
-            af_beschreibung =     'Die dritte geniale AF-Beschreibung',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            gf =                 'GF-foo',
-            datum =             timezone.now() - timedelta(days=365),
-            geloescht =         True,
+            userid_name = TblUserIDundName.objects.get(userid = 'xv13254'),
+            tf = 'foo-TF-gelöscht',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF-gelöscht',
+            enthalten_in_af = 'rva_01219_beta91_job_abst',
+            af_beschreibung = 'Die dritte geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now() - timedelta(days=365),
+            geloescht = True,
         )
 
     # Ist die Seite da?
@@ -1698,141 +1698,141 @@ class UserRolleNurNeueAFTest(TestCase):
         )
 
         TblAfliste.objects.create (
-            af_name =             'rva_01219_beta91_job_abst',
-            neu_ab =             timezone.now(),
+            af_name = 'rva_01219_beta91_job_abst',
+            neu_ab = timezone.now(),
         )
 
         TblAfliste.objects.create (
-            af_name =             'rva_01219_beta91_job_abst_nicht_zugewiesen',
-            neu_ab =             timezone.now(),
+            af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen',
+            neu_ab = timezone.now(),
         )
 
         # Drei UserIDen für eine Identität: XV und DV aktiv, AV gelöscht
         TblUserIDundName.objects.create (
-            userid =             'xv13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-LS',
+            userid = 'xv13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
         )
         TblUserIDundName.objects.create (
-            userid =             'dv13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-LS',
+            userid = 'dv13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
         )
         TblUserIDundName.objects.create (
-            userid =             'av13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         True,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-LS',
+            userid = 'av13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = True,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
         )
 
         # Eine UserID für eine weitere Identität: XV aktiv
         TblUserIDundName.objects.create (
-            userid =             'xv00042',
-            name =                 'User_xv00042',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-LS',
+            userid = 'xv00042',
+            name = 'User_xv00042',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
         )
 
         # Eine UserID für eine weitere Identität: XV aktiv: Für diesen User gibt es noch keine eingetragene Rolle
         TblUserIDundName.objects.create (
-            userid =             'xv00023',
-            name =                 'User_xv00023',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-LS',
+            userid = 'xv00023',
+            name = 'User_xv00023',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
         )
 
         # Zwei Rollen, die auf den ersten XV-User vergeben werden, die zweite wird auch dem 2. User vergeben
         TblRollen.objects.create (
-            rollenname =         'Erste Neue Rolle',
-            system =            'Testsystem',
+            rollenname = 'Erste Neue Rolle',
+            system = 'Testsystem',
             rollenbeschreibung = 'Das ist eine Testrolle',
         )
         TblRollen.objects.create (
-            rollenname =         'Zweite Neue Rolle',
-            system =            'Irgendein System',
+            rollenname = 'Zweite Neue Rolle',
+            system = 'Irgendein System',
             rollenbeschreibung = 'Das ist auch eine Testrolle',
         )
 
         # Drei AF-Zuordnungen zu Rollen
         TblRollehataf.objects.create (
-            mussfeld =            True,
-            einsatz =            TblRollehataf.EINSATZ_XABCV,
-            bemerkung =         'Irgend eine halbwegs sinnvolle Beschreibung',
-            af =                 TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
-            rollenname =         TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
+            mussfeld = True,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
+            rollenname = TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
         )
         TblRollehataf.objects.create (
-            mussfeld =            True,
-            einsatz =            TblRollehataf.EINSATZ_XABCV,
-            bemerkung =         'Irgend eine halbwegs sinnvolle Beschreibung',
-            af =                 TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen'),
-            rollenname =         TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
+            mussfeld = True,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen'),
+            rollenname = TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
         )
         TblRollehataf.objects.create (
-            mussfeld =            False,
-            einsatz =            TblRollehataf.EINSATZ_XABCV,
-            bemerkung =         'Auch irgend eine halbwegs sinnvolle Beschreibung',
-            af =                 TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
-            rollenname =         TblRollen.objects.get(rollenname= 'Zweite Neue Rolle'),
+            mussfeld = False,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Auch irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
+            rollenname = TblRollen.objects.get(rollenname= 'Zweite Neue Rolle'),
         )
 
         # User 12354_ Dem XV-User werden zwei Rollen zugewiesen, dem AV- und DV-User keine
         TblUserhatrolle.objects.create(
-            userid =             TblUserIDundName.objects.get(userid = 'xv13254'),
-            rollenname =         TblRollen.objects.first(),
+            userid = TblUserIDundName.objects.get(userid = 'xv13254'),
+            rollenname = TblRollen.objects.first(),
             schwerpunkt_vertretung = 'Schwerpunkt',
-            bemerkung =         'Das ist eine Testrolle für ZI-AI-BA-LS',
-            letzte_aenderung=     timezone.now(),
+            bemerkung = 'Das ist eine Testrolle für ZI-AI-BA-LS',
+            letzte_aenderung= timezone.now(),
         )
         TblUserhatrolle.objects.create(
-            userid =             TblUserIDundName.objects.get(userid = 'xv13254'),
-            rollenname =         TblRollen.objects.get(rollenname = 'Zweite Neue Rolle'),
+            userid = TblUserIDundName.objects.get(userid = 'xv13254'),
+            rollenname = TblRollen.objects.get(rollenname = 'Zweite Neue Rolle'),
             schwerpunkt_vertretung = 'Vertretung',
-            bemerkung =         'Das ist auch eine Testrolle für ZI-AI-BA-LS',
-            letzte_aenderung=     timezone.now(),
+            bemerkung = 'Das ist auch eine Testrolle für ZI-AI-BA-LS',
+            letzte_aenderung= timezone.now(),
         )
         # Dem zweiten User 00042 wird nur eine Rolle zugeordnet
         TblUserhatrolle.objects.create(
-            userid =             TblUserIDundName.objects.get(userid = 'xv00042'),
-            rollenname =         TblRollen.objects.first(),
+            userid = TblUserIDundName.objects.get(userid = 'xv00042'),
+            rollenname = TblRollen.objects.first(),
             schwerpunkt_vertretung = 'Schwerpunkt',
-            bemerkung =         'Das ist eine Testrolle für ZI-AI-BA-LS',
-            letzte_aenderung=     timezone.now(),
+            bemerkung = 'Das ist eine Testrolle für ZI-AI-BA-LS',
+            letzte_aenderung= timezone.now(),
         )
         # Und dem dritten User 00023 keine Rolle
 
         # Die nächsten beiden Objekte werden für tblGesamt als ForeignKey benötigt
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =         "rvg_01219_beta91_job_abst",
-            name_af_neu =        "rva_01219_beta91_job_abst",
-            zielperson =         'Fester BesterTester'
+            name_gf_neu = "rvg_01219_beta91_job_abst",
+            name_af_neu = "rva_01219_beta91_job_abst",
+            zielperson = 'Fester BesterTester'
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =         "GF-foo in tblÜbersichtAFGF",
-            name_af_neu =        "AF-foo in tblÜbersichtAFGF",
-            zielperson =         'Fester BesterTester'
+            name_gf_neu = "GF-foo in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =         "GF-foo-gelöscht in tblÜbersichtAFGF",
-            name_af_neu =        "AF-foo-gelöscht in tblÜbersichtAFGF",
-            zielperson =         'Fester BesterTester'
+            name_gf_neu = "GF-foo-gelöscht in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo-gelöscht in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
         )
         TblPlattform.objects.create(
             tf_technische_plattform = 'Test-Plattform'
@@ -1842,59 +1842,59 @@ class UserRolleNurNeueAFTest(TestCase):
         # für einen bestimmten User festzustellen, ob er über eine definierte AF verfügt
         # und diese auch auf aktiv gesetzt ist
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'xv13254'),
-            tf =                 'foo-TF',
-            tf_beschreibung =     'TF-Beschreibung für foo-TF',
-            enthalten_in_af =     'rva_01219_beta91_job_abst',
-            af_beschreibung =         'Die geniale AF-Beschreibung',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            gf =                 'GF-foo',
-            datum =             timezone.now(),
-            geloescht =         False,
+            userid_name = TblUserIDundName.objects.get(userid = 'xv13254'),
+            tf = 'foo-TF',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF',
+            enthalten_in_af = 'rva_01219_beta91_job_abst',
+            af_beschreibung = 'Die geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now(),
+            geloescht = False,
         )
 
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'xv00042'),
-            tf =                 'foo-TF',
-            tf_beschreibung =     'TF-Beschreibung für foo-TF',
-            enthalten_in_af =     'rva_01219_beta91_job_abst',
-            af_beschreibung =         'Auch eine geniale AF-Beschreibung',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            gf =                 'GF-foo',
-            datum =             timezone.now(),
-            geloescht =         False,
+            userid_name = TblUserIDundName.objects.get(userid = 'xv00042'),
+            tf = 'foo-TF',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF',
+            enthalten_in_af = 'rva_01219_beta91_job_abst',
+            af_beschreibung = 'Auch eine geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now(),
+            geloescht = False,
         )
 
         # und hier noch ein bereits gelöschtes Recht auf TF-Ebene.
         # ToDo Noch eine komplette AF mit allen GFs als gelöscht markiert vorbereiten
         # ToDo Noch eine komplette AF mit GF und TFD in anderer Rolle vorbereiten
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'xv13254'),
-            tf =                 'foo-TF-gelöscht',
-            tf_beschreibung =     'TF-Beschreibung für foo-TF-gelöscht',
-            enthalten_in_af =     'rva_01219_beta91_job_abst',
-            af_beschreibung =         'Die dritte geniale AF-Beschreibung',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            gf =                 'GF-foo',
-            datum =             timezone.now() - timedelta(days=365),
-            geloescht =         True,
+            userid_name = TblUserIDundName.objects.get(userid = 'xv13254'),
+            tf = 'foo-TF-gelöscht',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF-gelöscht',
+            enthalten_in_af = 'rva_01219_beta91_job_abst',
+            af_beschreibung = 'Die dritte geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now() - timedelta(days=365),
+            geloescht = True,
         )
 
         # Der XV-User der dritten Identität erhält ein Recht, das einer Rolle zugeordnet ist, die er aber noch nicht hat
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'xv00023'),
-            tf =                 'eine_TF_in_rva_01219_beta91_job_abst',
-            tf_beschreibung =     'TF-Beschreibung für eine_TF_in_rva_01219_beta91_job_abst',
-            enthalten_in_af =     'rva_01219_beta91_job_abst',
-            af_beschreibung =         'Die viertegeniale AF-Beschreibung',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            gf =                 'rvg_01219_beta91_job_abst',
-            datum =             timezone.now() - timedelta(days=42),
-            geloescht =         False,
+            userid_name = TblUserIDundName.objects.get(userid = 'xv00023'),
+            tf = 'eine_TF_in_rva_01219_beta91_job_abst',
+            tf_beschreibung = 'TF-Beschreibung für eine_TF_in_rva_01219_beta91_job_abst',
+            enthalten_in_af = 'rva_01219_beta91_job_abst',
+            af_beschreibung = 'Die viertegeniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'rvg_01219_beta91_job_abst',
+            datum = timezone.now() - timedelta(days=42),
+            geloescht = False,
         )
 
     """
@@ -2030,6 +2030,282 @@ class UserRolleNurNeueAFTest(TestCase):
         self.assertContains(response, '<option value="Allgemein">Rollen, die nicht Systemen zugeordnet sind</option>')
         self.assertContains(response, '<th><label for="id_bemerkung">Bemerkung:</label></th><td><textarea name="bemerkung" cols="40" rows="10" id="id_bemerkung">')
 
+class UserRolleUnbenutzteAFTest(TestCase):
+    # User / Rolle / AF : Das wird mal die Hauptseite für
+    # Aktualisierungen / Ergänzungen / Löschungen von Rollen und Verbindungen
+    def setUp(self):
+        Anmeldung(self.client.login)
+        SetupDatabase()
+        TblOrga.objects.create (
+            team = 'Django-Team-01',
+            themeneigentuemer = 'Ihmchen_01',
+        )
+
+        TblOrga.objects.create (
+            team = 'Django-Team-02',
+            themeneigentuemer = 'Ihmchen_02',
+        )
+
+        TblAfliste.objects.create (
+            af_name = 'rva_01219_beta91_job_abst',
+            neu_ab = timezone.now(),
+        )
+
+        TblAfliste.objects.create (
+            af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen',
+            neu_ab = timezone.now(),
+        )
+
+        # Drei UserIDen für eine Identität: XV und DV aktiv, AV gelöscht
+        TblUserIDundName.objects.create (
+            userid = 'xv13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
+        )
+        TblUserIDundName.objects.create (
+            userid = 'dv13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
+        )
+        TblUserIDundName.objects.create (
+            userid = 'av13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = True,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
+        )
+
+        # Eine UserID für eine weitere Identität: XV aktiv
+        TblUserIDundName.objects.create (
+            userid = 'xv00042',
+            name = 'User_xv00042',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
+        )
+
+        # Eine UserID für eine weitere Identität: XV aktiv: Für diesen User gibt es noch keine eingetragene Rolle
+        TblUserIDundName.objects.create (
+            userid = 'xv00023',
+            name = 'User_xv00023',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
+        )
+
+        # Zwei Rollen, die auf den ersten XV-User vergeben werden, die zweite wird auch dem 2. User vergeben
+        TblRollen.objects.create (
+            rollenname = 'Erste Neue Rolle',
+            system = 'Testsystem',
+            rollenbeschreibung = 'Das ist eine Testrolle',
+        )
+        TblRollen.objects.create (
+            rollenname = 'Zweite Neue Rolle',
+            system = 'Irgendein System',
+            rollenbeschreibung = 'Das ist auch eine Testrolle',
+        )
+
+        # Drei AF-Zuordnungen zu Rollen
+        TblRollehataf.objects.create (
+            mussfeld = True,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
+            rollenname = TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
+        )
+        TblRollehataf.objects.create (
+            mussfeld = True,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen'),
+            rollenname = TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
+        )
+        TblRollehataf.objects.create (
+            mussfeld = False,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Auch irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
+            rollenname = TblRollen.objects.get(rollenname= 'Zweite Neue Rolle'),
+        )
+
+        # User 12354_ Dem XV-User werden zwei Rollen zugewiesen, dem AV- und DV-User keine
+        TblUserhatrolle.objects.create(
+            userid = TblUserIDundName.objects.get(userid = 'xv13254'),
+            rollenname = TblRollen.objects.first(),
+            schwerpunkt_vertretung = 'Schwerpunkt',
+            bemerkung = 'Das ist eine Testrolle für ZI-AI-BA-LS',
+            letzte_aenderung= timezone.now(),
+        )
+        TblUserhatrolle.objects.create(
+            userid = TblUserIDundName.objects.get(userid = 'xv13254'),
+            rollenname = TblRollen.objects.get(rollenname = 'Zweite Neue Rolle'),
+            schwerpunkt_vertretung = 'Vertretung',
+            bemerkung = 'Das ist auch eine Testrolle für ZI-AI-BA-LS',
+            letzte_aenderung= timezone.now(),
+        )
+        # Dem zweiten User 00042 wird nur eine Rolle zugeordnet
+        TblUserhatrolle.objects.create(
+            userid = TblUserIDundName.objects.get(userid = 'xv00042'),
+            rollenname = TblRollen.objects.first(),
+            schwerpunkt_vertretung = 'Schwerpunkt',
+            bemerkung = 'Das ist eine Testrolle für ZI-AI-BA-LS',
+            letzte_aenderung= timezone.now(),
+        )
+        # Und dem dritten User 00023 keine Rolle
+
+        # Die nächsten beiden Objekte werden für tblGesamt als ForeignKey benötigt
+        TblUebersichtAfGfs.objects.create(
+            name_gf_neu = "rvg_01219_beta91_job_abst",
+            name_af_neu = "rva_01219_beta91_job_abst",
+            zielperson = 'Fester BesterTester'
+        )
+        TblUebersichtAfGfs.objects.create(
+            name_gf_neu = "GF-foo in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
+        )
+        TblUebersichtAfGfs.objects.create(
+            name_gf_neu = "GF-foo-gelöscht in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo-gelöscht in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
+        )
+        TblPlattform.objects.create(
+            tf_technische_plattform = 'Test-Plattform'
+        )
+
+        # Getestet werden soll die Möglichkeit,
+        # für einen bestimmten User festzustellen, ob er über eine definierte AF verfügt
+        # und diese auch auf aktiv gesetzt ist
+        TblGesamt.objects.create(
+            userid_name = TblUserIDundName.objects.get(userid = 'xv13254'),
+            tf = 'foo-TF',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF',
+            enthalten_in_af = 'rva_01219_beta91_job_abst',
+            af_beschreibung = 'Die geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now(),
+            geloescht = False,
+        )
+
+        TblGesamt.objects.create(
+            userid_name = TblUserIDundName.objects.get(userid = 'xv00042'),
+            tf = 'foo-TF',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF',
+            enthalten_in_af = 'rva_01219_beta91_job_abst',
+            af_beschreibung = 'Auch eine geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now(),
+            geloescht = False,
+        )
+
+        # und hier noch ein bereits gelöschtes Recht auf TF-Ebene.
+        # ToDo Noch eine komplette AF mit allen GFs als gelöscht markiert vorbereiten
+        # ToDo Noch eine komplette AF mit GF und TFD in anderer Rolle vorbereiten
+        TblGesamt.objects.create(
+            userid_name = TblUserIDundName.objects.get(userid = 'xv13254'),
+            tf = 'foo-TF-gelöscht',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF-gelöscht',
+            enthalten_in_af = 'rva_01219_beta91_job_abst',
+            af_beschreibung = 'Die dritte geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now() - timedelta(days=365),
+            geloescht = True,
+        )
+
+        # Der XV-User der dritten Identität erhält ein Recht, das einer Rolle zugeordnet ist, die er aber noch nicht hat
+        TblGesamt.objects.create(
+            userid_name = TblUserIDundName.objects.get(userid = 'xv00023'),
+            tf = 'eine_TF_in_rva_01219_beta91_job_abst',
+            tf_beschreibung = 'TF-Beschreibung für eine_TF_in_rva_01219_beta91_job_abst',
+            enthalten_in_af = 'rva_01219_beta91_job_abst',
+            af_beschreibung = 'Die viertegeniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'rvg_01219_beta91_job_abst',
+            datum = timezone.now() - timedelta(days=42),
+            geloescht = False,
+        )
+
+    """
+    def test_vorbereiten_rufe_startseite(self):
+        url = reverse('home')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+    """
+    def test_panel_01_view_status_code(self):
+        """
+        Ist die Seite vorhanden?
+        """
+        url = reverse('user_rolle_af')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+    def test_panel_02_view_with_valid_selection(self):
+        """
+        Eine gültige Auswahl für einen User in einer Gruppe:
+        Das nutzt noch das erste Panel in der Ergebnisanzeige
+        """
+        url = '{0}{1}'.format(reverse('user_rolle_af'), '?name=UseR&gruppe=BA-ls')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "xv13254")
+        self.assertNotContains(response, " die Selektion ungenutzte Arbeitsplatzfunktionen in den angegebenen Rollen")
+
+    def test_panel_03_view_with_valid_role_plus_name_and_group(self):
+        """
+        Die gleiche Anordnung wie in test_panel_03_view_with_valid_role_star_name_and_group,
+        aber nun mit dem mSuchstring "-" für die Rolle.
+        Damit müssten alle AFen, die zu einer zugewiesenen Rollen gehören, ausgeblendet werden.
+        """
+        url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=%2B&name=UseR&gruppe=BA-ls')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Keine angezeigten User", 1)
+        self.assertContains(response, "Rollenname", 1)
+        self.assertContains(response, "Ungenutzte AF", 1)
+        self.assertContains(response, "Erste Neue Rolle", 3)
+        self.assertContains(response, "rva_01219_beta91_job_abst_nicht_zugewiesen", 2)
+        self.assertContains(response, " die Selektion ungenutzte Arbeitsplatzfunktionen in den angegebenen Rollen", 1)
+
+    def test_panel_04_view_with_valid_role_plus_unique_name_and_group(self):
+        """
+        Suche nach den nicht zugewiesenen AFen bei einem vorgegebenen User, der so etwas enthält.
+        """
+        url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=%2B&name=UseR_xv00023&gruppe=BA-ls')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, " die Selektion ungenutzte Arbeitsplatzfunktionen in den angegebenen Rollen")
+        self.assertContains(response, "Keine angezeigten User", 1)
+        self.assertContains(response, "Keine AF-Liste erkannt", 1)
+
+    def test_panel_06_view_with_valid_role_dash(self):
+        url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=%2B')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Erste Neue Rolle", 3)
+        self.assertContains(response,
+                            'href="/adminrapp/tblrollen/Erste Neue Rolle/change">', 1)
+
+
 class UserRolleExportCSVTest(TestCase):
     # User / Rolle / AF : Das wird mal die Hauptseite für
     # Aktualisierungen / Ergänzungen / Löschungen von Rollen und Verbindungen
@@ -2047,105 +2323,105 @@ class UserRolleExportCSVTest(TestCase):
         )
 
         TblAfliste.objects.create (
-            af_name =             'rva_01219_beta91_job_abst',
-            neu_ab =             timezone.now(),
+            af_name = 'rva_01219_beta91_job_abst',
+            neu_ab = timezone.now(),
         )
 
         TblAfliste.objects.create (
-            af_name =             'rva_01219_beta91_job_abst_nicht_zugewiesen',
-            neu_ab =             timezone.now(),
+            af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen',
+            neu_ab = timezone.now(),
         )
 
         # Drei User: XV und DV aktiv, AV gelöscht
         TblUserIDundName.objects.create (
-            userid =             'xv13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-PS',
+            userid = 'xv13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-PS',
         )
         TblUserIDundName.objects.create (
-            userid =             'dv13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-PS',
+            userid = 'dv13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-PS',
         )
         TblUserIDundName.objects.create (
-            userid =             'av13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         True,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-PS',
+            userid = 'av13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = True,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-PS',
         )
 
         # Zwei Rollen, die auf den XV-User vergeben werden
         TblRollen.objects.create (
-            rollenname =         'Erste Neue Rolle',
-            system =            'Testsystem',
+            rollenname = 'Erste Neue Rolle',
+            system = 'Testsystem',
             rollenbeschreibung = 'Das ist eine Testrolle',
         )
         TblRollen.objects.create (
-            rollenname =         'Zweite Neue Rolle',
-            system =            'Irgendein System',
+            rollenname = 'Zweite Neue Rolle',
+            system = 'Irgendein System',
             rollenbeschreibung = 'Das ist auch eine Testrolle',
         )
 
         # Drei AF-Zuordnungen
         TblRollehataf.objects.create (
-            mussfeld =            True,
-            einsatz =            TblRollehataf.EINSATZ_XABCV,
-            bemerkung =         'Irgend eine halbwegs sinnvolle Beschreibung',
-            af =                 TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
-            rollenname =         TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
+            mussfeld = True,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
+            rollenname = TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
         )
         TblRollehataf.objects.create (
-            mussfeld =            True,
-            einsatz =            TblRollehataf.EINSATZ_XABCV,
-            bemerkung =         'Irgend eine halbwegs sinnvolle Beschreibung',
-            af =                 TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen'),
-            rollenname =         TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
+            mussfeld = True,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen'),
+            rollenname = TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
         )
         TblRollehataf.objects.create (
-            mussfeld =            False,
-            einsatz =            TblRollehataf.EINSATZ_XABCV,
-            bemerkung =         'Auch irgend eine halbwegs sinnvolle Beschreibung',
-            af =                 TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
-            rollenname =         TblRollen.objects.get(rollenname= 'Zweite Neue Rolle'),
+            mussfeld = False,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Auch irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
+            rollenname = TblRollen.objects.get(rollenname= 'Zweite Neue Rolle'),
         )
 
         # Dem XV-User werden zwei Rollen zugewiesen, dem AV- und DV-User keine
         TblUserhatrolle.objects.create(
-            userid =             TblUserIDundName.objects.get(userid = 'xv13254'),
-            rollenname =         TblRollen.objects.first(),
+            userid = TblUserIDundName.objects.get(userid = 'xv13254'),
+            rollenname = TblRollen.objects.first(),
             schwerpunkt_vertretung = 'Schwerpunkt',
-            bemerkung =         'Das ist eine Testrolle für ZI-AI-BA-PS',
-            letzte_aenderung=     timezone.now(),
+            bemerkung = 'Das ist eine Testrolle für ZI-AI-BA-PS',
+            letzte_aenderung= timezone.now(),
         )
         TblUserhatrolle.objects.create(
-            userid =             TblUserIDundName.objects.get(userid = 'xv13254'),
-            rollenname =         TblRollen.objects.get(rollenname = 'Zweite Neue Rolle'),
+            userid = TblUserIDundName.objects.get(userid = 'xv13254'),
+            rollenname = TblRollen.objects.get(rollenname = 'Zweite Neue Rolle'),
             schwerpunkt_vertretung = 'Vertretung',
-            bemerkung =         'Das ist auch eine Testrolle für ZI-AI-BA-PS',
-            letzte_aenderung=     timezone.now(),
+            bemerkung = 'Das ist auch eine Testrolle für ZI-AI-BA-PS',
+            letzte_aenderung= timezone.now(),
         )
 
         # Die nächsten beiden Objekte werden für tblGesamt als ForeignKey benötigt
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =         "GF-foo in tblÜbersichtAFGF",
-            name_af_neu =        "AF-foo in tblÜbersichtAFGF",
-            zielperson =         'Fester BesterTester'
+            name_gf_neu = "GF-foo in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =         "GF-foo-gelöscht in tblÜbersichtAFGF",
-            name_af_neu =        "AF-foo-gelöscht in tblÜbersichtAFGF",
-            zielperson =         'Fester BesterTester'
+            name_gf_neu = "GF-foo-gelöscht in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo-gelöscht in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
         )
         TblPlattform.objects.create(
             tf_technische_plattform = 'Test-Plattform'
@@ -2155,32 +2431,32 @@ class UserRolleExportCSVTest(TestCase):
         # für einen bestimmten User festzustellen, ob er über eine definierte AF verfügt
         # und diese auch auf aktiv gesetzt ist
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'xv13254'),
-            tf =                 'foo-TF',
-            tf_beschreibung =     'TF-Beschreibung für foo-TF',
-            enthalten_in_af =     'Sollte die AF rva_01219_beta91_job_abst sein',
-            af_beschreibung =         'Die geniale AF-Beschreibung',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            gf =                 'GF-foo',
-            datum =             timezone.now(),
-            geloescht =         False,
+            userid_name = TblUserIDundName.objects.get(userid = 'xv13254'),
+            tf = 'foo-TF',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF',
+            enthalten_in_af = 'Sollte die AF rva_01219_beta91_job_abst sein',
+            af_beschreibung = 'Die geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now(),
+            geloescht = False,
         )
 
         # und hier noch ein bereits gelöschtes Recht auf TF-Ebene.
         # ToDo Noch eine komplette AF mit allen GFs als gelöscht markiert vorbereiten
         # ToDo Noch eine komplette AF mit GF und TFD in anderer Rolle vorbereiten
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'xv13254'),
-            tf =                 'foo-TF-gelöscht',
-            tf_beschreibung =     'TF-Beschreibung für foo-TF-gelöscht',
-            enthalten_in_af =     'Sollte die AF rva_01219_beta91_job_abst sein',
-            af_beschreibung =         'Auch eine geniale AF-Beschreibung',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            gf =                 'GF-foo',
-            datum =             timezone.now() - timedelta(days=365),
-            geloescht =         True,
+            userid_name = TblUserIDundName.objects.get(userid = 'xv13254'),
+            tf = 'foo-TF-gelöscht',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF-gelöscht',
+            enthalten_in_af = 'Sollte die AF rva_01219_beta91_job_abst sein',
+            af_beschreibung = 'Auch eine geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now() - timedelta(days=365),
+            geloescht = True,
         )
 
     # Eine leere Auswahl
@@ -2236,24 +2512,24 @@ class ImportNewCSVSingleRecordTest(TestCase):
         self.response = self.client.get(url)
 
         Tblrechteneuvonimport.objects.create(
-            identitaet =             'xv13254',
-            nachname =                 'Bestertester',
-            vorname =                 'Fester',
-            tf_name =                 'supergeheime_TF',
-            tf_beschreibung =         'Die Beschreibung der supergeheimen TF',
-            af_anzeigename =         'rva_12345_geheime_AF',
-            af_beschreibung =         'Beschreibung der Geheim-AF',
+            identitaet = 'xv13254',
+            nachname = 'Bestertester',
+            vorname = 'Fester',
+            tf_name = 'supergeheime_TF',
+            tf_beschreibung = 'Die Beschreibung der supergeheimen TF',
+            af_anzeigename = 'rva_12345_geheime_AF',
+            af_beschreibung = 'Beschreibung der Geheim-AF',
             hoechste_kritikalitaet_tf_in_af = 'k',
-            tf_eigentuemer_org =     'ZI-AI-BA',
-            tf_applikation =         'RUVDE',
-            tf_kritikalitaet =         'u',
-            gf_name =                 'rvg_12345_geheime_AF',
-            gf_beschreibung =         'Beschreibung der Geheim-GF',
-            direct_connect =         False,
+            tf_eigentuemer_org = 'ZI-AI-BA',
+            tf_applikation = 'RUVDE',
+            tf_kritikalitaet = 'u',
+            gf_name = 'rvg_12345_geheime_AF',
+            gf_beschreibung = 'Beschreibung der Geheim-GF',
+            direct_connect = False,
             af_zugewiesen_an_account_name = 'av13254',
-            af_gueltig_ab =         timezone.now() - timedelta(days=364),
-            af_gueltig_bis =         timezone.now() + timedelta(days=365),
-            af_zuweisungsdatum =     timezone.now() - timedelta(days=366),
+            af_gueltig_ab = timezone.now() - timedelta(days=364),
+            af_gueltig_bis = timezone.now() + timedelta(days=365),
+            af_zuweisungsdatum = timezone.now() - timedelta(days=366),
         )
     def test_importpage_table_entry(self):
         num = Tblrechteneuvonimport.objects.filter(vorname = 'Fester').count()
@@ -2311,24 +2587,24 @@ class ImportNewIIQSingleRecordTest(TestCase):
 
         # Zunächst: Behandeln eines einzelnen Records
         Tblrechteneuvonimport.objects.create(
-            identitaet =             'Test_xv13254',
-            nachname =                 'Bestertester',
-            vorname =                 'Fester',
-            tf_name =                 'supergeheime_TF',
-            tf_beschreibung =         'Die Beschreibung der supergeheimen TF',
-            af_anzeigename =         'rva_12345_geheime_AF',
-            af_beschreibung =         'Beschreibung der Geheim-AF',
+            identitaet = 'Test_xv13254',
+            nachname = 'Bestertester',
+            vorname = 'Fester',
+            tf_name = 'supergeheime_TF',
+            tf_beschreibung = 'Die Beschreibung der supergeheimen TF',
+            af_anzeigename = 'rva_12345_geheime_AF',
+            af_beschreibung = 'Beschreibung der Geheim-AF',
             hoechste_kritikalitaet_tf_in_af = 'k',
-            tf_eigentuemer_org =     'ZI-AI-BA',
-            tf_applikation =         'RUVDE',
-            tf_kritikalitaet =         'u',
-            gf_name =                 'rvg_12345_geheime_AF',
-            gf_beschreibung =         'Beschreibung der Geheim-GF',
-            direct_connect =         False,
+            tf_eigentuemer_org = 'ZI-AI-BA',
+            tf_applikation = 'RUVDE',
+            tf_kritikalitaet = 'u',
+            gf_name = 'rvg_12345_geheime_AF',
+            gf_beschreibung = 'Beschreibung der Geheim-GF',
+            direct_connect = False,
             af_zugewiesen_an_account_name = 'Test_av13254',
-            af_gueltig_ab =         timezone.now() - timedelta(days=364),
-            af_gueltig_bis =         timezone.now() + timedelta(days=365),
-            af_zuweisungsdatum =     timezone.now() - timedelta(days=366),
+            af_gueltig_ab = timezone.now() - timedelta(days=364),
+            af_gueltig_bis = timezone.now() + timedelta(days=365),
+            af_zuweisungsdatum = timezone.now() - timedelta(days=366),
         )
 
     def test_importpage_view_status_code(self):
@@ -2423,59 +2699,59 @@ class NeuAFGFTest(TestCase):
 
         # Drei User: XV und DV aktiv, AV gelöscht
         TblUserIDundName.objects.create (
-            userid =             'xv13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-PS',
+            userid = 'xv13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-PS',
         )
         TblUserIDundName.objects.create (
-            userid =             'dv13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         False,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-PS',
+            userid = 'dv13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-PS',
         )
         TblUserIDundName.objects.create (
-            userid =             'av13254',
-            name =                 'User_xv13254',
-            orga =                 TblOrga.objects.get(team = 'Django-Team-01'),
-            zi_organisation =    'AI-BA',
-            geloescht =         True,
-            abteilung =         'ZI-AI-BA',
-            gruppe =             'ZI-AI-BA-PS',
+            userid = 'av13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = True,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-PS',
         )
 
         # Die nächsten Objekte werden für tblGesamt als ForeignKey benötigt
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =         "GF-foo in tblÜbersichtAFGF",
-            name_af_neu =        "AF-foo in tblÜbersichtAFGF",
-            zielperson =         'Fester BesterTester',
-            modelliert =         timezone.now()
+            name_gf_neu = "GF-foo in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester',
+            modelliert = timezone.now()
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =         "GF-foo2 in tblÜbersichtAFGF",
-            name_af_neu =        "AF-foo in tblÜbersichtAFGF",
-            zielperson =         'Fester BesterTester'
+            name_gf_neu = "GF-foo2 in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =         "GF-foo2 in tblÜbersichtAFGF",
-            name_af_neu =        "AF-foo2 in tblÜbersichtAFGF",
-            zielperson =         'Fester BesterTester'
+            name_gf_neu = "GF-foo2 in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo2 in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
         )
         TblUebersichtAfGfs.objects.create(
-            name_gf_neu =         "GF-foo-gelöscht in tblÜbersichtAFGF",
-            name_af_neu =        "AF-foo-gelöscht in tblÜbersichtAFGF",
-            zielperson =         'Fester BesterTester'
+            name_gf_neu = "GF-foo-gelöscht in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo-gelöscht in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
         )
         # Eine der AFen ist bekannt - aber das sollte egal sein.
         TblAfliste.objects.create (
-            af_name =             'AF-foo in tblÜbersichtAFGF',
-            neu_ab =             timezone.now(),
+            af_name = 'AF-foo in tblÜbersichtAFGF',
+            neu_ab = timezone.now(),
         )
 
         TblPlattform.objects.create(
@@ -2484,56 +2760,56 @@ class NeuAFGFTest(TestCase):
 
         # Es werden in der Tabelle die vier Rechte vergeben, eines davon gelöscht
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'xv13254'),
-            tf =                 'foo-TF',
-            tf_beschreibung =     'TF-Beschreibung für foo-TF',
-            enthalten_in_af =     'AF-foo in tblÜbersichtAFGF',
-            af_beschreibung =         'Die geniale AF-Beschreibung',
-            gf =                 'GF-foo in tblÜbersichtAFGF',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            datum =             timezone.now(),
-            geloescht =         False,
+            userid_name = TblUserIDundName.objects.get(userid = 'xv13254'),
+            tf = 'foo-TF',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF',
+            enthalten_in_af = 'AF-foo in tblÜbersichtAFGF',
+            af_beschreibung = 'Die geniale AF-Beschreibung',
+            gf = 'GF-foo in tblÜbersichtAFGF',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            datum = timezone.now(),
+            geloescht = False,
         )
 
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'dv13254'),
-            tf =                 'foo-TF2',
-            tf_beschreibung =     'TF-Beschreibung für foo-TF',
-            enthalten_in_af =     'AF-foo in tblÜbersichtAFGF',
-            af_beschreibung =         'Auch eine geniale AF-Beschreibung',
-            gf =                 'GF-foo2 in tblÜbersichtAFGF',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            datum =             timezone.now(),
-            geloescht =         False,
+            userid_name = TblUserIDundName.objects.get(userid = 'dv13254'),
+            tf = 'foo-TF2',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF',
+            enthalten_in_af = 'AF-foo in tblÜbersichtAFGF',
+            af_beschreibung = 'Auch eine geniale AF-Beschreibung',
+            gf = 'GF-foo2 in tblÜbersichtAFGF',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            datum = timezone.now(),
+            geloescht = False,
         )
 
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'av13254'),
-            tf =                 'foo-TF3',
-            tf_beschreibung =     'TF-Beschreibung für foo-TF',
-            gf =                 'GF-foo2 in tblÜbersichtAFGF',
-            enthalten_in_af =     'AF-foo2 in tblÜbersichtAFGF',
-            af_beschreibung =         'Die dritte geniale AF-Beschreibung',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            datum =             timezone.now(),
-            geloescht =         False,
+            userid_name = TblUserIDundName.objects.get(userid = 'av13254'),
+            tf = 'foo-TF3',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF',
+            gf = 'GF-foo2 in tblÜbersichtAFGF',
+            enthalten_in_af = 'AF-foo2 in tblÜbersichtAFGF',
+            af_beschreibung = 'Die dritte geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            datum = timezone.now(),
+            geloescht = False,
         )
 
         # und hier noch ein bereits gelöschtes Recht auf TF-Ebene.
         TblGesamt.objects.create(
-            userid_name =         TblUserIDundName.objects.get(userid = 'xv13254'),
-            tf =                 'foo-TF-gelöscht',
-            tf_beschreibung =     'TF-Beschreibung für foo-TF-gelöscht',
-            enthalten_in_af =     'AF-foo-gelöscht in tblÜbersichtAFGF',
-            af_beschreibung =         'Die 4. geniale AF-Beschreibung',
-            gf =                 'GF-foo-gelöscht in tblÜbersichtAFGF',
-            modell =            TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
-            plattform =         TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
-            datum =             timezone.now() - timedelta(days=365),
-            geloescht =         True,
+            userid_name = TblUserIDundName.objects.get(userid = 'xv13254'),
+            tf = 'foo-TF-gelöscht',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF-gelöscht',
+            enthalten_in_af = 'AF-foo-gelöscht in tblÜbersichtAFGF',
+            af_beschreibung = 'Die 4. geniale AF-Beschreibung',
+            gf = 'GF-foo-gelöscht in tblÜbersichtAFGF',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            datum = timezone.now() - timedelta(days=365),
+            geloescht = True,
         )
 
     # Eine leere Auswahl

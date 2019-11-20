@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect
 
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.utils.encoding import smart_str
+from django.db.models import Count
 import csv
 
 from .filters import RollenFilter, UseridFilter
@@ -140,14 +141,14 @@ def UhR_erzeuge_gefiltere_namensliste(request):
     # Ein paar Testzugriffe über das komplette Modell
     #   Hier ist die korrekte Hierarchie abgebildet von UserID bis AF:
     #   TblUserIDundName enthält Userid
-    #       TblUserHatRolle hat FK 'userid' auf TblUserIDundName
+    #       TblUserHatRolle hat Foreign Key 'userid' auf TblUserIDundName
     #       -> tbluserhatrolle_set.all auf eine aktuelle UserID-row liefert die Menge der relevanten Rollen
     #           Rolle hat ForeignKey 'rollenname' auf TblRolle und erhält damit die nicht-User-spezifischen Rollen-Parameter
     #               TblRolleHatAF hat ebenfalls einen ForeignKey 'rollennname' auf TblRollen
     #               -> rollenname.tblrollehataf_set.all liefert für eine konkrete Rolle die Liste der zugehörigen AF-Detailinformationen
     #
     #        TblGesamt hat FK 'userid_name' auf TblUserIDundName
-    #        -> .tblgesamt_set.filter(geloescht = False) liefert die akiven Arbeitsplatzfunktionen
+    #        -> .tblgesamt_set.filter(geloescht = False) liefert die aktiven Arbeitsplatzfunktionen
     #
 
     user = TblUserIDundName.objects.filter(userid = 'XV13254')[0]
@@ -210,7 +211,7 @@ def UhR_erzeuge_listen_mit_rollen(request):
 
     # Hole erst mal die Menge an Rollen, die namentlich passen
     suchstring = request.GET.get('rollenname', 'nix')
-    if suchstring == "*" or suchstring == "-":  # ToDo: Das ist ätzend, das ist doch factory-relevant!
+    if suchstring == "*" or suchstring == "-":
         rollen_liste = TblUserhatrolle.objects.all().order_by('rollenname').order_by('rollenname')
     else:
         rollen_liste = TblUserhatrolle.objects \
@@ -222,6 +223,40 @@ def UhR_erzeuge_listen_mit_rollen(request):
 
     return (namen_liste, panel_filter, rollen_liste, rollen_filter)
 
+
+def hole_unnoetigte_afen(namen_liste):
+    """
+    Diese Funktion dient dazu, überflüssige AFen in Rollendefinitionen zu erkennen
+    Erzeuge Deltaliste zwischen der Sollvorgabe der Rollenmenge
+    und der Menge der vorhandenen Arbeitsplatzfunktionen.
+
+    :param namen_liste: Liste der Namen, die derzeit selektiert sind.
+    :return: Queryset mit Treffern, beinhaltet Rollennamen und AF
+    """
+
+    # Zunächst wird das Soll der User-Rollen ermittelt
+    soll_rollen = TblUserhatrolle.objects \
+        .filter(userid__name__in=namen_liste.values('name')) \
+        .values('userid__name', 'rollenname')
+
+    # Nun das Ist der AFen je User:
+    ist_afen = TblGesamt.objects \
+        .exclude(geloescht=True) \
+        .exclude(userid_name__geloescht=True) \
+        .filter(userid_name__name__in=namen_liste.values('name')) \
+        .values('enthalten_in_af').annotate(dcount=Count('enthalten_in_af'))
+
+    # Und das Delta: Ziehe alle IST-AFen von den Soll-AFen ab und liefere das Delta zurück
+    delta = TblRollehataf.objects \
+        .filter(rollenname__in=soll_rollen.values('rollenname')) \
+        .exclude(af__af_name__in=ist_afen.values('enthalten_in_af')) \
+        .order_by('rollenname__rollenname', 'af', ) \
+        .values(
+        'rollenname__rollenname',
+        'af__af_name',
+    )
+
+    return delta
 
 def hole_userids_zum_namen(selektierter_name):
     """
@@ -421,7 +456,6 @@ def hole_af_mengen(userids, gesuchte_rolle):
                 af_liste = TblGesamt.objects.filter(userid_name_id__userid=userid) \
                     .filter(geloescht=False) \
                     .exclude(enthalten_in_af__in=unerwuenschte_af)
-                # ToDo: Hier könnte vielleicht auch ein values('enthalten_in_af') helfen, mit distinct()
             else:
                 af_liste = TblGesamt.objects.filter(userid_name_id__userid=userid) \
                     .filter(geloescht=False) \
@@ -604,14 +638,26 @@ class RollenListenUhr(UhR):
         (namen_liste, panel_filter, rollen_liste, rollen_filter) = \
             UhR_erzeuge_listen_mit_rollen(request)
 
+        form = ShowUhRForm(request.GET)
         gesuchte_rolle = request.GET.get('rollenname', None)
         if gesuchte_rolle == "*":  # Das ist die Wildcard-Suche, um den Modus in der Oberfläche auszuwählen
             gesuchte_rolle = None
 
+        # Finde alle AFen in den verwendeten Rollen, die keinem der User zugewieen sind
+        if gesuchte_rolle == "+":
+            af_liste = hole_unnoetigte_afen(namen_liste)
+            context = {
+                'filter': panel_filter, 'form': form,
+                'rollen_liste': rollen_liste, 'rollen_filter': rollen_filter,
+                'namen_liste': namen_liste,
+                'af_liste': af_liste,
+                'version': version,
+            }
+            return render(request, 'rapp/panel_UhR_ueberfluessige_af.html', context)
+
         (userids, af_per_uid, vorhanden, optional) \
             = UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle)
 
-        form = ShowUhRForm(request.GET)
         context = {
             'filter': panel_filter, 'form': form,
             'rollen_liste': rollen_liste, 'rollen_filter': rollen_filter,
