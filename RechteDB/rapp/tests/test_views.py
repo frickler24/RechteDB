@@ -2030,6 +2030,326 @@ class UserRolleNurNeueAFTest(TestCase):
         self.assertContains(response, '<option value="Allgemein">Rollen, die nicht Systemen zugeordnet sind</option>')
         self.assertContains(response, '<th><label for="id_bemerkung">Bemerkung:</label></th><td><textarea name="bemerkung" cols="40" rows="10" id="id_bemerkung">')
 
+class UserRolleUnbenutzteAFTest(TestCase):
+    # User / Rolle / AF : Das wird mal die Hauptseite für
+    # Aktualisierungen / Ergänzungen / Löschungen von Rollen und Verbindungen
+    def setUp(self):
+        Anmeldung(self.client.login)
+        SetupDatabase()
+        TblOrga.objects.create (
+            team = 'Django-Team-01',
+            themeneigentuemer = 'Ihmchen_01',
+        )
+
+        TblOrga.objects.create (
+            team = 'Django-Team-02',
+            themeneigentuemer = 'Ihmchen_02',
+        )
+
+        TblAfliste.objects.create (
+            af_name = 'rva_01219_beta91_job_abst',
+            neu_ab = timezone.now(),
+        )
+
+        TblAfliste.objects.create (
+            af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen',
+            neu_ab = timezone.now(),
+        )
+
+        # Drei UserIDen für eine Identität: XV und DV aktiv, AV gelöscht
+        TblUserIDundName.objects.create (
+            userid = 'xv13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
+        )
+        TblUserIDundName.objects.create (
+            userid = 'dv13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
+        )
+        TblUserIDundName.objects.create (
+            userid = 'av13254',
+            name = 'User_xv13254',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = True,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
+        )
+
+        # Eine UserID für eine weitere Identität: XV aktiv
+        TblUserIDundName.objects.create (
+            userid = 'xv00042',
+            name = 'User_xv00042',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
+        )
+
+        # Eine UserID für eine weitere Identität: XV aktiv: Für diesen User gibt es noch keine eingetragene Rolle
+        TblUserIDundName.objects.create (
+            userid = 'xv00023',
+            name = 'User_xv00023',
+            orga = TblOrga.objects.get(team = 'Django-Team-01'),
+            zi_organisation = 'AI-BA',
+            geloescht = False,
+            abteilung = 'ZI-AI-BA',
+            gruppe = 'ZI-AI-BA-LS',
+        )
+
+        # Zwei Rollen, die auf den ersten XV-User vergeben werden, die zweite wird auch dem 2. User vergeben
+        TblRollen.objects.create (
+            rollenname = 'Erste Neue Rolle',
+            system = 'Testsystem',
+            rollenbeschreibung = 'Das ist eine Testrolle',
+        )
+        TblRollen.objects.create (
+            rollenname = 'Zweite Neue Rolle',
+            system = 'Irgendein System',
+            rollenbeschreibung = 'Das ist auch eine Testrolle',
+        )
+
+        # Drei AF-Zuordnungen zu Rollen
+        TblRollehataf.objects.create (
+            mussfeld = True,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
+            rollenname = TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
+        )
+        TblRollehataf.objects.create (
+            mussfeld = True,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst_nicht_zugewiesen'),
+            rollenname = TblRollen.objects.get(rollenname= 'Erste Neue Rolle'),
+        )
+        TblRollehataf.objects.create (
+            mussfeld = False,
+            einsatz = TblRollehataf.EINSATZ_XABCV,
+            bemerkung = 'Auch irgend eine halbwegs sinnvolle Beschreibung',
+            af = TblAfliste.objects.get(af_name = 'rva_01219_beta91_job_abst'),
+            rollenname = TblRollen.objects.get(rollenname= 'Zweite Neue Rolle'),
+        )
+
+        # User 12354_ Dem XV-User werden zwei Rollen zugewiesen, dem AV- und DV-User keine
+        TblUserhatrolle.objects.create(
+            userid = TblUserIDundName.objects.get(userid = 'xv13254'),
+            rollenname = TblRollen.objects.first(),
+            schwerpunkt_vertretung = 'Schwerpunkt',
+            bemerkung = 'Das ist eine Testrolle für ZI-AI-BA-LS',
+            letzte_aenderung= timezone.now(),
+        )
+        TblUserhatrolle.objects.create(
+            userid = TblUserIDundName.objects.get(userid = 'xv13254'),
+            rollenname = TblRollen.objects.get(rollenname = 'Zweite Neue Rolle'),
+            schwerpunkt_vertretung = 'Vertretung',
+            bemerkung = 'Das ist auch eine Testrolle für ZI-AI-BA-LS',
+            letzte_aenderung= timezone.now(),
+        )
+        # Dem zweiten User 00042 wird nur eine Rolle zugeordnet
+        TblUserhatrolle.objects.create(
+            userid = TblUserIDundName.objects.get(userid = 'xv00042'),
+            rollenname = TblRollen.objects.first(),
+            schwerpunkt_vertretung = 'Schwerpunkt',
+            bemerkung = 'Das ist eine Testrolle für ZI-AI-BA-LS',
+            letzte_aenderung= timezone.now(),
+        )
+        # Und dem dritten User 00023 keine Rolle
+
+        # Die nächsten beiden Objekte werden für tblGesamt als ForeignKey benötigt
+        TblUebersichtAfGfs.objects.create(
+            name_gf_neu = "rvg_01219_beta91_job_abst",
+            name_af_neu = "rva_01219_beta91_job_abst",
+            zielperson = 'Fester BesterTester'
+        )
+        TblUebersichtAfGfs.objects.create(
+            name_gf_neu = "GF-foo in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
+        )
+        TblUebersichtAfGfs.objects.create(
+            name_gf_neu = "GF-foo-gelöscht in tblÜbersichtAFGF",
+            name_af_neu = "AF-foo-gelöscht in tblÜbersichtAFGF",
+            zielperson = 'Fester BesterTester'
+        )
+        TblPlattform.objects.create(
+            tf_technische_plattform = 'Test-Plattform'
+        )
+
+        # Getestet werden soll die Möglichkeit,
+        # für einen bestimmten User festzustellen, ob er über eine definierte AF verfügt
+        # und diese auch auf aktiv gesetzt ist
+        TblGesamt.objects.create(
+            userid_name = TblUserIDundName.objects.get(userid = 'xv13254'),
+            tf = 'foo-TF',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF',
+            enthalten_in_af = 'rva_01219_beta91_job_abst',
+            af_beschreibung = 'Die geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now(),
+            geloescht = False,
+        )
+
+        TblGesamt.objects.create(
+            userid_name = TblUserIDundName.objects.get(userid = 'xv00042'),
+            tf = 'foo-TF',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF',
+            enthalten_in_af = 'rva_01219_beta91_job_abst',
+            af_beschreibung = 'Auch eine geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now(),
+            geloescht = False,
+        )
+
+        # und hier noch ein bereits gelöschtes Recht auf TF-Ebene.
+        # ToDo Noch eine komplette AF mit allen GFs als gelöscht markiert vorbereiten
+        # ToDo Noch eine komplette AF mit GF und TFD in anderer Rolle vorbereiten
+        TblGesamt.objects.create(
+            userid_name = TblUserIDundName.objects.get(userid = 'xv13254'),
+            tf = 'foo-TF-gelöscht',
+            tf_beschreibung = 'TF-Beschreibung für foo-TF-gelöscht',
+            enthalten_in_af = 'rva_01219_beta91_job_abst',
+            af_beschreibung = 'Die dritte geniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'GF-foo',
+            datum = timezone.now() - timedelta(days=365),
+            geloescht = True,
+        )
+
+        # Der XV-User der dritten Identität erhält ein Recht, das einer Rolle zugeordnet ist, die er aber noch nicht hat
+        TblGesamt.objects.create(
+            userid_name = TblUserIDundName.objects.get(userid = 'xv00023'),
+            tf = 'eine_TF_in_rva_01219_beta91_job_abst',
+            tf_beschreibung = 'TF-Beschreibung für eine_TF_in_rva_01219_beta91_job_abst',
+            enthalten_in_af = 'rva_01219_beta91_job_abst',
+            af_beschreibung = 'Die viertegeniale AF-Beschreibung',
+            modell = TblUebersichtAfGfs.objects.get(name_gf_neu = "GF-foo in tblÜbersichtAFGF"),
+            plattform = TblPlattform.objects.get(tf_technische_plattform = 'Test-Plattform'),
+            gf = 'rvg_01219_beta91_job_abst',
+            datum = timezone.now() - timedelta(days=42),
+            geloescht = False,
+        )
+
+    """
+    def test_vorbereiten_rufe_startseite(self):
+        url = reverse('home')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+    """
+    def test_panel_01_view_status_code(self):
+        """
+        Ist die Seite vorhanden?
+        """
+        url = reverse('user_rolle_af')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+    def test_panel_02_view_with_valid_selection(self):
+        """
+        Eine gültige Auswahl für einen User in einer Gruppe:
+        Das nutzt noch das erste Panel in der Ergebnisanzeige
+        """
+        url = '{0}{1}'.format(reverse('user_rolle_af'), '?name=UseR&gruppe=BA-ls')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "xv13254")
+        self.assertNotContains(response, "Betrachtung von Rollenvarianten")
+
+    def test_panel_03_view_with_valid_role_plus_name_and_group(self):
+        """
+        Die gleiche Anordnung wie in test_panel_03_view_with_valid_role_star_name_and_group,
+        aber nun mit dem mSuchstring "-" für die Rolle.
+        Damit müssten alle AFen, die zu einer zugewiesenen Rollen gehören, ausgeblendet werden.
+        """
+        url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=-&name=UseR&gruppe=BA-ls')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "xv13254", 2)
+        self.assertContains(response, "xv00042", 2)
+        self.assertContains(response, "xv00023", 7)
+        self.assertContains(response, "nicht vergeben", 1)
+        self.assertContains(response, "Erste Neue Rolle", 1)
+        self.assertContains(response, "Zweite Neue Rolle", 1)
+        self.assertContains(response, "Keine AF zugewiesen oder durch Filter ausgeblendet", 3)
+
+    def test_panel_04_view_with_valid_role_plus_unique_name_and_group(self):
+        """
+        Suche nach den nicht zugewiesenen AFen bei einem vorgegebenen User, der so etwas enthält.
+        """
+        url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=-&name=UseR_xv00023&gruppe=BA-ls')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "xv13254")
+        self.assertNotContains(response, "xv00042")
+        self.assertContains(response, "xv00023", 13)
+        self.assertContains(response, "nicht vergeben", 1)
+        self.assertContains(response, "Erste Neue Rolle", 1)
+        self.assertContains(response, "Zweite Neue Rolle", 1)
+        self.assertNotContains(response, "Keine AF zugewiesen oder durch Filter ausgeblendet")
+
+    def test_panel_06_view_with_valid_role_dash(self):
+        url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=-')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "xv13254", 2)
+        self.assertContains(response, "Betrachtung von Rollenvarianten", 1)
+        self.assertContains(response, "rva_01219_beta91_job_abst", 4)
+        # Zwei Identitäten haben eine Rolle, für die es mehrere Varianten gibt, eine Identität hat keine Rolle
+        self.assertContains(response,
+                            '<a href="/rapp/user_rolle_af/xv00023/create/Zweite%2520Neue%2520Rolle/Schwerpunkt?&rollenname=-#xv00023.rva_01219_beta91_job_abst">Zweite Neue Rolle</a>', 1)
+        self.assertContains(response,
+                            '<a href="/rapp/user_rolle_af/xv00023/create/Zweite%2520Neue%2520Rolle/Schwerpunkt?&rollenname=-#xv00023.rva_01219_beta91_job_abst">Zweite Neue Rolle</a>', 1)
+        self.assertContains(response, "nicht vergeben", 1)
+        self.assertContains(response, "Erste Neue Rolle", 1)
+        self.assertContains(response, "Zweite Neue Rolle", 1)
+        self.assertContains(response, "Keine AF zugewiesen oder durch Filter ausgeblendet", 3)
+
+        # Es sollten keine Löschlinks vorhanden sein
+        self.assertNotContains(response, '/delete/?&rollenname=')
+
+    def test_panel_07_view_with_valid_role_dash(self):
+        url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=-')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "xv13254")
+        self.assertContains(response, "Betrachtung von Rollenvarianten")
+        self.assertContains(response, "rva_01219_beta91_job_abst", 4)
+        # In dieser Ansicht hat nur ein Identität nicht vergebene Rollen zu AFen
+        self.assertContains(response, '<a href="/rapp/user_rolle_af/xv00023/create/Zweite%2520Neue%2520Rolle/Schwerpunkt?&rollenname=-#xv00023.rva_01219_beta91_job_abst">Zweite Neue Rolle</a>', 1)
+        # Zum Abschluss klicken wir mal auf einen der Zuordnungs-links und erhalten die Sicherheitsabfrage:
+        createurl = '/rapp/user_rolle_af/{}/create/{}%20Neue%20Rolle/Schwerpunkt?&rollenname=-#{}.rva_01219_beta91_job_abst' \
+                           .format('xv00023', 'Zweite', 'xv00023')
+        response = self.client.get(createurl)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Rollen-Eintrag ergänzen für <strong></strong>')
+        self.assertContains(response, '<option value="">---------</option>', 3)
+        self.assertContains(response, '<option value="xv00042">xv00042 | User_xv00042</option>')
+        self.assertContains(response, '<option value="xv13254">xv13254 | User_xv13254</option>')
+        self.assertContains(response, '<option value="dv13254">dv13254 | User_xv13254</option>')
+        # ToDo Achtung, hier werden in der Liste auch gelöschte User angezeigt (uhr_form.html anpassen)!
+        # self.assertNotContains(response, '<option value="av13254">av13254 | User_xv13254</option>')
+        self.assertContains(response, '<option value="Erste Neue Rolle">Erste Neue Rolle</option>')
+        self.assertContains(response, '<option value="Zweite Neue Rolle" selected>Zweite Neue Rolle</option>')
+        self.assertContains(response, '<option value="Schwerpunkt" selected>Schwerpunktaufgabe</option>')
+        self.assertContains(response, '<option value="Vertretung">Vertretungstätigkeiten, Zweitsysteme</option>')
+        self.assertContains(response, '<option value="Allgemein">Rollen, die nicht Systemen zugeordnet sind</option>')
+        self.assertContains(response, '<th><label for="id_bemerkung">Bemerkung:</label></th><td><textarea name="bemerkung" cols="40" rows="10" id="id_bemerkung">')
+
 class UserRolleExportCSVTest(TestCase):
     # User / Rolle / AF : Das wird mal die Hauptseite für
     # Aktualisierungen / Ergänzungen / Löschungen von Rollen und Verbindungen
