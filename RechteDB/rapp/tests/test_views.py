@@ -2268,7 +2268,7 @@ class UserRolleUnbenutzteAFTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "xv13254")
-        self.assertNotContains(response, "Betrachtung von Rollenvarianten")
+        self.assertNotContains(response, " die Selektion ungenutzte Arbeitsplatzfunktionen in den angegebenen Rollen")
 
     def test_panel_03_view_with_valid_role_plus_name_and_group(self):
         """
@@ -2276,79 +2276,35 @@ class UserRolleUnbenutzteAFTest(TestCase):
         aber nun mit dem mSuchstring "-" für die Rolle.
         Damit müssten alle AFen, die zu einer zugewiesenen Rollen gehören, ausgeblendet werden.
         """
-        url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=-&name=UseR&gruppe=BA-ls')
+        url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=%2B&name=UseR&gruppe=BA-ls')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "xv13254", 2)
-        self.assertContains(response, "xv00042", 2)
-        self.assertContains(response, "xv00023", 7)
-        self.assertContains(response, "nicht vergeben", 1)
-        self.assertContains(response, "Erste Neue Rolle", 1)
-        self.assertContains(response, "Zweite Neue Rolle", 1)
-        self.assertContains(response, "Keine AF zugewiesen oder durch Filter ausgeblendet", 3)
+        self.assertContains(response, "Keine angezeigten User", 1)
+        self.assertContains(response, "Rollenname", 1)
+        self.assertContains(response, "Ungenutzte AF", 1)
+        self.assertContains(response, "Erste Neue Rolle", 3)
+        self.assertContains(response, "rva_01219_beta91_job_abst_nicht_zugewiesen", 2)
+        self.assertContains(response, " die Selektion ungenutzte Arbeitsplatzfunktionen in den angegebenen Rollen", 1)
 
     def test_panel_04_view_with_valid_role_plus_unique_name_and_group(self):
         """
         Suche nach den nicht zugewiesenen AFen bei einem vorgegebenen User, der so etwas enthält.
         """
-        url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=-&name=UseR_xv00023&gruppe=BA-ls')
+        url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=%2B&name=UseR_xv00023&gruppe=BA-ls')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "xv13254")
-        self.assertNotContains(response, "xv00042")
-        self.assertContains(response, "xv00023", 13)
-        self.assertContains(response, "nicht vergeben", 1)
-        self.assertContains(response, "Erste Neue Rolle", 1)
-        self.assertContains(response, "Zweite Neue Rolle", 1)
-        self.assertNotContains(response, "Keine AF zugewiesen oder durch Filter ausgeblendet")
+        self.assertNotContains(response, " die Selektion ungenutzte Arbeitsplatzfunktionen in den angegebenen Rollen")
+        self.assertContains(response, "Keine angezeigten User", 1)
+        self.assertContains(response, "Keine AF-Liste erkannt", 1)
 
     def test_panel_06_view_with_valid_role_dash(self):
-        url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=-')
+        url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=%2B')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "xv13254", 2)
-        self.assertContains(response, "Betrachtung von Rollenvarianten", 1)
-        self.assertContains(response, "rva_01219_beta91_job_abst", 4)
-        # Zwei Identitäten haben eine Rolle, für die es mehrere Varianten gibt, eine Identität hat keine Rolle
+        self.assertContains(response, "Erste Neue Rolle", 3)
         self.assertContains(response,
-                            '<a href="/rapp/user_rolle_af/xv00023/create/Zweite%2520Neue%2520Rolle/Schwerpunkt?&rollenname=-#xv00023.rva_01219_beta91_job_abst">Zweite Neue Rolle</a>', 1)
-        self.assertContains(response,
-                            '<a href="/rapp/user_rolle_af/xv00023/create/Zweite%2520Neue%2520Rolle/Schwerpunkt?&rollenname=-#xv00023.rva_01219_beta91_job_abst">Zweite Neue Rolle</a>', 1)
-        self.assertContains(response, "nicht vergeben", 1)
-        self.assertContains(response, "Erste Neue Rolle", 1)
-        self.assertContains(response, "Zweite Neue Rolle", 1)
-        self.assertContains(response, "Keine AF zugewiesen oder durch Filter ausgeblendet", 3)
+                            'href="/adminrapp/tblrollen/Erste Neue Rolle/change">', 1)
 
-        # Es sollten keine Löschlinks vorhanden sein
-        self.assertNotContains(response, '/delete/?&rollenname=')
-
-    def test_panel_07_view_with_valid_role_dash(self):
-        url = '{0}{1}'.format(reverse('user_rolle_af'), '?rollenname=-')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "xv13254")
-        self.assertContains(response, "Betrachtung von Rollenvarianten")
-        self.assertContains(response, "rva_01219_beta91_job_abst", 4)
-        # In dieser Ansicht hat nur ein Identität nicht vergebene Rollen zu AFen
-        self.assertContains(response, '<a href="/rapp/user_rolle_af/xv00023/create/Zweite%2520Neue%2520Rolle/Schwerpunkt?&rollenname=-#xv00023.rva_01219_beta91_job_abst">Zweite Neue Rolle</a>', 1)
-        # Zum Abschluss klicken wir mal auf einen der Zuordnungs-links und erhalten die Sicherheitsabfrage:
-        createurl = '/rapp/user_rolle_af/{}/create/{}%20Neue%20Rolle/Schwerpunkt?&rollenname=-#{}.rva_01219_beta91_job_abst' \
-                           .format('xv00023', 'Zweite', 'xv00023')
-        response = self.client.get(createurl)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Rollen-Eintrag ergänzen für <strong></strong>')
-        self.assertContains(response, '<option value="">---------</option>', 3)
-        self.assertContains(response, '<option value="xv00042">xv00042 | User_xv00042</option>')
-        self.assertContains(response, '<option value="xv13254">xv13254 | User_xv13254</option>')
-        self.assertContains(response, '<option value="dv13254">dv13254 | User_xv13254</option>')
-        # ToDo Achtung, hier werden in der Liste auch gelöschte User angezeigt (uhr_form.html anpassen)!
-        # self.assertNotContains(response, '<option value="av13254">av13254 | User_xv13254</option>')
-        self.assertContains(response, '<option value="Erste Neue Rolle">Erste Neue Rolle</option>')
-        self.assertContains(response, '<option value="Zweite Neue Rolle" selected>Zweite Neue Rolle</option>')
-        self.assertContains(response, '<option value="Schwerpunkt" selected>Schwerpunktaufgabe</option>')
-        self.assertContains(response, '<option value="Vertretung">Vertretungstätigkeiten, Zweitsysteme</option>')
-        self.assertContains(response, '<option value="Allgemein">Rollen, die nicht Systemen zugeordnet sind</option>')
-        self.assertContains(response, '<th><label for="id_bemerkung">Bemerkung:</label></th><td><textarea name="bemerkung" cols="40" rows="10" id="id_bemerkung">')
 
 class UserRolleExportCSVTest(TestCase):
     # User / Rolle / AF : Das wird mal die Hauptseite für

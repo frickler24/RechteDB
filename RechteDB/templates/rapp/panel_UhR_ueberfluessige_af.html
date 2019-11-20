@@ -38,13 +38,13 @@
 				<tbody>
 					{% for af in af_liste %}
 						<tr id="{{ af }}">
-							<td>
+							<td>{% spaceless %}
 								<a target="_blank"
-								   href="{% url 'admin:index' %}rapp/tblrollen/{{ af.rollenname__rollenname|escape }}">
+								   href="{% url 'admin:index' %}rapp/tblrollen/{{ af.rollenname__rollenname|escape }}/change">
 									{% ifchanged af.rollenname__rollenname %}
 										{{ af.rollenname__rollenname }}
 									{% endifchanged %}
-								</a>
+								</a>{% endspaceless %}
 							</td>
 							<td>{{ af.af__af_name }}</td>
 					{% empty %}
