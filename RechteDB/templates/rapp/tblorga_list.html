@@ -39,6 +39,7 @@
                 <thead class="thead-light">
                         <tr>
                             <th>Team</th>
+                            <th>Team-Liste</th>
                             <th>Definiert durch </th>
                         </tr>
                 </thead>
@@ -46,6 +47,7 @@
                     {% for team in tblorga_list %}
                         <tr>
                             <td> <a href="{{ team.get_absolute_update_url }}">{{ team.team }} </a> </td>
+                            <td>{{ team.teamliste }}</td>
                             <td>{{ team.themeneigentuemer }}</td>
                         </tr>
                     {% endfor %}

@@ -178,6 +178,7 @@ class TblOrga(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
     team = models.CharField(db_column='team', max_length=64, blank=False, null=False)
     themeneigentuemer = models.CharField(db_column='themeneigentuemer', max_length=64, blank=False, null=False)
+    teamliste = models.CharField(max_length=400, blank=True, null=True, default=None)
 
     class Meta:
         managed = True
