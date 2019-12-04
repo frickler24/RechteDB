@@ -113,6 +113,10 @@ class UhRUpdate(UpdateView):
         return url
 
 
+
+def einzel_orga():
+    pass
+
 def UhR_erzeuge_gefiltere_namensliste(request):
     """
     Finde alle relevanten Informationen zur aktuellen Selektion: UserIDs und zugehörige Orga
@@ -136,6 +140,25 @@ def UhR_erzeuge_gefiltere_namensliste(request):
     panel_liste = TblUserIDundName.objects.filter(geloescht=False).order_by('name')
     panel_filter = UseridFilter(request.GET, queryset=panel_liste)
     namen_liste = panel_filter.qs.filter(userid__istartswith="xv").select_related("orga")
+
+    teamnr = request.GET.get('orga')
+    if teamnr != None and teamnr != '':
+        teamqs = TblOrga.objects.get(id=teamnr)
+        if teamqs.teamliste != None:
+            teamliste = teamqs.teamliste.split(',')
+            name = request.GET.get('name')
+            gruppe = request.GET.get('gruppe')
+
+            print('Teamliste =', teamliste)
+            namen_liste = panel_liste.filter(orga__team__in=teamliste)
+            if gruppe != None and gruppe != '':
+                print('Filtere nach Gruppe', gruppe)
+                namen_liste = namen_liste.filter(gruppe=gruppe)
+                print(namen_liste)
+            if name != None and name != '':
+                print('Filtere nach Name', name)
+                namen_liste = namen_liste.filter(name=name)
+                print(namen_liste)
 
     """
     # Ein paar Testzugriffe über das komplette Modell

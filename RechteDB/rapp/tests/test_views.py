@@ -1346,7 +1346,8 @@ class UserRolleAFTests(TestCase):
     # nach dem konkreten Eintrag (die Nummer variiert über die Anzahl der ausgeführten Testfälle,
     # deshalb das etwas umständliche Gesuche unten).
     def test_panel_view_with_valid_selection_find_UserHatRolle_id(self):
-        url = '{0}{1}'.format(reverse('user_rolle_af'), '?name=&orga=1&gruppe=&pagesize=100')
+        id = TblOrga.objects.get(team='Django-Team-01').id
+        url = '{0}{1}{2}{3}'.format(reverse('user_rolle_af'), '?name=&orga=', id, '&gruppe=&pagesize=100')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "User_xv13254")  # Die UserID gibt es schon mal
@@ -1360,7 +1361,8 @@ class UserRolleAFTests(TestCase):
         self.assertContains(response, suchstr)  # Die UserIDhatRolle-Zeile wurde in der ReST-Schreibweise gefunden
 
     def test_panel_view_with_valid_selection_find_accordeon_link(self):
-        url = '{0}{1}'.format(reverse('user_rolle_af'), '?name=&orga=1&gruppe=&pagesize=100')
+        id = TblOrga.objects.get(team='Django-Team-01').id
+        url = '{0}{1}{2}{3}'.format(reverse('user_rolle_af'), '?name=&orga=', id, '&gruppe=&pagesize=100')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -1368,9 +1370,9 @@ class UserRolleAFTests(TestCase):
             foo = re.search('/user_rolle_af/(\d+)/', str(k))
             if foo != None:
                 suchstr = re.split('/', str(foo))
-                url = '{0}{1}/{2}'.format(reverse('user_rolle_af'),
+                url = '{0}{1}/{2}{3}{4}'.format(reverse('user_rolle_af'),
                                            suchstr[2],
-                                           '?name=&orga=1&gruppe=&pagesize=100')
+                                           '?name=&orga=', id, '&gruppe=&pagesize=100')
                 # print ()
                 # print ('suche nach folgender URL: {}'.format (url))
                 response = self.client.get(url)
