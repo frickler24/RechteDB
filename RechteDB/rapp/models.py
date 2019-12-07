@@ -176,16 +176,16 @@ class TblUebersichtAfGfs(models.Model):
 # Die Tabelle enthält die Teambeschreibungen. Das eigentliche Team ist das Feld "team"
 class TblOrga(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
-    team = models.CharField(db_column='team', max_length=64, blank=False, null=False)
+    team = models.CharField(db_column='team', max_length=64, blank=False, null=False, db_index=True)
     themeneigentuemer = models.CharField(db_column='themeneigentuemer', max_length=64, blank=False, null=False)
-    teamliste = models.CharField(max_length=400, blank=True, null=True, default=None)
+    teamliste = models.CharField(max_length=400, blank=True, null=True, default=None) # kann Listen von Teams enthalten
+    freies_team = models.CharField(max_length=4000, blank=True, null=True, default=None) # Usernamen + Spezifika
 
     class Meta:
         managed = True
         db_table = 'tblOrga'
         verbose_name = "Orga-Information"
-        verbose_name_plural = "06_Organisations-Übersicht (tblOrga)"
-        unique_together = (('team', 'themeneigentuemer'),)
+        verbose_name_plural = "06_Team-Übersicht (tblOrga)"
         ordering = ['team']
 
     def __str__(self) -> str:
