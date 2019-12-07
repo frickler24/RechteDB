@@ -144,21 +144,18 @@ def UhR_erzeuge_gefiltere_namensliste(request):
     teamnr = request.GET.get('orga')
     if teamnr != None and teamnr != '':
         teamqs = TblOrga.objects.get(id=teamnr)
-        if teamqs.teamliste != None:
-            teamliste = teamqs.teamliste.split(',')
-            name = request.GET.get('name')
-            gruppe = request.GET.get('gruppe')
-
-            print('Teamliste =', teamliste)
-            namen_liste = panel_liste.filter(orga__team__in=teamliste)
-            if gruppe != None and gruppe != '':
-                print('Filtere nach Gruppe', gruppe)
-                namen_liste = namen_liste.filter(gruppe=gruppe)
-                print(namen_liste)
-            if name != None and name != '':
-                print('Filtere nach Name', name)
-                namen_liste = namen_liste.filter(name=name)
-                print(namen_liste)
+        if teamqs.teamliste != None \
+                and teamqs.freies_team != None \
+                and teamqs.teamliste != '' \
+                and teamqs.freies_team != '':
+            print("""Fehler in UhR_erzeuge_gefiltere_namensliste: \
+            Sowohl teamliste als auch freies_team sind gesetzt in Team {}: teammliste = {}, freies_team = {}."""
+                  .format(teamnr, teamqs.teamliste, teamqs.freies_team))
+            return (None, None)
+        if teamqs.teamliste != None and teamqs.teamliste != '':
+            namen_liste = behandle_teamliste(panel_liste, request, teamqs)
+        elif teamqs.freies_team != None and teamqs.freies_team != '':
+            namen_liste = behandle_freies_team(panel_liste, request, teamqs)
 
     """
     # Ein paar Testzugriffe über das komplette Modell
@@ -196,8 +193,71 @@ def UhR_erzeuge_gefiltere_namensliste(request):
     af_liste = TblUserIDundName.objects.get(id=id).enthalten_in_af
     print ('6:', af_liste)
     """
-
     return (namen_liste, panel_filter)
+
+
+def behandle_freies_team(panel_liste, request, teamqs):
+    """
+    Wenn in der tblOrga für die aktuelle Selektion ein Freies_Team eingetragen ist,
+    müssen an dieser Stelle zunächst die angegebenen Namen berücksichtigt werden.
+    Die Anzeigeinhalte werden dann später bearbeitet.
+    :param panel_liste: Das bisherige Panel-QS
+    :param request: Das Übliche
+    :param teamqs: Hieran hängt in dieser Funktion der Inhalt "freies_team"
+    :return: gefilterte Namensliste als QuerySet
+    """
+    eintraege = teamqs.freies_team.split('|')
+    user = []
+    for e in eintraege:
+        user += [e.split(':')[0]]    # erster Teil ist der Name, zweiter Teil die gewünschte Anzeige
+    print('gesuchte User =', user)
+    namen_liste = panel_liste.filter(name__in=user)
+    return behandle_ft_oder_tl(namen_liste, request)
+
+
+def behandle_teamliste(panel_liste, request, teamqs):
+    """
+    Wenn in der tblOrga für die aktuelle Selektion eine Teamliste eingetragen ist,
+    müssen an dieser Stelle die angegebenen Namen berücksichtigt werden.
+    :param panel_liste: Das bisherige Panel-QS
+    :param request: Das Übliche
+    :param teamqs: Hieran hängt in dieser Funktion der Inhalt "teamliste"
+    :return: gefilterte Namensliste als QuerySet
+    """
+    teamliste = teamqs.teamliste.split(',')
+    print('Teamliste =', teamliste)
+    namen_liste = panel_liste.filter(orga__team__in=teamliste)
+    return behandle_ft_oder_tl(namen_liste, request)
+
+
+def behandle_ft_oder_tl(namen_liste, request):
+    """
+    In den rufenden Funktionen wurde bereits eine Namensliste erstellt.
+    Diese muss nun allerdings noch weiter gefiltert werden,
+    falls eine Namensteil oder eine Gruppe als Filterkriterien angegeben wurden.
+    Dabei können nicht die normalen Filterfunktionen verwendet werden, weil ja die Angabe
+    freies_teamm oder teamliste ghenau den anderen Filterkritereien widersprechen könnten.
+    Außerdem werden von dieser Funktion nur XV-Nummern-Einträge zurückgeliefert,
+    das vereinfacht das weitere Vorgehen erheblich.
+
+    :param namen_liste: Die besher gefundenen Namen als QuerySet
+    :param request: Das Übliche
+    :return: Die möglicherweise weiter gefilterte Nanemsliste
+    """
+    name = request.GET.get('name')
+    gruppe = request.GET.get('gruppe')
+    print('gefundene namen_liste vor Filterung =', namen_liste)
+    if gruppe != None and gruppe != '':
+        print('Filtere nach Gruppe', gruppe)
+        namen_liste = namen_liste.filter(gruppe__icontains=gruppe)
+        print(namen_liste)
+    if name != None and name != '':
+        print('Filtere nach Name', name)
+        namen_liste = namen_liste.filter(name__istartswith=name)
+        print(namen_liste)
+    namen_liste = namen_liste.filter(userid__istartswith="xv").select_related("orga")
+    print('Letztendliche Liste der Namen:', namen_liste)
+    return namen_liste
 
 
 def UhR_erzeuge_listen_ohne_rollen(request):
