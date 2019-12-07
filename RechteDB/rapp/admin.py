@@ -145,11 +145,11 @@ class UserIDundNameAdmin(admin.ModelAdmin):
 class Orga(admin.ModelAdmin):
     actions_on_top = True
     actions_on_bottom = True
-    list_display = ('team', 'themeneigentuemer', )
+    list_display = ('team', 'teamliste', 'freies_team', 'themeneigentuemer', )
     list_filter = ('themeneigentuemer', )
     list_display_links = ('team', )
     list_editable = ('themeneigentuemer', )
-    search_fields = ['team',]
+    search_fields = ['team', 'teamliste', 'freies_team', ]
 
     inlines = [UserIDundNameInline]
 

@@ -39,7 +39,8 @@
                 <thead class="thead-light">
                         <tr>
                             <th>Team</th>
-                            <th>Team-Liste</th>
+                            <th>Optional Team-Liste</th>
+                            <th>Optional Freies Team</th>
                             <th>Definiert durch </th>
                         </tr>
                 </thead>
@@ -48,6 +49,7 @@
                         <tr>
                             <td> <a href="{{ team.get_absolute_update_url }}">{{ team.team }} </a> </td>
                             <td>{{ team.teamliste }}</td>
+                            <td>{{ team.freies_team }}</td>
                             <td>{{ team.themeneigentuemer }}</td>
                         </tr>
                     {% endfor %}
