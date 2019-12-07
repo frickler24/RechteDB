@@ -30,7 +30,8 @@ class UserhatrolleInline(admin.TabularInline):
     model = TblUserhatrolle
     extra = 1
 
-    fields = ['userundrollenid', 'userid', 'rollenname', 'schwerpunkt_vertretung', 'bemerkung', ]
+    fields = ['userundrollenid', 'userid', 'rollenname',
+              'schwerpunkt_vertretung', 'bemerkung', 'teamspezifisch', ]
 
     formfield_overrides = {
         models.TextField: {
@@ -235,12 +236,13 @@ class Userhatrolle(admin.ModelAdmin):
         })},
     }
 
-    list_display = ('userundrollenid', 'userid', 'rollenname', 'schwerpunkt_vertretung',
+    list_display = ('userundrollenid', 'userid', 'teamspezifisch', 'rollenname', 'schwerpunkt_vertretung',
                     'get_rollenbeschreibung', 'bemerkung', 'letzte_aenderung', )
     list_filter = ('schwerpunkt_vertretung', )
     list_display_links = ('userundrollenid', 'rollenname', )
     list_editable = ('schwerpunkt_vertretung', 'bemerkung', )
-    search_fields = [ 'schwerpunkt_vertretung', 'rollenname__rollenname', 'bemerkung', 'userid__name', 'userid__userid', ]
+    search_fields = ['schwerpunkt_vertretung', 'rollenname__rollenname',
+                     'bemerkung', 'userid__name', 'userid__userid', ]
 
     list_per_page = 25
     extra = 1

@@ -104,6 +104,7 @@ class TblUserhatrolle(models.Model):
                          choices=SCHWERPUNKT_TYPE
                          )
     bemerkung = models.TextField(db_column='bemerkung', blank=True, null=True)
+    teamspezifisch = models.ForeignKey('TblOrga', models.PROTECT, db_column='id', blank=True, null=True, default=None)
     letzte_aenderung = models.DateTimeField(db_column='letzte_aenderung',
                                             default=timezone.now, blank=True, db_index=True)
 

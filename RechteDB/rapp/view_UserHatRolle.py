@@ -624,15 +624,15 @@ def UhR_verdichte_daten(panel_liste):
     Ausgehend von den Userids der Selektion zeige
       für jeden User (nur die XV-User zeigen auf Rollen, deshalb nehmen wir nur diese)
         alle Rollen mit allen Details
-          einschließlich aller darin befindlicher AFen mit ihren formalen Zuweiseungen (Soll-Bild)
+          einschließlich aller darin befindlicher AFen mit ihren formalen Zuweisungen (Soll-Bild)
             verdichtet auf Mengenbasis
               (keine Doppelnennungen von Rollen,
               aber ggfs. Mehrfachnennungen von AFen,
-              wenn sie in Rollen mehrfach enthalten sind)
+              wenn sie in disjunkten Rollen mehrfach erscheinen)
     """
-    usernamen = set()
     userids = set()
-    rollenMenge = set()
+    usernamen = set()
+    rollenmenge = set()
 
     for row in panel_liste:
         if row.userid[:2].lower() == "xv":
@@ -640,12 +640,12 @@ def UhR_verdichte_daten(panel_liste):
             userids.add(row.userid)
             userHatRollen = TblUserhatrolle.objects.filter(userid__userid=row.userid).order_by('rollenname')
             for e in userHatRollen:
-                rollenMenge.add(e.rollenname)
+                rollenmenge.add(e.rollenname)
 
     def order(a):
         return a.rollenname.lower()  # Liefert das kleingeschriebene Element, nach dem sortiert werden soll
 
-    return (sorted(list(rollenMenge), key=order), userids, usernamen)
+    return (sorted(list(rollenmenge), key=order), userids, usernamen)
 
 
 # Die beiden nachfolgenden Funktionen dienen nur dem Aufruf der eigentlichen Konzept-Funktion
@@ -1077,7 +1077,7 @@ def erzeuge_UhR_konzept(request, ansicht):
     :return: Gerendertes HTML
     """
 
-    def logging(request, rollenMenge, userids, usernamen):
+    def log(request, rollenMenge, userids, usernamen):
         if request.GET.get('display') == '1':
             print('rollenMenge')
             print(rollenMenge)
@@ -1098,7 +1098,7 @@ def erzeuge_UhR_konzept(request, ansicht):
     else:
         (rollenMenge, userids, usernamen) = (set(), set(), set())
 
-    logging(request, rollenMenge, userids, usernamen)
+    log(request, rollenMenge, userids, usernamen)
 
     aftf_dict = liefere_tf_liste(rollenMenge, userids)
     tf_liste = kurze_tf_liste(aftf_dict)
