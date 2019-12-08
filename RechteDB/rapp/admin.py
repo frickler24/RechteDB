@@ -238,9 +238,9 @@ class Userhatrolle(admin.ModelAdmin):
 
     list_display = ('userundrollenid', 'userid', 'teamspezifisch', 'rollenname', 'schwerpunkt_vertretung',
                     'get_rollenbeschreibung', 'bemerkung', 'letzte_aenderung', )
-    list_filter = ('schwerpunkt_vertretung', )
+    list_filter = ('schwerpunkt_vertretung', 'teamspezifisch', 'rollenname', )
     list_display_links = ('userundrollenid', 'rollenname', )
-    list_editable = ('schwerpunkt_vertretung', 'bemerkung', )
+    list_editable = ('schwerpunkt_vertretung', 'bemerkung', 'teamspezifisch', )
     search_fields = ['schwerpunkt_vertretung', 'rollenname__rollenname',
                      'bemerkung', 'userid__name', 'userid__userid', ]
 
