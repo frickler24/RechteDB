@@ -725,11 +725,14 @@ def UhR_verdichte_daten(request, panel_liste):
 
     for row in panel_liste:
         if row.userid[:2].lower() == "xv":
+            print('\n\nBehandle', row.name)
             if kein_freies_team(request) or soll_komplett(request, row):
                 (rollenmenge, usernamen, userids) = verdichte_standardfall(rollenmenge, row, userids, usernamen)
             elif freies_team(request) and not soll_komplett(request, row):
+                print('\nUhR_verdichte_daten: Start rollenmenge =', rollenmenge)
                 (rollenmenge, usernamen, userids) = \
                     verdichte_spezialfall(rollenmenge, row, userids, usernamen, request)
+                print('\nUhR_verdichte_daten: ergebnis rollenmenge =', rollenmenge)
 
     def order(a):
         return a.rollenname.lower()  # Liefert das kleingeschriebene Element, nach dem sortiert werden soll
@@ -782,37 +785,31 @@ def verdichte_spezialfall(rollenmenge, row, userids, usernamen, request):
 
     assert(request.GET.get('orga') != None)
     spezialteam = TblOrga.objects.get(id=request.GET.get('orga'))
-    print('Spezieller Team-Name =', spezialteam)
     erlaubte_rollenqs = TblUserhatrolle.objects\
         .filter(userid__name=row.name)\
         .filter(teamspezifisch=spezialteam)
 
     erlaubte_rollen = set()
     for e in erlaubte_rollenqs:
+        print('erlaubte Rollen hat gefunden:', e.rollenname)
         erlaubte_rollen.add(e.rollenname)
-        # print('erlaubte_rollenqs:', e.rollenname)
-
-    for e in userHatRollen:
         rollenmenge.add(e.rollenname)
-    # print('Vorher: Rollenmenge =', rollenmenge)
-    # restmenge = rollenmenge - erlaubte_rollen
-    schnittmenge = rollenmenge & erlaubte_rollen
-    print('\nSchnittmenge = {}'.format(schnittmenge))
 
-    restrolle = erzeuge_restrolle(row.userid, schnittmenge)
+    print('verdichte_spezialfall: Rollenmenge nach Ergänzung erlaubte Rollen =', rollenmenge)
+
+    restrolle = erzeuge_restrolle(row.userid, erlaubte_rollen)
     print('Restrolle =', restrolle)
 
-    schnittmenge.add(restrolle)
-    print('schnittmenge mit restrolle =', schnittmenge)
-    return (schnittmenge, usernamen, userids)
+    rollenmenge.add(restrolle)
+
+    print('verdichte_spezialfall: Ergebnis Rollenmenge =', rollenmenge)
+    return (rollenmenge, usernamen, userids)
 
 
 def erzeuge_restrolle(userid, rollenmenge):
     tempname = 'Weitere ' + TblUserIDundName.objects\
         .filter(userid=userid).values('abteilung')[0]['abteilung']
-    print('Rolle wird gesucht: ', tempname)
     rolle = alte_oder_neue_restrolle(tempname, userid)
-    print('rolle =', rolle)
 
     erledigt = hole_soll_af_mengen(rollenmenge)
     rest = hole_alle_offenen_AFen_zur_userid(userid, erledigt)
@@ -820,18 +817,9 @@ def erzeuge_restrolle(userid, rollenmenge):
     for r in rest:
         if r['enthalten_in_af'] == 'ka':
             continue
-        print('erzeuge RolleHatAF für ', r)
         af = TblAfliste.objects.filter(af_name=r['enthalten_in_af'])
         if af.count() == 0:
-            print('Achtung: Habe AF {} nicht in der TBL_AFListe gefunden'.format(r['enthalten_in_af']))
-            if TblAfliste.objects.filter(af_name='Noch_nicht_akzeptierte_AF').count() > 0:
-                print('Habe AF "Noch_nicht_akzeptierte_AF" gefunden')
-                foo = TblAfliste.objects.filter(af_name='Noch_nicht_akzeptierte_AF')
-                print(foo)
-                for i in foo:
-                    print(i)
-            else:
-                print('Erzeuge neue AF "Noch_nicht_akzeptierte_AF"')
+            if TblAfliste.objects.filter(af_name='Noch_nicht_akzeptierte_AF').count() == 0:
                 af = TblUebersichtAfGfs.objects.create(
                     name_gf_neu='Noch_nicht_akzeptierte_GF',
                     name_af_neu='Noch_nicht_akzeptierte_AF',
@@ -854,7 +842,6 @@ def erzeuge_restrolle(userid, rollenmenge):
                     except(e):
                         print('Fehler in alte_oder_neue_restrolle, StoredProc erzeuge_af_liste: {}'.format(e))
                     cursor.close()
-            print('Hänge "Noch_nicht_akzeptierte_AF" an die Liste der AFen an die Rolle an')
             merkaf = TblAfliste.objects.get(af_name='Noch_nicht_akzeptierte_AF')
         else:
             merkaf = TblAfliste.objects.get(af_name=r['enthalten_in_af'])
@@ -868,6 +855,7 @@ def erzeuge_restrolle(userid, rollenmenge):
         )
         neu.save()
     return rolle
+
 
 def alte_oder_neue_restrolle(tempname, userid):
     """
@@ -883,12 +871,10 @@ def alte_oder_neue_restrolle(tempname, userid):
 
     if weitereRolle.exists():
         afs_an_rolle = TblRollehataf.objects.filter(rollenname=tempname)
-        print('Delete afs:')
         for a in afs_an_rolle: print(a.af)
         afs_an_rolle.delete()
 
     else:
-        print('Lege neue Rolle mit dem Namen "{}" an'.format(tempname))
         rolle = TblRollen.objects.create(
             rollenname=tempname,
             system='Diverse',
