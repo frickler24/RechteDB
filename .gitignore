@@ -52,4 +52,4 @@ other_files/RechteDB-20190922.sql.gz
 RechteDB/.coverage
 RechteDB/cover
 other_files/rapp_racf_rechte.sql
-other_files/aclgroups_2019-03-07.csv
+other_files/aclgroups*

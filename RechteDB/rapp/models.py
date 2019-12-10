@@ -807,3 +807,17 @@ class Manuelle_Berechtigung(models.Model):
                + ' ' \
                + str(self.name) \
                + ' (erstellt von {} am {})'.format(self.ersteller, timezone.now())
+
+
+class ACLGruppen(models.Model):
+    tf = models.CharField(max_length=150, null=False, db_index=True, )
+    zugriff = models.CharField(max_length=50, null=False, )
+    server = models.CharField(max_length=50, null=False, )
+    pfad = models.CharField(max_length=400, null=False, )
+    letzte_aenderung = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        managed = True
+        verbose_name = "ACL-Gruppen"
+        verbose_name_plural = "95_ACL-Gruppen"
+        ordering = ['tf']

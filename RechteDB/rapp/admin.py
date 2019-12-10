@@ -18,6 +18,7 @@ from rapp.models import TblUebersichtAfGfs, TblUserIDundName, TblOrga, TblPlattf
                         RACF_Rechte, Orga_details, \
                         Modellierung, Direktverbindungen, \
                         Manuelle_Berechtigung
+from rapp.models import ACLGruppen
 
 # Für den Im- und Export
 from import_export.admin import ImportExportModelAdmin
@@ -405,3 +406,10 @@ class Manuelle_BerechtigungAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.TextField: {'widget': MDEditorWidget}
     }
+
+@admin.register(ACLGruppen)
+class ACLGruppen(admin.ModelAdmin):
+    alle = ['tf', 'zugriff', 'server', 'pfad', 'letzte_aenderung', ]
+    search_fields = ['tf', 'zugriff', 'server', 'pfad', ]
+    list_display = alle
+
