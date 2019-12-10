@@ -1550,7 +1550,7 @@ def panel_UhR_matrix_csv(request, flag=False):
         return HttpResponse("Fehlerhafte CSV-Generierung in panel_UhR_matrix_csv")
 
     (namen_liste, _) = UhR_erzeuge_gefiltere_namensliste(request)
-    (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(namen_liste)
+    (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(request, namen_liste)
 
     response = HttpResponse(content_type="text/tsv")
     response['Content-Disposition'] = 'attachment; filename="matrix.csv"'  # ToDo Hänge Datum an Dateinamen an
