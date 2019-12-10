@@ -33,6 +33,8 @@ from .models import TblUebersichtAfGfs
 from .templatetags.gethash import finde
 from django.utils import timezone
 
+from copy import deepcopy
+
 
 ###################################################################
 # Zuordnungen der Rollen zu den Usern (TblUserHatRolle ==> UhR)
@@ -791,13 +793,13 @@ def verdichte_spezialfall(rollenmenge, row, userids, usernamen, request):
 
     erlaubte_rollen = set()
     for e in erlaubte_rollenqs:
-        print('erlaubte Rollen hat gefunden:', e.rollenname)
+        # print('erlaubte Rollen hat gefunden:', e.rollenname)
         erlaubte_rollen.add(e.rollenname)
         rollenmenge.add(e.rollenname)
 
     print('verdichte_spezialfall: Rollenmenge nach Ergänzung erlaubte Rollen =', rollenmenge)
 
-    restrolle = erzeuge_restrolle(row.userid, erlaubte_rollen)
+    restrolle = erzeuge_restrolle(row.userid, erlaubte_rollen, spezialteam)
     print('Restrolle =', restrolle)
 
     rollenmenge.add(restrolle)
@@ -806,20 +808,22 @@ def verdichte_spezialfall(rollenmenge, row, userids, usernamen, request):
     return (rollenmenge, usernamen, userids)
 
 
-def erzeuge_restrolle(userid, rollenmenge):
+def erzeuge_restrolle(userid, rollenmenge, team):
     tempname = 'Weitere ' + TblUserIDundName.objects\
         .filter(userid=userid).values('abteilung')[0]['abteilung']
-    rolle = alte_oder_neue_restrolle(tempname, userid)
+    rolle = alte_oder_neue_restrolle(tempname, userid, team)
 
     erledigt = hole_soll_af_mengen(rollenmenge)
     rest = hole_alle_offenen_AFen_zur_userid(userid, erledigt)
 
-    for r in rest:
-        if r['enthalten_in_af'] == 'ka':
+    for eintrag in rest:
+        if eintrag['enthalten_in_af'] == 'ka':
             continue
-        af = TblAfliste.objects.filter(af_name=r['enthalten_in_af'])
+        af = TblAfliste.objects.filter(af_name=eintrag['enthalten_in_af'])
         if af.count() == 0:
             if TblAfliste.objects.filter(af_name='Noch_nicht_akzeptierte_AF').count() == 0:
+                print('WARN: Bitte in der Anwendung unter "Magie" einmalig "neue AF hinzufügen" ausführen')
+                print('WARN: Auslöser ist', eintrag['enthalten_in_af'])
                 af = TblUebersichtAfGfs.objects.create(
                     name_gf_neu='Noch_nicht_akzeptierte_GF',
                     name_af_neu='Noch_nicht_akzeptierte_AF',
@@ -844,7 +848,7 @@ def erzeuge_restrolle(userid, rollenmenge):
                     cursor.close()
             merkaf = TblAfliste.objects.get(af_name='Noch_nicht_akzeptierte_AF')
         else:
-            merkaf = TblAfliste.objects.get(af_name=r['enthalten_in_af'])
+            merkaf = TblAfliste.objects.get(af_name=eintrag['enthalten_in_af'])
 
         neu = TblRollehataf.objects.create (
             mussfeld=False,
@@ -857,24 +861,50 @@ def erzeuge_restrolle(userid, rollenmenge):
     return rolle
 
 
-def alte_oder_neue_restrolle(tempname, userid):
+def alte_oder_neue_restrolle(tempname, userid, team):
     """
     Zunächst wird für den User gesucht, ob er bereits über eine "Weitere <Abteilungskürzel>"-Rolle verfügt.
     Falls ja, werden alle daran hängenden AF-Einträge in Tbl_RolleHatAF gelöscht
     :param tempname: Der ausgedachte Name der neuen oder alten Rolle
     :param userid:
+    :param team: Die Referenz auf das Spezialteam. Wird benötigt zum Anlegen der UserHatRolle-Beziehung
     :return: Die alte und bereinigte oder die neu angelegte Rolle
     """
+
     weitereRolle = TblUserhatrolle.objects \
         .filter(userid__userid=userid) \
         .filter(rollenname=tempname)
 
     if weitereRolle.exists():
         afs_an_rolle = TblRollehataf.objects.filter(rollenname=tempname)
-        for a in afs_an_rolle: print(a.af)
         afs_an_rolle.delete()
 
+        # Ist die Teamspezfisch-Markierung schon mit der UserHatRolle-Eintrag verknüpft?
+        uhr = TblUserhatrolle.objects.filter(
+            userid=TblUserIDundName.objects.get(userid=userid),
+            rollenname=tempname,
+        )
+        # ToDo: Sonderfall * in der Spezifikationslite in team.freies_team
+        if uhr.count() > 0:
+            # dann ist die Rolle bereits mit dem User verknüpft
+            # Sicherheitshalber wird das Team-Spezifikum eingetragen, falls noch ein anderer Wert drin steht
+            uhr = deepcopy(uhr[0]) # Sonst ist kein Update möglich - warum auch immer...
+            if uhr.teamspezifisch != team:
+                uhr.teamspezifisch = team
+                uhr.save(force_update=True)
+        else:   # Nein, muss noch verknüpft werden
+            uhr = TblUserhatrolle.objects.create(
+                userid=TblUserIDundName.objects.get(userid=userid),
+                rollenname=tempname,
+                schwerpunkt_vertretung='Schwerpunkt',
+                bemerkung='Organisationsspezifische AFen',
+                teamspezifisch=team,
+                letzte_aenderung=timezone.now(),
+            )
+            uhr.save()
     else:
+        # In diesem Fall gibt es die Rolle "Weitere <Abteilung>" noch gar nicht
+        print('Rolle und Verknüpfung müssen komplett neu erstellt werden')
         rolle = TblRollen.objects.create(
             rollenname=tempname,
             system='Diverse',
@@ -885,6 +915,7 @@ def alte_oder_neue_restrolle(tempname, userid):
             rollenname=rolle,
             schwerpunkt_vertretung='Schwerpunkt',
             bemerkung='Organisationsspezifische AFen',
+            teamspezifisch=team,
             letzte_aenderung=timezone.now(),
         )
         rolle.save()
@@ -1390,7 +1421,7 @@ def erzeuge_pdf_header(request, pdf):
 
 
 # Funktionen zum Erstellen des Funktionsmatrix
-def erzeuge_UhR_matrixdaten(panel_liste):
+def erzeuge_UhR_matrixdaten(request, panel_liste):
     """
     Überschriften-Block:
         Erste Spaltenüberschrift ist "Name" als String, darunter werden die Usernamen liegen, daneben:
@@ -1404,11 +1435,14 @@ def erzeuge_UhR_matrixdaten(panel_liste):
 
     Zunächst benötigen wir für alle userIDs (sind nur die XV-Nummern) aus dem Panel alle Rollen
 
+    :param request: für die Fallunterscheidung spezifisches_team
+    :param panel_liste: Die Menge der betrachteten User
+    :return: usernamen, rollenmenge als Liste, rollen_je_username, teams_je_username
     """
     usernamen = set()  # Die Namen aller User,  die in der Selektion erfasst werden
     rollenmenge = set()  # Die Menge aller AFs aller spezifizierten User (aus Auswahl-Panel)
-    rollen_je_username = {}  # Die Rollen, die zum Namen gehören
     teams_je_username = {}  # Derzeit nur ein Team/UserID, aber multi-Teams müssen vorbereitet werden
+    rollen_je_username = {}  # Die Rollen, die zum Namen gehören
 
     for row in panel_liste:
         usernamen.add(row.name)
@@ -1425,8 +1459,18 @@ def erzeuge_UhR_matrixdaten(panel_liste):
         rollen_je_username[row.name] = set()
 
         # Hole die Liste der Rollen für den User, die XV-UserID steht im Panel
-        # ToDo: Hier muss die neue Funktion der Spezial-Teams rein
-        rollen = TblUserhatrolle.objects.filter(userid=row.userid).all()
+        if request.GET.get('orga') != None and request.GET.get('orga') != '':
+            spezialteam = TblOrga.objects.get(id=request.GET.get('orga'))
+            print('\nspezial_team =', spezialteam)
+            if spezialteam.freies_team != None and spezialteam.freies_team != '':
+                print('erzeuge_UhR_matrixdaten für Userid {}, {}'.format(row.userid, row.name))
+                rollen = TblUserhatrolle.objects \
+                    .filter(userid=row.userid) \
+                    .filter(teamspezifisch=spezialteam)
+            else:
+                rollen = TblUserhatrolle.objects.filter(userid=row.userid)
+        else:
+            rollen = TblUserhatrolle.objects.filter(userid=row.userid)
 
         # Merke die Rollen je Usernamen (also global für alle UserIDs der Identität)
         # sowie die Menge aller gefundenen Rollennamen
@@ -1466,7 +1510,7 @@ def panel_UhR_matrix(request):
     (namen_liste, panel_filter) = UhR_erzeuge_gefiltere_namensliste(request)
 
     if request.method == 'GET':
-        (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(namen_liste)
+        (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(request, namen_liste)
     else:
         (usernamen, rollenmenge, rollen_je_username, teams_je_username) = (set(), set(), set(), {})
 
