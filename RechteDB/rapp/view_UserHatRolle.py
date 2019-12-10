@@ -674,6 +674,44 @@ def UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle=None):
     return (userids, af_dict, vorhanden, optional)
 
 
+def freies_team(request):
+    return not kein_freies_team(request)
+def kein_freies_team(request):
+    """
+    Ist in der aktuellen Selektion ein Eintrag in der Teamdefinition "freies_team" gesetzt?
+    :param request:
+    :return: True, wenn "freies_feld" weder None noch '' ist
+    """
+    teamnr = request.GET.get('orga')
+    if teamnr == None or teamnr == '':
+        return True
+
+    teamqs = TblOrga.objects.get(id=teamnr)
+    return teamqs.freies_team == None or teamqs.freies_team == ''
+
+
+def soll_komplett(request, row):
+    """
+    Liefere für einen konkreten User in row, ob für ihn die Komplettdarstellung erfolgen soll
+    oder die eingeschränkte Sicht
+    :param request: Für die Orga-Definition benötigt
+    :param row: Der aktuelle User
+    :return: True falls für den User die KOmmplettdarstellung erfolgen soll
+    """
+    teamnr = request.GET.get('orga')
+    teamqs = TblOrga.objects.get(id=teamnr)
+    assert(teamqs.freies_team != None)
+    eintraege = teamqs.freies_team.split('|')
+    for e in eintraege:
+        zeile = e.split(':')
+        if row.name.lower() == zeile[0].lower():
+            if zeile[1].lower() == 'komplett':
+                return True
+            else:
+                return False
+    return False
+
+
 # Funktionen zum Erstellen des Berechtigungskonzepts
 def UhR_verdichte_daten(request, panel_liste):
     """
@@ -684,43 +722,6 @@ def UhR_verdichte_daten(request, panel_liste):
     - Wenn es sich um ein "freies_team" handelt und der User-Name nicht mit 'komplett' angegeben ist,
         wird die Spezialbehandlung durchgeführt
     """
-    def freies_team(request):
-        return not kein_freies_team(request)
-
-    def kein_freies_team(request):
-        """
-        Ist in der aktuellen Selektion ein Eintrag in der Teamdefinition "freies_team" gesetzt?
-        :param request:
-        :return: True, wenn "freies_feld" weder None noch '' ist
-        """
-        teamnr = request.GET.get('orga')
-        if teamnr == None or teamnr == '':
-            return True
-
-        teamqs = TblOrga.objects.get(id=teamnr)
-        return teamqs.freies_team == None or teamqs.freies_team == ''
-
-    def soll_komplett(request, row):
-        """
-        Liefer für einen konkreten User in row, ob für ihn die Komplettdarstellung erfolgen soll
-        oder die eingeschränkte Sicht
-        :param request: Für die Orga-Definition benötigt
-        :param row: Der aktuelle User
-        :return: True falls für den User die KOmmplettdarstellung erfolgen soll
-        """
-        teamnr = request.GET.get('orga')
-        teamqs = TblOrga.objects.get(id=teamnr)
-        assert(teamqs.freies_team != None)
-        eintraege = teamqs.freies_team.split('|')
-        for e in eintraege:
-            zeile = e.split(':')
-            if row.name.lower() == zeile[0].lower():
-                if zeile[1].lower() == 'komplett':
-                    return True
-                else:
-                    return False
-        return False
-
     userids = set()
     usernamen = set()
     rollenmenge = set()
@@ -730,7 +731,7 @@ def UhR_verdichte_daten(request, panel_liste):
             print('\n\nBehandle', row.name)
             if kein_freies_team(request) or soll_komplett(request, row):
                 (rollenmenge, usernamen, userids) = verdichte_standardfall(rollenmenge, row, userids, usernamen)
-            elif freies_team(request) and not soll_komplett(request, row):
+            else:
                 print('\nUhR_verdichte_daten: Start rollenmenge =', rollenmenge)
                 (rollenmenge, usernamen, userids) = \
                     verdichte_spezialfall(rollenmenge, row, userids, usernamen, request)
@@ -1458,19 +1459,16 @@ def erzeuge_UhR_matrixdaten(request, panel_liste):
         # Erzeuge zunächst die Hashes für die UserIDs. Daran werden nachher die Listen der Rechte gehängt.
         rollen_je_username[row.name] = set()
 
-        # Hole die Liste der Rollen für den User, die XV-UserID steht im Panel
-        if request.GET.get('orga') != None and request.GET.get('orga') != '':
+        # Fallunterscheidung nach "freies_team" und "spezielles_team"
+        if kein_freies_team(request) or soll_komplett(request, row):    # Standardfall
+            rollen = TblUserhatrolle.objects.filter(userid=row.userid)
+        else:
             spezialteam = TblOrga.objects.get(id=request.GET.get('orga'))
             print('\nspezial_team =', spezialteam)
-            if spezialteam.freies_team != None and spezialteam.freies_team != '':
-                print('erzeuge_UhR_matrixdaten für Userid {}, {}'.format(row.userid, row.name))
-                rollen = TblUserhatrolle.objects \
-                    .filter(userid=row.userid) \
-                    .filter(teamspezifisch=spezialteam)
-            else:
-                rollen = TblUserhatrolle.objects.filter(userid=row.userid)
-        else:
-            rollen = TblUserhatrolle.objects.filter(userid=row.userid)
+            print('erzeuge_UhR_matrixdaten für Userid {}, {}'.format(row.userid, row.name))
+            rollen = TblUserhatrolle.objects \
+                .filter(userid=row.userid) \
+                .filter(teamspezifisch=spezialteam)
 
         # Merke die Rollen je Usernamen (also global für alle UserIDs der Identität)
         # sowie die Menge aller gefundenen Rollennamen
