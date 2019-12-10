@@ -1470,10 +1470,8 @@ def panel_UhR_matrix(request):
     else:
         (usernamen, rollenmenge, rollen_je_username, teams_je_username) = (set(), set(), set(), {})
 
-    (paginator, pages, pagesize) = pagination(request, namen_liste)
     logging(request, rollen_je_username, rollenmenge, usernamen)
     context = {
-        'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
         'filter': panel_filter,
         'usernamen': usernamen,
         'rollenmenge': rollenmenge,
@@ -1486,9 +1484,9 @@ def panel_UhR_matrix(request):
 
 def string_aus_liste(liste):
     """
-    Erzeugt einen String, der alle Listenelemmente der Parameters Kommma-getrennt enthält
+    Erzeugt einen String, der alle Listenelemente der Parameters Kommma-getrennt enthält
     :param liste: Eine Liste mit Strings, bspw. ['abc', 'def']
-    :return: String mmit den Inhalten, getrennt durch ', ': "abc, def"
+    :return: String mit den Inhalten, getrennt durch ', ': "abc, def"
     """
     res = ""
     for s in liste:
