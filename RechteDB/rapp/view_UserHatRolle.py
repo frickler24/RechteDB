@@ -854,7 +854,7 @@ def erzeuge_restrolle(userid, rollenmenge, team):
         neu = TblRollehataf.objects.create (
             mussfeld=False,
             einsatz=TblRollehataf.EINSATZ_NONE,
-            bemerkung='Generierte Verbindung',
+            bemerkung='Rechtebündel; Details siehe Konzept der Abteilung',
             af=merkaf,
             rollenname=rolle,
         )
