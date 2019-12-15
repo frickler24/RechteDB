@@ -229,7 +229,7 @@ def behandle_teamliste(panel_liste, request, teamqs):
     :return: gefilterte Namensliste als QuerySet
     """
     teamliste = teamqs.teamliste.split(',')
-    print('Teamliste =', teamliste)
+    # print('Teamliste =', teamliste)
     namen_liste = panel_liste.filter(orga__team__in=teamliste)
     return behandle_ft_oder_tl(namen_liste, request)
 
@@ -250,17 +250,17 @@ def behandle_ft_oder_tl(namen_liste, request):
     """
     name = request.GET.get('name')
     gruppe = request.GET.get('gruppe')
-    print('gefundene namen_liste vor Filterung =', namen_liste)
+    # print('gefundene namen_liste vor Filterung =', namen_liste)
     if gruppe != None and gruppe != '':
-        print('Filtere nach Gruppe', gruppe)
+        # print('Filtere nach Gruppe', gruppe)
         namen_liste = namen_liste.filter(gruppe__icontains=gruppe)
-        print(namen_liste)
+        # print(namen_liste)
     if name != None and name != '':
-        print('Filtere nach Name', name)
+        # print('Filtere nach Name', name)
         namen_liste = namen_liste.filter(name__istartswith=name)
-        print(namen_liste)
+        # print(namen_liste)
     namen_liste = namen_liste.filter(userid__istartswith="xv").select_related("orga")
-    print('Letztendliche Liste der Namen:', namen_liste)
+    # print('Letztendliche Liste der Namen:', namen_liste)
     return namen_liste
 
 
@@ -728,7 +728,7 @@ def UhR_verdichte_daten(request, panel_liste):
 
     for row in panel_liste:
         if row.userid[:2].lower() == "xv":
-            print('\n\nBehandle', row.name)
+            # print('\n\nBehandle', row.name)
             if kein_freies_team(request) or soll_komplett(request, row):
                 (rollenmenge, usernamen, userids) = verdichte_standardfall(rollenmenge, row, userids, usernamen)
             else:
