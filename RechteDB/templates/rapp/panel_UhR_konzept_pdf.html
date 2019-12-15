@@ -28,7 +28,7 @@
         </h1>
 
         {% if rollenMenge %}
-			<h2>Liste der Rollen und ihrer Arbeitsplatzfunktionen (AF)</h2>
+			<h2>1. Liste der Rollen und ihrer Arbeitsplatzfunktionen (AF)</h2>
             {% for rolle in rollenMenge %}
                 <div>
 					<hr />
@@ -132,7 +132,7 @@
 		{% if aftf_dict %}
 			<p style="font-size: 10px; margin: 10px;"> </p>
 			<div><hr /><hr /><p style="font-size: 10px; margin: 0px;">&nbsp;</p></div>
-			<h2>Liste der Arbeitsplatzfunktionen und ihrer Technischen Funktionen (TF)</h2>
+			<h2>2. Liste der Arbeitsplatzfunktionen und ihrer Technischen Funktionen (TF)</h2>
 			<div id="AFTF_liste">
 			   {% for af, tf_dict in aftf_dict.items %}
 					<hr />
@@ -168,7 +168,7 @@
 		{% if racf_liste %}
 			<p style="font-size: 10px; margin: 10px;"> </p>
 			<div><hr /><hr /><p style="font-size: 10px; margin: 0px;">&nbsp;</p></div>
-			<h2>2. Auflistung der RACF-Profile</h2>
+			<h2>3. Auflistung der RACF-Profile</h2>
 
 			<div id="AFTF_liste">
 				{% for g in racf_liste|dictsort:"group" %}
@@ -201,7 +201,7 @@
 			<p style="font-size: 10px; margin: 10px;"> </p>
 			<div><hr /><hr /><p style="font-size: 10px; margin: 0px;">&nbsp;</p></div>
 			<p style="font-size: 10px; margin: 100px;">&nbsp;</p>
-			<h2>3. Auflistung der Db2-Grantees und zugehörender Tabellen</h2>
+			<h2>4. Auflistung der Db2-Grantees und zugehörender Tabellen</h2>
 
 			<div id="Db2_liste">
 				{% for grant in db2_liste %}
@@ -229,6 +229,39 @@
 				{% endfor db2_liste %}
 		{% else %}
 			<div>Keine Db2 - Informationen</div>
+		{% endif %}
+
+		{% if winacl_liste %}
+			<p style="font-size: 10px; margin: 10px;"> </p>
+			<div><hr /><hr /><p style="font-size: 10px; margin: 0px;">&nbsp;</p></div>
+			<h2>5. Auflistung der zugehörenden Windows Laufwerksrechte</h2>
+
+			<div id="AFTF_liste">
+				{% for ac in winacl_liste %}
+					{% ifchanged ac.group %}<hr />{% endifchanged %}
+					<p id="WINACL_{{ac.tf}}" style="font-size: 6px; line-height: 1; margin: -1rem;">
+						<strong>Name (AD-TF): '{{ ac.tf }}'</strong>,
+						&nbsp; &nbsp;
+						Zugriff: {{ ac.zugriff }},
+						&nbsp; &nbsp;
+						Server: {{ ac.server }},
+						&nbsp; &nbsp;
+						<strong>Pfad: {{ ac.pfad }}</strong>
+					</p>
+				{% endfor winacl_liste %}
+				<hr />
+				{% if winnoe %}
+					<h3>5.1 Folgende TFen müssen in den jeweiligen Systemen nachgeschlagen werden</h3>
+					<p style="font-size: 8px; line-height: 1; margin: 0rem;">
+						{% for e in winnoe %}
+							{{ e }}
+							{% if not forloop.last %},&nbsp;{% endif %}
+						{% endfor %}
+					</p>
+				{% endif %}
+			</div>
+		{% else %}
+			<div>Keine WINACL - Informationen</div>
 		{% endif %}
 
 		<div id="footerContent">

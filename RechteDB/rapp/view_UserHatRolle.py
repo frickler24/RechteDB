@@ -13,6 +13,7 @@ from django.db.models import Count
 from django.db import connection
 
 import csv
+import re
 
 from .filters import RollenFilter, UseridFilter
 from .xhtml2 import render_to_pdf
@@ -29,6 +30,7 @@ from .models import TblAfliste
 from .models import RACF_Rechte
 from .models import TblDb2
 from .models import TblUebersichtAfGfs
+from .models import ACLGruppen
 
 from .templatetags.gethash import finde
 from django.utils import timezone
@@ -1192,7 +1194,50 @@ def liefere_db2_liste(tf_menge):
 
 
 def liefere_win_lw_Liste(tf_menge):
-    return None
+    """
+    Liefert zu einer TF-Menge die Menge der dazugehörenden ACL-Einträge.
+    Die ACL-Tabelle enthält nur den eigentlichen Namen im Active Directory.
+    Die TF beschreibt jedoch den LDAP-Namen.
+    Deshalb muss der eigentliche AD-Name aus den TFs extrahiert werden,
+    bevor die DB-Abfrage erfolgen kann
+
+    Da die ersten Zeichen in der AD-Notation nicht unbedingt mmit den TFen übereinstimmen,
+    können wir erstnach mit dem ersten '_' beginnend vergleichen.
+    Da es kein in-like gibt, muss die Suche zunächst manuell geschehen.
+
+    Gleichzeitig wird die Liste der ACLs erstellt, für die keine Informationen gefunden wurden
+
+    :param tf_menge: Die Menge der TFen, zu denen die Db2-Grantee geliefert werden sollen.
+                     Es handelt sich um ein Queryset mit mehreren Elementen je Index,
+                     deshalb das Umsortieren am Anfang.
+    :return: Die RACF-Profile als Hash (racf[TF] = RACF-Info
+    """
+
+    suchmenge = set()
+    winacl = ACLGruppen.objects .order_by('tf', 'server', 'pfad') .values()
+    rest = set()
+
+    for t in tf_menge:
+        if 'CN=' in t['tf']:
+            ad = re.search("^CN=\w+?(_[\w-]+?),", t['tf'])
+            if ad == None:
+                s = 'ACHTUNG: regexp konnte nicht mehr gefunden werden in Eintrag ' + t['tf']
+                rest.add(s)
+                print(s)
+                continue
+            for acl in winacl:
+                if ad[1] in acl['tf']:
+                    suchmenge.add(acl['tf'])
+                    break;
+            rest.add(t['tf'])
+
+    retval = ACLGruppen.objects \
+        .filter(tf__in=suchmenge) \
+        .order_by('tf', 'server', 'pfad') \
+        .distinct() \
+        .values()
+
+    return (retval, rest)
 
 
 def kurze_tf_liste(aftf_dict):
@@ -1384,11 +1429,12 @@ def erzeuge_UhR_konzept(request, ansicht):
     if request.GET.get('episch', 0) == '1':
         racf_liste = liefere_racf_zu_tfs(tf_liste)
         db2_liste = liefere_db2_liste(tf_liste)
-        win_lw_Liste = liefere_win_lw_Liste(tf_liste)
+        (winacl_Liste, winnoe) = liefere_win_lw_Liste(tf_liste)
     else:     # Die Riesenlisten werden nur auf Anforderung aus dem UI erzeugt
         racf_liste = None
         db2_liste = None
-        win_lw_Liste = None
+        winacl_Liste = None
+        winnoe = None
 
     context = {
         'filter': panel_filter,
@@ -1397,7 +1443,8 @@ def erzeuge_UhR_konzept(request, ansicht):
         'af_kritikalitaet': af_kritikalitaet,
         'racf_liste': racf_liste,
         'db2_liste': db2_liste,
-        'win_lw_Liste': win_lw_Liste,
+        'winacl_liste': winacl_Liste,
+        'winnoe': winnoe,
         'version': version,
         'ueberschrift': erzeuge_ueberschrift(request),
     }
