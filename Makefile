@@ -138,12 +138,11 @@ rapptest:
         -e TZ='Europe/Berlin' \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB:/RechteDB \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB:/RechteDB/code \
-		rapp:latest sh -c "echo yes | /RechteDB/code/manage.py test"
+		rapp:latest sh -c "/RechteDB/code/manage.py test --no-input"
 
 rappprod:
 	docker run -d \
 		--name rapp \
-		-p 8089:8089 \
 		--network mariaNetz \
 		--network-alias rapp \
 		--restart unless-stopped \
@@ -178,4 +177,18 @@ halb:
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/other_files/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cnf \
 		haproxy haproxy -f /usr/local/etc/haproxy/haproxy.cnf -d -V
 
+vieleweg:
+	@echo $(shell bash -c 'for i in {1..10}; do docker rm -f rapp$$i; done')
+
+rappviele: vieleweg
+	@echo $(shell bash -c 'for i in {1..10}; do \
+        docker run -d \
+            --name rapp$$i \
+            --network mariaNetz \
+            --network-alias rapp$$i \
+            --restart unless-stopped \
+            -e TZ='Europe/Berlin' \
+            -v /home/lutz/Projekte/RechteDB2MySQL/RechteDB:/RechteDB \
+            -v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB:/RechteDB/code \
+            rapp:latest; done')
 

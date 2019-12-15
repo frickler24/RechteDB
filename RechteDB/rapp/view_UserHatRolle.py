@@ -1219,7 +1219,12 @@ def liefere_win_lw_Liste(tf_menge):
 
     for t in tf_menge:
         if 'CN=' in t['tf']:
-            ad = re.search("^CN=\w+?(_\w+?),", t['tf'])
+            ad = re.search("^CN=\w+?(_[\w-]+?),", t['tf'])
+            if ad == None:
+                s = 'ACHTUNG: regexp konnte nicht mehr gefunden werden in Eintrag ' + t['tf']
+                rest.append(s)
+                print(s)
+                continue
             for acl in winacl:
                 if ad[1] in acl['tf']:
                     suchmenge.add(acl['tf'])
@@ -1445,9 +1450,7 @@ def erzeuge_UhR_konzept(request, ansicht):
     if (ansicht):
         return render(request, 'rapp/panel_UhR_konzept.html', context)
 
-    print('Und jetzt das PDF machen')
     pdf = render_to_pdf('rapp/panel_UhR_konzept_pdf.html', context)
-    print('pdf lieferte', pdf)
     if pdf:
         return erzeuge_pdf_header(request, pdf)
     return HttpResponse("Fehlerhafte PDF-Generierung in erzeuge_UhR_konzept")
