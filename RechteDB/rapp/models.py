@@ -104,6 +104,7 @@ class TblUserhatrolle(models.Model):
                          choices=SCHWERPUNKT_TYPE
                          )
     bemerkung = models.TextField(db_column='bemerkung', blank=True, null=True)
+    teamspezifisch = models.ForeignKey('TblOrga', models.PROTECT, db_column='id', blank=True, null=True, default=None)
     letzte_aenderung = models.DateTimeField(db_column='letzte_aenderung',
                                             default=timezone.now, blank=True, db_index=True)
 
@@ -176,15 +177,16 @@ class TblUebersichtAfGfs(models.Model):
 # Die Tabelle enthält die Teambeschreibungen. Das eigentliche Team ist das Feld "team"
 class TblOrga(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
-    team = models.CharField(db_column='team', max_length=64, blank=False, null=False)
+    team = models.CharField(db_column='team', max_length=64, blank=False, null=False, db_index=True)
     themeneigentuemer = models.CharField(db_column='themeneigentuemer', max_length=64, blank=False, null=False)
+    teamliste = models.TextField(max_length=400, blank=True, null=True, default=None) # Listen von Teams
+    freies_team = models.TextField(max_length=4000, blank=True, null=True, default=None) # Usernamen + Spezifika
 
     class Meta:
         managed = True
         db_table = 'tblOrga'
         verbose_name = "Orga-Information"
-        verbose_name_plural = "06_Organisations-Übersicht (tblOrga)"
-        unique_together = (('team', 'themeneigentuemer'),)
+        verbose_name_plural = "06_Team-Übersicht (tblOrga)"
         ordering = ['team']
 
     def __str__(self) -> str:
@@ -805,3 +807,17 @@ class Manuelle_Berechtigung(models.Model):
                + ' ' \
                + str(self.name) \
                + ' (erstellt von {} am {})'.format(self.ersteller, timezone.now())
+
+
+class ACLGruppen(models.Model):
+    tf = models.CharField(max_length=150, null=False, db_index=True, )
+    zugriff = models.CharField(max_length=50, null=False, )
+    server = models.CharField(max_length=50, null=False, )
+    pfad = models.CharField(max_length=400, null=False, )
+    letzte_aenderung = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        managed = True
+        verbose_name = "ACL-Gruppen"
+        verbose_name_plural = "95_ACL-Gruppen"
+        ordering = ['tf']

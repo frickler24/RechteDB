@@ -52,3 +52,5 @@ other_files/RechteDB-20190922.sql.gz
 RechteDB/.coverage
 RechteDB/cover
 other_files/rapp_racf_rechte.sql
+other_files/aclgroups*
+Ladedaten/

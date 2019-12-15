@@ -15,7 +15,7 @@ def strhash(h, key):
 	key = str(key).lower()
 	if key in h:
 		return h[key]
-	return 'nicht gefunden: {}'.format(key)
+	return 'Ungenutzt'
 
 # Liefert einen Wert eines 2-teiligen Hashes für die Templates
 @register.filter

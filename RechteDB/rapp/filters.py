@@ -89,6 +89,7 @@ class UseridFilter(django_filters.FilterSet):
             'abteilung',
             'gruppe',
             'orga',
+            'orga__teamliste',
         ]
 
 class RollenFilter(django_filters.FilterSet):

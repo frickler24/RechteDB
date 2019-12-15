@@ -1,0 +1,25 @@
+#!/bin/bash
+
+/opt/schemacrawler/schemacrawler.sh --shell  <<EOF
+    connect --server=mysql --host=maria --port=3306 --database=RechteDB --user=root --password=geheim
+    show --no-info
+    limit --tables=RechteDB\..astel.*
+    load --info-level=standard
+    execute --command=schema --output-file=share/RApp_bastel.html
+    execute --command=schema --output-file=share/RApp_bastel.png
+    sweep
+    connect --server=mysql --host=maria --port=3306 --database=RechteDB --user=root --password=geheim
+    show --no-info
+    limit --tables=RechteDB\.dircon.*
+    load --info-level=standard
+    execute --command=schema --output-file=share/RApp_dircon.html
+    execute --command=schema --output-file=share/RApp_dircon.png
+    sweep
+    connect --server=mysql --host=maria --port=3306 --database=RechteDB --user=root --password=geheim
+    show --no-info
+    limit --tables=RechteDB\.tbl.*|RechteDB\.rapp.*
+    load --info-level=standard
+    execute --command=schema --output-file=share/RApp_core.html
+    execute --command=schema --output-file=share/RApp_core.png
+EOF
+echo done.

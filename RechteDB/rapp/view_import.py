@@ -190,6 +190,7 @@ def import_csv(request):
                 af_gueltig_bis = patch_datum (line['AF Gültig bis']),
                 af_zuweisungsdatum = patch_datum (line['AF Zuweisungsdatum']),
             )
+            # ToDo: ein try/Catch-Block um das Schreiben oder vorher Validierungsfunktion rufen
             neuerRecord.save()
             import_datum.aktuell += 1
             if import_datum.aktuell % 42 == 0:

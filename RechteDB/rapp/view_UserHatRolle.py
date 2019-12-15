@@ -9,6 +9,9 @@ from django.shortcuts import render, redirect
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.utils.encoding import smart_str
 from django.db.models import Count
+
+from django.db import connection
+
 import csv
 
 from .filters import RollenFilter, UseridFilter
@@ -18,14 +21,19 @@ from .views import version, pagination
 from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportForm_schritt3
 from .models import TblUserIDundName
 from .models import TblGesamt
+from .models import TblRollen
 from .models import TblRollehataf
 from .models import TblUserhatrolle
 from .models import TblOrga
+from .models import TblAfliste
 from .models import RACF_Rechte
 from .models import TblDb2
+from .models import TblUebersichtAfGfs
 
 from .templatetags.gethash import finde
 from django.utils import timezone
+
+from copy import deepcopy
 
 
 ###################################################################
@@ -137,6 +145,22 @@ def UhR_erzeuge_gefiltere_namensliste(request):
     panel_filter = UseridFilter(request.GET, queryset=panel_liste)
     namen_liste = panel_filter.qs.filter(userid__istartswith="xv").select_related("orga")
 
+    teamnr = request.GET.get('orga')
+    if teamnr != None and teamnr != '':
+        teamqs = TblOrga.objects.get(id=teamnr)
+        if teamqs.teamliste != None \
+                and teamqs.freies_team != None \
+                and teamqs.teamliste != '' \
+                and teamqs.freies_team != '':
+            print("""Fehler in UhR_erzeuge_gefiltere_namensliste: \
+            Sowohl teamliste als auch freies_team sind gesetzt in Team {}: teammliste = {}, freies_team = {}."""
+                  .format(teamnr, teamqs.teamliste, teamqs.freies_team))
+            return (namen_liste, panel_filter)
+        if teamqs.teamliste != None and teamqs.teamliste != '':
+            namen_liste = behandle_teamliste(panel_liste, request, teamqs)
+        elif teamqs.freies_team != None and teamqs.freies_team != '':
+            namen_liste = behandle_freies_team(panel_liste, request, teamqs)
+
     """
     # Ein paar Testzugriffe über das komplette Modell
     #   Hier ist die korrekte Hierarchie abgebildet von UserID bis AF:
@@ -173,8 +197,71 @@ def UhR_erzeuge_gefiltere_namensliste(request):
     af_liste = TblUserIDundName.objects.get(id=id).enthalten_in_af
     print ('6:', af_liste)
     """
-
     return (namen_liste, panel_filter)
+
+
+def behandle_freies_team(panel_liste, request, teamqs):
+    """
+    Wenn in der tblOrga für die aktuelle Selektion ein Freies_Team eingetragen ist,
+    müssen an dieser Stelle zunächst die angegebenen Namen berücksichtigt werden.
+    Die Anzeigeinhalte werden dann später bearbeitet.
+    :param panel_liste: Das bisherige Panel-QS
+    :param request: Das Übliche
+    :param teamqs: Hieran hängt in dieser Funktion der Inhalt "freies_team"
+    :return: gefilterte Namensliste als QuerySet
+    """
+    eintraege = teamqs.freies_team.split('|')
+    user = []
+    for e in eintraege:
+        user += [e.split(':')[0]]    # erster Teil ist der Name, zweiter Teil die gewünschte Anzeige
+    print('gesuchte User =', user)
+    namen_liste = panel_liste.filter(name__in=user)
+    return behandle_ft_oder_tl(namen_liste, request)
+
+
+def behandle_teamliste(panel_liste, request, teamqs):
+    """
+    Wenn in der tblOrga für die aktuelle Selektion eine Teamliste eingetragen ist,
+    müssen an dieser Stelle die angegebenen Namen berücksichtigt werden.
+    :param panel_liste: Das bisherige Panel-QS
+    :param request: Das Übliche
+    :param teamqs: Hieran hängt in dieser Funktion der Inhalt "teamliste"
+    :return: gefilterte Namensliste als QuerySet
+    """
+    teamliste = teamqs.teamliste.split(',')
+    # print('Teamliste =', teamliste)
+    namen_liste = panel_liste.filter(orga__team__in=teamliste)
+    return behandle_ft_oder_tl(namen_liste, request)
+
+
+def behandle_ft_oder_tl(namen_liste, request):
+    """
+    In den rufenden Funktionen wurde bereits eine Namensliste erstellt.
+    Diese muss nun allerdings noch weiter gefiltert werden,
+    falls eine Namensteil oder eine Gruppe als Filterkriterien angegeben wurden.
+    Dabei können nicht die normalen Filterfunktionen verwendet werden, weil ja die Angabe
+    freies_teamm oder teamliste ghenau den anderen Filterkritereien widersprechen könnten.
+    Außerdem werden von dieser Funktion nur XV-Nummern-Einträge zurückgeliefert,
+    das vereinfacht das weitere Vorgehen erheblich.
+
+    :param namen_liste: Die besher gefundenen Namen als QuerySet
+    :param request: Das Übliche
+    :return: Die möglicherweise weiter gefilterte Nanemsliste
+    """
+    name = request.GET.get('name')
+    gruppe = request.GET.get('gruppe')
+    # print('gefundene namen_liste vor Filterung =', namen_liste)
+    if gruppe != None and gruppe != '':
+        # print('Filtere nach Gruppe', gruppe)
+        namen_liste = namen_liste.filter(gruppe__icontains=gruppe)
+        # print(namen_liste)
+    if name != None and name != '':
+        # print('Filtere nach Name', name)
+        namen_liste = namen_liste.filter(name__istartswith=name)
+        # print(namen_liste)
+    namen_liste = namen_liste.filter(userid__istartswith="xv").select_related("orga")
+    # print('Letztendliche Liste der Namen:', namen_liste)
+    return namen_liste
 
 
 def UhR_erzeuge_listen_ohne_rollen(request):
@@ -257,6 +344,7 @@ def hole_unnoetigte_afen(namen_liste):
     )
 
     return delta
+
 
 def hole_userids_zum_namen(selektierter_name):
     """
@@ -466,10 +554,48 @@ def hole_af_mengen(userids, gesuchte_rolle):
     return af_dict
 
 
+def hole_alle_offenen_AFen_zur_userid(userid, erledigt):
+    """
+    Liefert eine Menge aller AFen, die für eine UserID in der Gesamttabelle aufgeführt sind
+    und die nicht in der erledigt-Liste auftauchen
+    :param userid:
+    :return: QuerySet mit den gesuchten AFen
+    """
+    print('erledigt Anzahl = {}\n Inhalt ='.format(erledigt.count(), list(erledigt)))
+    print('ungefilterte Gesamtliste = ',
+          list(TblGesamt.objects
+            .exclude(geloescht=True)
+            .exclude(userid_name_id__geloescht=True)
+            .filter(userid_name_id__userid=userid)
+            .values('enthalten_in_af')
+            .distinct()
+            .order_by('enthalten_in_af')
+          ))
+    print('Länge der Gesamtliste = ',
+          TblGesamt.objects
+            .exclude(geloescht=True)
+            .exclude(userid_name_id__geloescht=True)
+            .filter(userid_name_id__userid=userid)
+            .values('enthalten_in_af')
+            .distinct()
+            .count()
+          )
+    af_qs = TblGesamt.objects\
+        .exclude(geloescht=True)\
+        .exclude(userid_name_id__geloescht=True)\
+        .exclude(enthalten_in_af__in=erledigt)\
+        .filter(userid_name_id__userid=userid)\
+        .values('enthalten_in_af') \
+        .distinct() \
+        .order_by('enthalten_in_af')
+    print('AF_QS Anzahl = {}, Inhalt = {}'.format(af_qs.count(), list(af_qs)))
+    return af_qs
+
+
 def liefere_af_zu_rolle(gesuchte_rolle):
     """
-    Hole die Einträge in TblRolleHatAF, die zu einer engegebenen Rolle passen.
-    Wurde None oder "-" übergeben als Rollenname, liefere die Liste für alle Rollen
+    Hole die Einträge in TblRolleHatAF, die zu einer angegebenen Rolle passen.
+    Wurde None oder "-" als Rollenname übergeben, liefere die Liste für alle Rollen.
     :param gesuchte_rolle: EIN Rollenname oder None oder "-"
     :return: Trefferergebnis der Abfrage
     """
@@ -485,6 +611,19 @@ def liefere_af_zu_rolle(gesuchte_rolle):
             .distinct() \
             .order_by('af__af_name')
     return such_af
+
+
+def hole_soll_af_mengen(rollenmenge):
+    """
+    Hole für jede der übergebenen Rollen die SOLL-AFen.
+    :param rollenmenge:
+    :return: QUerySet mit den SOLL-AFen
+    """
+    retval = TblRollehataf.objects.none()
+
+    for rolle in rollenmenge:
+        retval |= liefere_af_zu_rolle(rolle)
+    return retval
 
 
 def suche_nach_none_wert(bekannte_rollen):
@@ -535,34 +674,255 @@ def UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle=None):
     return (userids, af_dict, vorhanden, optional)
 
 
+def freies_team(request):
+    return not kein_freies_team(request)
+def kein_freies_team(request):
+    """
+    Ist in der aktuellen Selektion ein Eintrag in der Teamdefinition "freies_team" gesetzt?
+    :param request:
+    :return: True, wenn "freies_feld" weder None noch '' ist
+    """
+    teamnr = request.GET.get('orga')
+    if teamnr == None or teamnr == '':
+        return True
+
+    teamqs = TblOrga.objects.get(id=teamnr)
+    return teamqs.freies_team == None or teamqs.freies_team == ''
+
+
+def soll_komplett(request, row):
+    """
+    Liefere für einen konkreten User in row, ob für ihn die Komplettdarstellung erfolgen soll
+    oder die eingeschränkte Sicht
+    :param request: Für die Orga-Definition benötigt
+    :param row: Der aktuelle User
+    :return: True falls für den User die KOmmplettdarstellung erfolgen soll
+    """
+    teamnr = request.GET.get('orga')
+    teamqs = TblOrga.objects.get(id=teamnr)
+    assert(teamqs.freies_team != None)
+    eintraege = teamqs.freies_team.split('|')
+    for e in eintraege:
+        zeile = e.split(':')
+        if row.name.lower() == zeile[0].lower():
+            if zeile[1].lower() == 'komplett':
+                return True
+            else:
+                return False
+    return False
+
+
 # Funktionen zum Erstellen des Berechtigungskonzepts
-def UhR_verdichte_daten(panel_liste):
+def UhR_verdichte_daten(request, panel_liste):
     """
-    Ausgehend von den Userids der Selektion zeige
-      für jeden User (nur die XV-User zeigen auf Rollen, deshalb nehmen wir nur diese)
-        alle Rollen mit allen Details
-          einschließlich aller darin befindlicher AFen mit ihren formalen Zuweiseungen (Soll-Bild)
-            verdichtet auf Mengenbasis
-              (keine Doppelnennungen von Rollen,
-              aber ggfs. Mehrfachnennungen von AFen,
-              wenn sie in Rollen mehrfach enthalten sind)
+    Es gibt zunächst Fallunterscheidungen zu den Einträgen in der panel_liste:
+    - Wenn kein Team gewählt wurde oder das gewählte Team kein "freies_team" ist
+      oder es ein freies_team ist und der User-Name mit 'komplett' angegeben ist
+        nimm die Standardbeaarbeitung
+    - Wenn es sich um ein "freies_team" handelt und der User-Name nicht mit 'komplett' angegeben ist,
+        wird die Spezialbehandlung durchgeführt
     """
-    usernamen = set()
     userids = set()
-    rollenMenge = set()
+    usernamen = set()
+    rollenmenge = set()
 
     for row in panel_liste:
         if row.userid[:2].lower() == "xv":
-            usernamen.add(row.name)  # Ist Menge, also keine Doppeleinträge möglich
-            userids.add(row.userid)
-            userHatRollen = TblUserhatrolle.objects.filter(userid__userid=row.userid).order_by('rollenname')
-            for e in userHatRollen:
-                rollenMenge.add(e.rollenname)
+            # print('\n\nBehandle', row.name)
+            if kein_freies_team(request) or soll_komplett(request, row):
+                (rollenmenge, usernamen, userids) = verdichte_standardfall(rollenmenge, row, userids, usernamen)
+            else:
+                print('\nUhR_verdichte_daten: Start rollenmenge =', rollenmenge)
+                (rollenmenge, usernamen, userids) = \
+                    verdichte_spezialfall(rollenmenge, row, userids, usernamen, request)
+                print('\nUhR_verdichte_daten: ergebnis rollenmenge =', rollenmenge)
 
     def order(a):
         return a.rollenname.lower()  # Liefert das kleingeschriebene Element, nach dem sortiert werden soll
+    return (sorted(list(rollenmenge), key=order), userids, usernamen)
 
-    return (sorted(list(rollenMenge), key=order), userids, usernamen)
+
+def verdichte_standardfall(rollenmenge, row, userids, usernamen):
+    """
+     Ausgehend von den Userids der Selektion zeige
+      für den angebenen XV-User (nur die XV-User zeigen auf Rollen, deshalb nehmen wir nur diese)
+        alle Rollen mit allen Details
+          einschließlich aller darin befindlicher AFen mit ihren formalen Zuweisungen (Soll-Bild)
+            verdichtet auf Mengenbasis
+              (keine Doppelnennungen von Rollen,
+              aber ggfs. Mehrfachnennungen von AFen,
+              wenn sie in disjunkten Rollen mehrfach erscheinen)
+
+    :param rollenmenge: Die bislang zusammengestellten Rollen
+    :param row: Der aktuelle User
+    :param userids: Die bislang behandelten UserIDs
+    :param usernamen:
+    :return: alle erweiterten Mengen: rollenmenge, usernamen, userids
+    """
+    usernamen.add(row.name)  # Ist Menge, also keine Doppeleinträge möglich
+    userids.add(row.userid)
+    userHatRollen = TblUserhatrolle.objects.filter(userid__userid=row.userid).order_by('rollenname')
+    for e in userHatRollen:
+        rollenmenge.add(e.rollenname)
+    return (rollenmenge, usernamen, userids)
+
+
+def verdichte_spezialfall(rollenmenge, row, userids, usernamen, request):
+    """
+    - Wenn es sich um ein "freies_team" handelt und der User-Name nicht mit 'komplett' angegeben ist
+            - wird zunächst die in der übergebenen Rolle angegebene Liste bearbeitet:
+            - wenn eine Rolle namens "Weitere <Gruppenbezeichnung des Users>" existiert,
+                werden alle AFen daraus entfernt, sonst wird die Rolle erzeugt und dem User zugewiesen
+            - Alle AFen des Users, die nicht bereits über rollenmenge adressiert sind, werden der neuen Rolle hinzugefügt
+            - Die neu konfigurierte Rolle wird der Rollenmenge hinzugefügt
+
+    :param rollenmenge: Die bislang zusammengestellten Rollen
+    :param row: Der aktuelle User
+    :param userids: Die bislang behandelten UserIDs
+    :param usernamen:
+    :return: alle erweiterten Mengen: rollenmenge, usernamen, userids
+    """
+    usernamen.add(row.name)  # Ist Menge, also keine Doppeleinträge möglich
+    userids.add(row.userid)
+    userHatRollen = TblUserhatrolle.objects.filter(userid__userid=row.userid).order_by('rollenname')
+
+    assert(request.GET.get('orga') != None)
+    spezialteam = TblOrga.objects.get(id=request.GET.get('orga'))
+    erlaubte_rollenqs = TblUserhatrolle.objects\
+        .filter(userid__name=row.name)\
+        .filter(teamspezifisch=spezialteam)
+
+    erlaubte_rollen = set()
+    for e in erlaubte_rollenqs:
+        # print('erlaubte Rollen hat gefunden:', e.rollenname)
+        erlaubte_rollen.add(e.rollenname)
+        rollenmenge.add(e.rollenname)
+
+    print('verdichte_spezialfall: Rollenmenge nach Ergänzung erlaubte Rollen =', rollenmenge)
+
+    restrolle = erzeuge_restrolle(row.userid, erlaubte_rollen, spezialteam)
+    print('Restrolle =', restrolle)
+
+    rollenmenge.add(restrolle)
+
+    print('verdichte_spezialfall: Ergebnis Rollenmenge =', rollenmenge)
+    return (rollenmenge, usernamen, userids)
+
+
+def erzeuge_restrolle(userid, rollenmenge, team):
+    tempname = 'Weitere ' + TblUserIDundName.objects\
+        .filter(userid=userid).values('abteilung')[0]['abteilung']
+    rolle = alte_oder_neue_restrolle(tempname, userid, team)
+
+    erledigt = hole_soll_af_mengen(rollenmenge)
+    rest = hole_alle_offenen_AFen_zur_userid(userid, erledigt)
+
+    for eintrag in rest:
+        if eintrag['enthalten_in_af'] == 'ka':
+            continue
+        af = TblAfliste.objects.filter(af_name=eintrag['enthalten_in_af'])
+        if af.count() == 0:
+            if TblAfliste.objects.filter(af_name='Noch_nicht_akzeptierte_AF').count() == 0:
+                print('WARN: Bitte in der Anwendung unter "Magie" einmalig "neue AF hinzufügen" ausführen')
+                print('WARN: Auslöser ist', eintrag['enthalten_in_af'])
+                af = TblUebersichtAfGfs.objects.create(
+                    name_gf_neu='Noch_nicht_akzeptierte_GF',
+                    name_af_neu='Noch_nicht_akzeptierte_AF',
+                    kommentar='Bitte in der Anwendung unter "Magie" einmalig "neue AF hinzufügen" ausführen',
+                    zielperson='Alle',
+                    af_text='Bitte in der Anwendung unter "Magie" einmalig "neue AF hinzufügen" ausführen',
+                    gf_text='',
+                    af_langtext='',
+                    af_ausschlussgruppen='',
+                    af_einschlussgruppen='',
+                    af_sonstige_vergabehinweise='',
+                    geloescht=False,
+                    kannweg=False,
+                    modelliert=timezone.now(),
+                )
+                af.save()
+                with connection.cursor() as cursor:
+                    try:
+                        cursor.callproc("erzeuge_af_liste")
+                    except(e):
+                        print('Fehler in alte_oder_neue_restrolle, StoredProc erzeuge_af_liste: {}'.format(e))
+                    cursor.close()
+            merkaf = TblAfliste.objects.get(af_name='Noch_nicht_akzeptierte_AF')
+        else:
+            merkaf = TblAfliste.objects.get(af_name=eintrag['enthalten_in_af'])
+
+        neu = TblRollehataf.objects.create (
+            mussfeld=False,
+            einsatz=TblRollehataf.EINSATZ_NONE,
+            bemerkung='Rechtebündel; Details siehe Konzept der Abteilung',
+            af=merkaf,
+            rollenname=rolle,
+        )
+        neu.save()
+    return rolle
+
+
+def alte_oder_neue_restrolle(tempname, userid, team):
+    """
+    Zunächst wird für den User gesucht, ob er bereits über eine "Weitere <Abteilungskürzel>"-Rolle verfügt.
+    Falls ja, werden alle daran hängenden AF-Einträge in Tbl_RolleHatAF gelöscht
+    :param tempname: Der ausgedachte Name der neuen oder alten Rolle
+    :param userid:
+    :param team: Die Referenz auf das Spezialteam. Wird benötigt zum Anlegen der UserHatRolle-Beziehung
+    :return: Die alte und bereinigte oder die neu angelegte Rolle
+    """
+
+    weitereRolle = TblUserhatrolle.objects \
+        .filter(userid__userid=userid) \
+        .filter(rollenname=tempname)
+
+    if weitereRolle.exists():
+        afs_an_rolle = TblRollehataf.objects.filter(rollenname=tempname)
+        afs_an_rolle.delete()
+
+        # Ist die Teamspezfisch-Markierung schon mit der UserHatRolle-Eintrag verknüpft?
+        uhr = TblUserhatrolle.objects.filter(
+            userid=TblUserIDundName.objects.get(userid=userid),
+            rollenname=tempname,
+        )
+        # ToDo: Sonderfall * in der Spezifikationslite in team.freies_team
+        if uhr.count() > 0:
+            # dann ist die Rolle bereits mit dem User verknüpft
+            # Sicherheitshalber wird das Team-Spezifikum eingetragen, falls noch ein anderer Wert drin steht
+            uhr = deepcopy(uhr[0]) # Sonst ist kein Update möglich - warum auch immer...
+            if uhr.teamspezifisch != team:
+                uhr.teamspezifisch = team
+                uhr.save(force_update=True)
+        else:   # Nein, muss noch verknüpft werden
+            uhr = TblUserhatrolle.objects.create(
+                userid=TblUserIDundName.objects.get(userid=userid),
+                rollenname=tempname,
+                schwerpunkt_vertretung='Schwerpunkt',
+                bemerkung='Organisationsspezifische AFen',
+                teamspezifisch=team,
+                letzte_aenderung=timezone.now(),
+            )
+            uhr.save()
+    else:
+        # In diesem Fall gibt es die Rolle "Weitere <Abteilung>" noch gar nicht
+        print('Rolle und Verknüpfung müssen komplett neu erstellt werden')
+        rolle = TblRollen.objects.create(
+            rollenname=tempname,
+            system='Diverse',
+            rollenbeschreibung='Organisationsspezifische AFen',
+        )
+        uhr = TblUserhatrolle.objects.create(
+            userid=TblUserIDundName.objects.get(userid=userid),
+            rollenname=rolle,
+            schwerpunkt_vertretung='Schwerpunkt',
+            bemerkung='Organisationsspezifische AFen',
+            teamspezifisch=team,
+            letzte_aenderung=timezone.now(),
+        )
+        rolle.save()
+        uhr.save()
+
+    return TblRollen.objects.get(rollenname=tempname)
 
 
 # Die beiden nachfolgenden Funktionen dienen nur dem Aufruf der eigentlichen Konzept-Funktion
@@ -994,7 +1354,7 @@ def erzeuge_UhR_konzept(request, ansicht):
     :return: Gerendertes HTML
     """
 
-    def logging(request, rollenMenge, userids, usernamen):
+    def log(request, rollenMenge, userids, usernamen):
         if request.GET.get('display') == '1':
             print('rollenMenge')
             print(rollenMenge)
@@ -1011,11 +1371,11 @@ def erzeuge_UhR_konzept(request, ansicht):
     (namen_liste, panel_filter) = UhR_erzeuge_gefiltere_namensliste(request)
 
     if request.method == 'GET':
-        (rollenMenge, userids, usernamen) = UhR_verdichte_daten(namen_liste)
+        (rollenMenge, userids, usernamen) = UhR_verdichte_daten(request, namen_liste)
     else:
         (rollenMenge, userids, usernamen) = (set(), set(), set())
 
-    logging(request, rollenMenge, userids, usernamen)
+    log(request, rollenMenge, userids, usernamen)
 
     aftf_dict = liefere_tf_liste(rollenMenge, userids)
     tf_liste = kurze_tf_liste(aftf_dict)
@@ -1062,7 +1422,7 @@ def erzeuge_pdf_header(request, pdf):
 
 
 # Funktionen zum Erstellen des Funktionsmatrix
-def erzeuge_UhR_matrixdaten(panel_liste):
+def erzeuge_UhR_matrixdaten(request, panel_liste):
     """
     Überschriften-Block:
         Erste Spaltenüberschrift ist "Name" als String, darunter werden die Usernamen liegen, daneben:
@@ -1076,11 +1436,14 @@ def erzeuge_UhR_matrixdaten(panel_liste):
 
     Zunächst benötigen wir für alle userIDs (sind nur die XV-Nummern) aus dem Panel alle Rollen
 
+    :param request: für die Fallunterscheidung spezifisches_team
+    :param panel_liste: Die Menge der betrachteten User
+    :return: usernamen, rollenmenge als Liste, rollen_je_username, teams_je_username
     """
     usernamen = set()  # Die Namen aller User,  die in der Selektion erfasst werden
     rollenmenge = set()  # Die Menge aller AFs aller spezifizierten User (aus Auswahl-Panel)
-    rollen_je_username = {}  # Die Rollen, die zum Namen gehören
     teams_je_username = {}  # Derzeit nur ein Team/UserID, aber multi-Teams müssen vorbereitet werden
+    rollen_je_username = {}  # Die Rollen, die zum Namen gehören
 
     for row in panel_liste:
         usernamen.add(row.name)
@@ -1096,8 +1459,16 @@ def erzeuge_UhR_matrixdaten(panel_liste):
         # Erzeuge zunächst die Hashes für die UserIDs. Daran werden nachher die Listen der Rechte gehängt.
         rollen_je_username[row.name] = set()
 
-        # Hole die Liste der Rollen für den User, die XV-UserID steht im Panel
-        rollen = TblUserhatrolle.objects.filter(userid=row.userid).all()
+        # Fallunterscheidung nach "freies_team" und "spezielles_team"
+        if kein_freies_team(request) or soll_komplett(request, row):    # Standardfall
+            rollen = TblUserhatrolle.objects.filter(userid=row.userid)
+        else:
+            spezialteam = TblOrga.objects.get(id=request.GET.get('orga'))
+            print('\nspezial_team =', spezialteam)
+            print('erzeuge_UhR_matrixdaten für Userid {}, {}'.format(row.userid, row.name))
+            rollen = TblUserhatrolle.objects \
+                .filter(userid=row.userid) \
+                .filter(teamspezifisch=spezialteam)
 
         # Merke die Rollen je Usernamen (also global für alle UserIDs der Identität)
         # sowie die Menge aller gefundenen Rollennamen
@@ -1137,14 +1508,12 @@ def panel_UhR_matrix(request):
     (namen_liste, panel_filter) = UhR_erzeuge_gefiltere_namensliste(request)
 
     if request.method == 'GET':
-        (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(namen_liste)
+        (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(request, namen_liste)
     else:
         (usernamen, rollenmenge, rollen_je_username, teams_je_username) = (set(), set(), set(), {})
 
-    (paginator, pages, pagesize) = pagination(request, namen_liste)
     logging(request, rollen_je_username, rollenmenge, usernamen)
     context = {
-        'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
         'filter': panel_filter,
         'usernamen': usernamen,
         'rollenmenge': rollenmenge,
@@ -1157,9 +1526,9 @@ def panel_UhR_matrix(request):
 
 def string_aus_liste(liste):
     """
-    Erzeugt einen String, der alle Listenelemmente der Parameters Kommma-getrennt enthält
+    Erzeugt einen String, der alle Listenelemente der Parameters Kommma-getrennt enthält
     :param liste: Eine Liste mit Strings, bspw. ['abc', 'def']
-    :return: String mmit den Inhalten, getrennt durch ', ': "abc, def"
+    :return: String mit den Inhalten, getrennt durch ', ': "abc, def"
     """
     res = ""
     for s in liste:
@@ -1181,7 +1550,7 @@ def panel_UhR_matrix_csv(request, flag=False):
         return HttpResponse("Fehlerhafte CSV-Generierung in panel_UhR_matrix_csv")
 
     (namen_liste, _) = UhR_erzeuge_gefiltere_namensliste(request)
-    (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(namen_liste)
+    (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(request, namen_liste)
 
     response = HttpResponse(content_type="text/tsv")
     response['Content-Disposition'] = 'attachment; filename="matrix.csv"'  # ToDo Hänge Datum an Dateinamen an

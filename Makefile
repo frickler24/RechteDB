@@ -28,6 +28,16 @@ mariadb:
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/mariadbconf.d:/etc/mysql/conf.d \
 		mariadb:10.2
 
+crawler:
+	docker run -it --rm \
+		--name crawlewr \
+		--network mariaNetz \
+        -v /home/lutz/schemadir:/home/schcrwlr/share \
+		--network-alias crawler \
+        -e TZ='Europe/Berlin' \
+		--entrypoint=/bin/bash \
+        schemacrawler/schemacrawler
+
 phpmyadmin:
 	docker run -d \
 		-p 8080:80 \

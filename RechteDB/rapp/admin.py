@@ -18,6 +18,7 @@ from rapp.models import TblUebersichtAfGfs, TblUserIDundName, TblOrga, TblPlattf
                         RACF_Rechte, Orga_details, \
                         Modellierung, Direktverbindungen, \
                         Manuelle_Berechtigung
+from rapp.models import ACLGruppen
 
 # Für den Im- und Export
 from import_export.admin import ImportExportModelAdmin
@@ -30,7 +31,8 @@ class UserhatrolleInline(admin.TabularInline):
     model = TblUserhatrolle
     extra = 1
 
-    fields = ['userundrollenid', 'userid', 'rollenname', 'schwerpunkt_vertretung', 'bemerkung', ]
+    fields = ['userundrollenid', 'userid', 'rollenname',
+              'schwerpunkt_vertretung', 'bemerkung', 'teamspezifisch', ]
 
     formfield_overrides = {
         models.TextField: {
@@ -145,11 +147,11 @@ class UserIDundNameAdmin(admin.ModelAdmin):
 class Orga(admin.ModelAdmin):
     actions_on_top = True
     actions_on_bottom = True
-    list_display = ('team', 'themeneigentuemer', )
+    list_display = ('team', 'teamliste', 'freies_team', 'themeneigentuemer', )
     list_filter = ('themeneigentuemer', )
     list_display_links = ('team', )
     list_editable = ('themeneigentuemer', )
-    search_fields = ['team',]
+    search_fields = ['team', 'teamliste', 'freies_team', ]
 
     inlines = [UserIDundNameInline]
 
@@ -235,12 +237,13 @@ class Userhatrolle(admin.ModelAdmin):
         })},
     }
 
-    list_display = ('userundrollenid', 'userid', 'rollenname', 'schwerpunkt_vertretung',
+    list_display = ('userundrollenid', 'userid', 'teamspezifisch', 'rollenname', 'schwerpunkt_vertretung',
                     'get_rollenbeschreibung', 'bemerkung', 'letzte_aenderung', )
-    list_filter = ('schwerpunkt_vertretung', )
+    list_filter = ('schwerpunkt_vertretung', 'teamspezifisch', 'rollenname', )
     list_display_links = ('userundrollenid', 'rollenname', )
-    list_editable = ('schwerpunkt_vertretung', 'bemerkung', )
-    search_fields = [ 'schwerpunkt_vertretung', 'rollenname__rollenname', 'bemerkung', 'userid__name', 'userid__userid', ]
+    list_editable = ('schwerpunkt_vertretung', 'bemerkung', 'teamspezifisch', )
+    search_fields = ['schwerpunkt_vertretung', 'rollenname__rollenname',
+                     'bemerkung', 'userid__name', 'userid__userid', ]
 
     list_per_page = 25
     extra = 1
@@ -403,3 +406,10 @@ class Manuelle_BerechtigungAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.TextField: {'widget': MDEditorWidget}
     }
+
+@admin.register(ACLGruppen)
+class ACLGruppen(admin.ModelAdmin):
+    alle = ['tf', 'zugriff', 'server', 'pfad', 'letzte_aenderung', ]
+    search_fields = ['tf', 'zugriff', 'server', 'pfad', ]
+    list_display = alle
+
