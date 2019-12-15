@@ -1215,25 +1215,26 @@ def liefere_win_lw_Liste(tf_menge):
 
     suchmenge = set()
     winacl = ACLGruppen.objects .order_by('tf', 'server', 'pfad') .values()
-    rest = list()
+    rest = set()
 
     for t in tf_menge:
         if 'CN=' in t['tf']:
             ad = re.search("^CN=\w+?(_[\w-]+?),", t['tf'])
             if ad == None:
                 s = 'ACHTUNG: regexp konnte nicht mehr gefunden werden in Eintrag ' + t['tf']
-                rest.append(s)
+                rest.add(s)
                 print(s)
                 continue
             for acl in winacl:
                 if ad[1] in acl['tf']:
                     suchmenge.add(acl['tf'])
                     break;
-            rest.append(t['tf'])
+            rest.add(t['tf'])
 
     retval = ACLGruppen.objects \
         .filter(tf__in=suchmenge) \
         .order_by('tf', 'server', 'pfad') \
+        .distinct() \
         .values()
 
     return (retval, rest)
