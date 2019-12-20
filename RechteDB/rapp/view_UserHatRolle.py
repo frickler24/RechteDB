@@ -1637,24 +1637,9 @@ def panel_UhR_af_export(request, id):
 
     (namen_liste, panel_filter, rollen_liste, rollen_filter) = UhR_erzeuge_listen_ohne_rollen(request)
     (userHatRolle_liste, selektierter_name, userids, usernamen,
-     selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID) \
-        = UhR_hole_daten(namen_liste, id)
+        selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID) \
+            = UhR_hole_daten(namen_liste, id)
 
-    """
-    context = {
-        'paginator': paginator, 'pages': pages, 'pagesize': pagesize,
-        'filter': panel_filter, 'form': form,
-        'rollen_liste': rollen_liste, 'rollen_filter': rollen_filter,
-        'userids': userids, 'usernamen': usernamen, 'afmenge': afmenge,
-        'userHatRolle_liste': userHatRolle_liste,
-        'id': id,
-        'selektierter_name': selektierter_name,
-        'selektierte_userid': selektierte_haupt_userid,
-        'selektierte_userids': selektierte_userids,
-        'afmenge_je_userID': afmenge_je_userID,
-        'version': version,
-    }
-    """
     response = HttpResponse(content_type="text/tsv")
     response['Content-Disposition'] = 'attachment; filename="rollen.csv"'
     response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
@@ -1679,7 +1664,7 @@ def panel_UhR_af_export(request, id):
             else:
                 line.append('nein')
             for userid in selektierte_userids:
-                if str(rollendefinition.af) in afmenge_je_userID[userid]:
+                if str(rollendefinition.af).strip().lower() in afmenge_je_userID[userid]:
                     line.append('ja')
                 else:
                     line.append('nein')
