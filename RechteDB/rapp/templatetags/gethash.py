@@ -69,6 +69,7 @@ def sort(menge):
 
 @register.filter
 def vergleich(einzel, menge):
+	einzel = einzel.strip()
 	for element in menge:
 		if element == einzel:
 			return True
