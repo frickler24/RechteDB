@@ -128,7 +128,7 @@ def neue_afgf_download(request):
     liste = list(hole_liste())
 
     response = HttpResponse(content_type="text/tsv")
-    response['Content-Distribution'] = 'attachment; filename="neue_AFGF.csv"'
+    response['Content-Disposition'] = 'attachment; filename="neue_AFGF.csv"'
     response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
 
     writer = csv.writer(response, csv.excel, delimiter = '\t', quotechar = '"')
@@ -142,7 +142,7 @@ def neue_afgf_download(request):
         zeile = []
         for i in range(0, 5):
             zeile.append(obj[i])
-        print(zeile)
+        # print(zeile)
         writer.writerow(zeile)
 
     return response

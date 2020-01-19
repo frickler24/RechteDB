@@ -1223,7 +1223,6 @@ def liefere_win_lw_Liste(tf_menge):
             if ad == None:
                 s = 'ACHTUNG: regexp konnte nicht mehr gefunden werden in Eintrag ' + t['tf']
                 rest.add(s)
-                print(s)
                 continue
             for acl in winacl:
                 if ad[1] in acl['tf']:

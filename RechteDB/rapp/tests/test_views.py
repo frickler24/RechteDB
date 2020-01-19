@@ -2394,12 +2394,12 @@ class UserRolleExportCSVTest(TestCase):
         )
 
         TblAfliste.objects.create(
-            af_name='rva_01219_beta91_job_abst',
+            af_name='rva_01219_Beta91_Job_Abst',
             neu_ab=timezone.now(),
         )
 
         TblAfliste.objects.create(
-            af_name='rva_01219_beta91_job_abst_nicht_zugewiesen',
+            af_name='rva_01219_Beta91_Job_Abst_nicht_zugewiesen',
             neu_ab=timezone.now(),
         )
 
@@ -2414,7 +2414,7 @@ class UserRolleExportCSVTest(TestCase):
             gruppe='ZI-AI-BA-PS',
         )
         TblUserIDundName.objects.create(
-            userid='dv13254',
+            userid='Dv13254',
             name='User_xv13254',
             orga=TblOrga.objects.get(team='Django-Team-01'),
             zi_organisation='AI-BA',
@@ -2423,7 +2423,7 @@ class UserRolleExportCSVTest(TestCase):
             gruppe='ZI-AI-BA-PS',
         )
         TblUserIDundName.objects.create(
-            userid='av13254',
+            userid='aV13254',
             name='User_xv13254',
             orga=TblOrga.objects.get(team='Django-Team-01'),
             zi_organisation='AI-BA',
@@ -2449,21 +2449,21 @@ class UserRolleExportCSVTest(TestCase):
             mussfeld=True,
             einsatz=TblRollehataf.EINSATZ_XABCV,
             bemerkung='Irgend eine halbwegs sinnvolle Beschreibung',
-            af=TblAfliste.objects.get(af_name='rva_01219_beta91_job_abst'),
+            af=TblAfliste.objects.get(af_name='rva_01219_Beta91_Job_Abst'),
             rollenname=TblRollen.objects.get(rollenname='Erste Neue Rolle'),
         )
         TblRollehataf.objects.create(
             mussfeld=True,
             einsatz=TblRollehataf.EINSATZ_XABCV,
             bemerkung='Irgend eine halbwegs sinnvolle Beschreibung',
-            af=TblAfliste.objects.get(af_name='rva_01219_beta91_job_abst_nicht_zugewiesen'),
+            af=TblAfliste.objects.get(af_name='rva_01219_Beta91_Job_Abst_nicht_zugewiesen'),
             rollenname=TblRollen.objects.get(rollenname='Erste Neue Rolle'),
         )
         TblRollehataf.objects.create(
             mussfeld=False,
             einsatz=TblRollehataf.EINSATZ_XABCV,
             bemerkung='Auch irgend eine halbwegs sinnvolle Beschreibung',
-            af=TblAfliste.objects.get(af_name='rva_01219_beta91_job_abst'),
+            af=TblAfliste.objects.get(af_name='rva_01219_Beta91_Job_Abst'),
             rollenname=TblRollen.objects.get(rollenname='Zweite Neue Rolle'),
         )
 
