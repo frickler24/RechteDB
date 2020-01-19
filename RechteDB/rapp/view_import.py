@@ -20,7 +20,7 @@ from .models import TblGesamt, Tblrechteneuvonimport, Tblrechteamneu, Letzter_im
 from .stored_procedures import connection
 from .views import version
 import time
-def neuer_import(request):
+def neuer_import(request, orga):
     """
     :return: Fehler-Flag (True: In Retval steht ein Fehler-beschreibendes HTML, False: ein Objekt wurde erzeugt)
     :return: retval: Fehlerbeschreibung oder neues Datenobjekt in Modell-Klasse Letzter_import
@@ -42,7 +42,7 @@ def neuer_import(request):
         pass
 
     # Legt ein neues Datenobjekt zum Markieren des Import-Status an, speichert aber erst weiter unten
-    letzter_import = Letzter_import(start = timezone.now(), schritt = 1)
+    letzter_import = Letzter_import(start=timezone.now(), schritt=1, zi_orga=orga)
     return (False, letzter_import)    # False signalisiert "Alles OK, weitermachen"
 
 def speichere_schritt(import_datum):
@@ -129,13 +129,7 @@ def import_csv(request):
     :return: Gerendertes HTML
     """
 
-    zeiten = { 'import_start': timezone.now(), } # Hier werden Laufzeiten vermerkt
-
-    # Zunächst versuche zu ermitteln, ob gerade ein anderer Import läuft:
-    # Legt ein neues Datenobjekt zum Markieren des Import-Status an, speichert aber erst weiter unten
-    (fehler, import_datum) = neuer_import(request)
-    if (fehler):
-        return import_datum
+    zeiten = {'import_start': timezone.now(), } # Hier werden Laufzeiten vermerkt
 
     def leere_importtabelle():
         """
@@ -290,6 +284,14 @@ def import_csv(request):
         if form.is_valid():
             orga = request.POST.get('organisation', 'Keine Orga!') # Auf dem Panel wurde die Ziel-Orga übergeben
             request.session['organisation'] = orga    # und merken in der Session für Schritt 3
+
+            # Zunächst versuche zu ermitteln, ob gerade ein anderer Import läuft:
+            # Legt ein neues Datenobjekt zum Markieren des Import-Status an, speichert aber erst weiter unten
+            (fehler, import_datum) = neuer_import(request, orga)
+            if (fehler):
+                return import_datum
+
+            # Nun kann die eigentliche Import-Arbeit beginnen
             laufzeiten = bearbeite_datei(False)
             statistik, fehler = import_schritt1(orga)
             request.session['import_statistik'] = statistik
@@ -480,8 +482,6 @@ def import3_quittung(request):
     letzter_schritt()
 
     context = {
-        #'form': form,
-        #'fehler': request.session.get('fehler3', None),
         'version': version,
     }
     return render(request, 'rapp/import3_quittung.html', context)
@@ -489,7 +489,7 @@ def import3_quittung(request):
 @login_required
 def import_status(request):
     """
-    Das wird vielleicht mal die ReST-Datenlieferung für einen Fortschrittsbalken.
+    Das ist die ReST-Datenlieferung für einen Fortschrittsbalken.
     :param request: GET- oder POST-Request
     :return: HTML-Output
     """

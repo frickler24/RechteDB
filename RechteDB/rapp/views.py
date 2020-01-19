@@ -83,6 +83,7 @@ def initialisiere_AFliste():
 
 # Der Direkteinsteig für die gesamte Anwendung
 # Dies ist die Einstiegsseite, sie ist ohne Login erreichbar.
+from django.db.models import Count, Max, Min, Avg
 def home(request):
     """
     Zeige ein paar Statistik-Infos über die RechteDB.
@@ -90,6 +91,31 @@ def home(request):
     :param request: GET oder POST Request vom Browser
     :return: Gerendertes HTML
     """
+
+    def hole_orgainfo():
+        orgas = Letzter_import.objects.exclude(zi_orga=None).distinct().values('zi_orga')
+        orgset = set()
+        for o in orgas:
+            orgset.add(o['zi_orga'])
+
+        importliste = {}
+        for o in sorted(list(orgset)):
+            try:
+                letzter_import_im_modell = Letzter_import.objects\
+                    .filter(zi_orga=o)\
+                    .filter(schritt=5)\
+                    .latest('id')
+                letzter_import = str(letzter_import_im_modell.end)[:19]
+                letzter_importeur = letzter_import_im_modell.user
+            except:
+                letzter_import = 'unbekannt'
+                letzter_importeur = '--'
+
+            name = "{} ({}):".format(o, letzter_importeur)
+            importliste[name] = letzter_import
+
+        return importliste
+
     num_rights = TblGesamt.objects.all().count()
     num_userids = TblUserIDundName.objects.all().count
     num_active_userids = TblUserIDundName.objects.filter(geloescht=False).count
@@ -101,12 +127,6 @@ def home(request):
     num_teams = TblOrga.objects.all().count
     num_active_rights = TblGesamt.objects.filter(geloescht=False).count
     stored_procedures = finde_procs_exakt()
-
-    try:
-        letzter_import_im_modell = Letzter_import.objects.latest('id')
-        letzter_import = str(letzter_import_im_modell.end)[:19]
-    except:
-        letzter_import = 'unbekannt'
 
     # Sicherheitshalber wird immer bei Aufruf der Startseite die Tabelle tbl_AFListe neu aufgebaut
     initialisiere_AFliste()
@@ -126,7 +146,7 @@ def home(request):
             'num_teams': num_teams,
             'num_users': User.objects.all().count,
             'sps': stored_procedures,
-            'letzter_import': letzter_import,
+            'importliste': hole_orgainfo(),
         },
     )
 
