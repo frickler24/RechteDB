@@ -44,7 +44,7 @@ class HomeTests(TestCase):
         self.assertEqual(self.response.status_code, 200)
         self.assertContains(self.response, 'Statistik über die RApp-Inhalte:', 1)
         self.assertContains(self.response, 'Status Stored Procedures:', 1)
-        self.assertContains(self.response, 'Stand letzter Import:', 1)
+        self.assertContains(self.response, 'Stand letzte Importe:', 1)
         self.assertContains(self.response, 'Administrierte Berechtigungen:', 1)
         self.assertContains(self.response, 'Aktive Rechte:', 1)
         self.assertContains(self.response, 'Administrierte UserIDs:', 1)
@@ -2765,7 +2765,7 @@ class ImportHelperFunctionsTest(TestCase):
 
     def test_import_neuer_import(self):
         # Neuer Aufruf sollte keinen Fehler liefern
-        (flag, imp) = neuer_import(None)
+        (flag, imp) = neuer_import(None, 'AI-BA')
         self.assertFalse(flag)
 
 

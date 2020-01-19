@@ -721,6 +721,7 @@ class Letzter_import(models.Model):
     max = models.IntegerField(null=False)
     aktuell = models.IntegerField(null=False)
     schritt = models.IntegerField(null=False, default=1)
+    zi_orga = models.CharField(max_length=64, null=True)
 
     class Meta:
         managed = True

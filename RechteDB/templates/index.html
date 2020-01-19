@@ -37,10 +37,14 @@
         </div>
       </div>
       <div class="row ">
-        <div class="col col-xs-10 col-sm-8 col-md-8 col-lg-8 col-xl-4">
-          Stand letzter Import:
+        <div class="col-12">
+          Stand letzte Importe:
         </div>
-        <div class="col col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 text-right bg-info">{{ letzter_import }}</div>
+        {% for orga, datum in importliste.items %}
+          <div class="col-2 text-left bg-info">{{ orga }}</div>
+          <div class="col-xs-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 text-right bg-info">{{ datum }}</div>
+          <div class="col-xs-0 col-sm-2 col-md-4 col-lg-5 col-xl-6 text-right bg-info"></div>
+        {% endfor %}
       </div>
       <div class="row pt-3 ">
         <div class="col col-xs-10 col-sm-8 col-md-6 col-lg-5 col-xl-4">
