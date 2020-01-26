@@ -1,0 +1,257 @@
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Coverage report</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script type="text/javascript" src="jquery.ba-throttle-debounce.min.js"></script>
+    <script type="text/javascript" src="jquery.tablesorter.min.js"></script>
+    <script type="text/javascript" src="jquery.hotkeys.js"></script>
+    <script type="text/javascript" src="coverage_html.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(coverage.index_ready);
+    </script>
+</head>
+<body class="indexfile">
+
+<div id="header">
+    <div class="content">
+        <h1>Coverage report:
+            <span class="pc_cov">72%</span>
+        </h1>
+
+        <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
+
+        <form id="filter_container">
+            <input id="filter" type="text" value="" placeholder="filter..." />
+        </form>
+    </div>
+</div>
+
+<div class="help_panel">
+    <img id="panel_icon" src="keybd_open.png" alt="Hide keyboard shortcuts" />
+    <p class="legend">Hot-keys on this page</p>
+    <div>
+    <p class="keyhelp">
+        <span class="key">n</span>
+        <span class="key">s</span>
+        <span class="key">m</span>
+        <span class="key">x</span>
+        
+        <span class="key">c</span> &nbsp; change column sorting
+    </p>
+    </div>
+</div>
+
+<div id="index">
+    <table class="index">
+        <thead>
+            
+            <tr class="tablehead" title="Click to sort">
+                <th class="name left headerSortDown shortkey_n">Module</th>
+                <th class="shortkey_s">statements</th>
+                <th class="shortkey_m">missing</th>
+                <th class="shortkey_x">excluded</th>
+                
+                <th class="right shortkey_c">coverage</th>
+            </tr>
+        </thead>
+        
+        <tfoot>
+            <tr class="total">
+                <td class="name left">Total</td>
+                <td>2433</td>
+                <td>680</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="1753 2433">72%</td>
+            </tr>
+        </tfoot>
+        <tbody>
+            
+            <tr class="file">
+                <td class="name left"><a href="RechteDB_settings_py.html">RechteDB/settings.py</a></td>
+                <td>30</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="30 30">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="RechteDB_urls_py.html">RechteDB/urls.py</a></td>
+                <td>19</td>
+                <td>3</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="16 19">84%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rapp_admin_py.html">rapp/admin.py</a></td>
+                <td>187</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="187 187">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rapp_anmeldung_py.html">rapp/anmeldung.py</a></td>
+                <td>10</td>
+                <td>1</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="9 10">90%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rapp_filters_py.html">rapp/filters.py</a></td>
+                <td>61</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="61 61">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rapp_forms_py.html">rapp/forms.py</a></td>
+                <td>31</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="31 31">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rapp_models_py.html">rapp/models.py</a></td>
+                <td>544</td>
+                <td>32</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="512 544">94%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rapp_resources_py.html">rapp/resources.py</a></td>
+                <td>30</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="30 30">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rapp_stored_procedures_py.html">rapp/stored_procedures.py</a></td>
+                <td>114</td>
+                <td>15</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="99 114">87%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rapp_templatetags_gethash_py.html">rapp/templatetags/gethash.py</a></td>
+                <td>49</td>
+                <td>5</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="44 49">90%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rapp_urls_py.html">rapp/urls.py</a></td>
+                <td>25</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="25 25">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rapp_view_UserHatRolle_py.html">rapp/view_UserHatRolle.py</a></td>
+                <td>647</td>
+                <td>207</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="440 647">68%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rapp_view_import_py.html">rapp/view_import.py</a></td>
+                <td>260</td>
+                <td>212</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="48 260">18%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rapp_view_manuell_py.html">rapp/view_manuell.py</a></td>
+                <td>26</td>
+                <td>0</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="26 26">100%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rapp_view_neueAFGF_py.html">rapp/view_neueAFGF.py</a></td>
+                <td>85</td>
+                <td>42</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="43 85">51%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rapp_view_serienbrief_py.html">rapp/view_serienbrief.py</a></td>
+                <td>162</td>
+                <td>136</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="26 162">16%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rapp_views_py.html">rapp/views.py</a></td>
+                <td>141</td>
+                <td>26</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="115 141">82%</td>
+            </tr>
+            
+            <tr class="file">
+                <td class="name left"><a href="rapp_xhtml2_py.html">rapp/xhtml2.py</a></td>
+                <td>12</td>
+                <td>1</td>
+                <td>0</td>
+                
+                <td class="right" data-ratio="11 12">92%</td>
+            </tr>
+            
+        </tbody>
+    </table>
+
+    <p id="no_rows">
+        No items found using the specified filter.
+    </p>
+</div>
+
+<div id="footer">
+    <div class="content">
+        <p>
+            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v4.5.4</a>,
+            created at 2020-01-26 15:46
+        </p>
+    </div>
+</div>
+
+</body>
+</html>
