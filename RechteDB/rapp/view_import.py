@@ -413,7 +413,8 @@ def import2(request):
 def import2_quittung(request):
     """
     Nun erfolgt eine Ausgabe, ob das Verändern der User-Tabelle geklappt hat.
-    Es wird ein Link angeboten auf eine geeignete Seite, um die User-Tabelle manuell anzupassen.
+    Es wird ein Link angeboten auf jeweils eine geeignete Seite pro neuem User,
+    um die User-Tabelle manuell anzupassen.
     Buttons werden angeboten, um den nächsten Schritt anzustoßen oder das Ganze abzubrechen.
 
     :param request: GET- oder POST-Request
