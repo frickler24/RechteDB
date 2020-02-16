@@ -293,6 +293,7 @@ class TblPlattform(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
     tf_technische_plattform = models.CharField(db_column='tf_technische_plattform', max_length=32,
                                                verbose_name='Plattform', unique=True)
+    geloescht = models.IntegerField(blank=True, null=True, verbose_name='gelöscht')
 
     class Meta:
         managed = True

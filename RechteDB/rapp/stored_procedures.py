@@ -457,16 +457,19 @@ BEGIN
         müssen schrittweise in die Gesamttabelle eingetragen werden.
     */
 
-    -- Lösche zunächst Plattform-Namen, die in der Gesamttabelle nicht mehr auftauchen
-    -- (manchmal werden Plattformen einfach umbenannt)
+    -- Markiere zunächst Plattform-Namen, die in der Gesamttabelle nicht mehr auftauchen, als gelöscht0
+    -- (manchmal werden Plattformen einfach umbenannt).
+    -- Das echte Löschen muss bei Bedarf in Schritten erfolgen,
+    -- weil in der Historientabelle weiterhin Referenzen auf die nicht mehr aktuellen PlattformIDs stehen können.
     drop table if exists bloed;
     CREATE TEMPORARY TABLE bloed as
         SELECT tblPlattform.`tf_technische_plattform` as x
             FROM tblPlattform
             LEFT JOIN tblGesamt ON tblPlattform.id = tblGesamt.plattform_id
-            WHERE tblGesamt.plattform_id IS NULL;
+            WHERE tblGesamt.plattform_id IS NULL
+                AND not tblPlattform.geloescht;
 
-    DELETE FROM tblPlattform
+    UPDATE tblPlattform SET geloescht = true
     WHERE `tf_technische_plattform` IN (SELECT x FROM bloed);
 
     -- Ergänze alle Plattformen, die bislang nur in tblRechteAMNeu bekannt sind
@@ -475,7 +478,8 @@ BEGIN
     FROM tblRechteAMNeu
         LEFT JOIN tblPlattform
         ON tblRechteAMNeu.`tf_technische_plattform` = tblPlattform.`tf_technische_plattform`
-    WHERE tblPlattform.`tf_technische_plattform` IS NULL;
+    WHERE not tblPlattform.geloescht
+        AND tblPlattform.`tf_technische_plattform` IS NULL;
 
     /*
         Der Status "gefunden" dient dazu,
@@ -806,18 +810,21 @@ BEGIN
     */
 
     /*
+        Ist doch ganz zu Beginn der SP schon geschehen.
+        Wenn keine Merkwürdigkeiten auftreten, kann das mal ganz gelöscht werden
         Jetzt sehen wir uns die Plattform an, die in der Importliste auftauchen
         und hängen gegebenenfalls fehlende Einträge an die Plattform-Tabelle an.
 
         qryF5_AktualisierePlattformListe
-    */
 
     INSERT INTO tblPlattform (`tf_technische_plattform`)
     SELECT DISTINCT tblRechteAMNeu.`tf_technische_plattform`
     FROM tblRechteAMNeu
         LEFT JOIN tblPlattform
         ON tblRechteAMNeu.`tf_technische_plattform` = tblPlattform.`tf_technische_plattform`
-        WHERE tblPlattform.`tf_technische_plattform` IS NULL;
+    WHERE not tblPlattform.geloescht
+        AND tblPlattform.`tf_technische_plattform` IS NULL;
+    */
 
 
     /*
@@ -1383,6 +1390,7 @@ def anzahl_procs():
             print('Error in finde_procs(): {}'.format(e))
 
         cursor.close()
+    print('Anzahl derzeit geladener Stored Prodcedures =', anzahl)
     return anzahl
 
 
@@ -1396,7 +1404,7 @@ def finde_procs_exakt():
 
 
 sps = {
-    1: push_sp_test,
+    1: push_sp_test,    # SP-Name = anzahl_inport_elemente
     2: push_sp_vorbereitung,
     3: push_sp_neueUser,
     4: push_sp_behandleUser,
@@ -1410,6 +1418,7 @@ sps = {
 
 
 def soll_procs():
+    print('Anzahl zu ladender Stored Procedures =', len(sps))
     return len(sps)
 
 
