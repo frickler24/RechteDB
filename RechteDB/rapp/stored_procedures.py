@@ -1390,7 +1390,7 @@ def anzahl_procs():
             print('Error in finde_procs(): {}'.format(e))
 
         cursor.close()
-    print('Anzahl derzeit geladener Stored Prodcedures =', anzahl)
+    # print('Anzahl derzeit geladener Stored Prodcedures =', anzahl)
     return anzahl
 
 
@@ -1418,7 +1418,7 @@ sps = {
 
 
 def soll_procs():
-    print('Anzahl zu ladender Stored Procedures =', len(sps))
+    # print('Anzahl zu ladender Stored Procedures =', len(sps))
     return len(sps)
 
 
