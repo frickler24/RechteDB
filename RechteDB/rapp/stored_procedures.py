@@ -1377,9 +1377,110 @@ END
     return push_sp('directConnects', sp, procs_schon_geladen)
 
 
-# Suche nach Stored Procedures in der aktuellen Datenbank
-# return: Anzahl an derzeit geladenen Stored Procedures
+def push_sp_AF_umbenennen(procs_schon_geladen):
+    sp = """
+CREATE PROCEDURE af_umbenennen (
+    INOUT altliste VARCHAR(16000),
+    INOUT neuliste VARCHAR(16000),
+    INOUT statusgedoens VARCHAR(16000)
+)
+proclabel: BEGIN
+    DECLARE finished INTEGER DEFAULT 0;
+    DECLARE AFalt TINYTEXT DEFAULT "";
+    DECLARE AFneu TINYTEXT DEFAULT "";
+    DECLARE intid BIGINT;
+    DECLARE status int(1);
+
+    -- declare cursor for change lines
+    DEClARE curLine
+        CURSOR FOR
+            SELECT id, alt, neu FROM altnachneu;
+
+    -- declare NOT FOUND handler
+    DECLARE CONTINUE HANDLER
+        FOR NOT FOUND SET finished = 1;
+    OPEN curLine;
+
+    getLine: LOOP
+        -- Leider werden die Variablen nicht auf null gesetzt, wenn eines der Selects unten fehlschlägt
+        SET @check1 = null, @check3 = null;
+
+        -- Zeile holen aus der Umsetz-Tabelle
+        FETCH curLine INTO intid, AFalt, AFneu;
+        IF finished = 1 THEN
+            LEAVE getLine;
+        END IF;
+
+        -- build list - Das kann dann irgendwann mal wieder weg, kostet nur RAM
+        SET statusgedoens = CONCAT(statusgedoens, "S1: ");
+        SET altliste = CONCAT(altliste, ",", AFalt);
+        SET neuliste = CONCAT(neuliste, ",", AFneu);
+
+        -- Wird das Element in den Tabellen gefunden?
+        SELECT id INTO @check1 FROM `tblGesamt` WHERE `enthalten_in_af` = AFalt LIMIT 1;
+        SELECT id INTO @check3 FROM `tbl_AFListe` WHERE `af_name` = AFalt LIMIT 1;
+
+        SET statusgedoens = CONCAT(statusgedoens,
+            'check1 = ', IFNULL(@check1, 'false'),
+            ', check3 = ', IFNULL(@check3, 'false'),
+            '\n'
+        );
+
+        SET @allesok = IFNULL(@check1, false)
+            AND IFNULL(@check3, false);
+        SET statusgedoens = CONCAT(statusgedoens, "S2:, allesok = ", @allesok, ', ');
+
+        IF @allesok THEN
+            -- Hier kommen jetzt die SQLs rein
+            UPDATE tblGesamt
+            SET `enthalten_in_af` = AFneu
+            WHERE `enthalten_in_af` = AFalt;
+
+            UPDATE tbl_AFListe
+            SET `af_name` = AFneu
+            WHERE `af_name` = AFalt;
+
+            SET @check1 = -1, @check3 = -1;
+            SELECT id INTO @check1 FROM `tblGesamt` WHERE `enthalten_in_af` = AFalt LIMIT 1;
+            SELECT id INTO @check3 FROM `tbl_AFListe` WHERE `af_name` = AFalt LIMIT 1;
+
+            -- set "Status-Flags"
+            INSERT INTO altnachneu_status
+                SET status = CONCAT('Ok für ', AFalt,
+                    ', check1 = ', IFNULL(@check1, 'false'),
+                    ', check3 = ', IFNULL(@check3, 'false'),
+                    ', intŝid = ', intid),
+                    id = intid;
+        ELSE
+            INSERT INTO altnachneu_status
+                SET status = CONCAT('Fehler in Abfrage für ', AFalt,
+                    ', check1 = ', IFNULL(@check1, 'false'),
+                    ', check3 = ', IFNULL(@check3, 'false'),
+                    ', intŝid = ', intid),
+                    id = intid;
+        END IF;
+        -- SET statusgedoens = CONCAT(statusgedoens, "7 ");
+
+    SET finished = 0; -- Der Status bezieht sich nur auf das Nicht-Finden des Suchstrings
+    END LOOP getLine;
+    CLOSE curLine;
+
+    UPDATE altnachneu INNER JOIN altnachneu_status ON altnachneu.id = altnachneu_status.id
+    SET altnachneu.status = altnachneu_status.status;
+
+    INSERT INTO altnachneuHistorie
+        SELECT 0 as `id`, `alt`, `neu`, `status` FROM altnachneu;
+
+END
+"""
+    return push_sp('AF_umbenennen', sp, procs_schon_geladen)
+
+
 def anzahl_procs():
+    """
+    Suche nach Stored Procedures in der aktuellen Datenbank
+    :return: Anzahl an derzeit geladenen Stored Procedures
+    """
     anzahl = 0  # Wenn die Zahl der Einträge bei SHOW > 0 ist, müssen die Procs jeweils gelöscht werden
     with connection.cursor() as cursor:
         try:
@@ -1403,6 +1504,11 @@ def finde_procs_exakt():
     return anzahl_procs() == soll_procs()
 
 
+def soll_procs():
+    # print('Anzahl zu ladender Stored Procedures =', len(sps))
+    return len(sps)
+
+
 sps = {
     1: push_sp_test,    # SP-Name = anzahl_inport_elemente
     2: push_sp_vorbereitung,
@@ -1414,12 +1520,8 @@ sps = {
     8: push_sp_erzeugeAFListe,
     9: push_sp_ueberschreibeModelle,
     10: push_sp_directConnects,
+    11: push_sp_AF_umbenennen,
 }
-
-
-def soll_procs():
-    # print('Anzahl zu ladender Stored Procedures =', len(sps))
-    return len(sps)
 
 
 @login_required
@@ -1430,19 +1532,8 @@ def handle_stored_procedures(request):
     if request.method == 'POST':
         procs_schon_geladen = finde_procs()
 
-        daten['anzahl_import_elemente'] = sps[1](procs_schon_geladen)
-        daten['call_anzahl_import_elemente'] = call_sp_test()
-        daten['vorbereitung'] = sps[2](procs_schon_geladen)
-        daten['neueUser'] = sps[3](procs_schon_geladen)
-        daten['behandleUser'] = sps[4](procs_schon_geladen)
-        daten['behandleRechte'] = sps[5](procs_schon_geladen)
-        daten['loescheDoppelteRechte'] = sps[6](procs_schon_geladen)
-        daten['setzeNichtAIFlag'] = sps[7](procs_schon_geladen)  # Falls die Funktion jemals wieder benötigt wird
-        daten['erzeuge_af_liste'] = sps[8](procs_schon_geladen)
-        daten['ueberschreibeModelle'] = sps[9](procs_schon_geladen)
-        daten['directConnects'] = sps[10](procs_schon_geladen)
+        for i in range(len(sps)):
+            # print('Key = {0}, Value = {1}'.format(i + 1, sps[i + 1].__name__))
+            daten[sps[i + 1].__name__] = sps[i + 1](procs_schon_geladen)
 
-    context = {
-        'daten': daten,
-    }
-    return render(request, 'rapp/stored_procedures.html', context)
+    return render(request, 'rapp/stored_procedures.html', {'daten': daten, })

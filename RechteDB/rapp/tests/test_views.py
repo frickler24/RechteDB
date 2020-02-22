@@ -2645,16 +2645,17 @@ class SetupDatabase(TestCase):
         url = reverse('stored_procedures')
         data = {}
         self.response = self.client.post(url, data)
-        self.assertContains(self.response, 'anzahl_import_elemente war erfolgreich.', 2)
-        self.assertContains(self.response, 'call_anzahl_import_elemente war erfolgreich.', 1)
-        self.assertContains(self.response, 'vorbereitung war erfolgreich.', 1)
-        self.assertContains(self.response, 'neueUser war erfolgreich.', 1)
-        self.assertContains(self.response, 'behandleUser war erfolgreich.', 1)
-        self.assertContains(self.response, 'behandleRechte war erfolgreich.', 1)
-        self.assertContains(self.response, 'loescheDoppelteRechte war erfolgreich.', 1)
-        self.assertContains(self.response, 'setzeNichtAIFlag war erfolgreich.', 1)
-        self.assertContains(self.response, 'erzeuge_af_liste war erfolgreich.', 1)
-        self.assertContains(self.response, 'ueberschreibeModelle war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_test war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_vorbereitung war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_neueUser war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_behandleUser war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_behandleRechte war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_loescheDoppelteRechte war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_nichtai war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_erzeugeAFListe war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_ueberschreibeModelle war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_directConnects war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_AF_umbenennen war erfolgreich.', 1)
 
 class ImportNewIIQSingleRecordTest(TestCase):
     # Tests für den Import neuer CSV-Listen und der zugehörigen Tabellen

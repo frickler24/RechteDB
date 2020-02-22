@@ -42,7 +42,6 @@ other_files/rapp_direktverbindungen_VorhandeneModelle.ods
 other_files/rapp_direktverbindungen_VorhandeneModelleMitAFVorschlägen.ods
 other_files/ubuntu_latex.tar.gz
 RechteDB/ER-Modell.mwb.bak
-other_files/RechteDB-20190711.sql
 other_files/mariaDB auf IBM-Server gehackt.sql
 venv37/
 other_files/RechteDB-20190726.sql
@@ -54,5 +53,7 @@ RechteDB/cover
 other_files/rapp_racf_rechte.sql
 other_files/aclgroups*
 Ladedaten/
-/Rechte ZI-AI-konvertiert.csv
-/other_files/XA/
+Rechte ZI-AI-konvertiert.csv
+other_files/XA/
+other_files/RechteDB-20*.sql*
+other_files/neue_AFGF-AI-BA nach erster Umbenennung 20200222.ods
