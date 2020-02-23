@@ -45,9 +45,10 @@ urlpatterns += [
     path('user/<int:pk>/toggle_geloescht/', login_required(views.userToggleGeloescht), name='user-toggle-geloescht'),
 ]
 
-# Der Link auf die Team-liste
+# Der Link auf die Team-Listen
 urlpatterns += [
     path('teamliste/', login_required(views.TeamListView.as_view()), name='teamliste'),
+    path('ungenutzteTeamliste/', login_required(views.panel_ungenutzteTeamliste), name='ungenutzteTeamliste'),
 ]
 
 # Generische Formulare für CUD Orga (Teams, werden im Frontend bedient)

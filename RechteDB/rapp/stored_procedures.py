@@ -1476,6 +1476,30 @@ END
     return push_sp('AF_umbenennen', sp, procs_schon_geladen)
 
 
+def push_sp_ungenutzteTeams(procs_schon_geladen):
+    sp = """
+CREATE PROCEDURE ungenutzteTeams()
+BEGIN
+    DROP TABLE IF EXISTS genutzte;
+    CREATE TEMPORARY TABLE genutzte
+        SELECT orga_id, tblOrga.team FROM `tblUserIDundName`
+        INNER JOIN tblOrga
+            ON tblUserIDundName.orga_id = tblOrga.id
+        GROUP BY orga_id;
+    
+    SELECT tblOrga.id, tblOrga.team from tblOrga
+    LEFT JOIN genutzte
+        ON tblOrga.id = genutzte.orga_id
+    
+    WHERE 
+        (tblOrga.teamliste = "" OR tblOrga.teamliste is null)
+        AND (tblOrga.freies_team = "" OR tblOrga.freies_team is null)
+        AND genutzte.orga_id is null;
+END
+"""
+    return push_sp('ungenutzteTeams', sp, procs_schon_geladen)
+
+
 def anzahl_procs():
     """
     Suche nach Stored Procedures in der aktuellen Datenbank
@@ -1521,6 +1545,7 @@ sps = {
     9: push_sp_ueberschreibeModelle,
     10: push_sp_directConnects,
     11: push_sp_AF_umbenennen,
+    12: push_sp_ungenutzteTeams,
 }
 
 

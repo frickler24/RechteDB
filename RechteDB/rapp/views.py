@@ -350,6 +350,7 @@ def panelDownload(request):
 
     return response
 
+
 def magic_click(request):
     def machwasintelligentes():
         pass
@@ -360,3 +361,33 @@ def magic_click(request):
     '''
     machwasintelligentes()
     return home(request)
+
+
+def panel_ungenutzteTeamliste(request):
+    def hole_daten():
+        antwort = {}
+        fehler = None
+
+        with connection.cursor() as cursor:
+            try:
+                cursor.callproc ("ungenutzteTeams")
+                tmp = cursor.fetchall()
+                for line in tmp:
+                    antwort[line[0]] = line[1]
+            except:
+                e = sys.exc_info()[0]
+                fehler = 'Error in panel_unusedTeamList: {}'.format(e)
+                print(fehler)
+        cursor.close()
+        return antwort, fehler
+
+    if request.method != 'GET':
+        return HttpResponse("Fehlerhafter Aufruf in panel_unusedTeamList")
+
+    antwort, fehler = hole_daten()
+    return render(
+        request, 'rapp/ungenutzte_teams.html', context={
+            'teams': antwort,
+            'fehler': fehler,
+        },
+    )
