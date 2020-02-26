@@ -451,7 +451,7 @@ def panel_rolle_umbenennen(request):
                     # meldung.append('Ursprünglicher Name: {}'.format(alter_name))
                     # meldung.append('Neuer Name: {}'.format(neuer_name))
 
-    # if a GET (or any other method) we'll create a blank form
+    # GET (or any other method)
     else:
         form = FormUmbenennen()
 
