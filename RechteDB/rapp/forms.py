@@ -57,3 +57,11 @@ class ImportForm_schritt3(forms.Form):
     # (Eventuell kann hier noch ein Flag angegeben werden, ob Doppeleinträge gesucht wertden sollen)
     doppelte_suchen = forms.BooleanField(label = 'Suche nach doppelten Einträgen (optional)', required = False)
 
+
+
+# Formular für das Umbenennen von Rollen
+class FormUmbenennen(forms.Form):
+    alter_name = forms.CharField(max_length=50, label='Bestehender Rollenname',
+        error_messages={'required': 'Bitte geben Sie den bestehenden Rollennamen an', 'invalid': 'Bestehender Rollennamen wird benötigt'})
+    neuer_name = forms.CharField(max_length=50, label='Zukünftiger Rollenname',
+        error_messages={'required': 'Bitte geben Sie den zukünftigen Rollennamen an', 'invalid': 'Zukünftiger Rollennamen wird benötigt'})

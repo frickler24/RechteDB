@@ -135,11 +135,17 @@ urlpatterns += [
     path('serienbrief/', login_required(view_serienbrief.serienbrief), name='serienbrief'),
 ]
 
-# Finden neuer Kombiunationen aus AF und GF: Anzeige und spezifische Aktualisierung
+# Finden neuer Kombinationen aus AF und GF: Anzeige und spezifische Aktualisierung
 urlpatterns += [
     path('neue_afgf/', login_required(view_neueAFGF.zeige_neue_afgf), name='zeige_neue_afgf'),
     path('neueAFGF_download/', login_required(view_neueAFGF.neue_afgf_download), name='neueAFGF_download'),
     path('neueAFGF_setzen/', login_required(view_neueAFGF.neueAFGF_setzen), name='neueAFGF_setzen'),
+]
+
+# Kopieren und Namensänderungen von Rollen
+urlpatterns += [
+    path('rolle_umbenennen/', login_required(views.panel_rolle_umbenennen), name='rolle_umbenennen'),
+    path('rolle_kopieren/', login_required(views.panel_rolle_kopieren), name='rolle_kopieren'),
 ]
 
 # URl zum Testen neuer Funktionalität (liegt in "Magie")

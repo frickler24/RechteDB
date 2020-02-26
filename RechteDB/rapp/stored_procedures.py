@@ -1500,6 +1500,34 @@ END
     return push_sp('ungenutzteTeams', sp, procs_schon_geladen)
 
 
+def push_sp_Rolle_umbenennen(procs_schon_geladen):
+    sp = """
+CREATE PROCEDURE rolle_umbenennen (
+    IN von VARCHAR(100),
+    IN nach VARCHAR(100)
+)
+BEGIN
+    START TRANSACTION;
+        SET FOREIGN_KEY_CHECKS = 0;
+        UPDATE tbl_Rollen
+        SET rollenname = nach
+        WHERE rollenname = von;
+    
+        UPDATE tbl_RolleHatAF
+        SET rollenname = nach
+        WHERE rollenname = von;
+    
+        UPDATE tbl_UserHatRolle
+        SET rollenname = nach
+        WHERE rollenname = von;
+
+        SET FOREIGN_KEY_CHECKS = 1;
+    COMMIT;
+END
+"""
+    return push_sp('Rolle_umbenennen', sp, procs_schon_geladen)
+
+
 def anzahl_procs():
     """
     Suche nach Stored Procedures in der aktuellen Datenbank
@@ -1546,6 +1574,7 @@ sps = {
     10: push_sp_directConnects,
     11: push_sp_AF_umbenennen,
     12: push_sp_ungenutzteTeams,
+    13: push_sp_Rolle_umbenennen,
 }
 
 

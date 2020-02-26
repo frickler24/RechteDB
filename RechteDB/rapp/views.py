@@ -22,10 +22,12 @@ from django.utils import timezone
 from math import *
 
 from .filters import PanelFilter
-from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, Letzter_import  # ToDo LetzterImport raus hier
+from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, Letzter_import
+from .models import TblRollen
+
 # An dieser stelle stehen diverse Tools zum Aufsetzen der Datenbank mit SPs
 from .stored_procedures import finde_procs_exakt, connection
-
+from .forms import FormUmbenennen
 
 ###################################################################
 # RApp - erforderliche Sichten und Reports
@@ -83,7 +85,6 @@ def initialisiere_AFliste():
 
 # Der Direkteinsteig für die gesamte Anwendung
 # Dies ist die Einstiegsseite, sie ist ohne Login erreichbar.
-from django.db.models import Count, Max, Min, Avg
 def home(request):
     """
     Zeige ein paar Statistik-Infos über die RechteDB.
@@ -391,3 +392,144 @@ def panel_ungenutzteTeamliste(request):
             'fehler': fehler,
         },
     )
+
+
+def panel_rolle_umbenennen(request):
+    """
+    Zeige das Formular zum Umbenennen von Rollen
+    :param request: GET oder POST Request vom Browser
+    :return: Gerendertes HTML
+    """
+    meldung = list()
+    fehlermeldung = list()
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = FormUmbenennen(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            alter_name = form.cleaned_data['alter_name']
+            neuer_name = form.cleaned_data['neuer_name']
+            print(alter_name, neuer_name)
+
+            # Schau nach, ob der alte Name existiert und der neue Name nicht existiert
+            altok = TblRollen.objects.filter(rollenname=alter_name).count() == 1
+            neuok = TblRollen.objects.filter(rollenname=neuer_name).count() == 0
+
+            if not neuok or not altok:
+                if not altok:
+                    fehlermeldung.append("Der bestehende Rollenname '{}' existiert nicht.".format(alter_name))
+                if not neuok:
+                    fehlermeldung.append("Der neue Rollenname '{}' existiert bereits.".format(neuer_name))
+            else:
+                with connection.cursor() as cursor:
+                    try:
+                        cursor.callproc("rolle_umbenennen", [alter_name, neuer_name])
+                        meldung.append('Prozedur ausgeführt')
+                    except:
+                        e = sys.exc_info()[0]
+                        fehlermeldung.append('Error in Rollen_umbenennen: {}'.format(e))
+                        print(e)
+                        print(sys.exc_info())
+                    cursor.close()
+
+                # Schau nach, ob nun der alte Name nicht mehr existiert und der neue Name existiert
+                altok = TblRollen.objects.filter(rollenname=alter_name).count() == 0
+                neuok = TblRollen.objects.filter(rollenname=neuer_name).count() == 1
+
+                if not neuok or not altok:
+                    if not altok:
+                        fehlermeldung\
+                            .append("Der bestehende Rollenname '{}' existiert immer noch."
+                                    .format(alter_name))
+                    if not neuok:
+                        fehlermeldung\
+                            .append("Der neue Rollenname '{}' existiert nach Umbenennen doch nicht."
+                                    .format(neuer_name))
+                else:
+                    meldung.append('Habe folgende Umbenennung durchgeführt:')
+                    # meldung.append('Ursprünglicher Name: {}'.format(alter_name))
+                    # meldung.append('Neuer Name: {}'.format(neuer_name))
+
+    # GET (or any other method)
+    else:
+        form = FormUmbenennen()
+
+    return render(
+        request,
+        'rapp/rolle_umbenennen.html',
+        context={
+            'form': form,
+            'meldung': meldung,
+            'fehlermeldung': fehlermeldung,
+        },
+    )
+
+
+def panel_rolle_kopieren(request):
+    """
+    Zeige ein paar Statistik-Infos über die RechteDB.
+    Das stellt sicher, dass die Anbidnung an die Datenbank funzt
+    :param request: GET oder POST Request vom Browser
+    :return: Gerendertes HTML
+    """
+
+    def hole_orgainfo():
+        orgas = Letzter_import.objects.exclude(zi_orga=None).distinct().values('zi_orga')
+        orgset = set()
+        for o in orgas:
+            orgset.add(o['zi_orga'])
+
+        importliste = {}
+        for o in sorted(list(orgset)):
+            try:
+                letzter_import_im_modell = Letzter_import.objects\
+                    .filter(zi_orga=o)\
+                    .filter(schritt=5)\
+                    .latest('id')
+                letzter_import = str(letzter_import_im_modell.end)[:19]
+                letzter_importeur = letzter_import_im_modell.user
+            except:
+                letzter_import = 'unbekannt'
+                letzter_importeur = '--'
+
+            name = "{} ({}):".format(o, letzter_importeur)
+            importliste[name] = letzter_import
+
+        return importliste
+
+    num_rights = TblGesamt.objects.all().count()
+    num_userids = TblUserIDundName.objects.all().count
+    num_active_userids = TblUserIDundName.objects.filter(geloescht=False).count
+    num_plattforms = TblPlattform.objects.count
+    num_iamba = TblGesamt.objects.filter(geloescht=False,
+                                         userid_name__abteilung='ZI-AI-BA',
+                                         userid_name__geloescht=False).count
+    num_userids_in_department = TblUserIDundName.objects.filter(geloescht=False, abteilung='ZI-AI-BA').count
+    num_teams = TblOrga.objects.all().count
+    num_active_rights = TblGesamt.objects.filter(geloescht=False).count
+    stored_procedures = finde_procs_exakt()
+
+    # Sicherheitshalber wird immer bei Aufruf der Startseite die Tabelle tbl_AFListe neu aufgebaut
+    initialisiere_AFliste()
+
+    request.session['version'] = version
+    return render(
+        request,
+        'index.html',
+        context={
+            'num_rights': num_rights,
+            'num_active_rights': num_active_rights,
+            'num_userIDs': num_userids,
+            'num_iam_ba': num_iamba,
+            'num_activeUserIDs': num_active_userids,
+            'num_plattforms': num_plattforms,
+            'num_userIDsInDepartment': num_userids_in_department,
+            'num_teams': num_teams,
+            'num_users': User.objects.all().count,
+            'sps': stored_procedures,
+            'importliste': hole_orgainfo(),
+        },
+    )
+
+
