@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.contrib.auth.decorators import login_required
 from django.urls import path
 
+from . import view_rolle_umbenennen
 from . import views
 from . import view_UserHatRolle
 from . import view_import
@@ -144,7 +145,7 @@ urlpatterns += [
 
 # Kopieren und Namensänderungen von Rollen
 urlpatterns += [
-    path('rolle_umbenennen/', login_required(views.panel_rolle_umbenennen), name='rolle_umbenennen'),
+    path('rolle_umbenennen/', login_required(view_rolle_umbenennen.panel_rolle_umbenennen), name='rolle_umbenennen'),
     path('rolle_kopieren/', login_required(views.panel_rolle_kopieren), name='rolle_kopieren'),
 ]
 

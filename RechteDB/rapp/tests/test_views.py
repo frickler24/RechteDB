@@ -1,7 +1,5 @@
-# from django.core.files.base import ContentFile
 import re
 from datetime import timedelta
-import time
 
 from django.test import TestCase
 from django.urls import reverse, resolve
@@ -2656,6 +2654,9 @@ class SetupDatabase(TestCase):
         self.assertContains(self.response, 'push_sp_ueberschreibeModelle war erfolgreich.', 1)
         self.assertContains(self.response, 'push_sp_directConnects war erfolgreich.', 1)
         self.assertContains(self.response, 'push_sp_AF_umbenennen war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_ungenutzteTeams war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_Rolle_umbenennen war erfolgreich.', 1)
+
 
 class ImportNewIIQSingleRecordTest(TestCase):
     # Tests für den Import neuer CSV-Listen und der zugehörigen Tabellen
@@ -2903,3 +2904,5 @@ class NeuAFGFTest(TestCase):
         url = reverse('zeige_neue_afgf')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+# ToDo: Hier müssen Testfälle für das Umbenennen von Rollen hinein
