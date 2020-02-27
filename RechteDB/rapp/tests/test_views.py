@@ -2905,4 +2905,3 @@ class NeuAFGFTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-# ToDo: Hier müssen Testfälle für das Umbenennen von Rollen hinein
