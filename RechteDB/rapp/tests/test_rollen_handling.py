@@ -1,15 +1,19 @@
-# import re
 from datetime import timedelta
 
 from django.test import TestCase
 from django.urls import reverse, resolve
 from django.utils import timezone
-# from django.db import connection
 
 from ..anmeldung import Anmeldung
-from ..models import TblOrga, TblUebersichtAfGfs, TblUserIDundName, TblPlattform, TblGesamt, \
-    TblAfliste, TblUserhatrolle, TblRollehataf, TblRollen
-# from ..stored_procedures import push_sp_Rolle_umbenennen, anzahl_procs
+from ..models import TblOrga
+from ..models import TblUebersichtAfGfs
+from ..models import TblUserIDundName
+from ..models import TblPlattform
+from ..models import TblGesamt
+from ..models import TblAfliste
+from ..models import TblUserhatrolle
+from ..models import TblRollehataf
+from ..models import TblRollen
 from .test_views import SetupDatabase
 
 
