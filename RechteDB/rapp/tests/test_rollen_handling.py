@@ -387,3 +387,90 @@ class UngenutzteTeamsTests(TestCase):
         self.assertContains(response, "Ungenutzte Teams", 4)
 
 """
+
+class UngenutzteRollenTests(TestCase):
+    def setUp(self):
+        Anmeldung(self.client.login)
+        SetupDatabase()
+
+        TblOrga.objects.create(
+            team='Django-Team-01',
+            themeneigentuemer='Ihmchen_01',
+        )
+
+        TblOrga.objects.create(
+            team='Django-Team-02',
+            themeneigentuemer='Ihmchen_02',
+        )
+
+        # Drei User: XV und DV aktiv, AV gelöscht
+        TblUserIDundName.objects.create(
+            userid='xv13254',
+            name='User_xv13254',
+            orga=TblOrga.objects.get(team='Django-Team-01'),
+            zi_organisation='AI-BA',
+            geloescht=False,
+            abteilung='ZI-AI-BA',
+            gruppe='ZI-AI-BA-PS',
+        )
+        TblUserIDundName.objects.create(
+            userid='dv13254',
+            name='User_xv13254',
+            orga=TblOrga.objects.get(team='Django-Team-01'),
+            zi_organisation='AI-BA',
+            geloescht=False,
+            abteilung='ZI-AI-BA',
+            gruppe='ZI-AI-BA-PS',
+        )
+        TblUserIDundName.objects.create(
+            userid='av13254',
+            name='User_xv13254',
+            orga=TblOrga.objects.get(team='Django-Team-01'),
+            zi_organisation='AI-BA',
+            geloescht=True,
+            abteilung='ZI-AI-BA',
+            gruppe='ZI-AI-BA-PS',
+        )
+
+        # Zwei Rollen, die auf den XV-User vergeben werden
+        TblRollen.objects.create(
+            rollenname='Erste Neue Rolle',
+            system='Testsystem',
+            rollenbeschreibung='Das ist eine Testrolle',
+        )
+        TblRollen.objects.create(
+            rollenname='Zweite Neue Rolle',
+            system='Irgendein System',
+            rollenbeschreibung='Das ist auch eine Testrolle',
+        )
+
+        TblRollen.objects.create(
+            rollenname='Diese eine ungenutzte Rolle soll gefunden werden',
+            system='Irgendein System',
+            rollenbeschreibung='Das ist auch eine Testrolle',
+        )
+
+        # Dem XV-User werden zwei Rollen zugewiesen, dem AV- und DV-User keine
+        TblUserhatrolle.objects.create(
+            userid=TblUserIDundName.objects.get(userid='xv13254'),
+            rollenname=TblRollen.objects.get(rollenname='Erste Neue Rolle'),
+            schwerpunkt_vertretung='Schwerpunkt',
+            bemerkung='Das ist eine Testrolle für ZI-AI-BA-PS',
+            letzte_aenderung=timezone.now(),
+        )
+        TblUserhatrolle.objects.create(
+            userid=TblUserIDundName.objects.get(userid='xv13254'),
+            rollenname=TblRollen.objects.get(rollenname='Zweite Neue Rolle'),
+            schwerpunkt_vertretung='Vertretung',
+            bemerkung='Das ist auch eine Testrolle für ZI-AI-BA-PS',
+            letzte_aenderung=timezone.now(),
+        )
+
+    def test_panel_status_code(self):
+        url = reverse('ungenutzte_rollen')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response,
+                            "Anzahl Rollen gesamt: 3, Anzahl genutzte Rollen: 2, Anzahl ungenutzter Rollen: 1", 1)
+        self.assertContains(response, "Diese eine ungenutzte Rolle soll gefunden werden", 1)
+
