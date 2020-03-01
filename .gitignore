@@ -57,3 +57,5 @@ Rechte ZI-AI-konvertiert.csv
 other_files/XA/
 other_files/RechteDB-20*.sql*
 other_files/neue_AFGF-AI-BA nach erster Umbenennung 20200222.ods
+db.json
+testdb.json
