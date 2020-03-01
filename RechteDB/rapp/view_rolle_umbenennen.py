@@ -4,8 +4,7 @@ from django.shortcuts import render
 
 from .forms import FormUmbenennen
 from .models import TblRollen
-from .stored_procedures import connection
-
+from django.db import connection
 
 def panel_rolle_umbenennen(request):
     """

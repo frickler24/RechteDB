@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from django.contrib.auth.decorators import login_required
 from django.urls import path
 
-from . import view_rolle_umbenennen
 from . import views
 from . import view_UserHatRolle
 from . import view_import
@@ -11,6 +10,8 @@ from . import stored_procedures
 from . import view_serienbrief
 from . import view_neueAFGF
 from . import view_manuell
+from . import view_rolle_umbenennen
+from . import view_ungenutzte_rollen
 
 # app_name = 'rapp'        # Wird nur benötigt als namespace, falls mehrere Apps dieselbe Teil-URL haben
 
@@ -146,7 +147,8 @@ urlpatterns += [
 # Kopieren und Namensänderungen von Rollen
 urlpatterns += [
     path('rolle_umbenennen/', login_required(view_rolle_umbenennen.panel_rolle_umbenennen), name='rolle_umbenennen'),
-    path('rolle_kopieren/', login_required(views.panel_rolle_kopieren), name='rolle_kopieren'),
+    path('ungenutzte_rollen/', login_required(view_ungenutzte_rollen.panel_ungenutzte_rollen), name='ungenutzte_rollen'),
+    # ToDo: path('rolle_kopieren/', login_required(views.panel_rolle_kopieren), name='rolle_kopieren'),
 ]
 
 # URl zum Testen neuer Funktionalität (liegt in "Magie")
