@@ -385,7 +385,7 @@ class UngenutzteTeamsTests(TestCase):
 
     # Ist die Seite da?
     def test_panel_status_code(self):
-        url = reverse('ungenutzteTeamliste')
+        url = reverse('ungenutzteTeams')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Ungenutzte Teams", 4)
