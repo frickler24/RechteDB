@@ -362,7 +362,7 @@ def magic_click(request):
     return home(request)
 
 
-def panel_ungenutzteTeamliste(request):
+def panel_ungenutzteTeams(request):
     def hole_daten():
         antwort = {}
         fehler = None

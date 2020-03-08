@@ -37,10 +37,14 @@
                 </div>
                 {% for key, value in teams.items %}
                     <div class="col-2" style="text-align: bottom;">
+                        <a href="{% url 'admin:rapp_tblorga_change' key %}" target="_blank" >
                         {{ key }}
+                        </a>
                     </div>
                     <div class="col-10" style="text-align: bottom;">
+                        <a href="{% url 'admin:rapp_tblorga_change' key %}" target="_blank" >
                         {{ value }}
+                        </a>
                     </div>
                 {% endfor %}
             </div>

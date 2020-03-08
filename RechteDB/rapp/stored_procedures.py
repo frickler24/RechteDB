@@ -1512,11 +1512,11 @@ BEGIN
         UPDATE tbl_Rollen
         SET rollenname = nach
         WHERE rollenname = von;
-    
+
         UPDATE tbl_RolleHatAF
         SET rollenname = nach
         WHERE rollenname = von;
-    
+
         UPDATE tbl_UserHatRolle
         SET rollenname = nach
         WHERE rollenname = von;
@@ -1526,6 +1526,45 @@ BEGIN
 END
 """
     return push_sp('Rolle_umbenennen', sp, procs_schon_geladen)
+
+
+def push_sp_ungenutzteAFGF(procs_schon_geladen):
+    sp = """
+CREATE PROCEDURE ungenutzteAFGF()
+BEGIN
+    DROP TABLE IF EXISTS alleAFGF;
+    
+    CREATE TEMPORARY TABLE alleAFGF
+        SELECT DISTINCT `enthalten_in_af`,
+            `gf`,
+            modell,
+            geloescht
+        FROM `tblGesamt`
+        UNION
+        SELECT DISTINCT `enthalten_in_af`,
+            `gf`,
+            modell,
+            geloescht
+        FROM `tblGesamtHistorie`
+        GROUP BY enthalten_in_af, gf;
+    
+    ALTER TABLE `RechteDB`.`alleAFGF` ADD INDEX `modell` (modell);
+    
+    SELECT
+        tblUEbersichtAF_GFs.id,
+        tblUEbersichtAF_GFs.name_af_neu,
+        tblUEbersichtAF_GFs.name_gf_neu,
+        alleAFGF.geloescht as 'tf_geloescht',
+        tblUEbersichtAF_GFs.geloescht as 'afgf_ungenutzt'
+    FROM tblUEbersichtAF_GFs
+    LEFT JOIN alleAFGF
+        ON alleAFGF.modell = tblUEbersichtAF_GFs.id
+    
+    WHERE alleAFGF.enthalten_in_af is null
+    ORDER BY name_af_neu, name_gf_neu;
+END
+"""
+    return push_sp('ungenutzteAFGF', sp, procs_schon_geladen)
 
 
 def anzahl_procs():
@@ -1548,7 +1587,6 @@ def anzahl_procs():
 
 
 def finde_procs():
-    finde_procs_exakt()
     return anzahl_procs() > 0
 
 
@@ -1557,7 +1595,6 @@ def finde_procs_exakt():
 
 
 def soll_procs():
-    # print('Anzahl zu ladender Stored Procedures =', len(sps))
     return len(sps)
 
 
@@ -1575,6 +1612,7 @@ sps = {
     11: push_sp_AF_umbenennen,
     12: push_sp_ungenutzteTeams,
     13: push_sp_Rolle_umbenennen,
+    14: push_sp_ungenutzteAFGF,
 }
 
 

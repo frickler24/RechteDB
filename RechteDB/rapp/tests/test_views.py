@@ -2350,7 +2350,7 @@ class UserRolleUnbenutzteAFTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Keine angezeigten User", 1)
         self.assertContains(response, "Rollenname", 1)
-        self.assertContains(response, "Ungenutzte AF", 1)
+        self.assertContains(response, "Ungenutzte AF", 2)
         self.assertContains(response, "Erste Neue Rolle", 3)
         self.assertContains(response, "rva_01219_beta91_job_abst_nicht_zugewiesen", 2)
         self.assertContains(response, " die Selektion ungenutzte Arbeitsplatzfunktionen in den angegebenen Rollen", 1)
@@ -2904,4 +2904,33 @@ class NeuAFGFTest(TestCase):
         url = reverse('zeige_neue_afgf')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+
+"""
+Die Dinger hier gehen wieder nicht, weil die SPs nicht geladen sind
+class ListenTest(TestCase):
+
+    def test_ungenutzteTeams(self):
+        url = reverse('ungenutzteTeams')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(self.response, 'Ungenutzte Teams', 2)
+        self.assertContains(self.response,
+                            'Auflistung definierter AF-GF-Kombinationen, die keinem User zugeordnet sind')
+        self.assertContains(self.response,
+                            'Betrachtet werden sowohl die aktiven als auch die historisierten Berechtigungen')
+
+
+    def test_ungenutzteAFGF(self):
+        url = reverse('ungenutzte_afgf')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(self.response, 'Ungenutzte AFGF-Kombinationen', 2)
+        self.assertContains(self.response,
+                            'Auflistung definierter AF-GF-Kombinationen, die keinem User zugeordnet sind')
+        self.assertContains(self.response,
+                            'Betrachtet werden sowohl die aktiven als auch die historisierten Berechtigungen')
+
+"""
+
 

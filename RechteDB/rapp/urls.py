@@ -12,6 +12,7 @@ from . import view_neueAFGF
 from . import view_manuell
 from . import view_rolle_umbenennen
 from . import view_ungenutzte_rollen
+from . import view_ungenutzte_afgf
 
 # app_name = 'rapp'        # Wird nur benötigt als namespace, falls mehrere Apps dieselbe Teil-URL haben
 
@@ -50,7 +51,7 @@ urlpatterns += [
 # Der Link auf die Team-Listen
 urlpatterns += [
     path('teamliste/', login_required(views.TeamListView.as_view()), name='teamliste'),
-    path('ungenutzteTeamliste/', login_required(views.panel_ungenutzteTeamliste), name='ungenutzteTeamliste'),
+    path('ungenutzteTeams/', login_required(views.panel_ungenutzteTeams), name='ungenutzteTeams'),
 ]
 
 # Generische Formulare für CUD Orga (Teams, werden im Frontend bedient)
@@ -142,6 +143,11 @@ urlpatterns += [
     path('neue_afgf/', login_required(view_neueAFGF.zeige_neue_afgf), name='zeige_neue_afgf'),
     path('neueAFGF_download/', login_required(view_neueAFGF.neue_afgf_download), name='neueAFGF_download'),
     path('neueAFGF_setzen/', login_required(view_neueAFGF.neueAFGF_setzen), name='neueAFGF_setzen'),
+]
+
+# Finden ungenutzter Kombinationen aus AF und GF: Anzeige mit spezifischen Links auf die jeweilige Adminseite
+urlpatterns += [
+    path('ungenutzte_afgf/', login_required(view_ungenutzte_afgf.panel_ungenutzte_afgf), name='ungenutzte_afgf'),
 ]
 
 # Kopieren und Namensänderungen von Rollen
