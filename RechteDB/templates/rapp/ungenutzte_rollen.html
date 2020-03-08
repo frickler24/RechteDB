@@ -4,11 +4,11 @@
 
 {% block breadcrumb %}
 	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
-	<li class="breadcrumb-item active">Rolle umbenennen</li>
+	<li class="breadcrumb-item active">Zeige ungenutzte Rollen</li>
 {% endblock breadcrumb %}
 
 {% block title %}
-	Rolle umbenennen - {{ block.super }}
+	Zeige ungenutzte Rollen - {{ block.super }}
 {% endblock %}
 
 
@@ -19,8 +19,10 @@
             <div class="container alert-normal">
                 {% for elem in liste %}
                 <div class="row">
-                    <div class="form-group col-12">
+                    <div class="form-group col-10">
+                        <a href="{% url 'admin:rapp_tblrollen_change' elem.rollenname %}" target="_blank" >
                         {{ elem.rollenname }}
+                        </a>
                     </div>
                 </div>
                 {% empty %}

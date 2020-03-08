@@ -33,10 +33,6 @@ DATABASES = {
         default=config('DATABASE_URL'),
         conn_max_age=600,
     ),
-    'foo': dj_database_url.config(
-        default=config('DATABASE_URL_FOO'),
-        conn_max_age=600,
-    )
 }
 
 # Application definition

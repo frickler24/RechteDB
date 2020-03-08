@@ -40,7 +40,7 @@ from django.conf.urls import include
 urlpatterns += [
     path('accounts/', include('django.contrib.auth.urls')),
     path('rapp/', include('rapp.urls')),
-    path('mdeditor/', include('mdeditor.urls'))
+    path('mdeditor/', include('mdeditor.urls')),
 ]
 
 if settings.DEBUG:

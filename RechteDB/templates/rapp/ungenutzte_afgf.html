@@ -3,11 +3,11 @@
 
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
-    <li class="breadcrumb-item active">Ungenutzte Teams</li>
+    <li class="breadcrumb-item active">Ungenutzte AFGF-Kombinationen</li>
 {% endblock breadcrumb %}
 
 {% block title %}
-	Ungenutzte Teams - {{ block.super }}
+	Ungenutzte aber genehmigte AFGF-Kombinationen - {{ block.super }}
 {% endblock %}
 
 {% block content %}
@@ -18,8 +18,9 @@
             </div>
             <div class="col mt-3">
                 <h5>
-                    Auflistung definierter Teams, denen keine User zugeordnet sind
+                    Auflistung definierter AF-GF-Kombinationen, die keinem User zugeordnet sind
                 </h5>
+                <p>Betrachtet werden sowohl die aktiven als auch die historisierten Berechtigungen</p>
             </div>
         </div>
         <div class="row mb-5 align-bottom">
