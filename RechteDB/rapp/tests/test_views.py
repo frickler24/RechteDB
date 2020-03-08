@@ -2905,3 +2905,29 @@ class NeuAFGFTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+
+class ListenTest(TestCase):
+
+    def test_ungenutzteTeams(self):
+        url = reverse('ungenutzteTeams')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(self.response, 'Ungenutzte Teams')
+        self.assertContains(self.response,
+                            'Auflistung definierter AF-GF-Kombinationen, die keinem User zugeordnet sind')
+        self.assertContains(self.response,
+                            'Betrachtet werden sowohl die aktiven als auch die historisierten Berechtigungen')
+
+
+    def test_ungenutzteAFGF(self):
+        url = reverse('ungenutzteAFGF')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(self.response, 'Ungenutzte Teams')
+        self.assertContains(self.response,
+                            'Auflistung definierter AF-GF-Kombinationen, die keinem User zugeordnet sind')
+        self.assertContains(self.response,
+                            'Betrachtet werden sowohl die aktiven als auch die historisierten Berechtigungen')
+
+
+

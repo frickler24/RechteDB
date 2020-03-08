@@ -17,7 +17,7 @@ def panel_ungenutzte_afgf(request):
     antwort, fehler = hole_daten()
     return render(
         request, 'rapp/ungenutzte_afgf.html', context={
-            'teams': antwort,
+            'antwort': antwort,
             'fehler': fehler,
         },
     )
@@ -36,7 +36,7 @@ def hole_daten():
             cursor.callproc ("ungenutzteAFGF")
             tmp = cursor.fetchall()
             for line in tmp:
-                antwort[line[0]] = line[1]
+                antwort[line[0]] = (line[1], line[2])
         except:
             e = sys.exc_info()[0]
             fehler = 'Error in panel_unusedTeamList: {}'.format(e)
