@@ -192,3 +192,25 @@ rappviele: vieleweg
             -v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB:/RechteDB/code \
             rapp:latest; done')
 
+chaos:
+	docker login -u=_ -p=$$CMKEY docker.chaosmesh.io
+	docker run \
+		--detach \
+		--name chaosmesh-agent \
+		--volume /var/run:/var/run \
+		--volume /run:/run \
+		--volume /dev:/dev \
+		--volume /sys:/sys \
+		--volume /var/log:/var/log \
+		--privileged \
+		--net=host \
+		--pid=host \
+		--ipc=host \
+		--restart unless-stopped \
+		--env="CHAOSMESH_AGENT_KEY=$$CMKEY" \
+		--env="CHAOSMESH_AGENT_REGISTER_URL=https://platform.chaosmesh.io" \
+		docker.chaosmesh.io/chaosmesh/agent
+
+nochaos:
+	-docker container rm -f chaosmesh-agent
+

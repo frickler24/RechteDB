@@ -237,7 +237,9 @@ class RollenUmbenennenTests(TestCase):
         self.assertNotContains(response, "Bitte geben Sie den bestehenden Rollennamen an")
         self.assertNotContains(response, "Bitte geben Sie den zukünftigen Rollennamen an")
 
-        self.assertContains(response, "Der bestehende Rollenname &#39;FALSCH Erste Neue Rolle&#39; existiert nicht.", 1)
+        self.assertContains(response, "Der bestehende Rollenname &#", 1)
+        self.assertContains(response, ";FALSCH Erste Neue Rolle&#", 1)
+        self.assertContains(response, "; existiert nicht.", 1)
         self.assertNotContains(response,
                                "Der bestehende Rollenname &#39;Rolle gibt es noch nicht&#39; existiert nicht.")
         self.assertNotContains(response, "Der neue Rollenname &#39;Zweite Neue Rolle&#39; existiert bereits.")
