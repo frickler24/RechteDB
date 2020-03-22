@@ -9,9 +9,9 @@ RUN apt-get update \
 
 RUN pip install --upgrade pip
 
-COPY requirements.txt ./
+COPY RechteDB/rapp/requirements/* ./
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install -r prod.txt
 
 COPY code_* /tmp/.
 RUN tar xf /tmp/code_* 

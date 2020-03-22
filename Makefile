@@ -88,7 +88,6 @@ codefile:
                 RechteDB/.dockerignore \
                 RechteDB/Makefile \
                 RechteDB/RechteDB \
-                RechteDB/requirements.txt \
                 RechteDB/Testfabrik_clear.csv \
                 RechteDB/Testfabrik_init.csv \
                 RechteDB/Testfabrik_run.csv \

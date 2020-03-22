@@ -7,14 +7,13 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --upgrade pip
+RUN pip3 install --upgrade pip
 
-COPY RechteDB/rapp/requirements/requirements.txt ./
-RUN pip install -r requirements.txt
+COPY RechteDB/rapp/requirements/* ./
+RUN pip3 install -r prod.txt
 
 RUN mkdir -p /RechteDB/code
 WORKDIR /RechteDB/code
-# ADD RechteDB/ .
 
 EXPOSE 8000
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
