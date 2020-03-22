@@ -237,12 +237,10 @@ class RollenUmbenennenTests(TestCase):
         self.assertNotContains(response, "Bitte geben Sie den bestehenden Rollennamen an")
         self.assertNotContains(response, "Bitte geben Sie den zukünftigen Rollennamen an")
 
-        self.assertContains(response, "Der bestehende Rollenname &#", 1)
-        self.assertContains(response, ";FALSCH Erste Neue Rolle&#", 1)
-        self.assertContains(response, "; existiert nicht.", 1)
+        self.assertContains(response, "Der bestehende Rollenname &#x27;FALSCH Erste Neue Rolle&#x27; existiert nicht.", 1)
         self.assertNotContains(response,
-                               "Der bestehende Rollenname &#39;Rolle gibt es noch nicht&#39; existiert nicht.")
-        self.assertNotContains(response, "Der neue Rollenname &#39;Zweite Neue Rolle&#39; existiert bereits.")
+                               "Der bestehende Rollenname &#x27;Rolle gibt es noch nicht&#x27; existiert nicht.")
+        self.assertNotContains(response, "Der neue Rollenname &#x27;Zweite Neue Rolle&#x27; existiert bereits.")
 
     def test_wrong_first_wrong_second_param(self):
         url = reverse('rolle_umbenennen')
@@ -258,12 +256,8 @@ class RollenUmbenennenTests(TestCase):
         self.assertNotContains(response, "Bitte geben Sie den bestehenden Rollennamen an")
         self.assertNotContains(response, "Bitte geben Sie den zukünftigen Rollennamen an")
 
-        self.assertContains(response, "Der bestehende Rollenname &#", 1)
-        self.assertContains(response, ";FALSCH Erste Neue Rolle&#", 1)
-        self.assertContains(response, "; existiert nicht.", 1)
-        self.assertContains(response, "Der neue Rollenname &#", 1)
-        self.assertContains(response, ";Zweite Neue Rolle&#", 1)
-        self.assertContains(response, "; existiert bereits.", 1)
+        self.assertContains(response, "Der bestehende Rollenname &#x27;FALSCH Erste Neue Rolle&#x27; existiert nicht.", 1)
+        self.assertContains(response, "Der neue Rollenname &#x27;Zweite Neue Rolle&#x27; existiert bereits.", 1)
 
 """
     # Das geht hier alles noch nicht, weil die Stored Procedures nicht geladen sind.
