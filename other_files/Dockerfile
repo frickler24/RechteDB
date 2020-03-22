@@ -9,7 +9,7 @@ RUN apt-get update \
 
 RUN pip install --upgrade pip
 
-COPY requirements.txt ./
+COPY RechteDB/rapp/requirements/requirements.txt ./
 RUN pip install -r requirements.txt
 
 RUN mkdir -p /RechteDB/code
