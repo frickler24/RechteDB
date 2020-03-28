@@ -15,9 +15,7 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
-
 from decouple import config, Csv
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
@@ -87,7 +85,7 @@ TEMPLATES = [
     },
 ]
 
-#WSGI_APPLICATION = 'RechteDB.wsgi.application'
+WSGI_APPLICATION = 'RechteDB.wsgi.application'
 
 
 # Database
@@ -120,12 +118,14 @@ USE_L10N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
-
+# Für die Nutzung von {% staic 'file' %}
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 STATIC_URL = '/static/'
+
+# Nur für das Deployment
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
 MEDIA_URL = '/media/'
