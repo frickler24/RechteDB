@@ -193,6 +193,7 @@ rappviele: vieleweg
 
 chaos:
 	docker login -u=_ -p=$$CMKEY docker.chaosmesh.io
+	docker pull docker.chaosmesh.io/chaosmesh/agent
 	docker run \
 		--detach \
 		--name chaosmesh-agent \
@@ -213,3 +214,12 @@ chaos:
 nochaos:
 	-docker container rm -f chaosmesh-agent
 
+prod:
+	(cd RechteDB; docker-compose up -d)
+
+prodoff:
+	(cd RechteDB; docker-compose down)
+
+prodneu: prodoff
+	docker image rm -f gunicorn_rapp nginx-rapp
+	make prod
