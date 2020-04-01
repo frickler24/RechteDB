@@ -218,8 +218,8 @@ prod:
 	(cd RechteDB; docker-compose up -d)
 
 prodoff:
-	(cd RechteDB; docker-compose down)
+	(cd RechteDB; docker-compose down -t 1)
 
-prodneu: prodoff
-	docker image rm -f gunicorn_rapp nginx-rapp
-	make prod
+prodneu:
+	(cd RechteDB && docker-compose build --no-cache && docker-compose up --detach --force-recreate)
+
