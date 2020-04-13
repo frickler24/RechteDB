@@ -30,11 +30,18 @@
 			</h2>
 			<div class="container">
 				<div class="row justify-content-md-center">
+					<a href="{% url 'uhr_konzept_pdf' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}episch=0"
+					   class="btn btn-outline-primary btn-sm" role="button"
+					   target="_blank">Erzeuge PDF kurz
+					</a> &nbsp;
 					<a href="{% url 'uhr_konzept_pdf' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}episch=1"
 					   class="btn btn-outline-primary btn-sm" role="button"
-					   target="_blank">Erzeuge PDF
-						(episch, mehrere Minuten,
-						Sie können zu diesem Tab zurückkehren und weiterarbeiten)
+					   target="_blank">Erzeuge PDF mit TF-Auflösung
+					</a> &nbsp;
+					<a href="{% url 'uhr_konzept_pdf' %}?{% for key,value in request.GET.items %}{{ key }}={{ value }}&{%endfor %}episch=9"
+					   class="btn btn-outline-primary btn-sm" role="button"
+						target="_blank">Erzeuge PDF episch,
+						Sie können in diesem Tab bleiben und während der Erzeugung ded PDFs weiterarbeiten)
 					</a>
 				</div>
 			</div>

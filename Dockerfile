@@ -9,7 +9,7 @@ RUN apt-get update \
 
 RUN pip3 install --upgrade pip
 
-COPY RechteDB/rapp/requirements/* ./
+COPY RechteDB/requirements/* ./
 RUN pip3 install -r prod.txt
 
 RUN mkdir -p /RechteDB/code

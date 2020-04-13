@@ -157,12 +157,6 @@
 				{% endfor aftf_dict %}
 				<hr />
 			</div>
-		{% else %}
-			<div class="text-danger">
-				<p>
-					Keine AF / TF - Informationen
-				</p>
-			</div>
 		{% endif %}
 
 		{% if racf_liste %}
@@ -173,7 +167,7 @@
 			<div id="AFTF_liste">
 				{% for g in racf_liste|dictsort:"group" %}
 					{% ifchanged g.group %}<hr />{% endifchanged %}
-					<p id="RACF_{{g.group}}" style="font-size: 6px; line-height: 1; margin: -1rem;">
+					<p id="RACF_{{g.group}}" style="font-size: 6px; line-height: 1; margin: 0rem;">
 						<strong>Name (Group): '{{ g.group }}'</strong>,
 						&nbsp; &nbsp;
 						Klasse: {{ g.ressource_class }},
@@ -193,8 +187,6 @@
 				{% endfor racf_liste %}
 				<hr />
 			</div>
-		{% else %}
-			<div>Keine RACF - Informationen</div>
 		{% endif %}
 
 		{% if db2_liste %}
@@ -206,7 +198,7 @@
 			<div id="Db2_liste">
 				{% for grant in db2_liste %}
 					{% ifchanged grant.grantee %}<hr />{% endifchanged %}
-					<p id="RACF_{{grant.grantee}}" style="font-size: 6px; line-height: 1; margin: -1rem;">
+					<p id="RACF_{{grant.grantee}}" style="font-size: 6px; line-height: 1; margin: 0rem;">
 						<strong>Name TF (Grantee):	'{{ grant.grantee }}'</strong>,
 						&nbsp; &nbsp;
 						<strong>Umgebung: 			{{ grant.source }}</strong>,
@@ -227,8 +219,6 @@
 						{% if grant.indexauth  %}INDEX={{  grant.indexauth }}{% endif %}
 					</p>
 				{% endfor db2_liste %}
-		{% else %}
-			<div>Keine Db2 - Informationen</div>
 		{% endif %}
 
 		{% if winacl_liste %}
@@ -239,7 +229,7 @@
 			<div id="AFTF_liste">
 				{% for ac in winacl_liste %}
 					{% ifchanged ac.group %}<hr />{% endifchanged %}
-					<p id="WINACL_{{ac.tf}}" style="font-size: 6px; line-height: 1; margin: -1rem;">
+					<p id="WINACL_{{ac.tf}}" style="font-size: 6px; line-height: 1; margin: 0rem;">
 						<strong>Name (AD-TF): '{{ ac.tf }}'</strong>,
 						&nbsp; &nbsp;
 						Zugriff: {{ ac.zugriff }},
@@ -260,8 +250,6 @@
 					</p>
 				{% endif %}
 			</div>
-		{% else %}
-			<div>Keine WINACL - Informationen</div>
 		{% endif %}
 
 		<div id="footerContent">
