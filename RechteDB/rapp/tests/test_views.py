@@ -1026,7 +1026,6 @@ class UserRolleAFTests(TestCase):
     # User / Rolle / AF: Die Hauptseite für Aktualisierungen / Ergänzungen / Löschungen von Rollen und Verbindungen
     def setUp(self):
         Anmeldung(self.client.login)
-        SetupDatabase()
         TblOrga.objects.create(
             team='Django-Team-01',
             themeneigentuemer='Ihmchen_01',
@@ -1343,7 +1342,7 @@ class UserRolleAFTests(TestCase):
         konzept_url = reverse('uhr_konzept')
         response = self.client.get(url)
         self.assertContains(response, 'href="{0}?episch=0"'.format(konzept_url), 1)
-        self.assertContains(response, 'href="{0}?episch=1"'.format(konzept_url), 1)
+        self.assertContains(response, 'href="{0}?episch=9"'.format(konzept_url), 1)
 
     def test_panel_view_contains_link_to_matrix_view(self):
         url = reverse('user_rolle_af')
@@ -1368,10 +1367,13 @@ class UserRolleAFTests(TestCase):
         self.assertContains(response, 'Das ist auch eine Testrolle', 1)
         self.assertContains(response, 'Testsystem', 1)
         self.assertContains(response, 'Irgendein System', 1)
-        self.assertContains(response, 'episch, mehrere Minuten,', 1)
-        self.assertContains(response, '<div>Keine TF-Menge (aftf_dict) geliefert</div>', 1)
+        self.assertContains(response, 'Erzeuge PDF kurz', 1)
+        self.assertContains(response, 'Erzeuge PDF mit TF-Auflösung', 1)
+        self.assertContains(response, 'Erzeuge PDF episch,', 1)
+        self.assertContains(response, '<div>Keine TF-Menge geliefert</div>', 1)
         self.assertContains(response, '<div>Keine RACF-Liste geliefert</div>', 1)
         self.assertContains(response, '<div>Keine Db2-Daten geliefert</div>', 1)
+        self.assertContains(response, '<div>Keine ACL-Daten geliefert</div>', 1)
 
     def test_panel_view_use_matrix_view(self):
         url = reverse('uhr_matrix')
@@ -2638,6 +2640,11 @@ class SetupDatabase(TestCase):
         url = reverse('stored_procedures')
         self.response = self.client.get(url)
         self.assertContains(self.response, 'csrfmiddlewaretoken')
+
+
+class SetupDatabase2(TestCase):
+    def setUp(self):
+        Anmeldung(self.client.login)
 
     def test_setup_setup_database_load_stored_proc(self):
         url = reverse('stored_procedures')

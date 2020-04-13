@@ -1421,19 +1421,27 @@ def erzeuge_UhR_konzept(request, ansicht):
 
     log(request, rollenMenge, userids, usernamen)
 
-    aftf_dict = liefere_tf_liste(rollenMenge, userids)
-    tf_liste = kurze_tf_liste(aftf_dict)
     af_kritikalitaet = liefere_af_kritikalitaet(rollenMenge, userids)
 
-    if request.GET.get('episch', 0) == '1':
+    winnoe = None
+    tf_liste = None
+    aftf_dict = None
+    db2_liste = None
+    racf_liste = None
+    winacl_Liste = None
+
+    # episch = 0: Liefere nur das generierte Konzept
+    # episch = 1: Liefere zusätzlich die TF-Liste
+    # episch = 9: Liefere alles, was in der DB zu finden ist
+    episch = int(request.GET.get('episch', 0))
+    if episch >= 1:
+        aftf_dict = liefere_tf_liste(rollenMenge, userids)
+        tf_liste = kurze_tf_liste(aftf_dict)
+
+    if episch == 9:
         racf_liste = liefere_racf_zu_tfs(tf_liste)
         db2_liste = liefere_db2_liste(tf_liste)
         (winacl_Liste, winnoe) = liefere_win_lw_Liste(tf_liste)
-    else:     # Die Riesenlisten werden nur auf Anforderung aus dem UI erzeugt
-        racf_liste = None
-        db2_liste = None
-        winacl_Liste = None
-        winnoe = None
 
     context = {
         'filter': panel_filter,
@@ -1446,6 +1454,7 @@ def erzeuge_UhR_konzept(request, ansicht):
         'winnoe': winnoe,
         'version': version,
         'ueberschrift': erzeuge_ueberschrift(request),
+        'episch': episch,
     }
     if (ansicht):
         return render(request, 'rapp/panel_UhR_konzept.html', context)
