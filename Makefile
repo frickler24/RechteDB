@@ -139,6 +139,15 @@ rapptest:
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB:/RechteDB/code \
 		rapp:latest sh -c "/RechteDB/code/manage.py test --no-input"
 
+rapptest2:
+	docker run -it --rm \
+		--name testDjango \
+		--network mariaNetz \
+        -e TZ='Europe/Berlin' \
+		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB:/RechteDB \
+		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB:/RechteDB/code \
+		rapp:latest bash
+
 rappprod:
 	docker run -d \
 		--name rapp \

@@ -16,27 +16,55 @@ def schoen(s):
     print(str(s).replace('\\n', '\n').replace('\\r', '\r').replace('\\t', '\t'))
 
 
-class HomeTests(TestCase):
-    def setup(self):
-        SetupDatabase()
+class AAAASetupDatabase(TestCase):
+    # Immer als erstes die Stoored Procedures laden!
+    def setUp(self):
+        Anmeldung(self.client.login)
 
-    # Sind die einzelnen Hsuptseiten erreichbar?
-    # Generell: Funktioniert irgend etwas?
-    def test_something_is_running(self):
+    def test_setup_setup_database_load_stored_proc(self):
+        url = reverse('stored_procedures')
+        data = {}
+        self.response = self.client.post(url, data)
+        self.assertContains(self.response, 'push_sp_test war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_vorbereitung war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_neueUser war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_behandleUser war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_behandleRechte war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_loescheDoppelteRechte war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_nichtai war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_erzeugeAFListe war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_ueberschreibeModelle war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_directConnects war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_AF_umbenennen war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_ungenutzteTeams war erfolgreich.', 1)
+        self.assertContains(self.response, 'push_sp_Rolle_umbenennen war erfolgreich.', 1)
+
+
+class ZZZZSetupDatabase(AAAASetupDatabase):
+    """
+    Der Klassen-Hack hier wird benötigt, damit sowohl beim Vorwärts- als auch beim Rückwärtstest
+    immer als erstes die Datenbank mit den Stored Procedures initialisiert wird.
+    Das geht wahrscheinlich auch anders...
+    """
+    pass
+
+
+class HomeTests(TestCase):
+    def xtest_something_is_running(self):
         self.assertTrue(True)
 
     # Funktioniert die Einstiegsseite?
-    def test_home_view_status_code(self):
+    def xtest_home_view_status_code(self):
         url = reverse('home')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-    def test_home_url_resolves_home_view(self):
+    def xtest_home_url_resolves_home_view(self):
         view = resolve('/rapp/')
         self.assertEqual(view.func, home)
 
     def test_home_url_gets_info_screen(self):
-        # Alle Daten erscheinen auf der Übersichtsseite
+        # Alle Daten erscheinen auf der Übersichtsseiteo
         url = reverse('home')
         self.response = self.client.get(url)
         self.assertEqual(self.response.status_code, 200)
@@ -1026,6 +1054,7 @@ class UserRolleAFTests(TestCase):
     # User / Rolle / AF: Die Hauptseite für Aktualisierungen / Ergänzungen / Löschungen von Rollen und Verbindungen
     def setUp(self):
         Anmeldung(self.client.login)
+        SetupDatabase()
         TblOrga.objects.create(
             team='Django-Team-01',
             themeneigentuemer='Ihmchen_01',
@@ -2622,7 +2651,6 @@ class ImportNewCSVSingleRecordTest(TestCase):
 
 class SetupDatabase(TestCase):
     # Tests für den Import der Stored Procedures in die Datenbank
-    # ToDo die Tests laufen nicht rückwärts. Das kann daran liegen, dass irgendein Curson nicht geschlossen wurde
     def setUp(self):
         Anmeldung(self.client.login)
 
@@ -2630,39 +2658,8 @@ class SetupDatabase(TestCase):
         url = reverse('stored_procedures')
         self.response = self.client.get(url)
         self.assertEqual(self.response.status_code, 200)
-
-    def test_setup_database_search_context(self):
-        url = reverse('stored_procedures')
-        self.response = self.client.get(url)
         self.assertContains(self.response, 'Ansonsten: Finger weg, das bringt hier nichts!')
-
-    def test_setup_database_csrf(self):
-        url = reverse('stored_procedures')
-        self.response = self.client.get(url)
         self.assertContains(self.response, 'csrfmiddlewaretoken')
-
-
-class SetupDatabase2(TestCase):
-    def setUp(self):
-        Anmeldung(self.client.login)
-
-    def test_setup_setup_database_load_stored_proc(self):
-        url = reverse('stored_procedures')
-        data = {}
-        self.response = self.client.post(url, data)
-        self.assertContains(self.response, 'push_sp_test war erfolgreich.', 1)
-        self.assertContains(self.response, 'push_sp_vorbereitung war erfolgreich.', 1)
-        self.assertContains(self.response, 'push_sp_neueUser war erfolgreich.', 1)
-        self.assertContains(self.response, 'push_sp_behandleUser war erfolgreich.', 1)
-        self.assertContains(self.response, 'push_sp_behandleRechte war erfolgreich.', 1)
-        self.assertContains(self.response, 'push_sp_loescheDoppelteRechte war erfolgreich.', 1)
-        self.assertContains(self.response, 'push_sp_nichtai war erfolgreich.', 1)
-        self.assertContains(self.response, 'push_sp_erzeugeAFListe war erfolgreich.', 1)
-        self.assertContains(self.response, 'push_sp_ueberschreibeModelle war erfolgreich.', 1)
-        self.assertContains(self.response, 'push_sp_directConnects war erfolgreich.', 1)
-        self.assertContains(self.response, 'push_sp_AF_umbenennen war erfolgreich.', 1)
-        self.assertContains(self.response, 'push_sp_ungenutzteTeams war erfolgreich.', 1)
-        self.assertContains(self.response, 'push_sp_Rolle_umbenennen war erfolgreich.', 1)
 
 
 class ImportNewIIQSingleRecordTest(TestCase):
