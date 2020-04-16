@@ -25,7 +25,11 @@
 				{% endif %}
 			</div>
 			<h2>
-				Rollen und Arbeitsplatzfunktionen
+				{% if aftf_dict %}
+					Rollen, Arbeitsplatzfunktionen und Detailinformationen
+				{% else %}
+					Rollen und Arbeitsplatzfunktionen
+				{% endif %}
 				{{ ueberschrift }}
 			</h2>
 			<div class="container">

@@ -21,7 +21,11 @@
     </head>
     <body>
         <h1>
-            Rollen, Arbeitsplatzfunktionen und Detailinformationen
+			{% if aftf_dict %}
+				Rollen, Arbeitsplatzfunktionen und Detailinformationen
+			{% else %}
+				Rollen und Arbeitsplatzfunktionen
+			{% endif %}
             {{ ueberschrift }}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             Stand: {% now "d.m.Y" %}
