@@ -466,7 +466,7 @@ class PanelTests(TestCase):
             af_beschreibung='Die geniale AF-Beschreibung',
             modell=TblUebersichtAfGfs.objects.get(name_af_neu='rva_00380_neue_AF auch mit mehr Zeichen als üblich',
                                                   name_gf_neu='rvg_00380_neueAF mit echt mehr Zeichen als üblich'),
-            tf_kritikalitaet='Superkritisch sich ist das auch schon zu lang',
+            tf_kritikalitaet='H',
             tf_eigentuemer_org='Keine Ahnung Org',
             plattform=TblPlattform.objects.get(tf_technische_plattform='RACFP'),
             gf='rvg_00380_neueGF mit echt mehr Zeichen als üblich',
@@ -497,10 +497,10 @@ class PanelTests(TestCase):
             af_beschreibung='Auch eine geniale AF-Beschreibung',
             modell=TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
                                                   name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
-            tf_kritikalitaet='Superkritisch sich ist das auch schon zu lang',
+            tf_kritikalitaet='k',
             tf_eigentuemer_org='Keine Ahnung Org',
             plattform=TblPlattform.objects.get(tf_technische_plattform='RACFP'),
-            gf='rvg_00458_neueAF mit echt mehr Zeichen als üblich',
+            gf='rvg_00458_neueGF mit echt mehr Zeichen als üblich',
             af_gueltig_ab=timezone.now() - timedelta(days=365),
             af_gueltig_bis=timezone.now() + timedelta(days=365),
             direct_connect='nein',
@@ -528,7 +528,7 @@ class PanelTests(TestCase):
             af_beschreibung='Die dritte geniale AF-Beschreibung',
             modell=TblUebersichtAfGfs.objects.get(name_af_neu='rva_00458_neue_AF auch mit mehr Zeichen als üblich',
                                                   name_gf_neu='rvg_00458_neueGF mit echt mehr Zeichen als üblich'),
-            tf_kritikalitaet='Superkritisch sich ist das auch schon zu lang',
+            tf_kritikalitaet='u',
             tf_eigentuemer_org='Keine Ahnung Org',
             plattform=TblPlattform.objects.get(tf_technische_plattform='RACFP'),
             gf='ka',
@@ -714,39 +714,68 @@ class PanelTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "xv10099")
 
-    def test_panel_view_with_valid_dc(self):
-        url = '{0}{1}'.format(reverse('panel'), '?direct_connect=n')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "xv10099", 4)
-
-        url = '{0}{1}'.format(reverse('panel'), '?direct_connect=nein')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "xv10099", 4)
-
-        url = '{0}{1}'.format(reverse('panel'), '?direct_connect=Nein')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "xv10099", 4)
-
-        url = '{0}{1}'.format(reverse('panel'), '?direct_connect=j')
+    def test_panel_view_with_valid_tfkrit(self):
+        url = '{0}{1}'.format(reverse('panel'), '?tf_kritikalitaet=h')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "xv10099", 2)
 
-        url = '{0}{1}'.format(reverse('panel'), '?direct_connect=ja')
+        url = '{0}{1}'.format(reverse('panel'), '?tf_kritikalitaet=H')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "xv10099", 2)
 
-        url = '{0}{1}'.format(reverse('panel'), '?direct_connect=Ja')
+        url = '{0}{1}'.format(reverse('panel'), '?tf_kritikalitaet=k')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "xv10099", 2)
 
-    def test_panel_view_with_invalid_dc(self):
-        url = '{0}{1}'.format(reverse('panel'), '?tf=nö')
+        url = '{0}{1}'.format(reverse('panel'), '?tf_kritikalitaet=K')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "xv10099", 2)
+
+        url = '{0}{1}'.format(reverse('panel'), '?tf_kritikalitaet=u')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "xv10099", 2)
+
+        url = '{0}{1}'.format(reverse('panel'), '?tf_kritikalitaet=U')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "xv10099", 2)
+
+    def test_panel_view_with_invalid_tfkrit(self):
+        url = '{0}{1}'.format(reverse('panel'), '?tf_kritikalitaet=nix')
+        response = self.client.get(url)
+        # schoen(response.content)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "xv10099")
+
+    def test_panel_view_with_valid_gf(self):
+        url = '{0}{1}'.format(reverse('panel'), '?gf=rvg_00380_neueGF mit echt mehr Zeichen als üblich')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "xv10099", 2)
+        url = '{0}{1}'.format(reverse('panel'), '?gf=rvg_00380_neueGF')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "xv10099", 2)
+        url = '{0}{1}'.format(reverse('panel'), '?gf=Zeichen als üblich')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "xv10099", 4)
+        url = '{0}{1}'.format(reverse('panel'), '?gf= mit echt mehr ')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "xv10099", 4)
+        url = '{0}{1}'.format(reverse('panel'), '?gf=ka')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "xv10099", 2)
+
+    def test_panel_view_with_invalid_gf(self):
+        url = '{0}{1}'.format(reverse('panel'), '?enthalten_in_af=rvg_00458_org_ba')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "xv10099")

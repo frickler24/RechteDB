@@ -9,6 +9,7 @@ class PanelFilter(django_filters.FilterSet):
     tf = django_filters.CharFilter(lookup_expr='icontains')
     tf_beschreibung = django_filters.CharFilter(lookup_expr='icontains')
     enthalten_in_af = django_filters.CharFilter(lookup_expr='icontains')
+    gf = django_filters.CharFilter(lookup_expr='icontains')
     userid_name__name = django_filters.CharFilter(lookup_expr='istartswith')
     userid_name__userid = django_filters.CharFilter(lookup_expr='istartswith')
     geloescht = django_filters.BooleanFilter()
@@ -18,8 +19,7 @@ class PanelFilter(django_filters.FilterSet):
     modell__name_af_neu = django_filters.CharFilter(lookup_expr='icontains')
     modell__name_gf_neu = django_filters.CharFilter(lookup_expr='icontains')
 
-    plattform_id__tf_technische_plattform =\
-                                    django_filters.ChoiceFilter()
+    plattform_id__tf_technische_plattform = django_filters.ChoiceFilter()
     modell__gf_beschreibung = django_filters.CharFilter(lookup_expr='icontains')
     loeschdatum = django_filters.CharFilter(lookup_expr='icontains')
     af_gueltig_ab = django_filters.CharFilter(lookup_expr='icontains')

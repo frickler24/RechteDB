@@ -79,11 +79,20 @@
 						{{ filter.form.modell__name_af_neu.label_tag }}
 						{% render_field filter.form.modell__name_af_neu class="form-control" %}
 					</div>
+					{% comment %}
 					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-3 col-xl-3">
 						{{ filter.form.modell__name_gf_neu.label_tag }}
 						{% render_field filter.form.modell__name_gf_neu class="form-control" %}
 					</div>
-
+					{% endcomment %}
+					<div class="form-group col-12 col-sm-4 col-md-4 col-lg-1 col-xl-1">
+						<label for="{{ filter.form.tf_kritikalitaet_for_label }}">TF-Krit.:</label>
+						{% render_field filter.form.tf_kritikalitaet class="form-control" %}
+					</div>
+					<div class="form-group col-12 col-sm-6 col-md-2 col-lg-2 col-xl-2">
+						{{ filter.form.gf.label_tag }}
+						{% render_field filter.form.gf class="form-control" %}
+					</div>
 					<div class="form-group col-12 col-sm-4 col-md-2 col-lg-2 col-xl-2">
 						<label for="{{ filter.form.direct_connect_for_label }}">Direktverbdg. enthält:</label>
 						{% render_field filter.form.direct_connect class="form-control" %}
