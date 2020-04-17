@@ -546,60 +546,6 @@ class TblDb2(models.Model):
         return str(self.id)
 
 
-# ToDo: Nach ausführlichen Tests löschen
-class kanndaswegTblRacfGruppen(models.Model):
-    group = models.CharField(db_column='Group', primary_key=True, max_length=150)
-    test = models.IntegerField(db_column='Test', blank=True, null=True)
-    produktion = models.IntegerField(db_column='Produktion', blank=True, null=True)
-    readonly = models.IntegerField(db_column='Readonly', blank=True, null=True)
-    db2_only = models.IntegerField(db_column='DB2-only', blank=True, null=True)
-    stempel = models.DateTimeField(db_column='Stempel')
-
-    def __str__(self) -> str:
-        return str(self.group)
-
-    class Meta:
-        managed = True
-        db_table = 'tbl_RACF_Gruppen'
-        verbose_name = 'RACF-Berechtigung'
-        verbose_name_plural = '40_RACF - Berechtigungen (tbl_DB2)'
-        ordering = ['group', ]
-
-    def get_test(self):
-        return int(self.test)
-
-    get_test.boolean = True
-    get_test.admin_order_field = 'test'
-    get_test.short_description = 'Test'
-
-    def get_produktion(self):
-        return int(self.produktion)
-
-    get_produktion.boolean = True
-    get_produktion.admin_order_field = 'produktion'
-    get_produktion.short_description = 'Produktion'
-
-    def get_readonly(self):
-        return int(self.readonly)
-
-    get_readonly.boolean = True
-    get_readonly.admin_order_field = 'readonly'
-    get_readonly.short_description = 'Read only'
-
-    def get_db2_only(self):
-        return int(self.db2_only)
-
-    get_db2_only.boolean = True
-    get_db2_only.admin_order_field = 'db2_only'
-    get_db2_only.short_description = 'DB2 only'
-
-
-###################################### Tblsubsysteme, Tblsachgebiete, TblDb2
-# Tabellen für den Import neuer Listen
-# Diese Tabellenspalten bleiben auf ihrem teilweise nicht SQL-konformem Namen,
-# weil sie als Importspalten für die csv / xls-Datein benötigt werden.
-# Gegebenenfalls kann das später noch angepasst werden.
-
 class Tblrechteneuvonimport(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
     identitaet = models.CharField(db_column='Identität', max_length=150, blank=False, null=False, db_index=True)

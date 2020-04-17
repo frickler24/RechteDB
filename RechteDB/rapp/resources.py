@@ -6,22 +6,26 @@ Some Ressources for handling csv and Excel sheets
 from import_export import resources
 from .models import Tblrechteneuvonimport, TblGesamt, Modellierung, Direktverbindungen
 
+
 class MeinCSVImporterModel(resources.ModelResource):
     """
         Resource-Class für import/export neuer Daten (erster Versuch, nur zum Export nutzen)
     """
+
     class Meta:
         model = Tblrechteneuvonimport
-        #encoding = "utf-8"
+        # encoding = "utf-8"
         delimiter = ";"
+
 
 class GesamtExporterModel(resources.ModelResource):
     """
         Resource-Class für export der Gesamttabelle (nach Selektion)
     """
+
     class Meta:
         model = TblGesamt
-        #encoding = "utf-8"
+        # encoding = "utf-8"
         delimiter = ";"
         fields = (
             'id', 'userid_name',
@@ -43,10 +47,12 @@ class GesamtExporterModel(resources.ModelResource):
 
         export_order = fields
 
+
 class ModellierungExporterModel(resources.ModelResource):
     """
         Resource-Class für export der Modellierungs-Tabelle
     """
+
     class Meta:
         model = Modellierung
         encoding = "utf-8"
@@ -62,10 +68,12 @@ class ModellierungExporterModel(resources.ModelResource):
 
         export_order = fields
 
+
 class DirektverbindungenExporterModel(resources.ModelResource):
     """
         Resource-Class für Im- und Eport der Direktverbindungen-Tabelle
     """
+
     class Meta:
         model = Direktverbindungen
         encoding = "utf-8"
@@ -73,9 +81,9 @@ class DirektverbindungenExporterModel(resources.ModelResource):
         quotechar = '"'
         escapechar = '\\',
         fields = ('id',
-            'organisation', 'entscheidung', 'entitlement', 'applikation',
-            'instanz', 'identitaet', 'manager', 'vorname', 'nachname', 'account_name',
-            'status', 'typ', 'nicht_anmailen', 'ansprechpartner'
-        )
+                  'organisation', 'entscheidung', 'entitlement', 'applikation',
+                  'instanz', 'identitaet', 'manager', 'vorname', 'nachname', 'account_name',
+                  'status', 'typ', 'nicht_anmailen', 'ansprechpartner'
+                  )
 
         export_order = fields

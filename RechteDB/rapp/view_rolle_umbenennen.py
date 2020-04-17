@@ -6,6 +6,7 @@ from .forms import FormUmbenennen
 from .models import TblRollen
 from django.db import connection
 
+
 def panel_rolle_umbenennen(request):
     """
     Zeige das Formular zum Umbenennen von Rollen und reagiere auf die POST-Nachricht entsprechend
@@ -131,6 +132,3 @@ def falsches_ergebnis(alter_name, neuer_name, altok, neuok, fehlermeldung):
         fehlermeldung \
             .append("Der neue Rollenname '{}' existiert nach Umbenennen doch nicht."
                     .format(neuer_name))
-
-
-

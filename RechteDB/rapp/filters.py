@@ -5,6 +5,7 @@ from .models import TblUserIDundName
 from .models import TblUserhatrolle
 from .models import TblRollehataf
 
+
 class PanelFilter(django_filters.FilterSet):
     tf = django_filters.CharFilter(lookup_expr='icontains')
     tf_beschreibung = django_filters.CharFilter(lookup_expr='icontains')
@@ -58,6 +59,7 @@ class PanelFilter(django_filters.FilterSet):
             'letzte_aenderung'
         ]
 
+
 class UseridRollenFilter(django_filters.FilterSet):
     userid__name = django_filters.CharFilter(lookup_expr='istartswith')
     userid__userid = django_filters.CharFilter(lookup_expr='istartswith')
@@ -66,7 +68,6 @@ class UseridRollenFilter(django_filters.FilterSet):
     userid__gruppe = django_filters.CharFilter(lookup_expr='icontains')
     userid__zi_organisation = django_filters.CharFilter(lookup_expr='icontains')
 
-
     class Meta:
         model = TblUserhatrolle
         fields = [
@@ -74,6 +75,7 @@ class UseridRollenFilter(django_filters.FilterSet):
             'rollenname__rollenname', 'rollenname__system', 'rollenname__rollenbeschreibung', 'rollenname__datum',
             'userid__geloescht', 'userid__name', 'userid__orga', 'userid__abteilung', 'userid__gruppe',
         ]
+
 
 class UseridFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='istartswith')
@@ -92,10 +94,12 @@ class UseridFilter(django_filters.FilterSet):
             'orga__teamliste',
         ]
 
+
 class RollenFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='istartswith')
     gruppe = django_filters.CharFilter(lookup_expr='icontains')
     rollenname = django_filters.CharFilter(lookup_expr='icontains')
+
     # afname = django_filters.CharFilter(lookup_expr='icontains')
 
     class Meta:
@@ -108,6 +112,7 @@ class RollenFilter(django_filters.FilterSet):
             'userid__orga',
             'rollenname',
         ]
+
 
 # Filter für das halbautomatische Selektieren über die Arbeitsplatzfunktion.
 # Wird insbesondere in der AF-Factory bei UhR genutzt

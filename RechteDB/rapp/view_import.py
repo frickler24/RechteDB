@@ -13,13 +13,15 @@ from django.contrib.auth.decorators import login_required
 import csv, datetime, textwrap, sys
 from math import *
 
-from .forms import ImportForm, ImportForm_schritt3
+from .forms import ImportForm, ImportFormSchritt3
 from .models import TblGesamt, Tblrechteneuvonimport, Tblrechteamneu, Letzter_import
 
 # An dieser stelle stehen diverse Tools zum Aufsetzen der Datenbank mit SPs
 from .stored_procedures import connection
 from .views import version
 import time
+
+
 def neuer_import(request, orga):
     """
     :return: Fehler-Flag (True: In Retval steht ein Fehler-beschreibendes HTML, False: ein Objekt wurde erzeugt)
@@ -43,10 +45,12 @@ def neuer_import(request, orga):
 
     # Legt ein neues Datenobjekt zum Markieren des Import-Status an, speichert aber erst weiter unten
     letzter_import = Letzter_import(start=timezone.now(), schritt=1, zi_orga=orga)
-    return (False, letzter_import)    # False signalisiert "Alles OK, weitermachen"
+    return (False, letzter_import)  # False signalisiert "Alles OK, weitermachen"
+
 
 def speichere_schritt(import_datum):
     import_datum.save()
+
 
 def naechster_schritt(request, schrittnummer):
     """
@@ -73,6 +77,7 @@ def naechster_schritt(request, schrittnummer):
     request.session['geforderter_schritt'] = schrittnummer
     return render(request, 'rapp/import_schrittfehler.html')
 
+
 def letzter_schritt():
     """
     :param request: HTTP_Request für mögliche Fehlermeldung / Session-Daten
@@ -91,6 +96,7 @@ def letzter_schritt():
 
     return
 
+
 def patch_datum(deutsches_datum):
     """
     # Drehe das deutsche Datumsformat um in das amerikanische und hänge TZ-Info an
@@ -100,22 +106,24 @@ def patch_datum(deutsches_datum):
     """
     if deutsches_datum == "" or deutsches_datum == None:
         return None
-    datum = deutsches_datum.split ('.')
-    if len (datum) != 3:
-        return deutsches_datum        # Dann passt das Datumsformat nicht
-    return  datum[2] + '-' + datum[1] + '-' + datum[0] + ' 00:00+0100'
+    datum = deutsches_datum.split('.')
+    if len(datum) != 3:
+        return deutsches_datum  # Dann passt das Datumsformat nicht
+    return datum[2] + '-' + datum[1] + '-' + datum[0] + ' 00:00+0100'
+
 
 def fehlerausgabe(fehler):
-        """
+    """
         Formatierte Ausgabe der Datenbakfehler
         :param fehler: Der Fehlertext, wie er bisher besteht
         :param e: Die System-Fehlerliste
         :return: fehler, ergänzt um die Einträge der System-Fehlerliste
         """
-        for e in sys.exc_info():
-            print(e)
-            fehler += "    " + format(e)
-        return fehler
+    for e in sys.exc_info():
+        print(e)
+        fehler += "    " + format(e)
+    return fehler
+
 
 @login_required
 def import_csv(request):
@@ -129,7 +137,7 @@ def import_csv(request):
     :return: Gerendertes HTML
     """
 
-    zeiten = {'import_start': timezone.now(), } # Hier werden Laufzeiten vermerkt
+    zeiten = {'import_start': timezone.now(), }  # Hier werden Laufzeiten vermerkt
 
     def leere_importtabelle():
         """
@@ -154,7 +162,7 @@ def import_csv(request):
         del request.session['Anzahl Zeilen']
 
         import_datum.aktuell = 0
-        speichere_schritt(import_datum)    # Jetzt wird das Objekt erst in der DB wirklich angelegt
+        speichere_schritt(import_datum)  # Jetzt wird das Objekt erst in der DB wirklich angelegt
 
         current_user = request.user
         import_datum.user = current_user.username
@@ -163,26 +171,26 @@ def import_csv(request):
             # Derzeit gibt es bereits Einträge in 'TF Name' und 'TF Beschreibung',
             # die die Grenzen bei weitem überschreiten.
             neuerRecord = Tblrechteneuvonimport(
-                identitaet = textwrap.shorten (line['Identität'], width=150, placeholder="..."),
-                nachname = textwrap.shorten (line['Nachname'], width=150, placeholder="..."),
-                vorname = textwrap.shorten (line['Vorname'], width=150, placeholder="..."),
-                tf_name = textwrap.shorten (line['TF Name'], width=100, placeholder="..."),
-                tf_beschreibung = textwrap.shorten (line['TF Beschreibung'], width=500, placeholder="..."),
-                af_anzeigename = textwrap.shorten (line['AF Anzeigename'], width=100, placeholder="..."),
-                af_beschreibung = textwrap.shorten (line['AF Beschreibung'], width=250, placeholder="..."),
-                hoechste_kritikalitaet_tf_in_af = textwrap.shorten (line['Höchste Kritikalität TF in AF'],
-                                                                    width=150, placeholder="..."),
-                tf_eigentuemer_org = textwrap.shorten (line['TF Eigentümer Org'], width=150, placeholder="..."),
-                tf_applikation = textwrap.shorten (line['TF Applikation'], width=250, placeholder="..."),
-                tf_kritikalitaet = textwrap.shorten (line['TF Kritikalitätskennzeichen'], width=150, placeholder="..."),
-                gf_name = textwrap.shorten (line['GF Name'], width=150, placeholder="..."),
-                gf_beschreibung = textwrap.shorten (line['GF Beschreibung'], width=250, placeholder="..."),
-                direct_connect = textwrap.shorten (line['Direct Connect'], width=150, placeholder="..."),
-                af_zugewiesen_an_account_name = textwrap.shorten (line['AF Zugewiesen an Account-Name'],
-                                                                  width=150, placeholder="..."),
-                af_gueltig_ab = patch_datum (line['AF Gültig ab']),
-                af_gueltig_bis = patch_datum (line['AF Gültig bis']),
-                af_zuweisungsdatum = patch_datum (line['AF Zuweisungsdatum']),
+                identitaet=textwrap.shorten(line['Identität'], width=150, placeholder="..."),
+                nachname=textwrap.shorten(line['Nachname'], width=150, placeholder="..."),
+                vorname=textwrap.shorten(line['Vorname'], width=150, placeholder="..."),
+                tf_name=textwrap.shorten(line['TF Name'], width=100, placeholder="..."),
+                tf_beschreibung=textwrap.shorten(line['TF Beschreibung'], width=500, placeholder="..."),
+                af_anzeigename=textwrap.shorten(line['AF Anzeigename'], width=100, placeholder="..."),
+                af_beschreibung=textwrap.shorten(line['AF Beschreibung'], width=250, placeholder="..."),
+                hoechste_kritikalitaet_tf_in_af=textwrap.shorten(line['Höchste Kritikalität TF in AF'],
+                                                                 width=150, placeholder="..."),
+                tf_eigentuemer_org=textwrap.shorten(line['TF Eigentümer Org'], width=150, placeholder="..."),
+                tf_applikation=textwrap.shorten(line['TF Applikation'], width=250, placeholder="..."),
+                tf_kritikalitaet=textwrap.shorten(line['TF Kritikalitätskennzeichen'], width=150, placeholder="..."),
+                gf_name=textwrap.shorten(line['GF Name'], width=150, placeholder="..."),
+                gf_beschreibung=textwrap.shorten(line['GF Beschreibung'], width=250, placeholder="..."),
+                direct_connect=textwrap.shorten(line['Direct Connect'], width=150, placeholder="..."),
+                af_zugewiesen_an_account_name=textwrap.shorten(line['AF Zugewiesen an Account-Name'],
+                                                               width=150, placeholder="..."),
+                af_gueltig_ab=patch_datum(line['AF Gültig ab']),
+                af_gueltig_bis=patch_datum(line['AF Gültig bis']),
+                af_zuweisungsdatum=patch_datum(line['AF Zuweisungsdatum']),
             )
             # ToDo: ein try/Catch-Block um das Schreiben oder vorher Validierungsfunktion rufen
             neuerRecord.save()
@@ -191,7 +199,7 @@ def import_csv(request):
                 speichere_schritt(import_datum)
 
         zeiten['schreibe_ende'] = timezone.now()
-        speichere_schritt(import_datum)    # Damit ist der Datensatz für diesen Schritt endgültig fertig.
+        speichere_schritt(import_datum)  # Damit ist der Datensatz für diesen Schritt endgültig fertig.
 
     def hole_datei():
         """
@@ -200,9 +208,9 @@ def import_csv(request):
         :return: zeilen_der_Datei, der_Dialekt_der_Datei (CSV, TSV, ...); Dialoect wird durch sniff() ermittelt
         """
         datei = request.FILES['datei']
-        inhalt = datei.read().decode("ISO-8859-1")    # Warum das kein UTF-8 ist, weiß ich auch nicht
+        inhalt = datei.read().decode("ISO-8859-1")  # Warum das kein UTF-8 ist, weiß ich auch nicht
         zeilen = inhalt.splitlines()
-        request.session['Anzahl Zeilen'] = len(zeilen) - 1    # Merken für Fortschrittsbalken, 1. Zeile ist Header
+        request.session['Anzahl Zeilen'] = len(zeilen) - 1  # Merken für Fortschrittsbalken, 1. Zeile ist Header
 
         dialect = csv.Sniffer().sniff(zeilen[0])
         dialect.escapechar = '\\'
@@ -228,8 +236,8 @@ def import_csv(request):
         schreibe_zeilen(reader)
 
         zeiten['import_ende'] = timezone.now()
-        laufzeiten = { # Laufzeit ist immer gefüllt, bei den beiden anderen kann Unvorhergesehenes passieren
-            'Laufzeit':        str(zeiten['import_ende'] - zeiten['import_start']),
+        laufzeiten = {  # Laufzeit ist immer gefüllt, bei den beiden anderen kann Unvorhergesehenes passieren
+            'Laufzeit': str(zeiten['import_ende'] - zeiten['import_start']),
         }
         if 'leere_ende' in zeiten and 'leere_start' in zeiten:
             laufzeiten['Leeren'] = str(zeiten['leere_ende'] - zeiten['leere_start'])
@@ -238,7 +246,7 @@ def import_csv(request):
 
         if ausgabe:
             for line in laufzeiten:
-                print (line)
+                print(line)
         return laufzeiten
 
     def import_schritt1(orga):
@@ -258,7 +266,7 @@ def import_csv(request):
                 s += 1
                 cursor.callproc("erzeuge_af_liste")
                 s += 1
-                cursor.callproc ("neueUser", [orga, ])
+                cursor.callproc("neueUser", [orga, ])
                 tmp = cursor.fetchall()
                 for line in tmp:
                     statistik[line[0]] = line[1]
@@ -266,11 +274,11 @@ def import_csv(request):
                 e = sys.exc_info()[0]
                 fehler = 'Error in import_schritt1(): {}'.format(e)
                 if s == 1:
-                    print ('Fehler in import_schritt1, StoredProc "vorbereitung"', fehler)
+                    print('Fehler in import_schritt1, StoredProc "vorbereitung"', fehler)
                 elif s == 2:
                     print('Fehler in import_schritt1, StoredProc "erzeuge_af_liste"', fehler)
                 elif s == 3:
-                    print ('Fehler in import_schritt1, StoredProc "neueUser"', fehler)
+                    print('Fehler in import_schritt1, StoredProc "neueUser"', fehler)
                 else:
                     print('Ohgottogott: Fehler in import_schritt1, aber wo?', fehler, 's =', s)
 
@@ -282,8 +290,8 @@ def import_csv(request):
     if request.method == 'POST':
         form = ImportForm(request.POST, request.FILES)
         if form.is_valid():
-            orga = request.POST.get('organisation', 'Keine Orga!') # Auf dem Panel wurde die Ziel-Orga übergeben
-            request.session['organisation'] = orga    # und merken in der Session für Schritt 3
+            orga = request.POST.get('organisation', 'Keine Orga!')  # Auf dem Panel wurde die Ziel-Orga übergeben
+            request.session['organisation'] = orga  # und merken in der Session für Schritt 3
 
             # Zunächst versuche zu ermitteln, ob gerade ein anderer Import läuft:
             # Legt ein neues Datenobjekt zum Markieren des Import-Status an, speichert aber erst weiter unten
@@ -305,7 +313,8 @@ def import_csv(request):
         'form': form,
         'version': version,
     }
-    return render (request, 'rapp/import.html', context)
+    return render(request, 'rapp/import.html', context)
+
 
 @login_required
 def import2(request):
@@ -319,6 +328,7 @@ def import2(request):
     :param request: Der POST- oder GET-Request vom Browser
     :return: HTML-Output
     """
+
     def hole_alles(db):
         """
         Lesen aller Werte aus einer übergebenen Datenbank
@@ -332,7 +342,7 @@ def import2(request):
         with connection.cursor() as cursor:
             try:
                 sql = "SELECT * FROM {}".format(db)
-                cursor.execute (sql)
+                cursor.execute(sql)
                 retval = cursor.fetchall()
             except:
                 fehler = 'Error in hole_alles(): {}'.format(e)
@@ -368,7 +378,7 @@ def import2(request):
         fehler = False
         with connection.cursor() as cursor:
             try:
-                cursor.callproc("behandleUser") # diese SProc benötigt die Orga nicht als Parameter
+                cursor.callproc("behandleUser")  # diese SProc benötigt die Orga nicht als Parameter
             except:
                 fehler = 'Fehler in import_schritt2, StoredProc behandleUser: {}'.format(e)
                 fehler = fehlerausgabe(fehler)
@@ -382,13 +392,13 @@ def import2(request):
         if retval:
             return retval  # Dann ist ein Schrittfehler aufgetreten und retval enthält die Fehlermeldung
 
-        form = forms.Form(request.POST) # Kein Eintrag in forms.py erfordelrich, da keine Modell-Anbindung oder Felder
+        form = forms.Form(request.POST)  # Kein Eintrag in forms.py erfordelrich, da keine Modell-Anbindung oder Felder
         if form.is_valid():
             fehler = import_schritt2()
             request.session['fehler2'] = fehler
             return redirect('import2_quittung')
         else:
-            print ('Form war nicht valide')
+            print('Form war nicht valide')
     else:
         form = forms.Form()
 
@@ -409,6 +419,7 @@ def import2(request):
     request.session['geloeschteUser'] = hole_geloeschteUser()[0]  # Nur die Daten, ohne den Returncode der Funktion
     return render(request, 'rapp/import2.html', context)
 
+
 @login_required
 def import2_quittung(request):
     """
@@ -420,21 +431,22 @@ def import2_quittung(request):
     :param request: GET- oder POST-Request
     :return: HTML-Output
     """
+
     def import_schritt3(orga, dopp):
         # Führt die letzte definitiv erforderliche Stored Procedures behandle_Rechte() aus.
         # Optional kann dann noch das Löschen doppelt angelegeter Rechte erfolgen (loescheDoppelteRechte)
         fehler = False
         with connection.cursor() as cursor:
             try:
-                retval = cursor.callproc ("behandleRechte", [orga, ])
+                retval = cursor.callproc("behandleRechte", [orga, ])
                 if dopp:
-                    retval += cursor.callproc ("loescheDoppelteRechte", [False, ]) # False = Nicht nur lesen
-                retval += cursor.callproc ("ueberschreibeModelle")
+                    retval += cursor.callproc("loescheDoppelteRechte", [False, ])  # False = Nicht nur lesen
+                retval += cursor.callproc("ueberschreibeModelle")
 
             except:
                 fehler = 'Fehler in import_schritt3, StoredProc behandleUser oder loescheDoppelteRechte oder ueberschreibeModelle: '
                 fehler = fehlerausgabe(fehler)
-                print (fehler)
+                print(fehler)
 
             cursor.close()
             return fehler
@@ -444,7 +456,7 @@ def import2_quittung(request):
         if retval:
             return retval  # Dann ist ein Schrittfehler aufgetreten und retval enthält die Fehlermeldung
 
-        form = ImportForm_schritt3(request.POST)
+        form = ImportFormSchritt3(request.POST)
         if form.is_valid():
             orga = request.session.get('organisation', 'keine-Orga')
             dopp = request.POST.get('doppelte_suchen', False)
@@ -452,15 +464,15 @@ def import2_quittung(request):
             fehler = import_schritt3(orga, dopp)
 
             request.session['fehler3'] = fehler
-            ergebnis = TblGesamt.objects.filter(geloescht = False,
-                                         userid_name__zi_organisation = orga,
-                                         userid_name__geloescht = False).count()
+            ergebnis = TblGesamt.objects.filter(geloescht=False,
+                                                userid_name__zi_organisation=orga,
+                                                userid_name__geloescht=False).count()
             request.session['ergebnis'] = ergebnis
             return redirect('import3_quittung')
         else:
-            print ('Form war nicht valide')
+            print('Form war nicht valide')
     else:
-        form = ImportForm_schritt3(initial={'doppelte_suchen': False})
+        form = ImportFormSchritt3(initial={'doppelte_suchen': False})
 
     context = {
         'form': form,
@@ -468,6 +480,7 @@ def import2_quittung(request):
         'version': version,
     }
     return render(request, 'rapp/import2_quittung.html', context)
+
 
 @login_required
 def import3_quittung(request):
@@ -487,6 +500,7 @@ def import3_quittung(request):
     }
     return render(request, 'rapp/import3_quittung.html', context)
 
+
 @login_required
 def import_status(request):
     """
@@ -495,7 +509,7 @@ def import_status(request):
     :return: HTML-Output
     """
     try:
-        letzter_import_im_modell = Letzter_import.objects.latest('id') # Die aktuelle Zeile
+        letzter_import_im_modell = Letzter_import.objects.latest('id')  # Die aktuelle Zeile
         if letzter_import_im_modell.end is None:
             # In diesem Fall ist das gut, weil ja unser Import läuft.
             context = {
@@ -507,9 +521,9 @@ def import_status(request):
         else:
             context = {
                 'version': version,
-                'aktuell': -2 ,
-                'zeilen': -2 ,
-                'proz': -2 ,
+                'aktuell': -2,
+                'zeilen': -2,
+                'proz': -2,
             }
     except:
         context = {

@@ -3,6 +3,7 @@ import sys
 from django.shortcuts import render
 from django.db import connection
 
+
 def panel_ungenutzte_afgf(request):
     """
     Zeige die Liste ungenutzter Rollen;
@@ -33,7 +34,7 @@ def hole_daten():
 
     with connection.cursor() as cursor:
         try:
-            cursor.callproc ("ungenutzteAFGF")
+            cursor.callproc("ungenutzteAFGF")
             tmp = cursor.fetchall()
             for line in tmp:
                 antwort[line[0]] = (line[1], line[2])

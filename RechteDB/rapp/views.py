@@ -23,7 +23,7 @@ from django.utils import timezone
 from .filters import PanelFilter
 from .models import TblUserIDundName, TblGesamt, TblOrga, TblPlattform, Letzter_import
 
-# An dieser stelle stehen diverse Tools zum Aufsetzen der Datenbank mit SPs
+# An dieser Stelle stehen diverse Tools zum Aufsetzen der Datenbank mit SPs
 from .stored_procedures import finde_procs_exakt, connection
 
 
@@ -66,6 +66,7 @@ def get_version(package):
     return manual + ' - ' + git_rev.decode('utf-8')
 version = get_version('rapp')
 
+
 def initialisiere_AFliste():
     '''
     Aufbau der tbl_AFListe; Deren Inhalt ist abhängig von Veränderungen in tblUebersichtAF_GFs
@@ -80,6 +81,7 @@ def initialisiere_AFliste():
             fehler = 'Fehler in initialisiere_AFliste(): {}'.format(e)
             print('Fehler Beim Erstellen der AFListe, StoredProc erzeuge_af_liste', fehler)
         cursor.close()
+
 
 # Der Direkteinsteig für die gesamte Anwendung
 # Dies ist die Einstiegsseite, sie ist ohne Login erreichbar.
@@ -100,9 +102,9 @@ def home(request):
         importliste = {}
         for o in sorted(list(orgset)):
             try:
-                letzter_import_im_modell = Letzter_import.objects\
-                    .filter(zi_orga=o)\
-                    .filter(schritt=5)\
+                letzter_import_im_modell = Letzter_import.objects \
+                    .filter(zi_orga=o) \
+                    .filter(schritt=5) \
                     .latest('id')
                 letzter_import = str(letzter_import_im_modell.end)[:19]
                 letzter_importeur = letzter_import_im_modell.user
@@ -149,12 +151,14 @@ def home(request):
         },
     )
 
+
 ###################################################################
 # Gesamtliste
 class GesamtListView(ListView):
     """Die Gesamtliste der Rechte ungefiltert"""
     model = TblGesamt
     paginate_by = 50
+
 
 class GesamtDetailView(generic.DetailView):
     """Die Detailsicht eines einzelnen Rechts"""
@@ -167,19 +171,26 @@ class UserIDundNameListView(ListView):
     """Die Gesamtliste der User ungefiltert"""
     model = TblUserIDundName
     paginate_by = 50
+
+
 class TblUserIDundNameCreate(CreateView):
     """Erstellen eines neuen Users"""
     model = TblUserIDundName
     fields = '__all__'
-    initial = {'geloscht' : 'False',}
+    initial = {'geloscht': 'False', }
+
+
 class TblUserIDundNameUpdate(UpdateView):
     """Ändern eines Users"""
     model = TblUserIDundName
     fields = '__all__'
+
+
 class TblUserIDundNameDelete(DeleteView):
     """Löschen eines Users"""
     model = TblUserIDundName
     success_url = reverse_lazy('userliste')
+
 
 def userToggleGeloescht(request, pk):
     """
@@ -190,13 +201,14 @@ def userToggleGeloescht(request, pk):
     :param pk: ID des zu löschenden UserID-Eintrags
     :return: Gerendertes HTML
     """
-    user_inst = get_object_or_404(TblUserIDundName, pk = pk)
+    user_inst = get_object_or_404(TblUserIDundName, pk=pk)
 
     user_inst.geloescht = not user_inst.geloescht
     user_inst.save()
 
     # redirect to a new URL:
-    return HttpResponseRedirect(reverse('userliste') )
+    return HttpResponseRedirect(reverse('userliste'))
+
 
 ###################################################################
 # Die Gesamtliste der Teams (TblOrga)
@@ -204,19 +216,25 @@ class TeamListView(generic.ListView):
     """Die Gesamtliste der Teams (TblOrga)"""
     model = TblOrga
 
+
 class TblOrgaCreate(CreateView):
     """Neues Team erstellen"""
     model = TblOrga
     fields = '__all__'
-    initial = {'geloscht' : 'False',}
+    initial = {'geloscht': 'False', }
+
+
 class TblOrgaUpdate(UpdateView):
     """Team ändern"""
     model = TblOrga
     fields = '__all__'
+
+
 class TblOrgaDelete(DeleteView):
     """Team löschen"""
     model = TblOrga
     success_url = reverse_lazy('teamliste')
+
 
 # Paginierung nach Tutorial - Aufteilung langer Seiten in mehrere
 def pagination(request, liste, psize=10):
@@ -235,6 +253,7 @@ def pagination(request, liste, psize=10):
         pages = paginator.page(paginator.num_pages)
 
     return (paginator, pages, pagesize)
+
 
 ###################################################################
 # Panel geht direkt auf die Gesamt-Datentabelle
@@ -276,10 +295,10 @@ def panelDownload(request):
 
     dateiname = "gesamt_" + timezone.now().strftime("%Y-%m-%d-%H-%M") + ".csv"
     response = HttpResponse(content_type="text/tsv")
-    response['Content-Disposition'] = 'attachment; filename='+dateiname
+    response['Content-Disposition'] = 'attachment; filename=' + dateiname
     response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
 
-    writer = csv.writer(response, delimiter = '\t', quotechar = '"')
+    writer = csv.writer(response, delimiter='\t', quotechar='"')
     writer.writerow([
         'UserID',
         'Name',
@@ -353,6 +372,7 @@ def panelDownload(request):
 def magic_click(request):
     def machwasintelligentes():
         pass
+
     '''
     Ist nur eine Hülle, um Funktionen aufrufen zu können, die noch über keine Seite verfügen.
     :param request:
@@ -369,7 +389,7 @@ def panel_ungenutzteTeams(request):
 
         with connection.cursor() as cursor:
             try:
-                cursor.callproc ("ungenutzteTeams")
+                cursor.callproc("ungenutzteTeams")
                 tmp = cursor.fetchall()
                 for line in tmp:
                     antwort[line[0]] = line[1]
@@ -409,9 +429,9 @@ def panel_rolle_kopieren(request):
         importliste = {}
         for o in sorted(list(orgset)):
             try:
-                letzter_import_im_modell = Letzter_import.objects\
-                    .filter(zi_orga=o)\
-                    .filter(schritt=5)\
+                letzter_import_im_modell = Letzter_import.objects \
+                    .filter(zi_orga=o) \
+                    .filter(schritt=5) \
                     .latest('id')
                 letzter_import = str(letzter_import_im_modell.end)[:19]
                 letzter_importeur = letzter_import_im_modell.user
@@ -457,5 +477,3 @@ def panel_rolle_kopieren(request):
             'importliste': hole_orgainfo(),
         },
     )
-
-

@@ -30,7 +30,7 @@ def zeige_neue_afgf(request):
     context = {
         'meineTabelle': liste,
         'gesamtzahl': len(liste),
-        'AFGFzahl':    len(hole_kurzeliste())
+        'AFGFzahl': len(hole_kurzeliste())
     }
     return render(request, 'rapp/neueAFGF_list.html', context)
 
@@ -45,6 +45,8 @@ def from_teil():
             AND tblGesamt.gf = tblUEbersichtAF_GFs.name_gf_neu
     """
     return from_teil
+
+
 def bedingung():
     where = """
         WHERE NOT tblGesamt.geloescht
@@ -55,6 +57,7 @@ def bedingung():
     """
     return where
 
+
 def baue_sql(anfang, ende):
     """
     :param anfang: Das Select oder Insert oder was auch immer vor dem FROM-Teil
@@ -62,6 +65,7 @@ def baue_sql(anfang, ende):
     :return: das vollständige SQL
     """
     return anfang + from_teil() + bedingung() + ende
+
 
 def hole_liste():
     """
@@ -74,7 +78,7 @@ def hole_liste():
                 tblGesamt.enthalten_in_af, tblGesamt.gf, tblGesamt.gf_beschreibung
     """
 
-    ende ="""
+    ende = """
         GROUP BY tblUserIDundName.name,tblUserIDundName.userid, tblGesamt.enthalten_in_af, tblGesamt.gf;
     """
     sql = baue_sql(anfang, ende)
@@ -131,7 +135,7 @@ def neue_afgf_download(request):
     response['Content-Disposition'] = 'attachment; filename="neue_AFGF.csv"'
     response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
 
-    writer = csv.writer(response, csv.excel, delimiter = '\t', quotechar = '"')
+    writer = csv.writer(response, csv.excel, delimiter='\t', quotechar='"')
     writer.writerow([
         'Name', 'UserID',
         'AF',
@@ -146,6 +150,7 @@ def neue_afgf_download(request):
         writer.writerow(zeile)
 
     return response
+
 
 def neueAFGF_setzen(request):
     """
@@ -195,4 +200,3 @@ def neueAFGF_setzen(request):
         cursor.close()
 
     return zeige_neue_afgf(request)
-

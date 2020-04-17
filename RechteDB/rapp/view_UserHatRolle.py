@@ -19,7 +19,7 @@ from .filters import RollenFilter, UseridFilter
 from .xhtml2 import render_to_pdf
 
 from .views import version, pagination
-from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportForm_schritt3
+from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportFormSchritt3
 from .models import TblUserIDundName
 from .models import TblGesamt
 from .models import TblRollen
@@ -215,7 +215,7 @@ def behandle_freies_team(panel_liste, request, teamqs):
     eintraege = teamqs.freies_team.split('|')
     user = []
     for e in eintraege:
-        user += [e.split(':')[0]]    # erster Teil ist der Name, zweiter Teil die gewünschte Anzeige
+        user += [e.split(':')[0]]  # erster Teil ist der Name, zweiter Teil die gewünschte Anzeige
     print('gesuchte User =', user)
     namen_liste = panel_liste.filter(name__in=user)
     return behandle_ft_oder_tl(namen_liste, request)
@@ -566,27 +566,27 @@ def hole_alle_offenen_AFen_zur_userid(userid, erledigt):
     print('erledigt Anzahl = {}\n Inhalt ='.format(erledigt.count(), list(erledigt)))
     print('ungefilterte Gesamtliste = ',
           list(TblGesamt.objects
-            .exclude(geloescht=True)
-            .exclude(userid_name_id__geloescht=True)
-            .filter(userid_name_id__userid=userid)
-            .values('enthalten_in_af')
-            .distinct()
-            .order_by('enthalten_in_af')
-          ))
+               .exclude(geloescht=True)
+               .exclude(userid_name_id__geloescht=True)
+               .filter(userid_name_id__userid=userid)
+               .values('enthalten_in_af')
+               .distinct()
+               .order_by('enthalten_in_af')
+               ))
     print('Länge der Gesamtliste = ',
           TblGesamt.objects
-            .exclude(geloescht=True)
-            .exclude(userid_name_id__geloescht=True)
-            .filter(userid_name_id__userid=userid)
-            .values('enthalten_in_af')
-            .distinct()
-            .count()
+          .exclude(geloescht=True)
+          .exclude(userid_name_id__geloescht=True)
+          .filter(userid_name_id__userid=userid)
+          .values('enthalten_in_af')
+          .distinct()
+          .count()
           )
-    af_qs = TblGesamt.objects\
-        .exclude(geloescht=True)\
-        .exclude(userid_name_id__geloescht=True)\
-        .exclude(enthalten_in_af__in=erledigt)\
-        .filter(userid_name_id__userid=userid)\
+    af_qs = TblGesamt.objects \
+        .exclude(geloescht=True) \
+        .exclude(userid_name_id__geloescht=True) \
+        .exclude(enthalten_in_af__in=erledigt) \
+        .filter(userid_name_id__userid=userid) \
         .values('enthalten_in_af') \
         .distinct() \
         .order_by('enthalten_in_af')
@@ -678,6 +678,8 @@ def UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle=None):
 
 def freies_team(request):
     return not kein_freies_team(request)
+
+
 def kein_freies_team(request):
     """
     Ist in der aktuellen Selektion ein Eintrag in der Teamdefinition "freies_team" gesetzt?
@@ -702,7 +704,7 @@ def soll_komplett(request, row):
     """
     teamnr = request.GET.get('orga')
     teamqs = TblOrga.objects.get(id=teamnr)
-    assert(teamqs.freies_team != None)
+    assert (teamqs.freies_team != None)
     eintraege = teamqs.freies_team.split('|')
     for e in eintraege:
         zeile = e.split(':')
@@ -741,6 +743,7 @@ def UhR_verdichte_daten(request, panel_liste):
 
     def order(a):
         return a.rollenname.lower()  # Liefert das kleingeschriebene Element, nach dem sortiert werden soll
+
     return (sorted(list(rollenmenge), key=order), userids, usernamen)
 
 
@@ -788,10 +791,10 @@ def verdichte_spezialfall(rollenmenge, row, userids, usernamen, request):
     userids.add(row.userid)
     userHatRollen = TblUserhatrolle.objects.filter(userid__userid=row.userid).order_by('rollenname')
 
-    assert(request.GET.get('orga') != None)
+    assert (request.GET.get('orga') != None)
     spezialteam = TblOrga.objects.get(id=request.GET.get('orga'))
-    erlaubte_rollenqs = TblUserhatrolle.objects\
-        .filter(userid__name=row.name)\
+    erlaubte_rollenqs = TblUserhatrolle.objects \
+        .filter(userid__name=row.name) \
         .filter(teamspezifisch=spezialteam)
 
     erlaubte_rollen = set()
@@ -812,7 +815,7 @@ def verdichte_spezialfall(rollenmenge, row, userids, usernamen, request):
 
 
 def erzeuge_restrolle(userid, rollenmenge, team):
-    tempname = 'Weitere ' + TblUserIDundName.objects\
+    tempname = 'Weitere ' + TblUserIDundName.objects \
         .filter(userid=userid).values('abteilung')[0]['abteilung']
     rolle = alte_oder_neue_restrolle(tempname, userid, team)
 
@@ -853,7 +856,7 @@ def erzeuge_restrolle(userid, rollenmenge, team):
         else:
             merkaf = TblAfliste.objects.get(af_name=eintrag['enthalten_in_af'])
 
-        neu = TblRollehataf.objects.create (
+        neu = TblRollehataf.objects.create(
             mussfeld=False,
             einsatz=TblRollehataf.EINSATZ_NONE,
             bemerkung='Rechtebündel; Details siehe Konzept der Abteilung',
@@ -891,11 +894,11 @@ def alte_oder_neue_restrolle(tempname, userid, team):
         if uhr.count() > 0:
             # dann ist die Rolle bereits mit dem User verknüpft
             # Sicherheitshalber wird das Team-Spezifikum eingetragen, falls noch ein anderer Wert drin steht
-            uhr = deepcopy(uhr[0]) # Sonst ist kein Update möglich - warum auch immer...
+            uhr = deepcopy(uhr[0])  # Sonst ist kein Update möglich - warum auch immer...
             if uhr.teamspezifisch != team:
                 uhr.teamspezifisch = team
                 uhr.save(force_update=True)
-        else:   # Nein, muss noch verknüpft werden
+        else:  # Nein, muss noch verknüpft werden
             uhr = TblUserhatrolle.objects.create(
                 userid=TblUserIDundName.objects.get(userid=userid),
                 rollenname=tempname,
@@ -1214,7 +1217,7 @@ def liefere_win_lw_Liste(tf_menge):
     """
 
     suchmenge = set()
-    winacl = ACLGruppen.objects .order_by('tf', 'server', 'pfad') .values()
+    winacl = ACLGruppen.objects.order_by('tf', 'server', 'pfad').values()
     rest = set()
 
     for t in tf_menge:
@@ -1369,7 +1372,7 @@ def liefere_af_kritikalitaet(rollenMenge, userids):
         .values('enthalten_in_af',
                 'hoechste_kritikalitaet_tf_in_af',
                 'letzte_aenderung',
-        )
+                )
 
     # Merke den jeweils jüngsten Eintrag je AF, ignoriere Case
     hoechste_kritikalitaet_tf_in_af = {}
@@ -1515,7 +1518,7 @@ def erzeuge_UhR_matrixdaten(request, panel_liste):
         rollen_je_username[row.name] = set()
 
         # Fallunterscheidung nach "freies_team" und "spezielles_team"
-        if kein_freies_team(request) or soll_komplett(request, row):    # Standardfall
+        if kein_freies_team(request) or soll_komplett(request, row):  # Standardfall
             rollen = TblUserhatrolle.objects.filter(userid=row.userid)
         else:
             spezialteam = TblOrga.objects.get(id=request.GET.get('orga'))
@@ -1645,8 +1648,8 @@ def panel_UhR_af_export(request, id):
 
     (namen_liste, panel_filter, rollen_liste, rollen_filter) = UhR_erzeuge_listen_ohne_rollen(request)
     (userHatRolle_liste, selektierter_name, userids, usernamen,
-        selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID) \
-            = UhR_hole_daten(namen_liste, id)
+     selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID) \
+        = UhR_hole_daten(namen_liste, id)
 
     response = HttpResponse(content_type="text/tsv")
     response['Content-Disposition'] = 'attachment; filename="rollen.csv"'

@@ -1,11 +1,8 @@
-import sys
-
 from django.shortcuts import render
 
-from .forms import FormUmbenennen
 from .models import TblRollen
 from .models import TblUserhatrolle
-from django.db import connection
+
 
 def panel_ungenutzte_rollen(request):
     """

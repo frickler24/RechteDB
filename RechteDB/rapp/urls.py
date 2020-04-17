@@ -112,7 +112,7 @@ urlpatterns += [
     path('manuell/<int:pk>/update/',
          login_required(view_manuell.Manuelle_BerechtigungUpdate.as_view()), name='manuell_update'),
     path('manuell/create/',
-         login_required(view_manuell.Manuelle_BerechtigungCreate.as_view()), name='manuell_create'),
+         login_required(view_manuell.ManuelleBerechtigungCreate.as_view()), name='manuell_create'),
     path('manuell/',
          login_required(view_manuell.Manuelle_BerechtigungListe.as_view()), name='manuell_liste'),
 ]

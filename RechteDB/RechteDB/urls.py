@@ -19,11 +19,14 @@ from django.conf.urls import include
 from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
 
-admin.site.site_header = 'RechteDB - Adminseiten'
-admin.site.site_title = 'RechteDB - Administration'
-admin.site.index_title = 'RechteDB - Übersicht'
+from django.urls import path
+from django.conf.urls import include
+from django.views.generic import RedirectView
+
+admin.site.site_header = 'RApp - Adminseiten'
+admin.site.site_title = 'RApp - Administration'
+admin.site.index_title = 'RApp - Übersicht'
 
 urlpatterns = [
     path('admin', admin.site.urls),
@@ -35,7 +38,6 @@ if settings.DEBUG:
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ]
 
-from django.conf.urls import include
 # Use include() to add paths from the rapp application
 urlpatterns += [
     path('accounts/', include('django.contrib.auth.urls')),
@@ -48,7 +50,6 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Das ist die wichtigste Zeile: / wird auf /rapp gemappt
-from django.views.generic import RedirectView
 urlpatterns += [
     path('', RedirectView.as_view(url='/rapp')),
 ]

@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
+
 def latex_header():
     s = """\\documentclass[a4paper,landscape,12pt]{letter}
     \\usepackage[paper=a4paper,height=18cm,left=25mm,right=20mm,width=22cm]{geometry}
@@ -33,6 +34,7 @@ def latex_header():
     
     """
     return s + "\n"
+
 
 def hole_identitaeten():
     """
@@ -63,6 +65,7 @@ def hole_identitaeten():
 
     return liste
 
+
 def hole_userids(name):
     sql = """
         -- Hole nur erst mal die Accounts (UserIDs) zu einem Namen
@@ -88,15 +91,17 @@ def hole_userids(name):
 
     return liste
 
+
 def latex_adresse(userid):
     userid = userid.lower()
     s = "\\begin{letter}{"
     s += "{}@ruv.de".format(userid)
-    if userid[1] != "v" or userid.startswith("xv86"):    # Technischer User
+    if userid[1] != "v" or userid.startswith("xv86"):  # Technischer User
         s += "\\space\\space\\space\\space\\space\\space\\space\\space\\space\\bfseries\\colorbox{red}{Achtung, Technischer User}"
     s += "\\hfill \\break"
     s += "}"
     return s + "\n"
+
 
 def latex_anrede(name):
     s = """\\begin{normalsize}
@@ -114,6 +119,7 @@ def latex_anrede(name):
     """
     return s + "\n"
 
+
 def latex_einleitungstext():
     s = """\\begin{normalsize}
     Ihnen sind derzeit eines oder mehrere Rechte als sogenannte \\emph{Direct Connects} zugeordnet.
@@ -128,6 +134,7 @@ def latex_einleitungstext():
     \\end{normalsize}
     """
     return s + "\n"
+
 
 def hole_daten(name):
     sql = """
@@ -160,6 +167,7 @@ def hole_daten(name):
 
     return liste
 
+
 def erzeuge_tf_menge(datenzeilen):
     """
     Erzeugt aus den Datenzeile eine Menge der TFs und liefert sie als String zurück.
@@ -175,6 +183,7 @@ def erzeuge_tf_menge(datenzeilen):
     for tf in sorted(list(tfs)):
         s += escape_element(tf) + "\\\\"
     return s + "\n"
+
 
 def latex_tf_liste(datenzeilen):
     s = """\\begin{normalsize}
@@ -196,6 +205,7 @@ def latex_tf_liste(datenzeilen):
     \\end{normalsize}
     """
     return s + "\n"
+
 
 def latex_tabellenkopf():
     s = """\\begin{normalsize}
@@ -224,6 +234,7 @@ def latex_tabellenkopf():
     """
     return s + "\n"
 
+
 def escape_element(element):
     """
     Ein paar Sonderzeichen versteht LaTeX falsch in Tabellen, deshalb müssen sie hier escpaped werden.
@@ -234,11 +245,12 @@ def escape_element(element):
     """
     if element == "[Bitte hier „kurz & bündig“ und für „Dritte verständlich“ die Berechtigung beschreiben! Fokus: WAS kann man mit der Berechtigung machen?]":
         return "Noch nicht bearbeitet"
-    return element\
-                .replace('\\', '\\\\') \
-                .replace('#', '\\#') \
-                .replace('&', '\\&') \
-                .replace('_', '\\_')
+    return element \
+        .replace('\\', '\\\\') \
+        .replace('#', '\\#') \
+        .replace('&', '\\&') \
+        .replace('_', '\\_')
+
 
 def hole_af_varianten(datenzeilen):
     """
@@ -261,12 +273,14 @@ def hole_af_varianten(datenzeilen):
         s += " \\\\\n"
     return s + "\n"
 
+
 def latex_tabellenende():
     s = """\hline
         \end{longtable}
         \end{tiny}
     """
     return s + "\n"
+
 
 def latex_nachsatz():
     s = """\\begin{minipage}{\\textwidth}
@@ -282,9 +296,11 @@ def latex_nachsatz():
     """
     return s + "\n"
 
+
 def latex_abspann():
     s = "\\end{document}"
     return s + "\n"
+
 
 def hole_userid(name):
     account = hole_userids(name)[0]  # Geliefert wird immer eine Liste mit Listen: (('XV00563',), ('BV00563',))
@@ -293,6 +309,7 @@ def hole_userid(name):
     else:
         userid = ('x' + account[0][1:]).lower()
     return userid
+
 
 def serienbrief(request):
     """
@@ -311,7 +328,7 @@ def serienbrief(request):
         userid = hole_userid(name)
 
         brief += latex_adresse(userid)
-        brief += latex_anrede(name[0]) # Geliefert wird auch hier immer eine Liste mit Listen
+        brief += latex_anrede(name[0])  # Geliefert wird auch hier immer eine Liste mit Listen
         brief += latex_einleitungstext()
 
         datenzeilen = hole_daten(name)
@@ -328,15 +345,17 @@ def serienbrief(request):
     response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
     return response
 
+
 def gib_dateiname(name, userid):
     name_ohne_space = name.replace(" ", "-")
-    s = "Rezertifizierung_{0}_{1}_{2}"\
-            .format(name_ohne_space, userid, timezone.now())\
+    s = "Rezertifizierung_{0}_{1}_{2}" \
+            .format(name_ohne_space, userid, timezone.now()) \
             .replace(".", "-") \
             .replace(":", "-") \
             .replace(" ", "_") \
-            + ".tex"
+        + ".tex"
     return s
+
 
 def einzelbrief(request):
     """
@@ -360,9 +379,9 @@ def einzelbrief(request):
     for name in namen:
         userid = hole_userid(name)
 
-        brief = latex_header()                    # Für jeden Namen wird eine neue Datei angelegt
+        brief = latex_header()  # Für jeden Namen wird eine neue Datei angelegt
         brief += latex_adresse(userid)
-        brief += latex_anrede(name[0])             # Geliefert wird auch hier immer eine Liste mit Listen
+        brief += latex_anrede(name[0])  # Geliefert wird auch hier immer eine Liste mit Listen
         brief += latex_einleitungstext()
 
         datenzeilen = hole_daten(name)
@@ -379,7 +398,7 @@ def einzelbrief(request):
         filename_in_zip = gib_dateiname(name[0], userid)
         in_memory_zip.writestr(filename_in_zip, brief)
 
-    in_memory_zip.close()    # Die Daten stehen nun weiterhin in in_memory_data zur Verfügung
+    in_memory_zip.close()  # Die Daten stehen nun weiterhin in in_memory_data zur Verfügung
 
     filename = "Einzelbriefe.zip"
     response = HttpResponse(in_memory_data.getvalue(), content_type='application/zip')
