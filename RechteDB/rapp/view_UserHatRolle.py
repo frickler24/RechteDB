@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse
 from django.urls import reverse
 
 # Imports für die Selektions-Views panel, selektion u.a.
@@ -12,6 +12,7 @@ from django.db.models import Count
 
 from django.db import connection
 
+from .excel import Excel
 import csv
 import re
 
@@ -1619,16 +1620,12 @@ def panel_UhR_matrix_csv(request, flag=False):
     (namen_liste, _) = UhR_erzeuge_gefiltere_namensliste(request)
     (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(request, namen_liste)
 
-    response = HttpResponse(content_type="text/tsv")
-    response['Content-Disposition'] = 'attachment; filename="matrix.csv"'
-    response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
-
     headline = [smart_str(u'Name')] + [smart_str(u'Teams')]
     for r in rollenmenge:
         headline += [smart_str(r.rollenname)]
 
-    writer = csv.writer(response, csv.excel, delimiter='\t', quotechar='"')
-    writer.writerow(headline)
+    excel = Excel("matrix.csv")
+    excel.writerow(headline)
 
     for user in usernamen:
         line = [user] + [smart_str(string_aus_liste(teams_je_username[user]))]
@@ -1641,9 +1638,9 @@ def panel_UhR_matrix_csv(request, flag=False):
                     line += [smart_str(wert[0])]
             else:
                 line += [smart_str(finde(rollen_je_username[user], rolle))]
-        writer.writerow(line)
+        excel.writerow(line)
 
-    return response
+    return excel.response
 
 
 def panel_UhR_af_export(request, id):
@@ -1660,10 +1657,6 @@ def panel_UhR_af_export(request, id):
      selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID) \
         = UhR_hole_daten(namen_liste, id)
 
-    response = HttpResponse(content_type="text/tsv")
-    response['Content-Disposition'] = 'attachment; filename="rollen.csv"'
-    response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
-
     headline = [
         smart_str(u'Name'),
         smart_str(u'Rollenname'),
@@ -1673,8 +1666,8 @@ def panel_UhR_af_export(request, id):
     for userid in selektierte_userids:
         headline.append(smart_str(userid))
 
-    writer = csv.writer(response, csv.excel, delimiter='\t', quotechar='"')
-    writer.writerow(headline)
+    excel = Excel("rollen.csv")
+    excel.writerow(headline)
 
     for rolle in userHatRolle_liste:
         for rollendefinition in TblRollehataf.objects.filter(rollenname=rolle.rollenname):
@@ -1688,6 +1681,6 @@ def panel_UhR_af_export(request, id):
                     line.append('ja')
                 else:
                     line.append('nein')
-            writer.writerow(line)
+            excel.writerow(line)
 
-    return response
+    return excel.response
