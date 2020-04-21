@@ -957,7 +957,7 @@ class UhR(object):
 
 # Ein einzelner User mit seiner UserID und all seinen vergebenen Rollen
 class EinzelUhr(UhR):
-    def behandle(self, request, id):
+    def setze_context(self, request, id):
         """
         Finde alle relevanten Informationen zur aktuellen Selektion
         Das ist die Factory-Klasse für die Betrachtung einzelner User und deren spezifischer Rollen
@@ -986,28 +986,28 @@ class EinzelUhr(UhR):
             'afmenge_je_userID': afmenge_je_userID,
             'version': version,
         }
-        return render(request, 'rapp/panel_UhR.html', context)
+        return context
+
+    def behandle(self, request, id):
+        return render(request, 'rapp/panel_UhR.html', self.setze_context(request, id))
 
 
 # Für alle selektierten Used und ihre IDs alle AFen und die dazugehörigen Rollen
 class RollenListenUhr(UhR):
-    def behandle(self, request, _):
+    def setze_context(self, request):
         """
         Finde alle relevanten Informationen zur aktuellen Selektion
         Das ist die Factory-Klasse für die Betrachtung aller User mit spezifischen Rollen- oder AF-Namen
 
         :param request: GET oder POST Request vom Browser
         :param id: wird hier nicht verwendet, deshalb "_"
-        :return: Gerendertes HTML
+        :return: Zu renderndes HTML-File, Context für das zu rendernde HTML
         """
         (namen_liste, panel_filter, rollen_liste, rollen_filter) = \
             UhR_erzeuge_listen_mit_rollen(request)
 
         form = ShowUhRForm(request.GET)
         gesuchte_rolle = request.GET.get('rollenname', None)
-        if gesuchte_rolle == "*":  # Das ist die Wildcard-Suche, um den Modus in der Oberfläche auszuwählen
-            gesuchte_rolle = None
-
         # Finde alle AFen in den verwendeten Rollen, die keinem der User zugewieen sind
         if gesuchte_rolle == "+":
             af_liste = hole_unnoetigte_afen(namen_liste)
@@ -1018,11 +1018,12 @@ class RollenListenUhr(UhR):
                 'af_liste': af_liste,
                 'version': version,
             }
-            return render(request, 'rapp/panel_UhR_ueberfluessige_af.html', context)
+            return 'rapp/panel_UhR_ueberfluessige_af.html', context
 
-        (userids, af_per_uid, vorhanden, optional) \
-            = UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle)
+        if gesuchte_rolle == "*":
+            gesuchte_rolle = None
 
+        (userids, af_per_uid, vorhanden, optional) = UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle)
         context = {
             'filter': panel_filter, 'form': form,
             'rollen_liste': rollen_liste, 'rollen_filter': rollen_filter,
@@ -1032,18 +1033,16 @@ class RollenListenUhr(UhR):
             'optional': optional,
             'version': version,
         }
-        return render(request, 'rapp/panel_UhR_rolle.html', context)
+        return 'rapp/panel_UhR_rolle.html', context
 
-
-# FFU
-class AFListenUhr(UhR):
-    def behandle(self, request, id):
-        assert 0, 'Funktion AFListenUhr::behandle() ist noch nicht implementiert. Der Aufruf ist nicht valide.'
+    def behandle(self, request, _):
+        html, cont = self.setze_context(request)
+        return render(request, html, cont)
 
 
 # Für alle selektierten User und deren IDs alle AFen, die für die konkrete UserID nicht zu Rollen zugeordnet sind
 class NeueListenUhr(UhR):
-    def behandle(self, request, _):
+    def setze_context(self, request):
         """
         Diese Factory-Klasse selektiert zunächst alle AFen,
         die für den jeweiligen User noch nicht mit einer Rolle belegt sind.
@@ -1052,7 +1051,7 @@ class NeueListenUhr(UhR):
 
         :param request: GET oder POST Request vom Browser
         :param id: wird hier nicht verwendet, deshalb "_"
-        :return: Gerendertes HTML
+        :return: Context für das zu rendernde HTML
         """
         (namen_liste, panel_filter, rollen_liste, rollen_filter) = \
             UhR_erzeuge_listen_mit_rollen(request)
@@ -1071,7 +1070,16 @@ class NeueListenUhr(UhR):
             'optional': optional,
             'version': version,
         }
-        return render(request, 'rapp/panel_UhR_rolle.html', context)
+        return context
+
+    def behandle(self, request, _):
+        return render(request, 'rapp/panel_UhR_rolle.html', self.setze_context(request))
+
+
+# For Future Use
+class AFListenUhr(UhR):
+    def behandle(self, request, id):
+        assert 0, 'Funktion AFListenUhr::behandle() ist noch nicht implementiert. Der Aufruf ist nicht valide.'
 
 
 # Zeige das Selektionspanel
@@ -1079,7 +1087,8 @@ def panel_UhR(request, id=0):
     """
     Finde die richtige Anzeige und evaluiere sie über das factory-Pattern
 
-    - wenn rollennamme gesetzt ist, rufe die Factory "rolle"
+    - wenn rollenname = "-" ist, rufe die Factory "nur_neue"
+    - wenn rollenname anderweitig gesetzt ist, rufe die Factory "rolle"
     - wenn rollenname nicht gesetzt oder leer ist und afname gesetzt ist, rufe factory "af"
     - Ansonsten rufe die Standard-Factory "einzel"
 
@@ -1090,11 +1099,11 @@ def panel_UhR(request, id=0):
     assert request.method != 'POST', 'Irgendwas ist im panel_UhR über POST angekommen'
     assert request.method == 'GET', 'Irgendwas ist im panel_UhR nicht über GET angekommen: ' + request.method
 
-    if request.GET.get('rollenname', None) != None and request.GET.get('rollenname', None) == "-":
+    if request.GET.get('rollenname', None) is not None and request.GET.get('rollenname', None) == "-":
         name = 'nur_neue'
-    elif request.GET.get('rollenname', None) != None and request.GET.get('rollenname', None) != "":
+    elif request.GET.get('rollenname', None) is not None and request.GET.get('rollenname', None) != "":
         name = 'rolle'
-    elif request.GET.get('afname', None) != None and request.GET.get('afname', None) != "":
+    elif request.GET.get('afname', None) is not None and request.GET.get('afname', None) != "":
         print('Factory AF')
         name = 'af'
     else:
@@ -1611,7 +1620,7 @@ def panel_UhR_matrix_csv(request, flag=False):
     (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(request, namen_liste)
 
     response = HttpResponse(content_type="text/tsv")
-    response['Content-Disposition'] = 'attachment; filename="matrix.csv"'  # ToDo Hänge Datum an Dateinamen an
+    response['Content-Disposition'] = 'attachment; filename="matrix.csv"'
     response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
 
     headline = [smart_str(u'Name')] + [smart_str(u'Teams')]
