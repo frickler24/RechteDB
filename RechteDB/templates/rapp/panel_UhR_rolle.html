@@ -20,7 +20,14 @@
 
 <div class="container-fluid">
 	{% if userids %}
-		<div class="col-12 mt-4">
+		<div class="col-4 mt-4">
+            <a href="{% url 'user_rolle_af' %}?{% for key,value in request.GET.items %}&{{ key }}={{ value }}{% endfor %}&export=999"
+                class="btn btn-outline-primary btn-sm"
+                role="button">
+                Export
+            </a>
+		</div>
+		<div class="col-8 mt-4">
 			{% if form.non_field_errors %}
 				<p>{{ form.non_field_errors }}</p>
 			{% endif %}

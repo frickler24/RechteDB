@@ -1,41 +1,35 @@
 from __future__ import unicode_literals
 
-from django.http import HttpResponseRedirect, HttpResponse
-from django.urls import reverse
-
-# Imports für die Selektions-Views panel, selektion u.a.
-from django.shortcuts import render, redirect
-
-from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
-from django.utils.encoding import smart_str
-from django.db.models import Count
+import re
+from copy import deepcopy
 
 from django.db import connection
+from django.db.models import Count
+from django.http import HttpResponse
 
-import csv
-import re
-
-from .filters import RollenFilter, UseridFilter
-from .xhtml2 import render_to_pdf
-
-from .views import version, pagination
-from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportFormSchritt3
-from .models import TblUserIDundName
-from .models import TblGesamt
-from .models import TblRollen
-from .models import TblRollehataf
-from .models import TblUserhatrolle
-from .models import TblOrga
-from .models import TblAfliste
-from .models import RACF_Rechte
-from .models import TblDb2
-from .models import TblUebersichtAfGfs
-from .models import ACLGruppen
-
-from .templatetags.gethash import finde
+from django.shortcuts import render
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.encoding import smart_str
+from django.views.generic import CreateView, UpdateView, DeleteView
 
-from copy import deepcopy
+from .excel import Excel
+from .filters import RollenFilter, UseridFilter
+from .forms import ShowUhRForm, CreateUhRForm
+from .models import ACLGruppen
+from .models import RACF_Rechte
+from .models import TblAfliste
+from .models import TblDb2
+from .models import TblGesamt
+from .models import TblOrga
+from .models import TblRollehataf
+from .models import TblRollen
+from .models import TblUebersichtAfGfs
+from .models import TblUserIDundName
+from .models import TblUserhatrolle
+from .templatetags.gethash import finde
+from .views import version, pagination
+from .xhtml2 import render_to_pdf
 
 
 ###################################################################
@@ -957,7 +951,7 @@ class UhR(object):
 
 # Ein einzelner User mit seiner UserID und all seinen vergebenen Rollen
 class EinzelUhr(UhR):
-    def behandle(self, request, id):
+    def setze_context(self, request, id):
         """
         Finde alle relevanten Informationen zur aktuellen Selektion
         Das ist die Factory-Klasse für die Betrachtung einzelner User und deren spezifischer Rollen
@@ -986,28 +980,35 @@ class EinzelUhr(UhR):
             'afmenge_je_userID': afmenge_je_userID,
             'version': version,
         }
-        return render(request, 'rapp/panel_UhR.html', context)
+        return context
+
+    def behandle(self, request, id):
+        """
+        Erzeuge die HTML-Sicht für den Dialog
+
+        :param request: Der HTTP-Request, kann '' oder einen Rollennamenteil beinhalten
+        :param id: optional die ID eines Users
+        :return: Das gerenderte HTML
+        """
+        return render(request, 'rapp/panel_UhR.html', self.setze_context(request, id))
 
 
-# Für alle selektierten Used und ihre IDs alle AFen und die dazugehörigen Rollen
+# Für alle selektierten Used und ihre IDs alle AFen und die dazugehörigen Rollen (+ / *)
 class RollenListenUhr(UhR):
-    def behandle(self, request, _):
+    def setze_context(self, request):
         """
         Finde alle relevanten Informationen zur aktuellen Selektion
         Das ist die Factory-Klasse für die Betrachtung aller User mit spezifischen Rollen- oder AF-Namen
 
         :param request: GET oder POST Request vom Browser
         :param id: wird hier nicht verwendet, deshalb "_"
-        :return: Gerendertes HTML
+        :return: Zu renderndes HTML-File, Context für das zu rendernde HTML
         """
         (namen_liste, panel_filter, rollen_liste, rollen_filter) = \
             UhR_erzeuge_listen_mit_rollen(request)
 
         form = ShowUhRForm(request.GET)
         gesuchte_rolle = request.GET.get('rollenname', None)
-        if gesuchte_rolle == "*":  # Das ist die Wildcard-Suche, um den Modus in der Oberfläche auszuwählen
-            gesuchte_rolle = None
-
         # Finde alle AFen in den verwendeten Rollen, die keinem der User zugewieen sind
         if gesuchte_rolle == "+":
             af_liste = hole_unnoetigte_afen(namen_liste)
@@ -1018,11 +1019,12 @@ class RollenListenUhr(UhR):
                 'af_liste': af_liste,
                 'version': version,
             }
-            return render(request, 'rapp/panel_UhR_ueberfluessige_af.html', context)
+            return 'rapp/panel_UhR_ueberfluessige_af.html', context
 
-        (userids, af_per_uid, vorhanden, optional) \
-            = UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle)
+        if gesuchte_rolle == "*":
+            gesuchte_rolle = None
 
+        (userids, af_per_uid, vorhanden, optional) = UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle)
         context = {
             'filter': panel_filter, 'form': form,
             'rollen_liste': rollen_liste, 'rollen_filter': rollen_filter,
@@ -1032,18 +1034,119 @@ class RollenListenUhr(UhR):
             'optional': optional,
             'version': version,
         }
-        return render(request, 'rapp/panel_UhR_rolle.html', context)
+        return 'rapp/panel_UhR_rolle.html', context
 
+    def behandle(self, request, _):
+        """
+        Erzeuge die HTML-Sicht für den Dialog
+        :param request: der HTTP-Requerst, kann * oder * enthalten in rollenname
+        :param _:
+        :return: Das gerenderte HTML
+        """
+        html, cont = self.setze_context(request)
+        return render(request, html, cont)
 
-# FFU
-class AFListenUhr(UhR):
-    def behandle(self, request, id):
-        assert 0, 'Funktion AFListenUhr::behandle() ist noch nicht implementiert. Der Aufruf ist nicht valide.'
+    def exportiere(self, request, _):
+        """
+        Finde die korrekte Exportfuntion anhand des Parameters rollenmenge
+        :param request: Der Request
+        :param _:
+        :return: Die CSV-Inhalte zum Download
+        """
+        gesuchte_rolle = request.GET.get('rollenname', None)
+        if gesuchte_rolle == '+':
+            return self.exportiere_plus(request)
+        if gesuchte_rolle == '*':
+            return self.exportiere_stern(request)
+        else:
+            print('RollenListenUhr: gesuchte_rolle ist merkwürdigerweise >>>{}<<<', format(gesuchte_rolle))
+
+    def exportiere_plus(self, request):
+        """
+        Liefert die Liste der AFen, die zur aktuellen Treffernmenge zwar in den Rollen modelliert sind,
+        aber keine Verwendung bei den Usern finden.
+
+        :param request: Der HTML-Request mit den gewünschten Filtern und '+' als Rollenname
+                        Achtung: das '+' muss ein %2B sein, sonst wird es vom Button eliniert!
+        :return: Die csv-Daten zum Download
+        """
+        headline = [
+            smart_str(u'Rollenname'),
+            smart_str(u'Ungenutze AF'),
+        ]
+        excel = Excel("rollen.csv")
+        excel.writerow(headline)
+
+        _, context = self.setze_context(request)
+        for af in context['af_liste']:
+            line = [
+                af['rollenname__rollenname'],
+                af['af__af_name']
+            ]
+            excel.writerow(line)
+        return excel.response
+
+    def zweiter(self, str):
+        """
+        Liefert den zweiten Teil eines mit '!' getrennten Strings.
+        Wenn der String Leerstring ist, liefere nur den Leerstring zurück
+        :param str: Der String xxx!yyyyy
+        :return: yyyyy oder '' wenn String == ''
+        """
+        if str == '':
+            return str
+        return str.split('!')[1]
+
+    def exportiere_stern(self, request):
+        """
+        Liefert die Liste der AFen, die zur aktuellen Treffernmenge mit Rollen hinterlegt sind
+        sowie die Menge der Rollen, die zusätzlich oder alternativ für die AF vergeben werden könnten.
+
+        Der etwas wirre Block im letzten Teil ist bei Verwendung von HTML-Tabellen wesentlich einfacher,
+        aber hier müssen die Spalten selbständig nebeneinander aufgefüllt werden.
+
+        :param context: Die gefundenen Daten uzur Anzeige
+        :return: Die csv-Daten zum Download
+        """
+        _, context = self.setze_context(request)
+
+        userids = context['userids']
+
+        headline = [
+            smart_str(u'Name'),
+            smart_str(u'UserID'),
+            smart_str(u'AF'),
+            smart_str(u'Vergebene Rolle'),
+            smart_str(u'Mögliche weitere Rollen')
+        ]
+        excel = Excel("Rollenzuordnungen_zu_AFen.csv")
+        excel.writerow(headline)
+
+        for name in userids:
+            for userid in userids[name]:
+                for af in sorted(context['af_per_uid'][userid]):
+                    bastelkey = userid + '!' + af
+                    numvorhanden = len(context['vorhanden'][bastelkey]) - 1  # wegen des Leerstrings am Ende
+                    numoptional = len(context['optional'][bastelkey]) - 1  # wegen des Leerstrings am Ende
+
+                    for i in range(max(numvorhanden, numoptional)):
+                        if i < numvorhanden:
+                            vorh = self.zweiter(context['vorhanden'][bastelkey][i]) # den aktuellen Wert
+                        elif i >= 0:
+                            # letzten Wert bis zum Ende wiederholen für bessere Darstellung
+                            vorh = self.zweiter(context['vorhanden'][bastelkey][numvorhanden - 1])
+                        else:
+                            vorh = 'keine Zuordnung'
+                        opti = context['optional'][bastelkey][i] if i < numoptional else ' '
+                        line = [name, userid, af, vorh, opti]
+                        excel.writerow(line)
+
+        return excel.response
 
 
 # Für alle selektierten User und deren IDs alle AFen, die für die konkrete UserID nicht zu Rollen zugeordnet sind
 class NeueListenUhr(UhR):
-    def behandle(self, request, _):
+    def setze_context(self, request):
         """
         Diese Factory-Klasse selektiert zunächst alle AFen,
         die für den jeweiligen User noch nicht mit einer Rolle belegt sind.
@@ -1052,7 +1155,7 @@ class NeueListenUhr(UhR):
 
         :param request: GET oder POST Request vom Browser
         :param id: wird hier nicht verwendet, deshalb "_"
-        :return: Gerendertes HTML
+        :return: Context für das zu rendernde HTML
         """
         (namen_liste, panel_filter, rollen_liste, rollen_filter) = \
             UhR_erzeuge_listen_mit_rollen(request)
@@ -1071,7 +1174,59 @@ class NeueListenUhr(UhR):
             'optional': optional,
             'version': version,
         }
-        return render(request, 'rapp/panel_UhR_rolle.html', context)
+        return context
+
+    def behandle(self, request, _):
+        """
+        Erzeuge die HTML-Sicht für den Dialog
+        :param request: der HTTP-Request, enthält '-' als rollenname
+        :param _: wird nicht benötigt, ist bei anderen die ID
+        :return: Das gerenderte HTML
+        """
+        return render(request, 'rapp/panel_UhR_rolle.html', self.setze_context(request))
+
+    def exportiere(self, request, _):
+        """
+        Liefert die Liste der AFen, die für den User derzeit keiner Rolle zugeordnet sind
+        sowie die Menge der Rollen, die für die AF vergeben werden könnten.
+
+        :param context: Die gefundenen Daten uzur Anzeige
+        :return: Die csv-Daten zum Download
+        """
+        context = self.setze_context(request)
+        userids = context['userids']
+
+        headline = [
+            smart_str(u'Name'),
+            smart_str(u'UserID'),
+            smart_str(u'AF'),
+            smart_str(u'Mögliche Rollen')
+        ]
+        excel = Excel("AFen_ohne_Rollenzuordnung.csv")
+        excel.writerow(headline)
+
+        for name in userids:
+            for userid in userids[name]:
+                for af in sorted(context['af_per_uid'][userid]):
+                    if af == 'ka':  # Das Zeug interessiert niemanden
+                        continue
+                    bastelkey = userid + '!' + af
+                    numoptional = len(context['optional'][bastelkey]) - 1  # wegen des Leerstrings am Ende
+
+                    for i in range(numoptional):
+                        opti = context['optional'][bastelkey][i]
+                        line = [name, userid, af, opti]
+                        excel.writerow(line)
+
+        return excel.response
+
+# For Future Use
+class AFListenUhr(UhR):
+    def behandle(self, request, id):
+        """
+        Noch leere Funktion
+        """
+        assert 0, 'Funktion AFListenUhr::behandle() ist noch nicht implementiert. Der Aufruf ist nicht valide.'
 
 
 # Zeige das Selektionspanel
@@ -1079,7 +1234,8 @@ def panel_UhR(request, id=0):
     """
     Finde die richtige Anzeige und evaluiere sie über das factory-Pattern
 
-    - wenn rollennamme gesetzt ist, rufe die Factory "rolle"
+    - wenn rollenname = "-" ist, rufe die Factory "nur_neue"
+    - wenn rollenname anderweitig gesetzt ist, rufe die Factory "rolle"
     - wenn rollenname nicht gesetzt oder leer ist und afname gesetzt ist, rufe factory "af"
     - Ansonsten rufe die Standard-Factory "einzel"
 
@@ -1090,18 +1246,21 @@ def panel_UhR(request, id=0):
     assert request.method != 'POST', 'Irgendwas ist im panel_UhR über POST angekommen'
     assert request.method == 'GET', 'Irgendwas ist im panel_UhR nicht über GET angekommen: ' + request.method
 
-    if request.GET.get('rollenname', None) != None and request.GET.get('rollenname', None) == "-":
+    if request.GET.get('rollenname', None) is not None and request.GET.get('rollenname', None) == "-":
         name = 'nur_neue'
-    elif request.GET.get('rollenname', None) != None and request.GET.get('rollenname', None) != "":
+    elif request.GET.get('rollenname', None) is not None and request.GET.get('rollenname', None) != "":
         name = 'rolle'
-    elif request.GET.get('afname', None) != None and request.GET.get('afname', None) != "":
+    elif request.GET.get('afname', None) is not None and request.GET.get('afname', None) != "":
         print('Factory AF')
         name = 'af'
     else:
         name = 'einzel'
 
     obj = UhR.factory(name)
-    return obj.behandle(request, id)
+    if request.GET.get('export', None) is not None:
+        return obj.exportiere(request, id)
+    else:
+        return obj.behandle(request, id)
 
 
 def erzeuge_pdf_namen(request):
@@ -1610,16 +1769,12 @@ def panel_UhR_matrix_csv(request, flag=False):
     (namen_liste, _) = UhR_erzeuge_gefiltere_namensliste(request)
     (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(request, namen_liste)
 
-    response = HttpResponse(content_type="text/tsv")
-    response['Content-Disposition'] = 'attachment; filename="matrix.csv"'  # ToDo Hänge Datum an Dateinamen an
-    response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
-
     headline = [smart_str(u'Name')] + [smart_str(u'Teams')]
     for r in rollenmenge:
         headline += [smart_str(r.rollenname)]
 
-    writer = csv.writer(response, csv.excel, delimiter='\t', quotechar='"')
-    writer.writerow(headline)
+    excel = Excel("matrix.csv")
+    excel.writerow(headline)
 
     for user in usernamen:
         line = [user] + [smart_str(string_aus_liste(teams_je_username[user]))]
@@ -1632,9 +1787,9 @@ def panel_UhR_matrix_csv(request, flag=False):
                     line += [smart_str(wert[0])]
             else:
                 line += [smart_str(finde(rollen_je_username[user], rolle))]
-        writer.writerow(line)
+        excel.writerow(line)
 
-    return response
+    return excel.response
 
 
 def panel_UhR_af_export(request, id):
@@ -1651,10 +1806,6 @@ def panel_UhR_af_export(request, id):
      selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID) \
         = UhR_hole_daten(namen_liste, id)
 
-    response = HttpResponse(content_type="text/tsv")
-    response['Content-Disposition'] = 'attachment; filename="rollen.csv"'
-    response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
-
     headline = [
         smart_str(u'Name'),
         smart_str(u'Rollenname'),
@@ -1664,8 +1815,8 @@ def panel_UhR_af_export(request, id):
     for userid in selektierte_userids:
         headline.append(smart_str(userid))
 
-    writer = csv.writer(response, csv.excel, delimiter='\t', quotechar='"')
-    writer.writerow(headline)
+    excel = Excel("rollen.csv")
+    excel.writerow(headline)
 
     for rolle in userHatRolle_liste:
         for rollendefinition in TblRollehataf.objects.filter(rollenname=rolle.rollenname):
@@ -1679,6 +1830,6 @@ def panel_UhR_af_export(request, id):
                     line.append('ja')
                 else:
                     line.append('nein')
-            writer.writerow(line)
+            excel.writerow(line)
 
-    return response
+    return excel.response
