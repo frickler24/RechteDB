@@ -21,6 +21,13 @@
 
 <div class="container-fluid">
 	{% if af_liste %}
+		<div class="col-4 mt-4">
+            <a href="{% url 'user_rolle_af' %}?{% for key,value in request.GET.items %}&{{ key }}={% if value == '+' %}%2B{% else %}{{ value }}{% endif %}{% endfor %}&export=1"
+                class="btn btn-outline-primary btn-sm"
+                role="button">
+                Export
+            </a>
+		</div>
 		<div class="col-12 mt-4">
 			{% if form.non_field_errors %}
 				<p>{{ form.non_field_errors }}</p>

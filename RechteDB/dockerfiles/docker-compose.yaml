@@ -15,7 +15,7 @@ services:
     networks:
       - rapp_net
     ports:
-      - 8081:80
+      - 8088:80
     volumes:
       - /home/lutz/Projekte/ProdRApp/RechteDB/staticfiles:/static:rw
     healthcheck:
