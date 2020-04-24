@@ -1,42 +1,35 @@
 from __future__ import unicode_literals
 
-from django.http import HttpResponse
-from django.urls import reverse
-
-# Imports für die Selektions-Views panel, selektion u.a.
-from django.shortcuts import render, redirect
-
-from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
-from django.utils.encoding import smart_str
-from django.db.models import Count
+import re
+from copy import deepcopy
 
 from django.db import connection
+from django.db.models import Count
+from django.http import HttpResponse
+
+from django.shortcuts import render
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.encoding import smart_str
+from django.views.generic import CreateView, UpdateView, DeleteView
 
 from .excel import Excel
-import csv
-import re
-
 from .filters import RollenFilter, UseridFilter
-from .xhtml2 import render_to_pdf
-
-from .views import version, pagination
-from .forms import ShowUhRForm, CreateUhRForm, ImportForm, ImportFormSchritt3
-from .models import TblUserIDundName
-from .models import TblGesamt
-from .models import TblRollen
-from .models import TblRollehataf
-from .models import TblUserhatrolle
-from .models import TblOrga
-from .models import TblAfliste
-from .models import RACF_Rechte
-from .models import TblDb2
-from .models import TblUebersichtAfGfs
+from .forms import ShowUhRForm, CreateUhRForm
 from .models import ACLGruppen
-
+from .models import RACF_Rechte
+from .models import TblAfliste
+from .models import TblDb2
+from .models import TblGesamt
+from .models import TblOrga
+from .models import TblRollehataf
+from .models import TblRollen
+from .models import TblUebersichtAfGfs
+from .models import TblUserIDundName
+from .models import TblUserhatrolle
 from .templatetags.gethash import finde
-from django.utils import timezone
-
-from copy import deepcopy
+from .views import version, pagination
+from .xhtml2 import render_to_pdf
 
 
 ###################################################################
