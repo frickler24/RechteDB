@@ -62,3 +62,9 @@ testdb.json
 venv/
 RechteDB/content.tar.gz
 **/staticfiles/
+**/*.pem
+**/*.key
+**/*.crt
+other_files/frickler.pem*
+other_files/dump_20200426.sql.gz.kannwegnachDemoITSec
+other_files/letsencrypt/

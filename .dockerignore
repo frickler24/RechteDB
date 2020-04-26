@@ -1,6 +1,5 @@
 **/.git
 **/my3.6venv
-**/other_files/0030_Direktverbindungen.py
 **/other_files/aclgroups_2019-03-07.csv
 **/other_files/aclgroups_2019-03-07.sql
 **/other_files/change
@@ -19,3 +18,4 @@
 **/other_files/testdb.json
 **/other_files/TF-Zertifizierung
 **/other_files/XA
+**/other_files/dump_20200426.sql.gz.kannwegnachDemoITSec

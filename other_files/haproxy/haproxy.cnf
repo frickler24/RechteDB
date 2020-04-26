@@ -1,6 +1,7 @@
 global
     daemon
     maxconn 256
+    tune.ssl.default-dh-param 2048
 
 defaults
     mode http
@@ -24,8 +25,17 @@ listen stats
     #stats auth admin:<Passwort>
     stats uri /stats
 
-frontend http-in
+frontend http
     bind *:80
+    mode http
+
+    acl letsencrypt-acl path_beg -i /.well-known/acme-challenge/
+    http-request redirect scheme https if !letsencrypt-acl
+    use_backend letsencrypt if letsencrypt-acl
+
+frontend https
+    bind *:443 ssl crt /certs/RApp.pem
+    mode http
 
     acl is_pma url_beg /pma
     use_backend pma_server if is_pma
@@ -40,8 +50,22 @@ frontend http-in
 resolvers mydns
     nameserver dns1 127.0.0.11:53
 
+
+#############################
+# Liste der Backends
+#############################
+
+# Der ist nur aktiv, wenn der entsprechende Container läuft. Wegen Portkonbflikten auf dem Docker Host eher selten...
+
+backend letsencrypt
+    server letsencrypt 172.42.0.99:80 # feste IP-Adresse, weil das Erkennen des Servers sehr schnell gehen muss
+    timeout connect 1h
+    timeout server 1h
+
+
+# Die eingentliche Anwendung
+
 backend rapp_server
-    # Das ist der RApp-Server.
     option httpchk HEAD /rapp/ HTTP/1.1\r\nHost:\ rapp:8081\r\nUser-agent:\ Der\ wilde\ Watz
     option forwardfor
     balance roundrobin
@@ -55,8 +79,8 @@ backend rapp_server
     server server8 rapp8:8000 check fall 1 rise 2 resolvers mydns
     server server9 rapp9:8000 check fall 1 rise 2 resolvers mydns
     server server10 rapp10:8000 check fall 1 rise 2 resolvers mydns
-    server serverx1 rapp:8000 check fall 1 rise 2 resolvers mydns
-    server serverx2 rappneu:8000 check fall 1 rise 2 resolvers mydns
+    server rappstandalone rapp:8000 check fall 1 rise 2 resolvers mydns
+    server rappneu rappneu:8000 check fall 1 rise 2 resolvers mydns
 
 backend pma_server
     # Das hier ist der PMA-Server phpmyadmin
@@ -69,6 +93,5 @@ backend pma_server
 # Statistik-Server - das ist der HAProxy selbst mit separatem Port
 backend statistic
     option httpchk HEAD / HTTP/1.1\r\nHost:\ hap
-    mode http
     server statsrv1 hap:9000 resolvers mydns
 
