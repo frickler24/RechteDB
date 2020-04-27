@@ -195,10 +195,6 @@ chaos:
 		--detach \
 		--name chaosmesh-agent \
 		--volume /var/run:/var/run \
-		--volume /run:/run \
-		--volume /dev:/dev \
-		--volume /sys:/sys \
-		--volume /var/log:/var/log \
 		--privileged \
 		--net=host \
 		--pid=host \
@@ -221,6 +217,8 @@ prodneu:
 	(cd RechteDB && docker-compose build --no-cache && docker-compose up --detach --force-recreate)
 
 vorbereitung:
+	-docker rm -f hap
+	make hap_port80und443
 	@echo "Ports 80 und 443 freischalten im Router für den Docker-Host, dann <Return>"
 	@read a
 
@@ -244,13 +242,30 @@ letsencrypt: vorbereitung
 		cat /home/lutz/Projekte/RechteDB2MySQL/RechteDB/other_files/letsencrypt/etc/live/frickler.eichler-web.de/fullchain.pem \
 			/home/lutz/Projekte/RechteDB2MySQL/RechteDB/other_files/letsencrypt/etc/live/frickler.eichler-web.de/privkey.pem \
 			> /home/lutz/Projekte/RechteDB2MySQL/RechteDB/other_files/certs/RApp.pem
-		docker kill -s HUP hap
+		docker rm -f hap
+		make hap
 		@echo
 		@echo "Nun die Ports 80 und 443 wieder auf den ursprünglichen Stand zurücksetzen".
 
 hap:
 	-docker run -d \
 		--name hap \
+		--restart unless-stopped \
+		--publish 8088:80 \
+		--publish 18443:443 \
+		--network mariaNetz \
+		--network-alias hap \
+		--restart unless-stopped \
+		-e TZ='Europe/Berlin' \
+		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/other_files/haproxy:/usr/local/etc/haproxy:ro \
+		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/other_files/certs:/certs:ro \
+		haproxy haproxy -f /usr/local/etc/haproxy/haproxy.cnf -d -V
+
+
+hap_port80und443:
+	-docker run -d \
+		--name hap \
+		--restart unless-stopped \
 		--publish 80:80 \
 		--publish 443:443 \
 		--publish 8088:80 \
@@ -262,4 +277,5 @@ hap:
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/other_files/haproxy:/usr/local/etc/haproxy:ro \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/other_files/certs:/certs:ro \
 		haproxy haproxy -f /usr/local/etc/haproxy/haproxy.cnf -d -V
+
 
