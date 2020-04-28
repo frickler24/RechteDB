@@ -726,7 +726,7 @@ def UhR_verdichte_daten(request, panel_liste):
 
     for row in panel_liste:
         if row.userid[:2].lower() == "xv":
-            # print('\n\nBehandle', row.name)
+            print('\n\nBehandle', row.name)
             if kein_freies_team(request) or soll_komplett(request, row):
                 (rollenmenge, usernamen, userids) = verdichte_standardfall(rollenmenge, row, userids, usernamen)
             else:
@@ -1550,7 +1550,6 @@ def liefere_af_kritikalitaet(rollenMenge, userids):
     return hoechste_kritikalitaet_tf_in_af
 
 
-# Erzeuge das Berechtigungskonzept für Anzeige und PDF
 def erzeuge_UhR_konzept(request, ansicht):
     """
     Erzeuge das Berechtigungskonzept für eine Menge an selektierten Identitäten.

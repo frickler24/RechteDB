@@ -24,10 +24,11 @@ import time
 
 def neuer_import(request, orga):
     """
+    Prüfe, ob derzeit ein Import parallel läuft. Falls das der Fall ist, informiere über Returnwert im Fehler-Flag.
+
     :return: Fehler-Flag (True: In Retval steht ein Fehler-beschreibendes HTML, False: ein Objekt wurde erzeugt)
     :return: retval: Fehlerbeschreibung oder neues Datenobjekt in Modell-Klasse Letzter_import
     """
-    fehler = False
     # Zunächst versuche zu ermitteln, ob gerade ein anderer Import läuft:
     try:
         # Das nachfolgende Statement kann schon mal schiefgehen, z.B. wenn die DB noch leer ist.
@@ -54,6 +55,9 @@ def speichere_schritt(import_datum):
 
 def naechster_schritt(request, schrittnummer):
     """
+    Das dient dem Update der Schrittverfolgung in der Log-DB.
+    Prüfe, ob die übergebene Schrittnummer zum gespeicherten Wert passt udn reagiere entsprechend.
+
     :param request: Der HTTP-Request mit den relevanten Session-Informationen
     :param schrittnummmer: Welcher Schritt soll als nächstes ausgeführt werden?
     :return: None: Alles OK; Sonst ein Fehler-HTML zur Anzeige.
@@ -65,10 +69,12 @@ def naechster_schritt(request, schrittnummer):
         if letzter_import_im_modell.end is None:
             # In diesem Fall ist das gut, weil ja unser Import läuft.
             erwarteter_schritt = letzter_import_im_modell.schritt + 1
+
             if schrittnummer == erwarteter_schritt:
                 letzter_import_im_modell.schritt = schrittnummer
                 letzter_import_im_modell.save()
-                return False  # Kein Fehler gefunden, Nummer wurde aktualisiert
+                # Kein Fehler gefunden, Nummer wurde aktualisiert
+                return False
     except:
         pass
 
@@ -80,11 +86,13 @@ def naechster_schritt(request, schrittnummer):
 
 def letzter_schritt():
     """
+    SChließe den EIntrag in der LogDB und beende damit für alle diesen Import.
+
     :param request: HTTP_Request für mögliche Fehlermeldung / Session-Daten
     :return: --
     """
     try:
-        # Das nachfolgende Statement darf nun nicht mehr schiefgehen
+        # Das nachfolgende Statement darf nicht schiefgehen. Falls doch, ist es auch egal...
         letzter_import_im_modell = Letzter_import.objects.latest('id')
         if letzter_import_im_modell.end is None:
             # In diesem Fall ist das gut, weil ja unser Import läuft.
@@ -94,12 +102,11 @@ def letzter_schritt():
     except:
         pass
 
-    return
-
 
 def patch_datum(deutsches_datum):
     """
-    # Drehe das deutsche Datumsformat um in das amerikanische und hänge TZ-Info an
+    Drehe das deutsche Datumsformat um in das amerikanische und hänge TZ-Info an.
+    ToDo: Kann Das Ändern des Datumsformats auch von Standardfunktion übernommen werden?
 
     :param deutsches_datum:
     :return: Datum im amerikanischen Format einschließlich Zeitzonen-Information für DE
@@ -114,7 +121,8 @@ def patch_datum(deutsches_datum):
 
 def fehlerausgabe(fehler):
     """
-        Formatierte Ausgabe der Datenbakfehler
+        Formatierte Ausgabe der Datenbankfehler
+
         :param fehler: Der Fehlertext, wie er bisher besteht
         :param e: Die System-Fehlerliste
         :return: fehler, ergänzt um die Einträge der System-Fehlerliste
@@ -129,7 +137,6 @@ def fehlerausgabe(fehler):
 def import_csv(request):
     """
     Importiere neue CSV-Datei mit IIQ-Daten
-
     Das Verfahren geht über mehrere HTML-Seiten,
     demzufolge befindet sich hier auch die Abbildung als Automat über mehrere Schritte.
 
@@ -191,6 +198,7 @@ def import_csv(request):
                 af_gueltig_ab=patch_datum(line['AF Gültig ab']),
                 af_gueltig_bis=patch_datum(line['AF Gültig bis']),
                 af_zuweisungsdatum=patch_datum(line['AF Zuweisungsdatum']),
+                organisation=textwrap.shorten(line['Organisation'], width=10, placeholder="Hä?"),
             )
             # ToDo: ein try/Catch-Block um das Schreiben oder vorher Validierungsfunktion rufen
             neuerRecord.save()
@@ -307,6 +315,7 @@ def import_csv(request):
             request.session['fehler1'] = fehler
             return redirect('import2')
     else:
+        # ToDo: Gleich beim ImportForm eien Hinweis auf laufende Import anzeigen mit Löschmöglichkeit
         form = ImportForm(initial={'organisation': 'AI-BA'}, auto_id=False)
 
     context = {
@@ -320,10 +329,10 @@ def import_csv(request):
 def import2(request):
     """
     Der zweite Schritt zeigt zunächst die statistischen Ergebnisse von Schritt 1, dann die neuen User
-    Soewie die zu löschenden User.
+    sawie die zu löschenden User.
     Beim Bestätigen des Schrittes werden die neuen User der UserIDundName-Tabelle hinzugefügt
     und die zu löschenden markiert sowie deren Rechte historisiert
-    (warum eigentlich, die können doch bei der Reinkaranation wieder verwendet werden?).
+    (ToDo: warum eigentlich, die können doch bei der Reinkaranation wieder verwendet werden?).
 
     :param request: Der POST- oder GET-Request vom Browser
     :return: HTML-Output
@@ -370,8 +379,6 @@ def import2(request):
     def import_schritt2():
         """
         Führt die Stored Procedure behandleUser() zum Aktualisieren der UserIDundName-Tabelle aus
-        Als Seiteneffekt werden die Tabellen qryUpdateNeueBerechtigungenZIAIBA_2_GelöschteUser_a
-        und qryUpdateNeueBerechtigungenZIAIBA_1_NeueUser_a gefüllt, die weiter unten in die Session übernommen werden.
 
         :return: Fehler-Information (False = kein Fehler)
         """
@@ -392,7 +399,7 @@ def import2(request):
         if retval:
             return retval  # Dann ist ein Schrittfehler aufgetreten und retval enthält die Fehlermeldung
 
-        form = forms.Form(request.POST)  # Kein Eintrag in forms.py erfordelrich, da keine Modell-Anbindung oder Felder
+        form = forms.Form(request.POST)  # Kein Eintrag in forms.py erforderlich, da keine Modell-Anbindung oder Felder
         if form.is_valid():
             fehler = import_schritt2()
             request.session['fehler2'] = fehler

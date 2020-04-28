@@ -118,11 +118,13 @@ BEGIN
         Die Daten werden zunächst in eine Hilfstabelle tblRechteNeuVonImport eingelesen
         und dann von dort in die vorher geleerte tblRechteAMNeu kopiert.
         tblRechteAMNeu ist ab dann die Arbeitsdatei für alle weiteren Vorgänge,
-        die Hilfsdatei wird nicht mehr benutzt.Dieser Zwischenschritt war früher erforderlich,
+        die Hilfsdatei wird nicht mehr benutzt.
+        
+        Dieser Zwischenschritt war früher erforderlich,
         weil der gespeicherte Import die Tabelle komplett geloescht hat
         (also eine DROP - CREATE - Sequenz durchlief),
         damit waren die Datentypangaben und Referenzen futsch.
-        Heute wird enur noch genutzt, um die doppelt eingelesenen Zeilen zu entfernen
+        Heute wird er nur noch genutzt, um die doppelt vorhandenen Zeilen zu entfernen
         und dynamische Werte zu erzeugen.
     */
 
@@ -137,9 +139,10 @@ BEGIN
         Or tblRechteNeuVonImport.`AF zugewiesen an Account-name` = "";
 
     /*
-        Da hat es wohl mal Irritationen mit useriden gegeben:
-        Technische User wurden mit anderen useriden angezeigt, als XV86-er Nummern
-        Das wird hier korrigiert.
+        Da hat es wohl mal andere Konventionen bei Unix mit useriden gegeben:
+        Technische User wurden mit anderen useriden angelegt, als XV86-er Nummern.
+        Das wird hier gepatcht. Ist eigentlich nicht ganz korrekt, 
+        soll uns aber erst mal jemand nachweisen.
     */
 
     UPDATE tblRechteNeuVonImport
@@ -162,7 +165,7 @@ BEGIN
     */
     drop table if exists rapp_NeuVonImportDuplikatfrei;
     create temporary table rapp_NeuVonImportDuplikatfrei as
-        SELECT `AF zugewiesen an Account-name`         AS userid,
+        SELECT `AF zugewiesen an Account-name`   AS userid,
                CONCAT(`Nachname`,', ',`Vorname`) AS name,
                `tf name`                         AS tf,
                `tf beschreibung`                 AS tf_beschreibung,
@@ -177,19 +180,19 @@ BEGIN
                `direct connect`                  AS direct_connect,
                `höchste kritikalität tf in af`   AS hk_tf_in_af,
                `gf beschreibung`                 AS gf_beschreibung,
-               `af zuweisungsdatum`              AS af_zuweisungsdatum
+               `af zuweisungsdatum`              AS af_zuweisungsdatum,
+               `organisation`                    AS organisation
         FROM tblRechteNeuVonImport
         GROUP BY `userid`,
                  `tf`,
                  `enthalten_in_af`,
                  `tf_technische_plattform`,
-                 `GF`;
+                 `GF`,
+                 organisation;
 
     /*
-        ALTER TABLE `RechteDB`.`rapp_NeuVonImportDuplikatfrei`
-            ADD PRIMARY KEY (`userid`, `tf`(70), `enthalten_in_af`(30), `tf_technische_plattform`, `GF`);
+        Umkopieren der DAten von einer Tabelle in die andere
     */
-
 
     TRUNCATE table tblRechteAMNeu;
     INSERT INTO tblRechteAMNeu (userid, name, tf, `tf_beschreibung`, 
@@ -197,7 +200,7 @@ BEGIN
                 `tf_kritikalitaet`,
                 `tf_eigentuemer_org`, `tf_technische_plattform`, GF, 
                 `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
-                `gf_beschreibung`, `af_zuweisungsdatum`, doppelerkennung)
+                `gf_beschreibung`, `af_zuweisungsdatum`, organisation, doppelerkennung)
     SELECT rapp_NeuVonImportDuplikatfrei.userid,
            rapp_NeuVonImportDuplikatfrei.name,
            rapp_NeuVonImportDuplikatfrei.tf,
@@ -214,6 +217,7 @@ BEGIN
            rapp_NeuVonImportDuplikatfrei.`hk_tf_in_af`,
            rapp_NeuVonImportDuplikatfrei.`gf_beschreibung`,
            rapp_NeuVonImportDuplikatfrei.`af_zuweisungsdatum`,
+           rapp_NeuVonImportDuplikatfrei.`organisation`,
            0
     FROM rapp_NeuVonImportDuplikatfrei
     ON DUPLICATE KEY UPDATE doppelerkennung=doppelerkennung+1;
@@ -289,8 +293,12 @@ BEGIN
         Zunächst werden diejenigen User in eine temporäre Tabelle geschrieben,
         die in der Importliste auftauchen und
             die nicht in der User-Tabelle auftauchen (die beiden ersten Zeilen im WHERE), oder
-            die in der User-Tabelle vorhanden, aber auf "geloescht" gesetzt sind (dritte Zeile im WHERE),
-        Dabei wird die3 Team-Zuordnung "neu" mit der konstanten Nummer 35 eingetragen.
+            die in der User-Tabelle vorhanden, aber auf "geloescht" gesetzt sind (dritte Zeile im WHERE), oder
+            die in der User-Tabelle vorhanden sind, 
+                aber mit einer anderen Abteilung oder Gruppe als in der Importtabelle angegeben, oder
+            bei denen die zweite und dritte Bedingung zutreffen (gelöschter User einer andern Orga) (3.+4. Zeile)
+            
+        Dabei wird die Team-Zuordnung "neu" mit der konstanten Nummer 35 bei völlig neuen Usern eingetragen.
         Der Vergleich erfolgt sowohl über über name als auch userid,
         damit auch erneut vergebene useriden auffallen.
 
@@ -305,8 +313,14 @@ BEGIN
                         tblRechteAMNeu.name as name1,
                         '35' AS Ausdr1,
                         orga AS Ausdr2,
-                        tblUserIDundName.userid as userid2,
-                        tblUserIDundName.name as name2,
+                        tblRechteAMNeu.organisation as gruppe,
+                        concat('ZI-', orga) as abteilung,
+                        tblUserIDundName.userid as userid_alt,
+                        tblUserIDundName.name as name_alt,
+                        tblUserIDundName.orga_id as team_alt,
+                        tblUserIDundName.zi_organisation as zi_orga_alt,
+                        tblUserIDundName.abteilung as abteilung_alt,
+                        tblUserIDundName.gruppe as gruppe_alt,
                         tblUserIDundName.geloescht
         FROM tblRechteAMNeu
             LEFT JOIN tblUserIDundName
@@ -315,13 +329,13 @@ BEGIN
 
         WHERE (tblRechteAMNeu.userid    IS NOT NULL AND tblUserIDundName.userid IS NULL)
             OR (tblRechteAMNeu.name     IS NOT NULL AND tblUserIDundName.name   IS NULL)
-            OR tblUserIDundName.`geloescht` = TRUE;
+            OR tblUserIDundName.`geloescht` = TRUE
+            OR (gruppe != tblUserIDundName.gruppe AND concat(gruppe, '--') != tblUserIDundName.gruppe)
+        ;
 
     /*
         Sichtung der nicht mehr vorhandenen User, deren Einträge im weiteren Verlauf geloescht werden sollen
         Erst einmal werden die Rechte der als zu löschen markierten User in die Historientabelle verschoben.
-
-        ToDo: Mal checken, ob wir die Tabelle wirklich materialisiert benötigen oder nicht (evtl. zur Ansicht?)
     */
 
     drop table if exists rapp_geloeschte_user;
@@ -369,7 +383,7 @@ create procedure behandleUser ()
 BEGIN
 
     /*
-        Merke die als gelöscht markierten User in einer temoprären Tabelle,
+        Merke die als gelöscht markierten User in einer temporären Tabelle,
         damit imm nächsten SAchritt das Join schnell funktioniert.
     */
     drop table if exists tbl_tmpGeloeschte;
@@ -390,25 +404,10 @@ BEGIN
 
     /*
         Nun werden die wirklich neuen User an die userid-Tabelle angehängt
-        (ehemals rapp_neue_user_tmp u.a.)
-    * /
-    drop table if exists rapp_neue_user_tmp;
-    create temporary table rapp_neue_user_tmp as
-        SELECT userid1, name1, Ausdr1, Ausdr2, geloescht
-            FROM rapp_neue_user
-            WHERE (`geloescht` = FALSE or `geloescht` IS NULL)
-                AND (userid1 IS NOT NULL OR name1 IS NOT NULL);
-
-    INSERT INTO tblUserIDundName (userid, name, orga_id, `zi_organisation`, geloescht )
-        SELECT  userid1,
-                name1,
-                Ausdr1 AS orga_id,
-                Ausdr2 AS `zi_organisation`
-            FROM rapp_neue_user_tmp;
     */
     INSERT INTO tblUserIDundName (userid, name, orga_id, `zi_organisation`, geloescht, gruppe, abteilung )
         SELECT userid1, name1, Ausdr1 AS orga_id, Ausdr2 AS `zi_organisation`, 
-                False AS geloescht, "" as gruppe, "" as abteilung
+                False AS geloescht, gruppe, abteilung
             FROM rapp_neue_user
             WHERE COALESCE(`geloescht`, FALSE) = FALSE
                 AND (userid1 IS NOT NULL OR name1 IS NOT NULL);
@@ -459,6 +458,7 @@ BEGIN
 
 
     -- Setzen der Löschflags in der Gesamttabelle für jedes Recht jeder nicht mehr vorhandenen userid
+    -- ToDo Das ist eigentlich redundant zur Historisierung
 
     UPDATE
         tblGesamt
@@ -477,6 +477,23 @@ BEGIN
             ON rapp_geloeschte_user.userid = tblUserIDundName.userid
         SET `geloescht` = TRUE
         WHERE COALESCE(`geloescht`, FALSE) = FALSE;
+    
+    /*
+        Nun werden für alle UserIDen, die in der rapp_neue_user Tabelle stehen,
+        die Abteilung und die Gruppe in der Usertabelle aktualisiert.
+        Das führt dazu, dass User, die in der Organisation umziehen, endlich richtig behandelt werden.
+        
+        Berücksichtigt wird der Sonderfall, dass Bereichs- udn Abteilungskürzel - wo sinnvoll -- mit '--' terminiert werden.
+        Das wird überall dort benötigt, wo die Suche "enthält" zu viele Treffer findet (bspw. beim BL)
+    */
+    UPDATE tblUserIDundName
+    INNER JOIN rapp_neue_user
+        ON tblUserIDundName.userid = rapp_neue_user.userid1
+            and tblUserIDundName.gruppe != rapp_neue_user.gruppe
+            and tblUserIDundName.gruppe != concat(rapp_neue_user.gruppe, '--')
+    SET tblUserIDundName.abteilung = rapp_neue_user.abteilung,
+        tblUserIDundName.gruppe = rapp_neue_user.gruppe;
+    
 END
 """
     return push_sp('behandleUser', sp, procs_schon_geladen)
