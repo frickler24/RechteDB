@@ -11,6 +11,11 @@ from django.contrib.auth.decorators import login_required
 
 
 def check_sp(name):
+    """
+    Prüfe, ob die Stored Procedure <name> in der DB installiert ist
+    :param name: Der Name der zu prüfenden Stored Procedure
+    :return: '' im Erfolgsfall, sonst eine Fehlermeldung
+    """
     sp = """
     SELECT routine_name
     FROM information_schema.routines
@@ -65,6 +70,11 @@ def push_sp(name, sp, procs_schon_geladen):
 
 
 def push_sp_test(procs_schon_geladen):
+    """
+    Erzeuge die SP 'anzahl_import_elemente', die die Menge der Tabelle `tblRechteNeuVonImport` ermittelt
+    :param procs_schon_geladen: wird transparent an push_sp weitergereicht
+    :return: den Returnwert von push_sp
+    """
     sp = """
 CREATE PROCEDURE anzahl_import_elemente()
 BEGIN
@@ -75,6 +85,12 @@ END
 
 
 def call_sp_test():
+    """
+    Prüfe, ob Stored Procedures installiert sind mit Hilfe der SP "anzahl_import_elemente"
+    Wenn die SP installiert ist und einen Wert >0 zurückliefert, sind die ersten Hürden genommen.
+
+    :return: Anzahl der Elemente in `tblRechteNeuVonImport` oder Fehlercode
+    """
     fehler = False
     with connection.cursor() as cursor:
         try:
@@ -89,6 +105,12 @@ def call_sp_test():
 
 
 def push_sp_vorbereitung(procs_schon_geladen):
+    """
+    Erzeuge Stored Procedure "vorbereitung"; das ist der erste Schritt beim Import von IIQ-Daten
+
+    :param procs_schon_geladen: wird transparent an push_sp weitergereicht
+    :return: den Returnwert von push_sp
+    """
     sp = """
 create procedure vorbereitung()
 BEGIN
@@ -240,6 +262,13 @@ END
 
 
 def push_sp_neueUser(procs_schon_geladen):
+    """
+    Erzeuge Stored Procedure "neue_user"; das ist der zweite Schritt beim Import von IIQ-Daten
+
+    :param procs_schon_geladen: wird transparent an push_sp weitergereicht
+    :return: den Returnwert von push_sp
+    """
+
     sp = """
 create procedure neueUser (IN orga char(32))
 BEGIN
@@ -328,6 +357,13 @@ END
 
 
 def push_sp_behandleUser(procs_schon_geladen):
+    """
+    Erzeuge Stored Procedure "behandle_user"; das ist der dritte Schritt beim Import von IIQ-Daten
+
+    :param procs_schon_geladen: wird transparent an push_sp weitergereicht
+    :return: den Returnwert von push_sp
+    """
+
     sp = """
 create procedure behandleUser ()
 BEGIN
@@ -447,6 +483,13 @@ END
 
 
 def push_sp_behandleRechte(procs_schon_geladen):
+    """
+    Erzeuge Stored Procedure "behandle_rechte"; das ist der vierte Schritt beim Import von IIQ-Daten
+
+    :param procs_schon_geladen: wird transparent an push_sp weitergereicht
+    :return: den Returnwert von push_sp
+    """
+
     sp = """
 create procedure behandleRechte (IN orga char(32))
 BEGIN
