@@ -68,7 +68,4 @@ RechteDB/content.tar.gz
 other_files/frickler.pem*
 other_files/dump_20200426.sql.gz.kannwegnachDemoITSec
 other_files/letsencrypt/
-documentation/Komponenten-Übersicht_20200426.svg
-documentation/Komponenten-Übersicht.drawio
-documentation/Komponenten_Uebersicht_20200427_231836.jpg
-documentation/Komponenten_Uebersicht_20200427_231836.png
+documentation/experiment_Übersicht.drawio
