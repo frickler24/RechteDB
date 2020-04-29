@@ -385,7 +385,7 @@ def import2(request):
         fehler = False
         with connection.cursor() as cursor:
             try:
-                cursor.callproc("behandleUser")  # diese SProc benötigt die Orga nicht als Parameter
+                cursor.callproc("behandleUser")
             except:
                 fehler = 'Fehler in import_schritt2, StoredProc behandleUser: {}'.format(e)
                 fehler = fehlerausgabe(fehler)

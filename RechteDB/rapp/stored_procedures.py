@@ -330,7 +330,8 @@ BEGIN
         WHERE (tblRechteAMNeu.userid    IS NOT NULL AND tblUserIDundName.userid IS NULL)
             OR (tblRechteAMNeu.name     IS NOT NULL AND tblUserIDundName.name   IS NULL)
             OR tblUserIDundName.`geloescht` = TRUE
-            OR (gruppe != tblUserIDundName.gruppe AND concat(gruppe, '--') != tblUserIDundName.gruppe)
+            OR (tblRechteAMNeu.organisation != tblUserIDundName.gruppe 
+                AND concat(tblRechteAMNeu.organisation, '--') != tblUserIDundName.gruppe)
         ;
 
     /*
@@ -410,7 +411,11 @@ BEGIN
                 False AS geloescht, gruppe, abteilung
             FROM rapp_neue_user
             WHERE COALESCE(`geloescht`, FALSE) = FALSE
-                AND (userid1 IS NOT NULL OR name1 IS NOT NULL);
+                AND (userid1 IS NOT NULL OR name1 IS NOT NULL)
+    ON DUPLICATE KEY UPDATE `zi_organisation` = Ausdr2, 
+        geloescht = 0, 
+        tblUserIDundName.gruppe = rapp_neue_user.gruppe, 
+        tblUserIDundName.abteilung = rapp_neue_user.abteilung;
 
     -- select * from tblUserIDundName;
 

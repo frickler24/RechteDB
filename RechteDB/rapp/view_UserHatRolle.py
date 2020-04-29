@@ -726,7 +726,7 @@ def UhR_verdichte_daten(request, panel_liste):
 
     for row in panel_liste:
         if row.userid[:2].lower() == "xv":
-            print('\n\nBehandle', row.name)
+            # print('\n\nBehandle', row.name)
             if kein_freies_team(request) or soll_komplett(request, row):
                 (rollenmenge, usernamen, userids) = verdichte_standardfall(rollenmenge, row, userids, usernamen)
             else:
