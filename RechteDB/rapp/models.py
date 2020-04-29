@@ -214,7 +214,7 @@ class TblUserIDundName(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
     userid = models.CharField(db_column='userid', max_length=32, unique=True)
     name = models.CharField(db_column='name', max_length=191, db_index=True)
-    orga = models.ForeignKey('TblOrga', db_column='orga_id', on_delete=models.CASCADE,
+    orga = models.ForeignKey('TblOrga', db_column='orga_id', on_delete=models.DO_NOTHING,
                              verbose_name='Team', db_index=True)
     zi_organisation = models.CharField(db_column='zi_organisation', max_length=64,
                                        verbose_name='ZI-Organisation', db_index=True)
@@ -222,6 +222,8 @@ class TblUserIDundName(models.Model):
                                     verbose_name='gelöscht')
     abteilung = models.CharField(db_column='abteilung', max_length=64, db_index=True, )
     gruppe = models.CharField(db_column='gruppe', max_length=32, db_index=True)
+    npu_rolle = models.CharField(max_length=20, blank=True, null=True)
+    npu_grund = models.CharField(max_length=2000, blank=True, null=True)
 
     class Meta:
         managed = True
@@ -569,6 +571,8 @@ class Tblrechteneuvonimport(models.Model):
     af_gueltig_bis = models.DateTimeField(db_column='AF Gültig bis', blank=True, null=True)
     af_zuweisungsdatum = models.DateTimeField(db_column='AF Zuweisungsdatum', blank=True, null=True)
     organisation = models.CharField(max_length=20, blank=False, null=False, default='Fehler!!!')
+    npu_rolle = models.CharField(max_length=20, blank=True, null=True)
+    npu_grund = models.CharField(max_length=2000, blank=True, null=True)
 
     class Meta:
         managed = True
@@ -604,6 +608,8 @@ class Tblrechteamneu(models.Model):
     doppelerkennung = models.IntegerField(blank=True, null=True)
     af_beschreibung = models.TextField(max_length=2000, blank=True, null=True, default='')
     organisation = models.CharField(max_length=20, blank=False, null=False)
+    npu_rolle = models.CharField(max_length=20, blank=True, null=True)
+    npu_grund = models.CharField(max_length=2000, blank=True, null=True)
 
     class Meta:
         managed = True
