@@ -568,6 +568,7 @@ class Tblrechteneuvonimport(models.Model):
     af_gueltig_ab = models.DateTimeField(db_column='AF Gültig ab', blank=True, null=True)
     af_gueltig_bis = models.DateTimeField(db_column='AF Gültig bis', blank=True, null=True)
     af_zuweisungsdatum = models.DateTimeField(db_column='AF Zuweisungsdatum', blank=True, null=True)
+    organisation = models.CharField(max_length=20, blank=False, null=False, default='Fehler!!!')
 
     class Meta:
         managed = True
@@ -602,6 +603,7 @@ class Tblrechteamneu(models.Model):
     angehaengt_sonst = models.IntegerField(db_column='angehaengt_sonst', blank=True, null=True)
     doppelerkennung = models.IntegerField(blank=True, null=True)
     af_beschreibung = models.TextField(max_length=2000, blank=True, null=True, default='')
+    organisation = models.CharField(max_length=20, blank=False, null=False)
 
     class Meta:
         managed = True

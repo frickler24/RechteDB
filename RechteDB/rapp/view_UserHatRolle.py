@@ -1550,7 +1550,6 @@ def liefere_af_kritikalitaet(rollenMenge, userids):
     return hoechste_kritikalitaet_tf_in_af
 
 
-# Erzeuge das Berechtigungskonzept für Anzeige und PDF
 def erzeuge_UhR_konzept(request, ansicht):
     """
     Erzeuge das Berechtigungskonzept für eine Menge an selektierten Identitäten.
