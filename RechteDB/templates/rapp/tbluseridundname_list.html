@@ -43,6 +43,8 @@
                     <th>aktiv</th>
                     <th>Abteilung</th>
                     <th>Gruppe</th>
+                    <th>NPU-Rolle</th>
+                    <th>NPU-Grund</th>
                     <th>&nbsp;</th>
                 </tr>
             </thead>
@@ -66,6 +68,8 @@
                         </td>
                         <td>{{user.abteilung}}</td>
                         <td>{{user.gruppe}}</td>
+                        <td>{{user.npu_rolle}}</td>
+                        <td>{{user.npu_grund}}</td>
                         <td>
                             <a href="{{ user.get_absolute_delete_url }}" >
                                 <img src="{% static 'delete.svg' %}" width="15" />

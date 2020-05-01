@@ -181,7 +181,9 @@ BEGIN
                `höchste kritikalität tf in af`   AS hk_tf_in_af,
                `gf beschreibung`                 AS gf_beschreibung,
                `af zuweisungsdatum`              AS af_zuweisungsdatum,
-               `organisation`                    AS organisation
+               `organisation`,
+               `npu_rolle`,
+               `npu_grund`
         FROM tblRechteNeuVonImport
         GROUP BY `userid`,
                  `tf`,
@@ -191,7 +193,7 @@ BEGIN
                  organisation;
 
     /*
-        Umkopieren der DAten von einer Tabelle in die andere
+        Umkopieren der Daten von einer Tabelle in die andere
     */
 
     TRUNCATE table tblRechteAMNeu;
@@ -200,7 +202,9 @@ BEGIN
                 `tf_kritikalitaet`,
                 `tf_eigentuemer_org`, `tf_technische_plattform`, GF, 
                 `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
-                `gf_beschreibung`, `af_zuweisungsdatum`, organisation, doppelerkennung)
+                `gf_beschreibung`, `af_zuweisungsdatum`, organisation,
+                `npu_rolle`, `npu_grund`,
+                doppelerkennung)
     SELECT rapp_NeuVonImportDuplikatfrei.userid,
            rapp_NeuVonImportDuplikatfrei.name,
            rapp_NeuVonImportDuplikatfrei.tf,
@@ -218,6 +222,8 @@ BEGIN
            rapp_NeuVonImportDuplikatfrei.`gf_beschreibung`,
            rapp_NeuVonImportDuplikatfrei.`af_zuweisungsdatum`,
            rapp_NeuVonImportDuplikatfrei.`organisation`,
+           rapp_NeuVonImportDuplikatfrei.`npu_rolle`,
+           rapp_NeuVonImportDuplikatfrei.`npu_grund`,
            0
     FROM rapp_NeuVonImportDuplikatfrei
     ON DUPLICATE KEY UPDATE doppelerkennung=doppelerkennung+1;
@@ -238,6 +244,8 @@ BEGIN
     UPDATE tblRechteAMNeu SET `GF` = 'k.A.' WHERE GF Is Null or GF = '';
     UPDATE tblRechteAMNeu SET `hk_tf_in_af` = 'k.A.' WHERE `hk_tf_in_af` Is Null or `hk_tf_in_af` = '';
     UPDATE tblRechteAMNeu SET `af_beschreibung` = 'keine geliefert bekommmen' WHERE `af_beschreibung` Is Null or `af_beschreibung` = '';
+    UPDATE tblRechteAMNeu SET `npu_rolle` = '' WHERE `npu_rolle` Is Null;
+    UPDATE tblRechteAMNeu SET `npu_grund` = '' WHERE `npu_grund` Is Null;
 
     /*
     -- Sollte nun 0 ergeben:
@@ -311,16 +319,20 @@ BEGIN
     create table rapp_neue_user as
         SELECT DISTINCT tblRechteAMNeu.userid as userid1,
                         tblRechteAMNeu.name as name1,
-                        '35' AS Ausdr1,
+                        COALESCE(tblUserIDundName.orga_id, 35) AS Ausdr1,
                         orga AS Ausdr2,
-                        tblRechteAMNeu.organisation as gruppe,
                         concat('ZI-', orga) as abteilung,
+                        tblRechteAMNeu.organisation as gruppe,
+                        tblRechteAMNeu.npu_rolle,
+                        tblRechteAMNeu.npu_grund,
                         tblUserIDundName.userid as userid_alt,
                         tblUserIDundName.name as name_alt,
                         tblUserIDundName.orga_id as team_alt,
                         tblUserIDundName.zi_organisation as zi_orga_alt,
                         tblUserIDundName.abteilung as abteilung_alt,
                         tblUserIDundName.gruppe as gruppe_alt,
+                        tblUserIDundName.npu_rolle as npu_rolle_alt,
+                        tblUserIDundName.npu_grund as npu_grund_alt,
                         tblUserIDundName.geloescht
         FROM tblRechteAMNeu
             LEFT JOIN tblUserIDundName
@@ -396,7 +408,7 @@ BEGIN
     -- select * from tbl_tmpGeloeschte;
 
     /*
-        Markiere die useriden wieder als aktiv, die bereits bekannt, aber als geloescht markiert sind.
+        Markiere die UserIDen wieder als aktiv, die bereits bekannt, aber als geloescht markiert sind.
     */
     UPDATE tblUserIDundName
         INNER JOIN tbl_tmpGeloeschte
@@ -404,16 +416,30 @@ BEGIN
     SET tblUserIDundName.geloescht = False;
 
     /*
-        Nun werden die wirklich neuen User an die userid-Tabelle angehängt
+        Nun werden die neuen User an die userid-Tabelle angehängt.
+        Für User, die bereits existieren und für die Änderungen identifiziet wurden,
+        werden die NPU-Informationen, die ZI-Organisation,
+        die Abteilung und die Gruppe aktualisiert.
     */
-    INSERT INTO tblUserIDundName (userid, name, orga_id, `zi_organisation`, geloescht, gruppe, abteilung )
-        SELECT userid1, name1, Ausdr1 AS orga_id, Ausdr2 AS `zi_organisation`, 
-                False AS geloescht, gruppe, abteilung
+    INSERT INTO tblUserIDundName (userid, name, 
+            orga_id, 
+            `zi_organisation`, 
+            geloescht, 
+            npu_rolle, npu_grund, 
+            gruppe, abteilung)
+        SELECT userid1, name1, 
+                Ausdr1 AS orga_id, 
+                Ausdr2 AS `zi_organisation`, 
+                False AS geloescht, 
+                npu_rolle, npu_grund, 
+                gruppe, abteilung
             FROM rapp_neue_user
             WHERE COALESCE(`geloescht`, FALSE) = FALSE
                 AND (userid1 IS NOT NULL OR name1 IS NOT NULL)
     ON DUPLICATE KEY UPDATE `zi_organisation` = Ausdr2, 
         geloescht = 0, 
+        tblUserIDundName.npu_rolle = rapp_neue_user.npu_rolle, 
+        tblUserIDundName.npu_grund = rapp_neue_user.npu_grund, 
         tblUserIDundName.gruppe = rapp_neue_user.gruppe, 
         tblUserIDundName.abteilung = rapp_neue_user.abteilung;
 
@@ -498,7 +524,7 @@ BEGIN
             and tblUserIDundName.gruppe != concat(rapp_neue_user.gruppe, '--')
     SET tblUserIDundName.abteilung = rapp_neue_user.abteilung,
         tblUserIDundName.gruppe = rapp_neue_user.gruppe;
-    
+
 END
 """
     return push_sp('behandleUser', sp, procs_schon_geladen)

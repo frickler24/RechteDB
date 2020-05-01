@@ -83,7 +83,7 @@
                        Achtung - Auch dieser Schritt kann nicht rückgängig gemacht werden.
                    </div>
                    <div class="col py-3 col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3">
-                       <button onclick="location.href = '{% url 'home' %}';" type="reset"
+                       <button onclick="location.href = '{% url 'import_abbruch' %}';" type="reset"
                                class="btn btn-outline-success expand" >Abbrechen</button>
                    </div>
                </div>
@@ -103,39 +103,9 @@
             <h5>Liste neuer oder wiedergefundener User</h5>
             <div class="row">
                 {% if request.session.neueUser %}
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th scope="col">UserID</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Team-#</th>
-                                <th scope="col">Orga</th>
-                                <th scope="col">Abteilung</th>
-                                <th scope="col">Gruppe</th>
-
-                                <th scope="col">UserID alt</th>
-                                <th scope="col">Name alt</th>
-                                <th scope="col">Team-# alt</th>
-                                <th scope="col">Orga alt</th>
-                                <th scope="col">Abteilung alt</th>
-                                <th scope="col">Gruppe alt</th>
-                                <th scope="col">gelöscht</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for user in request.session.neueUser %}
-                                <tr>
-                                    {% for elem in user %}
-                                        <td>
-                                            <a href="/adminrapp/tbluseridundname?name={{ user.1 }}" target="_blank">
-                                                {{ elem }}
-                                            </a>
-                                        </td>
-                                    {% endfor %}
-                                </tr>
-                            {% endfor neueUser %}
-                        </tbody>
-                    </table>
+                    {% with links=1 %}
+                        {% include 'rapp/import2_tabelle.html' %}
+                    {% endwith %}
                 {% else %}
                     <p class="ml-5">Keine neuen User gefunden</p>
                 {% endif %}

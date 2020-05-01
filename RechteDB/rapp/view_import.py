@@ -34,8 +34,8 @@ def neuer_import(request, orga):
         # Das nachfolgende Statement kann schon mal schiefgehen, z.B. wenn die DB noch leer ist.
         letzter_import_im_modell = Letzter_import.objects.latest('id')
         if letzter_import_im_modell.end is None:
-            # Dann läuft gerade ein anderer Import, sonst wäre das end-Feld gesetzt
-            # oder der letzte Import ist abgebrochen
+            # Dann läuft gerade ein anderer Import oder der letzte Import ist abgebrochen,
+            # sonst wäre das end-Feld gesetzt
             request.session['parallel_start'] = str(letzter_import_im_modell.start)
             request.session['parallel_user'] = letzter_import_im_modell.user
             fehlermeldung = render(request, 'rapp/import_parallel.html')
@@ -134,6 +134,19 @@ def fehlerausgabe(fehler):
 
 
 @login_required
+def import_abbruch(request):
+    """
+    Wenn ein Abbruch auf einem der Import-Panels geklickt wurde,
+    muss die Import-Statistik abgeschlossen werden. Anschließend wird die Import-Seite aufgerufen.
+
+    :param request: Der Request
+    :return:
+    """
+    letzter_schritt()
+    return redirect('import')
+
+
+@login_required
 def import_csv(request):
     """
     Importiere neue CSV-Datei mit IIQ-Daten
@@ -198,7 +211,9 @@ def import_csv(request):
                 af_gueltig_ab=patch_datum(line['AF Gültig ab']),
                 af_gueltig_bis=patch_datum(line['AF Gültig bis']),
                 af_zuweisungsdatum=patch_datum(line['AF Zuweisungsdatum']),
-                organisation=textwrap.shorten(line['Organisation'], width=10, placeholder="Hä?"),
+                organisation=textwrap.shorten(line['Organisation'], width=15, placeholder="Hä?"),
+                npu_rolle=textwrap.shorten(line['Kategorie NPU'], width=10, placeholder="Hä?"),
+                npu_grund=textwrap.shorten(line['Grund NPU'], width=2000, placeholder="..."),
             )
             # ToDo: ein try/Catch-Block um das Schreiben oder vorher Validierungsfunktion rufen
             neuerRecord.save()
@@ -315,8 +330,7 @@ def import_csv(request):
             request.session['fehler1'] = fehler
             return redirect('import2')
     else:
-        # ToDo: Gleich beim ImportForm eien Hinweis auf laufende Import anzeigen mit Löschmöglichkeit
-        form = ImportForm(initial={'organisation': 'AI-BA'}, auto_id=False)
+        form = ImportForm(initial={'organisation': 'AI-CS'}, auto_id=False)
 
     context = {
         'form': form,
@@ -413,8 +427,6 @@ def import2(request):
     Der Context wird beim ersten Aufruf (dem ersten Anzeigen) des Templates geüllt.
     Bei eventuellen weiteren GET-Lieferunngen wird der Context erneut gesetzt.
     """
-    # ToDo: Nochmal überlegen, was in die Session gehört und was nicht. Session-Vars direkt im Template behandeln!
-
     context = {
         'form': form,
         'fehler': request.session.get('fehler1', None),

@@ -123,12 +123,15 @@ class UserIDundNameAdmin(admin.ModelAdmin):
         ('Orga-Details      ', {'fields': ['zi_organisation', 'abteilung', 'gruppe'], 'classes': ["""'collapse'"""] }),
     ]
 
-    list_display = ('id', 'userid', 'colored_name', 'orga', 'zi_organisation', 'get_active', 'abteilung', 'gruppe',)
+    list_display = ('id', 'userid', 'colored_name', 'orga', 'zi_organisation',
+                    'get_active', 'abteilung', 'gruppe',
+                    'npu_rolle', 'npu_grund',
+                    )
     list_display_links = ('userid', 'colored_name', 'get_active', )
     list_editable = ('orga', 'zi_organisation', 'abteilung', 'gruppe', )
-    search_fields = ['name', 'zi_organisation', 'abteilung', 'gruppe', 'userid']
+    search_fields = ['name', 'zi_organisation', 'abteilung', 'gruppe', 'userid', 'npu_rolle', 'npu_grund']
 
-    list_filter = ('geloescht', 'abteilung', 'gruppe', 'orga', )
+    list_filter = ('geloescht', 'abteilung', 'gruppe', 'orga', 'npu_rolle', 'npu_grund', )
 
     actions_on_top = True
     actions_on_bottom = True

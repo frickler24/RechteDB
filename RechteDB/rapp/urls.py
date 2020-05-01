@@ -125,6 +125,7 @@ urlpatterns += [
     path('import3_quittung/', login_required(view_import.import3_quittung), name='import3_quittung'),
     path('import_reset/', login_required(view_import.import_reset), name='import_reset'),
     path('import_status/', login_required(view_import.import_status), name='import_status'),
+    path('import_abbruch/', login_required(view_import.import_abbruch), name='import_abbruch'),
 ]
 
 # URl zum Bestücken der verschiedenen Stored Procedures in das DBMS

@@ -228,11 +228,11 @@ class TblUserIDundName(models.Model):
     class Meta:
         managed = True
         db_table = 'tblUserIDundName'
-        index_together = (('gruppe', 'geloescht'),)
         verbose_name = "UserID-Name-Kombination"
         verbose_name_plural = "05_UserID-Name-Übersicht (tblUserIDundName)"
         ordering = ['geloescht', 'name', '-userid']
         unique_together = (('userid', 'name'),)
+        index_together = (('gruppe', 'geloescht'),)
         index_together = (('geloescht', 'zi_organisation'),)
 
     def __str__(self) -> str:
