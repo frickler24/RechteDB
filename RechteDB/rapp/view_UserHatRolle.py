@@ -27,7 +27,6 @@ from .models import TblRollen
 from .models import TblUebersichtAfGfs
 from .models import TblUserIDundName
 from .models import TblUserhatrolle
-from .templatetags.gethash import finde
 from .views import version, pagination
 from .xhtml2 import render_to_pdf
 
@@ -361,7 +360,7 @@ def hole_userids_zum_namen(selektierter_name):
     for num in range(number_of_userids):
         userids.append(TblUserIDundName.objects
                        .filter(name=selektierter_name)
-                       .order_by('-userid') \
+                       .order_by('-userid')
                        .filter(geloescht=False)[num].userid)
     return userids
 
@@ -1635,160 +1634,6 @@ def erzeuge_pdf_header(request, pdf):
         content = "attachment; filename={}".format(filename)
     response['Content-Disposition'] = content
     return response
-
-
-# Funktionen zum Erstellen des Funktionsmatrix
-def erzeuge_UhR_matrixdaten(request, panel_liste):
-    """
-    Überschriften-Block:
-        Erste Spaltenüberschrift ist "Name" als String, darunter werden die Usernamen liegen, daneben:
-            Zeige Teamzugehörigkeit(en), daneben
-                Ausgehend von den Userids der Selektion zeige
-                    die Liste der Rollen alle nebeneinander als Spaltenüberschriften
-    Zeileninhalte:
-        Für jeden User (nur die XV-User zeigen auf Rollen, deshalb nehmen wir nur diese)
-            zeige den Usernamen sowie in jeder zu dem User passenden Rolle die Art der Verwendung (S/V/A)
-                in Kurz- oder Langversion, je nach Flag
-
-    Zunächst benötigen wir für alle userIDs (sind nur die XV-Nummern) aus dem Panel alle Rollen
-
-    :param request: für die Fallunterscheidung spezifisches_team
-    :param panel_liste: Die Menge der betrachteten User
-    :return: usernamen, rollenmenge als Liste, rollen_je_username, teams_je_username
-    """
-    usernamen = set()  # Die Namen aller User,  die in der Selektion erfasst werden
-    rollenmenge = set()  # Die Menge aller AFs aller spezifizierten User (aus Auswahl-Panel)
-    teams_je_username = {}  # Derzeit nur ein Team/UserID, aber multi-Teams müssen vorbereitet werden
-    rollen_je_username = {}  # Die Rollen, die zum Namen gehören
-
-    for row in panel_liste:
-        usernamen.add(row.name)
-        teamliste = TblOrga.objects \
-            .filter(tbluseridundname__name=row.name, tbluseridundname__geloescht=False) \
-            .exclude(team="Gelöschter User")  # Die als gelöscht markierten User werden nicht mehr angezeigt
-
-        teammenge = set()
-        for team in teamliste:
-            teammenge.add(str(team))
-        teams_je_username[row.name] = [str(team) for team in teammenge]
-
-        # Erzeuge zunächst die Hashes für die UserIDs. Daran werden nachher die Listen der Rechte gehängt.
-        rollen_je_username[row.name] = set()
-
-        # Fallunterscheidung nach "freies_team" und "spezielles_team"
-        if kein_freies_team(request) or soll_komplett(request, row):  # Standardfall
-            rollen = TblUserhatrolle.objects.filter(userid=row.userid)
-        else:
-            spezialteam = TblOrga.objects.get(id=request.GET.get('orga'))
-            print('\nspezial_team =', spezialteam)
-            print('erzeuge_UhR_matrixdaten für Userid {}, {}'.format(row.userid, row.name))
-            rollen = TblUserhatrolle.objects \
-                .filter(userid=row.userid) \
-                .filter(teamspezifisch=spezialteam)
-
-        # Merke die Rollen je Usernamen (also global für alle UserIDs der Identität)
-        # sowie die Menge aller gefundenen Rollennamen
-        # Achtung: rolle ist nur eine für den User spezifische Linknummer auf das Rollenobjekt.
-        for rolle in rollen:
-            info = (rolle.rollenname, rolle.schwerpunkt_vertretung)
-            rollen_je_username[row.name].add(info)
-            rollenmenge.add(rolle.rollenname)
-
-    def order(a):
-        return a.rollenname.lower()  # Liefert das kleingeschriebene Element, nach dem sortiert werden soll
-
-    return (sorted(usernamen), sorted(list(rollenmenge), key=order), rollen_je_username, teams_je_username)
-
-
-def panel_UhR_matrix(request):
-    """
-    Erzeuge eine Verantwortungsmatrix für eine Menge an selektierten Identitäten.
-    :param request: GET Request vom Browser
-    :return: Gerendertes HTML
-    """
-
-    def logging(request, rollen_je_username, rollenmenge, usernamen):
-        if request.GET.get('display') == '1':
-            print('usernamen')
-            print(usernamen)
-
-            print('rollenmenge')
-            for a in rollenmenge:
-                print(a)
-
-            print('rollen_je_username')
-            for a in rollen_je_username:
-                print(a, rollen_je_username[a])
-
-    # Erst mal die relevanten User-Listen holen - sie sind abhängig von Filtereinstellungen
-    (namen_liste, panel_filter) = UhR_erzeuge_gefiltere_namensliste(request)
-
-    if request.method == 'GET':
-        (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(request, namen_liste)
-    else:
-        (usernamen, rollenmenge, rollen_je_username, teams_je_username) = (set(), set(), set(), {})
-
-    logging(request, rollen_je_username, rollenmenge, usernamen)
-    context = {
-        'filter': panel_filter,
-        'usernamen': usernamen,
-        'rollenmenge': rollenmenge,
-        'rollen_je_username': rollen_je_username,
-        'teams_je_username': teams_je_username,
-        'version': version,
-    }
-    return render(request, 'rapp/panel_UhR_matrix.html', context)
-
-
-def string_aus_liste(liste):
-    """
-    Erzeugt einen String, der alle Listenelemente der Parameters Kommma-getrennt enthält
-    :param liste: Eine Liste mit Strings, bspw. ['abc', 'def']
-    :return: String mit den Inhalten, getrennt durch ', ': "abc, def"
-    """
-    res = ""
-    for s in liste:
-        if (res == ""):
-            res = s
-        else:
-            res += (", " + s)
-    return res
-
-
-def panel_UhR_matrix_csv(request, flag=False):
-    """
-    Exportfunktion für das Filter-Panel zum Selektieren aus der "User und Rollen"-Tabelle).
-    :param request: GET oder POST Request vom Browser
-    :param flag: False oder nicht gegeben -> liefere ausführliche Text, 'kommpakt' -> liefere nur Anfangsbuchstaben
-    :return: Gerendertes HTML mit den CSV-Daten oder eine Fehlermeldung
-    """
-    if request.method != 'GET':
-        return HttpResponse("Fehlerhafte CSV-Generierung in panel_UhR_matrix_csv")
-
-    (namen_liste, _) = UhR_erzeuge_gefiltere_namensliste(request)
-    (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(request, namen_liste)
-
-    headline = [smart_str(u'Name')] + [smart_str(u'Teams')]
-    for r in rollenmenge:
-        headline += [smart_str(r.rollenname)]
-
-    excel = Excel("matrix.csv")
-    excel.writerow(headline)
-
-    for user in usernamen:
-        line = [user] + [smart_str(string_aus_liste(teams_je_username[user]))]
-        for rolle in rollenmenge:
-            if flag:
-                wert = finde(rollen_je_username[user], rolle)
-                if wert == None or len(wert) <= 0:
-                    line += ['']
-                else:
-                    line += [smart_str(wert[0])]
-            else:
-                line += [smart_str(finde(rollen_je_username[user], rolle))]
-        excel.writerow(line)
-
-    return excel.response
 
 
 def panel_UhR_af_export(request, id):
