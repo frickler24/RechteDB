@@ -559,7 +559,8 @@ def import_status(request):
             'proz': -1,
         }
 
-    return render(request, 'rapp/import_status.html', context)
+    print(str(context))
+    return render(request, 'rapp/import_statusjson.html', context)
 
 
 @login_required

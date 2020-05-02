@@ -55,7 +55,7 @@
         <p>Anschließend kann die weitere Verarbeitung über den roten Button unten angestoßen
             oder der Vorgang abgebrochen werden. </p>
 
-        <form method="post" name="import" novalidate>
+        <form id="form2b" method="post" name="import" novalidate>
             {% csrf_token %}
             <div class="container bg-light">
                 <div class="row">
@@ -94,6 +94,8 @@
                 d.getElementById('hochladen').onclick = function () {
                     d.getElementById('loading2').style.display = 'block';
                     d.getElementById('hochladen').disabled = true;
+                    document.getElementById('form2b').submit();
+                    return true;
                 };
             }(document));
         </script>

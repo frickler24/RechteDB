@@ -340,16 +340,18 @@ BEGIN
             ON tblRechteAMNeu.userid = tblUserIDundName.userid
             AND tblUserIDundName.name = tblRechteAMNeu.name
 
-        WHERE 
-            (tblRechteAMNeu.userid    IS NOT NULL AND tblUserIDundName.userid IS NULL)
-            OR (tblRechteAMNeu.name     IS NOT NULL AND tblUserIDundName.name   IS NULL)
-            OR tblUserIDundName.`geloescht` = TRUE
-            OR (tblRechteAMNeu.organisation != tblUserIDundName.gruppe 
-                AND concat(tblRechteAMNeu.organisation, '--') != tblUserIDundName.gruppe)
-            OR tblRechteAMNeu.npu_rolle != tblUserIDundName.npu_rolle 
-            OR tblRechteAMNeu.npu_rolle not like "" AND tblUserIDundName.npu_rolle is null
-            OR tblRechteAMNeu.npu_grund != tblUserIDundName.npu_grund
-            OR tblRechteAMNeu.npu_grund not like "" AND tblUserIDundName.npu_grund is null
+        WHERE tblRechteAMNeu.organisation NOT REGEXP '^[0-9]{5}'
+            AND (
+                (tblRechteAMNeu.userid    IS NOT NULL AND tblUserIDundName.userid IS NULL)
+                OR (tblRechteAMNeu.name     IS NOT NULL AND tblUserIDundName.name   IS NULL)
+                OR tblUserIDundName.`geloescht` = TRUE
+                OR (tblRechteAMNeu.organisation != tblUserIDundName.gruppe 
+                    AND concat(tblRechteAMNeu.organisation, '--') != tblUserIDundName.gruppe)
+                OR tblRechteAMNeu.npu_rolle != tblUserIDundName.npu_rolle 
+                OR tblRechteAMNeu.npu_rolle not like "" AND tblUserIDundName.npu_rolle is null
+                OR tblRechteAMNeu.npu_grund != tblUserIDundName.npu_grund
+                OR tblRechteAMNeu.npu_grund not like "" AND tblUserIDundName.npu_grund is null
+            )
         ;
 
     /*
