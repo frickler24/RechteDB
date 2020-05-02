@@ -215,7 +215,6 @@ def import_csv(request):
                 npu_rolle=textwrap.shorten(line['Kategorie NPU'], width=10, placeholder="Hä?"),
                 npu_grund=textwrap.shorten(line['Grund NPU'], width=2000, placeholder="..."),
             )
-            # ToDo: ein try/Catch-Block um das Schreiben oder vorher Validierungsfunktion rufen
             neuerRecord.save()
             import_datum.aktuell += 1
             if import_datum.aktuell % 42 == 0:
@@ -315,6 +314,8 @@ def import_csv(request):
         if form.is_valid():
             orga = request.POST.get('organisation', 'Keine Orga!')  # Auf dem Panel wurde die Ziel-Orga übergeben
             request.session['organisation'] = orga  # und merken in der Session für Schritt 3
+            update_gruppe = request.POST.get('update_gruppe', False)
+            request.session['update_gruppe'] = update_gruppe
 
             # Zunächst versuche zu ermitteln, ob gerade ein anderer Import läuft:
             # Legt ein neues Datenobjekt zum Markieren des Import-Status an, speichert aber erst weiter unten
@@ -344,7 +345,8 @@ def import2(request):
     """
     Der zweite Schritt zeigt zunächst die statistischen Ergebnisse von Schritt 1, dann die neuen User
     sawie die zu löschenden User.
-    Beim Bestätigen des Schrittes werden die neuen User der UserIDundName-Tabelle hinzugefügt
+    Beim Bestätigen des Schrittes werden die neuen User der UserIDundName-Tabelle hinzugefügt,
+    geänderte User aktualisiert (in Teilen abhängig vom Flag update_gruppe in der Session)
     und die zu löschenden markiert sowie deren Rechte historisiert
     (ToDo: warum eigentlich, die können doch bei der Reinkaranation wieder verwendet werden?).
 
@@ -393,15 +395,20 @@ def import2(request):
     def import_schritt2():
         """
         Führt die Stored Procedure behandleUser() zum Aktualisieren der UserIDundName-Tabelle aus
+        In der Procedure ist relevant,
+        ob die Gruppenzugehörigkeit auf die aktuell gelesene Information aktualisiert
+        oder die bestehden Daten erhalten bleiben sollen (per Übergabe der Session-Varaible).
 
         :return: Fehler-Information (False = kein Fehler)
         """
         fehler = False
         with connection.cursor() as cursor:
             try:
-                cursor.callproc("behandleUser")
+                update = request.session.get('update_gruppe', False) or 'off'
+                print('update:', type(update), update)
+                cursor.callproc("behandleUser", [update, ])
             except:
-                fehler = 'Fehler in import_schritt2, StoredProc behandleUser: {}'.format(e)
+                fehler = 'Fehler in import_schritt2, StoredProc behandleUser({}): {}'.format(update, e)
                 fehler = fehlerausgabe(fehler)
                 print(fehler)
 

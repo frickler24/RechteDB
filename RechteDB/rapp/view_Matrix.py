@@ -120,7 +120,6 @@ def erzeuge_userIDlisten(namen_liste):
     for row in namen_liste:
         uids = hole_userids_zum_namen(row.name)
         uids_je_username[row.name] = uids
-    # print("UserID-Liste je Identität:", uids_je_username)
     return uids_je_username
 
 
@@ -153,7 +152,6 @@ def erzeuge_npu_details(namen_liste):
     for row in namen_liste:
         details = hole_npu_detail(row.name)
         details_je_username[row.name] = details
-    print("NPU-Details je Identität:", details_je_username)
     return details_je_username
 
 

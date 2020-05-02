@@ -304,7 +304,8 @@ BEGIN
             die in der User-Tabelle vorhanden, aber auf "geloescht" gesetzt sind (dritte Zeile im WHERE), oder
             die in der User-Tabelle vorhanden sind, 
                 aber mit einer anderen Abteilung oder Gruppe als in der Importtabelle angegeben, oder
-            bei denen die zweite und dritte Bedingung zutreffen (gelöschter User einer andern Orga) (3.+4. Zeile)
+            bei denen die zweite und dritte Bedingung zutreffen (gelöschter User einer andern Orga) (3.+4. Zeile) oder
+            bei denen sich die npu_details unterscheiden (5.-8. Zeile)
             
         Dabei wird die Team-Zuordnung "neu" mit der konstanten Nummer 35 bei völlig neuen Usern eingetragen.
         Der Vergleich erfolgt sowohl über über name als auch userid,
@@ -339,11 +340,16 @@ BEGIN
             ON tblRechteAMNeu.userid = tblUserIDundName.userid
             AND tblUserIDundName.name = tblRechteAMNeu.name
 
-        WHERE (tblRechteAMNeu.userid    IS NOT NULL AND tblUserIDundName.userid IS NULL)
+        WHERE 
+            (tblRechteAMNeu.userid    IS NOT NULL AND tblUserIDundName.userid IS NULL)
             OR (tblRechteAMNeu.name     IS NOT NULL AND tblUserIDundName.name   IS NULL)
             OR tblUserIDundName.`geloescht` = TRUE
             OR (tblRechteAMNeu.organisation != tblUserIDundName.gruppe 
                 AND concat(tblRechteAMNeu.organisation, '--') != tblUserIDundName.gruppe)
+            OR tblRechteAMNeu.npu_rolle != tblUserIDundName.npu_rolle 
+            OR tblRechteAMNeu.npu_rolle not like "" AND tblUserIDundName.npu_rolle is null
+            OR tblRechteAMNeu.npu_grund != tblUserIDundName.npu_grund
+            OR tblRechteAMNeu.npu_grund not like "" AND tblUserIDundName.npu_grund is null
         ;
 
     /*
@@ -367,7 +373,7 @@ BEGIN
     -- SELECT * from rapp_geloeschte_user;
 
     -- Ein bisschen Statistik für den Anwender
-    select 'Anzahl neuer User' as name, count(*) as wert from rapp_neue_user 
+    select 'Anzahl neuer oder geänderter User' as name, count(*) as wert from rapp_neue_user 
     UNION
     select 'Anzahl gelöschter User' as name, count(*) as wert from rapp_geloeschte_user
     UNION
@@ -392,7 +398,7 @@ def push_sp_behandleUser(procs_schon_geladen):
     """
 
     sp = """
-create procedure behandleUser ()
+create procedure behandleUser (IN update_gruppe char(3))
 BEGIN
 
     /*
@@ -419,31 +425,55 @@ BEGIN
         Nun werden die neuen User an die userid-Tabelle angehängt.
         Für User, die bereits existieren und für die Änderungen identifiziet wurden,
         werden die NPU-Informationen, die ZI-Organisation,
-        die Abteilung und die Gruppe aktualisiert.
+        die Abteilung und - je nach Flag update_gruppe - die Gruppe aktualisiert.
+        
+        ToDo: ACHTUNG: Bis auf eine Zeile steht der nachfolgende Code doppelt!
     */
-    INSERT INTO tblUserIDundName (userid, name, 
-            orga_id, 
-            `zi_organisation`, 
-            geloescht, 
-            npu_rolle, npu_grund, 
-            gruppe, abteilung)
-        SELECT userid1, name1, 
-                Ausdr1 AS orga_id, 
-                Ausdr2 AS `zi_organisation`, 
-                False AS geloescht, 
+    IF update_gruppe like 'on%' THEN
+        INSERT INTO tblUserIDundName (userid, name, 
+                orga_id, 
+                `zi_organisation`, 
+                geloescht, 
                 npu_rolle, npu_grund, 
-                gruppe, abteilung
-            FROM rapp_neue_user
-            WHERE COALESCE(`geloescht`, FALSE) = FALSE
-                AND (userid1 IS NOT NULL OR name1 IS NOT NULL)
-    ON DUPLICATE KEY UPDATE `zi_organisation` = Ausdr2, 
-        geloescht = 0, 
-        tblUserIDundName.npu_rolle = rapp_neue_user.npu_rolle, 
-        tblUserIDundName.npu_grund = rapp_neue_user.npu_grund, 
-        tblUserIDundName.gruppe = rapp_neue_user.gruppe, 
-        tblUserIDundName.abteilung = rapp_neue_user.abteilung;
-
-    -- select * from tblUserIDundName;
+                gruppe, abteilung)
+            SELECT userid1, name1, 
+                    Ausdr1 AS orga_id, 
+                    Ausdr2 AS `zi_organisation`, 
+                    False AS geloescht, 
+                    npu_rolle, npu_grund, 
+                    gruppe, abteilung
+                FROM rapp_neue_user
+                WHERE COALESCE(`geloescht`, FALSE) = FALSE
+                    AND (userid1 IS NOT NULL OR name1 IS NOT NULL)
+        ON DUPLICATE KEY UPDATE `zi_organisation` = Ausdr2, 
+            geloescht = 0, 
+            tblUserIDundName.npu_rolle = rapp_neue_user.npu_rolle, 
+            tblUserIDundName.npu_grund = rapp_neue_user.npu_grund, 
+            tblUserIDundName.gruppe = rapp_neue_user.gruppe, 
+            tblUserIDundName.abteilung = rapp_neue_user.abteilung;
+    ELSE 
+        INSERT INTO tblUserIDundName (userid, name, 
+                orga_id, 
+                `zi_organisation`, 
+                geloescht, 
+                npu_rolle, npu_grund, 
+                gruppe, abteilung)
+            SELECT userid1, name1, 
+                    Ausdr1 AS orga_id, 
+                    Ausdr2 AS `zi_organisation`, 
+                    False AS geloescht, 
+                    npu_rolle, npu_grund, 
+                    gruppe, abteilung
+                FROM rapp_neue_user
+                WHERE COALESCE(`geloescht`, FALSE) = FALSE
+                    AND (userid1 IS NOT NULL OR name1 IS NOT NULL)
+        ON DUPLICATE KEY UPDATE `zi_organisation` = Ausdr2, 
+            geloescht = 0, 
+            tblUserIDundName.npu_rolle = rapp_neue_user.npu_rolle, 
+            tblUserIDundName.npu_grund = rapp_neue_user.npu_grund, 
+            tblUserIDundName.abteilung = rapp_neue_user.abteilung;
+    END IF;
+        
 
     /*
         Bevor die alten User als geloescht markiert werden,
@@ -489,7 +519,7 @@ BEGIN
 
 
     -- Setzen der Löschflags in der Gesamttabelle für jedes Recht jeder nicht mehr vorhandenen userid
-    -- ToDo Das ist eigentlich redundant zur Historisierung
+    -- ToDo Mal überlegen, wann Historisierung und wann auf gelöscht Setzen sinnvoller ist
 
     UPDATE
         tblGesamt
@@ -517,14 +547,15 @@ BEGIN
         Berücksichtigt wird der Sonderfall, dass Bereichs- udn Abteilungskürzel - wo sinnvoll -- mit '--' terminiert werden.
         Das wird überall dort benötigt, wo die Suche "enthält" zu viele Treffer findet (bspw. beim BL)
     */
-    UPDATE tblUserIDundName
-    INNER JOIN rapp_neue_user
-        ON tblUserIDundName.userid = rapp_neue_user.userid1
-            and tblUserIDundName.gruppe != rapp_neue_user.gruppe
-            and tblUserIDundName.gruppe != concat(rapp_neue_user.gruppe, '--')
-    SET tblUserIDundName.abteilung = rapp_neue_user.abteilung,
-        tblUserIDundName.gruppe = rapp_neue_user.gruppe;
-
+    if update_gruppe like 'on%' THEN
+        UPDATE tblUserIDundName
+        INNER JOIN rapp_neue_user
+            ON tblUserIDundName.userid = rapp_neue_user.userid1
+                and tblUserIDundName.gruppe != rapp_neue_user.gruppe
+                and tblUserIDundName.gruppe != concat(rapp_neue_user.gruppe, '--')
+        SET tblUserIDundName.abteilung = rapp_neue_user.abteilung,
+            tblUserIDundName.gruppe = rapp_neue_user.gruppe;
+    END IF;
 END
 """
     return push_sp('behandleUser', sp, procs_schon_geladen)

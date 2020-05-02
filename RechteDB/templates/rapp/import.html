@@ -68,7 +68,11 @@
                     </ol><hr />
    				<div class="form-group form-group-sm col-12">
                     {% for field in form %}
-                        <div class="form-group">
+                        {% if field.name == 'update_gruppe' %}
+                            <div class="form-check col-2 ">
+                        {% else %}
+                            <div class="form-check col-12 ">
+                        {% endif %}
                             {{ field.label_tag }}
 
                             {% if form.is_bound %}
