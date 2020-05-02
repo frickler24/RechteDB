@@ -112,20 +112,49 @@ def erzeuge_UhR_matrixdaten(request, namen_liste):
 def erzeuge_userIDlisten(namen_liste):
     """
     Liefert die Menge der UserIDen, die zu einem Namen derzeit aktuell vorliegen
-    :param namen_liste:
-    :return:
+    :param namen_liste: Zu welchen Namen sollen die UserIDs gesucht werden?
+    :return: Liste der UserIDs je Identität
     """
-    usernamen = set()  # Die Namen aller User,  die in der Selektion erfasst werden
     uids_je_username = {}
 
     for row in namen_liste:
         uids = hole_userids_zum_namen(row.name)
-        print(row.name, uids)
         uids_je_username[row.name] = uids
+    # print("UserID-Liste je Identität:", uids_je_username)
     return uids_je_username
 
-def erzeuge_npu_details(request, namen_liste):
-    return None
+
+def hole_npu_detail(selektierter_name):
+    """
+    Hole die Rolle und den Grund für einen angegebenen NPU.
+    Dies funktioniert nur, weil der Name ein unique Key in der Tabelle ist.
+    Wichtig: Filtere gelöschte User heraus, sonst gibt es falsche Anzeigen
+
+    :param selektierter_name: Zu welchem Namen sollen die NPU-Details gesucht werden?
+    :return: tupel (npu_rolle, npu_grund)
+    """
+    query = TblUserIDundName.objects \
+        .filter(name=selektierter_name) \
+        .order_by('-userid') \
+        .filter(geloescht=False) \
+        .values('npu_rolle', 'npu_grund')
+    details = [(q['npu_rolle'], q['npu_grund']) for q in query]
+    return details
+
+def erzeuge_npu_details(namen_liste):
+    """
+    Hole die Rolle und den Grund für die angegebenen NPUs.
+
+    :param namen_liste: Zu welchen Namen sollen die NPU-Details gesucht werden?
+    :return: Liste der tupel (npu_rolle, npu_grund)
+    """
+    details_je_username = {}
+
+    for row in namen_liste:
+        details = hole_npu_detail(row.name)
+        details_je_username[row.name] = details
+    print("NPU-Details je Identität:", details_je_username)
+    return details_je_username
 
 
 def panel_UhR_matrix(request):
@@ -141,7 +170,7 @@ def panel_UhR_matrix(request):
     if request.method == 'GET':
         (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(request, namen_liste)
         UserIDen_je_name = erzeuge_userIDlisten(namen_liste)
-        npu_details_je_name = erzeuge_npu_details(request, namen_liste)
+        npu_details_je_name = erzeuge_npu_details(namen_liste)
     else:
         (usernamen, rollenmenge, rollen_je_username, teams_je_username, UserIDen_je_name, npu_details_je_name) \
             = (set(), set(), set(), {})

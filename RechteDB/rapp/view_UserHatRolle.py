@@ -347,7 +347,7 @@ def hole_userids_zum_namen(selektierter_name):
     Dies funktioniert nur, weil der Name ein unique Key in der Tabelle ist.
     Wichtig: Filtere gelöschte User heraus, sonst gibt es falsche Anzeigen
 
-    :param selektierter_name: Zu welcehm Namen sollen die UserIDs gesucht werden?
+    :param selektierter_name: Zu welchem Namen sollen die UserIDs gesucht werden?
     :return: Liste der UserIDs (als String[])
     """
     query = TblUserIDundName.objects \
