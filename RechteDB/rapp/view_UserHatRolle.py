@@ -350,18 +350,12 @@ def hole_userids_zum_namen(selektierter_name):
     :param selektierter_name: Zu welcehm Namen sollen die UserIDs gesucht werden?
     :return: Liste der UserIDs (als String[])
     """
-    userids = []  # Die Menge der UserIDs, die an Identität ID hängen
-
-    # Wir müssen das in einer Schleife machen, weil wir von jedem Identitäts--Element nur die UserID benötigen
-    number_of_userids = TblUserIDundName.objects \
+    query = TblUserIDundName.objects \
         .filter(name=selektierter_name) \
+        .order_by('-userid') \
         .filter(geloescht=False) \
-        .count()
-    for num in range(number_of_userids):
-        userids.append(TblUserIDundName.objects
-                       .filter(name=selektierter_name)
-                       .order_by('-userid')
-                       .filter(geloescht=False)[num].userid)
+        .values('userid')
+    userids = [q['userid'] for q in query]
     return userids
 
 
@@ -1130,7 +1124,7 @@ class RollenListenUhr(UhR):
 
                     for i in range(max(numvorhanden, numoptional)):
                         if i < numvorhanden:
-                            vorh = self.zweiter(context['vorhanden'][bastelkey][i]) # den aktuellen Wert
+                            vorh = self.zweiter(context['vorhanden'][bastelkey][i])  # den aktuellen Wert
                         elif i >= 0:
                             # letzten Wert bis zum Ende wiederholen für bessere Darstellung
                             vorh = self.zweiter(context['vorhanden'][bastelkey][numvorhanden - 1])
@@ -1218,6 +1212,7 @@ class NeueListenUhr(UhR):
                         excel.writerow(line)
 
         return excel.response
+
 
 # For Future Use
 class AFListenUhr(UhR):
