@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 # Imports für die Selektions-Views panel, selektion u.a.
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from django.utils import timezone
@@ -34,8 +35,8 @@ def neuer_import(request, orga):
         # Das nachfolgende Statement kann schon mal schiefgehen, z.B. wenn die DB noch leer ist.
         letzter_import_im_modell = Letzter_import.objects.latest('id')
         if letzter_import_im_modell.end is None:
-            # Dann läuft gerade ein anderer Import, sonst wäre das end-Feld gesetzt
-            # oder der letzte Import ist abgebrochen
+            # Dann läuft gerade ein anderer Import oder der letzte Import ist abgebrochen,
+            # sonst wäre das end-Feld gesetzt
             request.session['parallel_start'] = str(letzter_import_im_modell.start)
             request.session['parallel_user'] = letzter_import_im_modell.user
             fehlermeldung = render(request, 'rapp/import_parallel.html')
@@ -134,6 +135,19 @@ def fehlerausgabe(fehler):
 
 
 @login_required
+def import_abbruch(request):
+    """
+    Wenn ein Abbruch auf einem der Import-Panels geklickt wurde,
+    muss die Import-Statistik abgeschlossen werden. Anschließend wird die Import-Seite aufgerufen.
+
+    :param request: Der Request
+    :return:
+    """
+    letzter_schritt()
+    return redirect('import')
+
+
+@login_required
 def import_csv(request):
     """
     Importiere neue CSV-Datei mit IIQ-Daten
@@ -198,9 +212,11 @@ def import_csv(request):
                 af_gueltig_ab=patch_datum(line['AF Gültig ab']),
                 af_gueltig_bis=patch_datum(line['AF Gültig bis']),
                 af_zuweisungsdatum=patch_datum(line['AF Zuweisungsdatum']),
-                organisation=textwrap.shorten(line['Organisation'], width=10, placeholder="Hä?"),
+                organisation=textwrap.shorten(line['Organisation'], width=15, placeholder="Hä?"),
+                npu_rolle=textwrap.shorten(line['Kategorie NPU'], width=10, placeholder="Hä?"),
+                npu_grund=textwrap.shorten(line['Grund NPU'], width=2000, placeholder="..."),
+                iiq_organisation=textwrap.shorten(line['Organisation'], width=64, placeholder="..."),
             )
-            # ToDo: ein try/Catch-Block um das Schreiben oder vorher Validierungsfunktion rufen
             neuerRecord.save()
             import_datum.aktuell += 1
             if import_datum.aktuell % 42 == 0:
@@ -227,7 +243,6 @@ def import_csv(request):
     def bearbeite_datei(ausgabe):
         """
         Liest die im Web angegebene Datei ein und versucht, sie in der Übergabetabelle zu hinterlegen.
-        ToDo Die Fehlerbehandlung muss verbessert werden
 
         :param ausgabe: boolean flag, ob die Funktion Textausgaben erzeugen soll (debug)
         :return: Laufzeiten-Summen der Funktionen zum Einlesen und Bearbeiten
@@ -300,6 +315,8 @@ def import_csv(request):
         if form.is_valid():
             orga = request.POST.get('organisation', 'Keine Orga!')  # Auf dem Panel wurde die Ziel-Orga übergeben
             request.session['organisation'] = orga  # und merken in der Session für Schritt 3
+            update_gruppe = request.POST.get('update_gruppe', False)
+            request.session['update_gruppe'] = update_gruppe
 
             # Zunächst versuche zu ermitteln, ob gerade ein anderer Import läuft:
             # Legt ein neues Datenobjekt zum Markieren des Import-Status an, speichert aber erst weiter unten
@@ -315,8 +332,7 @@ def import_csv(request):
             request.session['fehler1'] = fehler
             return redirect('import2')
     else:
-        # ToDo: Gleich beim ImportForm eien Hinweis auf laufende Import anzeigen mit Löschmöglichkeit
-        form = ImportForm(initial={'organisation': 'AI-BA'}, auto_id=False)
+        form = ImportForm(initial={'organisation': 'AI-CS'}, auto_id=False)
 
     context = {
         'form': form,
@@ -330,7 +346,8 @@ def import2(request):
     """
     Der zweite Schritt zeigt zunächst die statistischen Ergebnisse von Schritt 1, dann die neuen User
     sawie die zu löschenden User.
-    Beim Bestätigen des Schrittes werden die neuen User der UserIDundName-Tabelle hinzugefügt
+    Beim Bestätigen des Schrittes werden die neuen User der UserIDundName-Tabelle hinzugefügt,
+    geänderte User aktualisiert (in Teilen abhängig vom Flag update_gruppe in der Session)
     und die zu löschenden markiert sowie deren Rechte historisiert
     (ToDo: warum eigentlich, die können doch bei der Reinkaranation wieder verwendet werden?).
 
@@ -379,15 +396,20 @@ def import2(request):
     def import_schritt2():
         """
         Führt die Stored Procedure behandleUser() zum Aktualisieren der UserIDundName-Tabelle aus
+        In der Procedure ist relevant,
+        ob die Gruppenzugehörigkeit auf die aktuell gelesene Information aktualisiert
+        oder die bestehden Daten erhalten bleiben sollen (per Übergabe der Session-Varaible).
 
         :return: Fehler-Information (False = kein Fehler)
         """
         fehler = False
         with connection.cursor() as cursor:
             try:
-                cursor.callproc("behandleUser")
+                update = request.session.get('update_gruppe', False) or 'off'
+                print('update:', type(update), update)
+                cursor.callproc("behandleUser", [update, ])
             except:
-                fehler = 'Fehler in import_schritt2, StoredProc behandleUser: {}'.format(e)
+                fehler = 'Fehler in import_schritt2, StoredProc behandleUser({}): {}'.format(update, e)
                 fehler = fehlerausgabe(fehler)
                 print(fehler)
 
@@ -413,8 +435,6 @@ def import2(request):
     Der Context wird beim ersten Aufruf (dem ersten Anzeigen) des Templates geüllt.
     Bei eventuellen weiteren GET-Lieferunngen wird der Context erneut gesetzt.
     """
-    # ToDo: Nochmal überlegen, was in die Session gehört und was nicht. Session-Vars direkt im Template behandeln!
-
     context = {
         'form': form,
         'fehler': request.session.get('fehler1', None),
@@ -540,7 +560,7 @@ def import_status(request):
             'proz': -1,
         }
 
-    return render(request, 'rapp/import_status.html', context)
+    return render(request, 'rapp/import_statusjson.html', context)
 
 
 @login_required

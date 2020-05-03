@@ -23,7 +23,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 # Die internal_IPs sind für den Debugger. In Produktion läuft dieser nicht mit (DEBUG=False)
 INTERNAL_IPS = config('INTERNAL_IPS')
-INTERNAL_IPS = ''
+# INTERNAL_IPS = '' # uncomment for disabling debugger
 
 DATABASES = {
     'default': dj_database_url.config(

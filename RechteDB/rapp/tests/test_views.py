@@ -12,7 +12,7 @@ from ..view_import import patch_datum, neuer_import
 from ..views import home
 
 
-def schoen(s):
+def schoen(s: object) -> object:
     print(str(s).replace('\\n', '\n').replace('\\r', '\r').replace('\\t', '\t'))
 
 
@@ -2624,16 +2624,16 @@ class UserRolleExportCSVTest(TestCase):
         url = '{0}{1}'.format(reverse('uhr_matrix_csv'), '?name=UseR&gruppe=BA-ps')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Name\tTeams\tErste Neue Rolle\tZweite Neue Rolle\r\n", 1)
-        self.assertContains(response, "User_xv13254\tDjango-Team-01\tSchwerpunkt\tVertretung\r\n", 1)
+        self.assertContains(response, "User_xv13254\tDjango-Team-01\txv13254, Dv13254\tSchwerpunkt\tVertretung\tNone\tNone\r\n", 1)
+        self.assertContains(response, "Name\tTeams\tUserIDs\tErste Neue Rolle\tZweite Neue Rolle\tNPU-Rolle\tNPU-Grund\r\n", 1)
 
     # Eine gültige Auswahl für einen User in einer Gruppe, csv-Export kurzvariante
     def test_matrix_short_scv_with_valid_selection(self):
         url = '{0}{1}'.format(reverse('uhr_matrix_csv'), 'kompakt/?name=UseR&gruppe=BA-ps')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Name\tTeams\tErste Neue Rolle\tZweite Neue Rolle\r\n", 1)
-        self.assertContains(response, "User_xv13254\tDjango-Team-01\tS\tV\r\n", 1)
+        self.assertContains(response, "Name\tTeams\tUserIDs\tErste Neue Rolle\tZweite Neue Rolle\tNPU-Rolle\tNPU-Grund\r\n", 1)
+        self.assertContains(response, "User_xv13254\tDjango-Team-01\txv13254, Dv13254\tS\tV\tNone\tNone\r\n", 1)
 
 
 class ImportNewCSVSingleRecordTest(TestCase):

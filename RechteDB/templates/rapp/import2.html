@@ -21,37 +21,9 @@
         <div class="container alert-secondary">
             <h5>Liste neuer oder wiedergefundener User</h5>
             <div class="row">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th scope="col">UserID</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Team-#</th>
-                            <th scope="col">Orga</th>
-                            <th scope="col">Abteilung</th>
-                            <th scope="col">Gruppe</th>
-
-                            <th scope="col">UserID alt</th>
-                            <th scope="col">Name alt</th>
-                            <th scope="col">Team-# alt</th>
-                            <th scope="col">Orga alt</th>
-                            <th scope="col">Abteilung alt</th>
-                            <th scope="col">Gruppe alt</th>
-                            <th scope="col">gelöscht</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in request.session.neueUser %}
-                            <tr>
-                                {% for elem in user %}
-                                    <td>{{ elem }}</td>
-                                {% endfor %}
-                            </tr>
-                        {% empty %}
-                            <tr><td>Keine neuen User gefunden</td></tr>
-                        {% endfor neueUser %}
-                    </tbody>
-                </table>
+                {% with links=0 %}
+                    {% include 'rapp/import2_tabelle.html' %}
+                {% endwith %}
             </div>
         </div>
         <p>&nbsp;</p>
@@ -81,9 +53,9 @@
             </div>
         </div>
 
-        <form method="post" name="import" enctype="multipart/form-data" novalidate>
+        <form id="form2" method="post" name="import" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
-           <div class="container bg-light py-3 mt-1">
+            <div class="container bg-light py-3 mt-1">
                <div class="row">
                     <div class="row my-3" id="loading2" style="display:none;">
                         <img src="{% static 'loading.gif' %}" alt="Lade..." />
@@ -97,11 +69,11 @@
                    <div class="col pt-3 col-xs-12 col-sm-12 col-md-4 col-lg-6 col-xl-6 alert alert-warning">
                         Wenn die angezeigten Daten plausibel sind, weiter mit dem Button "User-Tabelle aktualisieren!",
                         sonst abbrechen.<br />
-                       Bisher sind keine Daten in den Zieltabellen verändert worden.<br />
+                        Bisher sind keine Daten in den Zieltabellen verändert worden.<br />
                        <b>Achtung - dieser Schritt kann nicht rückgängig gemacht werden.</b>
                    </div>
                    <div class="col py-3 col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3">
-                       <button onclick="location.href = '{% url 'import' %}';" type="reset"
+                       <button onclick="location.href = '{% url 'import_abbruch' %}';" type="reset"
                                class="btn btn-outline-success expand " >Abbrechen</button>
                    </div>
                </div>
@@ -112,6 +84,8 @@
                 d.getElementById('hochladen').onclick = function () {
                     d.getElementById('loading2').style.display = 'block';
                     d.getElementById('hochladen').disabled = true;
+                    document.getElementById('form2').submit();
+                    return true;
                 };
             }(document));
         </script>

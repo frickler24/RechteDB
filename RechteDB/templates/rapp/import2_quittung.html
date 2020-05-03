@@ -55,7 +55,21 @@
         <p>Anschließend kann die weitere Verarbeitung über den roten Button unten angestoßen
             oder der Vorgang abgebrochen werden. </p>
 
-        <form method="post" name="import" novalidate>
+        <p>&nbsp;</p>
+        <div class="container alert-secondary">
+            <h5>Liste neuer oder wiedergefundener User</h5>
+            <div class="row">
+                {% if request.session.neueUser %}
+                    {% with links=1 %}
+                        {% include 'rapp/import2_tabelle.html' %}
+                    {% endwith %}
+                {% else %}
+                    <p class="ml-5">Keine neuen User gefunden</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <form id="form2b" method="post" name="import" novalidate>
             {% csrf_token %}
             <div class="container bg-light">
                 <div class="row">
@@ -83,64 +97,23 @@
                        Achtung - Auch dieser Schritt kann nicht rückgängig gemacht werden.
                    </div>
                    <div class="col py-3 col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3">
-                       <button onclick="location.href = '{% url 'home' %}';" type="reset"
+                       <button onclick="location.href = '{% url 'import_abbruch' %}';" type="reset"
                                class="btn btn-outline-success expand" >Abbrechen</button>
                    </div>
                </div>
             </div>
         </form>
+        <p>&nbsp;</p>
+
         <script type="text/javascript">
             (function (d) {
                 d.getElementById('hochladen').onclick = function () {
                     d.getElementById('loading2').style.display = 'block';
                     d.getElementById('hochladen').disabled = true;
+                    document.getElementById('form2b').submit();
+                    return true;
                 };
             }(document));
         </script>
-
-        <p>&nbsp;</p>
-        <div class="container alert-secondary">
-            <h5>Liste neuer oder wiedergefundener User</h5>
-            <div class="row">
-                {% if request.session.neueUser %}
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th scope="col">UserID</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Team-#</th>
-                                <th scope="col">Orga</th>
-                                <th scope="col">Abteilung</th>
-                                <th scope="col">Gruppe</th>
-
-                                <th scope="col">UserID alt</th>
-                                <th scope="col">Name alt</th>
-                                <th scope="col">Team-# alt</th>
-                                <th scope="col">Orga alt</th>
-                                <th scope="col">Abteilung alt</th>
-                                <th scope="col">Gruppe alt</th>
-                                <th scope="col">gelöscht</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for user in request.session.neueUser %}
-                                <tr>
-                                    {% for elem in user %}
-                                        <td>
-                                            <a href="/adminrapp/tbluseridundname?name={{ user.1 }}" target="_blank">
-                                                {{ elem }}
-                                            </a>
-                                        </td>
-                                    {% endfor %}
-                                </tr>
-                            {% endfor neueUser %}
-                        </tbody>
-                    </table>
-                {% else %}
-                    <p class="ml-5">Keine neuen User gefunden</p>
-                {% endif %}
-            </div>
-        </div>
-        <p>&nbsp;</p>
 	</div>
 {% endblock %}

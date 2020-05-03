@@ -159,7 +159,7 @@ BEGIN
     */
 
     /*
-        Leeren und Füllen der eigentlichen Importtabelle
+        Löschen und Füllen der eigentlichen Importtabelle
         Einschließlich Herausfiltern der doppelten Zeilen
         (> 1% der Zeilen werden aus IIQ doppelt geliefert)
     */
@@ -181,7 +181,10 @@ BEGIN
                `höchste kritikalität tf in af`   AS hk_tf_in_af,
                `gf beschreibung`                 AS gf_beschreibung,
                `af zuweisungsdatum`              AS af_zuweisungsdatum,
-               `organisation`                    AS organisation
+               `organisation`,
+               `npu_rolle`,
+               `npu_grund`,
+               `iiq_organisation`
         FROM tblRechteNeuVonImport
         GROUP BY `userid`,
                  `tf`,
@@ -191,7 +194,7 @@ BEGIN
                  organisation;
 
     /*
-        Umkopieren der DAten von einer Tabelle in die andere
+        Umkopieren der Daten von einer Tabelle in die andere
     */
 
     TRUNCATE table tblRechteAMNeu;
@@ -200,7 +203,9 @@ BEGIN
                 `tf_kritikalitaet`,
                 `tf_eigentuemer_org`, `tf_technische_plattform`, GF, 
                 `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
-                `gf_beschreibung`, `af_zuweisungsdatum`, organisation, doppelerkennung)
+                `gf_beschreibung`, `af_zuweisungsdatum`, organisation,
+                `npu_rolle`, `npu_grund`, `iiq_organisation`,
+                doppelerkennung)
     SELECT rapp_NeuVonImportDuplikatfrei.userid,
            rapp_NeuVonImportDuplikatfrei.name,
            rapp_NeuVonImportDuplikatfrei.tf,
@@ -218,9 +223,12 @@ BEGIN
            rapp_NeuVonImportDuplikatfrei.`gf_beschreibung`,
            rapp_NeuVonImportDuplikatfrei.`af_zuweisungsdatum`,
            rapp_NeuVonImportDuplikatfrei.`organisation`,
+           rapp_NeuVonImportDuplikatfrei.`npu_rolle`,
+           rapp_NeuVonImportDuplikatfrei.`npu_grund`,
+           rapp_NeuVonImportDuplikatfrei.`iiq_organisation`,
            0
     FROM rapp_NeuVonImportDuplikatfrei
-    ON DUPLICATE KEY UPDATE doppelerkennung=doppelerkennung+1;
+    ON DUPLICATE KEY UPDATE doppelerkennung = doppelerkennung + 1;
 
     /*
         Beim Kopieren ist wichtig, dass die Felder,
@@ -238,6 +246,8 @@ BEGIN
     UPDATE tblRechteAMNeu SET `GF` = 'k.A.' WHERE GF Is Null or GF = '';
     UPDATE tblRechteAMNeu SET `hk_tf_in_af` = 'k.A.' WHERE `hk_tf_in_af` Is Null or `hk_tf_in_af` = '';
     UPDATE tblRechteAMNeu SET `af_beschreibung` = 'keine geliefert bekommmen' WHERE `af_beschreibung` Is Null or `af_beschreibung` = '';
+    UPDATE tblRechteAMNeu SET `npu_rolle` = '' WHERE `npu_rolle` Is Null;
+    UPDATE tblRechteAMNeu SET `npu_grund` = '' WHERE `npu_grund` Is Null;
 
     /*
     -- Sollte nun 0 ergeben:
@@ -296,7 +306,8 @@ BEGIN
             die in der User-Tabelle vorhanden, aber auf "geloescht" gesetzt sind (dritte Zeile im WHERE), oder
             die in der User-Tabelle vorhanden sind, 
                 aber mit einer anderen Abteilung oder Gruppe als in der Importtabelle angegeben, oder
-            bei denen die zweite und dritte Bedingung zutreffen (gelöschter User einer andern Orga) (3.+4. Zeile)
+            bei denen die zweite und dritte Bedingung zutreffen (gelöschter User einer andern Orga) (3.+4. Zeile) oder
+            bei denen sich die npu_details unterscheiden (5.-8. Zeile)
             
         Dabei wird die Team-Zuordnung "neu" mit der konstanten Nummer 35 bei völlig neuen Usern eingetragen.
         Der Vergleich erfolgt sowohl über über name als auch userid,
@@ -311,27 +322,38 @@ BEGIN
     create table rapp_neue_user as
         SELECT DISTINCT tblRechteAMNeu.userid as userid1,
                         tblRechteAMNeu.name as name1,
-                        '35' AS Ausdr1,
+                        COALESCE(tblUserIDundName.orga_id, 35) AS Ausdr1,
                         orga AS Ausdr2,
-                        tblRechteAMNeu.organisation as gruppe,
                         concat('ZI-', orga) as abteilung,
+                        tblRechteAMNeu.organisation as gruppe,
+                        tblRechteAMNeu.npu_rolle,
+                        tblRechteAMNeu.npu_grund,
                         tblUserIDundName.userid as userid_alt,
                         tblUserIDundName.name as name_alt,
                         tblUserIDundName.orga_id as team_alt,
                         tblUserIDundName.zi_organisation as zi_orga_alt,
                         tblUserIDundName.abteilung as abteilung_alt,
                         tblUserIDundName.gruppe as gruppe_alt,
+                        tblUserIDundName.npu_rolle as npu_rolle_alt,
+                        tblUserIDundName.npu_grund as npu_grund_alt,
                         tblUserIDundName.geloescht
         FROM tblRechteAMNeu
             LEFT JOIN tblUserIDundName
             ON tblRechteAMNeu.userid = tblUserIDundName.userid
             AND tblUserIDundName.name = tblRechteAMNeu.name
 
-        WHERE (tblRechteAMNeu.userid    IS NOT NULL AND tblUserIDundName.userid IS NULL)
-            OR (tblRechteAMNeu.name     IS NOT NULL AND tblUserIDundName.name   IS NULL)
-            OR tblUserIDundName.`geloescht` = TRUE
-            OR (tblRechteAMNeu.organisation != tblUserIDundName.gruppe 
-                AND concat(tblRechteAMNeu.organisation, '--') != tblUserIDundName.gruppe)
+        WHERE tblRechteAMNeu.organisation NOT REGEXP '^[0-9]{5}'
+            AND (
+                (tblRechteAMNeu.userid    IS NOT NULL AND tblUserIDundName.userid IS NULL)
+                OR (tblRechteAMNeu.name     IS NOT NULL AND tblUserIDundName.name   IS NULL)
+                OR tblUserIDundName.`geloescht` = TRUE
+                OR (tblRechteAMNeu.organisation != tblUserIDundName.gruppe 
+                    AND concat(tblRechteAMNeu.organisation, '--') != tblUserIDundName.gruppe)
+                OR tblRechteAMNeu.npu_rolle != tblUserIDundName.npu_rolle 
+                OR tblRechteAMNeu.npu_rolle not like "" AND tblUserIDundName.npu_rolle is null
+                OR tblRechteAMNeu.npu_grund != tblUserIDundName.npu_grund
+                OR tblRechteAMNeu.npu_grund not like "" AND tblUserIDundName.npu_grund is null
+            )
         ;
 
     /*
@@ -355,7 +377,7 @@ BEGIN
     -- SELECT * from rapp_geloeschte_user;
 
     -- Ein bisschen Statistik für den Anwender
-    select 'Anzahl neuer User' as name, count(*) as wert from rapp_neue_user 
+    select 'Anzahl neuer oder geänderter User' as name, count(*) as wert from rapp_neue_user 
     UNION
     select 'Anzahl gelöschter User' as name, count(*) as wert from rapp_geloeschte_user
     UNION
@@ -380,7 +402,7 @@ def push_sp_behandleUser(procs_schon_geladen):
     """
 
     sp = """
-create procedure behandleUser ()
+create procedure behandleUser (IN update_gruppe char(3))
 BEGIN
 
     /*
@@ -396,7 +418,7 @@ BEGIN
     -- select * from tbl_tmpGeloeschte;
 
     /*
-        Markiere die useriden wieder als aktiv, die bereits bekannt, aber als geloescht markiert sind.
+        Markiere die UserIDen wieder als aktiv, die bereits bekannt, aber als geloescht markiert sind.
     */
     UPDATE tblUserIDundName
         INNER JOIN tbl_tmpGeloeschte
@@ -404,20 +426,58 @@ BEGIN
     SET tblUserIDundName.geloescht = False;
 
     /*
-        Nun werden die wirklich neuen User an die userid-Tabelle angehängt
+        Nun werden die neuen User an die userid-Tabelle angehängt.
+        Für User, die bereits existieren und für die Änderungen identifiziet wurden,
+        werden die NPU-Informationen, die ZI-Organisation,
+        die Abteilung und - je nach Flag update_gruppe - die Gruppe aktualisiert.
+        
+        ToDo: ACHTUNG: Bis auf eine Zeile steht der nachfolgende Code doppelt!
     */
-    INSERT INTO tblUserIDundName (userid, name, orga_id, `zi_organisation`, geloescht, gruppe, abteilung )
-        SELECT userid1, name1, Ausdr1 AS orga_id, Ausdr2 AS `zi_organisation`, 
-                False AS geloescht, gruppe, abteilung
-            FROM rapp_neue_user
-            WHERE COALESCE(`geloescht`, FALSE) = FALSE
-                AND (userid1 IS NOT NULL OR name1 IS NOT NULL)
-    ON DUPLICATE KEY UPDATE `zi_organisation` = Ausdr2, 
-        geloescht = 0, 
-        tblUserIDundName.gruppe = rapp_neue_user.gruppe, 
-        tblUserIDundName.abteilung = rapp_neue_user.abteilung;
-
-    -- select * from tblUserIDundName;
+    IF update_gruppe like 'on%' THEN
+        INSERT INTO tblUserIDundName (userid, name, 
+                orga_id, 
+                `zi_organisation`, 
+                geloescht, 
+                npu_rolle, npu_grund, 
+                gruppe, abteilung)
+            SELECT userid1, name1, 
+                    Ausdr1 AS orga_id, 
+                    Ausdr2 AS `zi_organisation`, 
+                    False AS geloescht, 
+                    npu_rolle, npu_grund, 
+                    gruppe, abteilung
+                FROM rapp_neue_user
+                WHERE COALESCE(`geloescht`, FALSE) = FALSE
+                    AND (userid1 IS NOT NULL OR name1 IS NOT NULL)
+        ON DUPLICATE KEY UPDATE `zi_organisation` = Ausdr2, 
+            geloescht = 0, 
+            tblUserIDundName.npu_rolle = rapp_neue_user.npu_rolle, 
+            tblUserIDundName.npu_grund = rapp_neue_user.npu_grund, 
+            tblUserIDundName.gruppe = rapp_neue_user.gruppe, 
+            tblUserIDundName.abteilung = rapp_neue_user.abteilung;
+    ELSE 
+        INSERT INTO tblUserIDundName (userid, name, 
+                orga_id, 
+                `zi_organisation`, 
+                geloescht, 
+                npu_rolle, npu_grund, 
+                gruppe, abteilung)
+            SELECT userid1, name1, 
+                    Ausdr1 AS orga_id, 
+                    Ausdr2 AS `zi_organisation`, 
+                    False AS geloescht, 
+                    npu_rolle, npu_grund, 
+                    gruppe, abteilung
+                FROM rapp_neue_user
+                WHERE COALESCE(`geloescht`, FALSE) = FALSE
+                    AND (userid1 IS NOT NULL OR name1 IS NOT NULL)
+        ON DUPLICATE KEY UPDATE `zi_organisation` = Ausdr2, 
+            geloescht = 0, 
+            tblUserIDundName.npu_rolle = rapp_neue_user.npu_rolle, 
+            tblUserIDundName.npu_grund = rapp_neue_user.npu_grund, 
+            tblUserIDundName.abteilung = rapp_neue_user.abteilung;
+    END IF;
+        
 
     /*
         Bevor die alten User als geloescht markiert werden,
@@ -463,7 +523,7 @@ BEGIN
 
 
     -- Setzen der Löschflags in der Gesamttabelle für jedes Recht jeder nicht mehr vorhandenen userid
-    -- ToDo Das ist eigentlich redundant zur Historisierung
+    -- ToDo Mal überlegen, wann Historisierung und wann auf gelöscht Setzen sinnvoller ist
 
     UPDATE
         tblGesamt
@@ -491,14 +551,29 @@ BEGIN
         Berücksichtigt wird der Sonderfall, dass Bereichs- udn Abteilungskürzel - wo sinnvoll -- mit '--' terminiert werden.
         Das wird überall dort benötigt, wo die Suche "enthält" zu viele Treffer findet (bspw. beim BL)
     */
-    UPDATE tblUserIDundName
-    INNER JOIN rapp_neue_user
-        ON tblUserIDundName.userid = rapp_neue_user.userid1
-            and tblUserIDundName.gruppe != rapp_neue_user.gruppe
-            and tblUserIDundName.gruppe != concat(rapp_neue_user.gruppe, '--')
-    SET tblUserIDundName.abteilung = rapp_neue_user.abteilung,
-        tblUserIDundName.gruppe = rapp_neue_user.gruppe;
+    if update_gruppe like 'on%' THEN
+        UPDATE tblUserIDundName
+        INNER JOIN rapp_neue_user
+            ON tblUserIDundName.userid = rapp_neue_user.userid1
+                and tblUserIDundName.gruppe != rapp_neue_user.gruppe
+                and tblUserIDundName.gruppe != concat(rapp_neue_user.gruppe, '--')
+        SET tblUserIDundName.abteilung = rapp_neue_user.abteilung,
+            tblUserIDundName.gruppe = rapp_neue_user.gruppe;
+    END IF;
     
+    /*
+        Abschließend werden alle gefundenen EInträge aus IIQ zur Organisation (in unserem SInn die Gruppe)
+        in das entsprechende Feld kopiert - unabhängig von Update-Flag.
+        
+        Das hat zum Zweck, dass anschließend dauerhaft Abfragen zu Inkonsistenzen durchgeführt werden können.
+        Dazu wird es mindestens eine Liste geben, in der die Abweichungen dargestellt werden.
+    */
+    
+    UPDATE tblUserIDundName
+    INNER JOIN tblRechteAMNeu
+        ON tblUserIDundName.userid = tblRechteAMNeu.userid
+    SET tblUserIDundName.iiq_organisation = tblRechteAMNeu.iiq_organisation
+    WHERE not tblUserIDundName.geloescht;
 END
 """
     return push_sp('behandleUser', sp, procs_schon_geladen)

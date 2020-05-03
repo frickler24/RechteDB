@@ -13,6 +13,7 @@ from . import view_manuell
 from . import view_rolle_umbenennen
 from . import view_ungenutzte_rollen
 from . import view_ungenutzte_afgf
+from . import view_Matrix
 
 # app_name = 'rapp'        # Wird nur benötigt als namespace, falls mehrere Apps dieselbe Teil-URL haben
 
@@ -91,13 +92,13 @@ urlpatterns += [
          login_required(view_UserHatRolle.panel_UhR_konzept_pdf),
          name='uhr_konzept_pdf'),
     path('user_rolle_af/matrix/',
-         login_required(view_UserHatRolle.panel_UhR_matrix),
+         login_required(view_Matrix.panel_UhR_matrix),
          name='uhr_matrix'),
     path('user_rolle_af/matrix_csv/',
-         login_required(view_UserHatRolle.panel_UhR_matrix_csv),
+         login_required(view_Matrix.panel_UhR_matrix_csv),
          name='uhr_matrix_csv'),
     path('user_rolle_af/matrix_csv/<str:flag>/',
-         login_required(view_UserHatRolle.panel_UhR_matrix_csv),
+         login_required(view_Matrix.panel_UhR_matrix_csv),
          name='uhr_matrix_csv'),
     path('user_rolle_af/',
          login_required(view_UserHatRolle.panel_UhR),
@@ -125,6 +126,7 @@ urlpatterns += [
     path('import3_quittung/', login_required(view_import.import3_quittung), name='import3_quittung'),
     path('import_reset/', login_required(view_import.import_reset), name='import_reset'),
     path('import_status/', login_required(view_import.import_status), name='import_status'),
+    path('import_abbruch/', login_required(view_import.import_abbruch), name='import_abbruch'),
 ]
 
 # URl zum Bestücken der verschiedenen Stored Procedures in das DBMS

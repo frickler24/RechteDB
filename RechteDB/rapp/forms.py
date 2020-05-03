@@ -45,6 +45,7 @@ class ImportForm(forms.Form):
     # Die ersten Parameter, die für einen CSV-Import abgefragt werden müssen
     organisation = forms.ChoiceField(label='Organisation')
     datei = forms.FileField(label='Dateiname')
+    update_gruppe = forms.BooleanField(required=False, initial=False, label='Gruppenzugehörigkeit aktualisieren')
 
     def __init__(self, *args, **kwargs):
         super(ImportForm, self).__init__(*args, **kwargs)

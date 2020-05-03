@@ -5,7 +5,7 @@
 {% block breadcrumb %}
 	<li class="breadcrumb-item"><a href="{% url 'home' %}">Start</a></li>
     <li class="breadcrumb-item"><a href="{% url 'import' %}">Import neuer Daten</a></li>
-	<li class="breadcrumb-item active">Import neuer Daten - Ergebnis</li>
+	<li class="breadcrumb-item active">Import neuer Daten - Fehler</li>
 {% endblock breadcrumb %}
 
 {% block title %}
@@ -32,10 +32,6 @@
 <form method="get" name="import">
     <div class="container bg-light py-3 mt-1 alert-success">
        <div class="row">
-           <div class="col py-3 col-xs-12 col-sm-12 col-md-4 col-lg-3 col-xl-3">
-               <button onclick="location.href = '{% url 'import' %}';" type="reset"
-                       class="btn btn-outline-success expand" >Weiter zum nächsten Import</button>
-           </div>
            <div class="col py-3 col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
                <button onclick="location.href = '{% url 'import_reset' %}';" type="reset"
                        class="btn btn-outline-danger expand" >Löschen des Status und weiter zum nächsten Import</button>

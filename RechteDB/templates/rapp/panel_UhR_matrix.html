@@ -23,6 +23,9 @@
 		'usernamen' = Set
 		'rollenmenge' = Set
 		'rollen_je_username' = Liste mit (Namen und Liste der Rollen)
+        'UserIDen_je_username' = erzeuge_userIDlisten(namen_liste)
+        'npu_details_je_username' = erzeuge_npu_details(namen_liste)
+
 
 		Überschriften-Block:
 			Erste Spaltenüberschrift ist "Name" als String, darunter werden die Usernamen liegen, daneben:
@@ -67,9 +70,12 @@
 						<tr class="bg-primary text-left">
 							<th width="10%">Name</th>
 							<th width="10%">Teams</th>
+							<th width="10%">UserIDs</th>
 							{% for rolle in rollenmenge %}
 								<th><small>{{ rolle }}</small></th>
 							{% endfor %}
+							<th width="5%">NPU-Rolle</th>
+							<th width="10%">NPU-Grund</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -85,6 +91,13 @@
 									</small>
 								{% endfor %}
 							</td>
+							<td>
+								{% for userID in UserIDen_je_username|hash:user %}
+									<small>
+										{{ userID }}{% if not forloop.last %},<br />{% endif %}
+									</small>
+								{% endfor %}
+							</td>
 							{% for rolle in rollenmenge %}
 								<td>
 									<small>
@@ -92,6 +105,20 @@
 									</small>
 								</td>
 							{% endfor %}
+							<td>
+								{% for rolle in npu_details_je_username|hash:user %}
+									<small>
+										{{ rolle.0 }}{% if not forloop.last %},<br />{% endif %}
+									</small>
+								{% endfor %}
+							</td>
+							<td>
+								{% for rolle in npu_details_je_username|hash:user %}
+									<small>
+										{{ rolle.1 }}{% if not forloop.last %},<br />{% endif %}
+									</small>
+								{% endfor %}
+							</td>
 						</tr>
 					{% endfor usernamen %}
 					</tbody>

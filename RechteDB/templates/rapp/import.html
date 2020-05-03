@@ -48,7 +48,7 @@
                             <li> Manuelle Konvertierung
                                 <ol>
                                     <li>Öffnen der Datei mit Notepad++ oder ähnlichem Werkzeug, das regexp versteht
-                                        (<strong style="color: red;">nicht Excel wegen Unicode!</strong>)</li>
+                                        (<strong style="color: #ff0000;">nicht Excel wegen Unicode!</strong>)</li>
                                     <li>Ersetzen Sie alle harten Zeilenumbrüche innerhalb von Kommentarfeldern:<br />
                                         Ersetze alle &nbsp;&nbsp;&nbsp;
                                         \n^([^xv])<br />
@@ -68,7 +68,11 @@
                     </ol><hr />
    				<div class="form-group form-group-sm col-12">
                     {% for field in form %}
-                        <div class="form-group">
+                        {% if field.name == 'update_gruppe' %}
+                            <div class="form-check col-2 ">
+                        {% else %}
+                            <div class="form-check col-12 ">
+                        {% endif %}
                             {{ field.label_tag }}
 
                             {% if form.is_bound %}
@@ -98,10 +102,25 @@
             <div class="container bg-light py-3 mt-3">
                 <div class="row my-3" id="loading2" style="display:none;">
                     <img src="{% static 'loading.gif' %}" alt="Lade..." />
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                             role="progressbar" aria-valuemin="0" aria-valuemax="100" id="progressbar"
+                             {% if proz > 0 %}
+                                 aria-valuenow="{{ proz }}"
+                                 style="width: {{ proz }}%;">{{ proz }}%
+                             {% else %}
+                                 aria-valuenow="0"
+                                 style="width: 1%;">0%
+                             {% endif %}
+                        </div>
+                    </div>
+
+                    {% comment %}
                     <iframe width="1000" height="20"
                             style="border: 0; margin-top: 1rem; color: green;"
                             id="FrameID" src="{% url 'import_status' %}">
                     </iframe>
+                    {% endcomment %}
                 </div>
 
                 <button class="btn btn-outline-success mt-3" type="submit" name="hochladen" id="hochladen"
@@ -116,13 +135,30 @@
                     d.getElementById('hochladen').disabled = true;
                     function timeout() {
                         t = setTimeout (function() {
-                            document.getElementById('FrameID').contentWindow.location.reload(true);
+                            $.ajax({
+                                url: "{% url 'import_status' %}",
+                                error: function () { console.log('Da hat was nicht gefunzt'); },
+                                success: function (data) {
+                                    console.log(data);
+                                    console.log(JSON.parse(data).proz);
+                                    document.getElementById('progressbar').setAttribute("aria-valuenow",
+                                        JSON.parse(data).proz);
+                                    document.getElementById('progressbar')
+                                        .setAttribute("style", "width:" + JSON.parse(data).proz + "%;");
+                                    document.getElementById('progressbar')
+                                        .innerHTML = JSON.parse(data).proz + "%;";
+                                }
+                            });
                             timeout();
                         }, 1000);
                     }
                     timeout();
-                };
+                    document.getElementById('form').submit();
+                    return true;
+                    };
+                console.log('Function d initialisiert')
+                return true;
             }(document));
-       </script>
+        </script>
 	</div>
 {% endblock %}
