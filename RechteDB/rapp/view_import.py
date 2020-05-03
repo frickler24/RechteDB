@@ -215,6 +215,7 @@ def import_csv(request):
                 organisation=textwrap.shorten(line['Organisation'], width=15, placeholder="Hä?"),
                 npu_rolle=textwrap.shorten(line['Kategorie NPU'], width=10, placeholder="Hä?"),
                 npu_grund=textwrap.shorten(line['Grund NPU'], width=2000, placeholder="..."),
+                iiq_organisation=textwrap.shorten(line['Organisation'], width=64, placeholder="..."),
             )
             neuerRecord.save()
             import_datum.aktuell += 1
@@ -242,7 +243,6 @@ def import_csv(request):
     def bearbeite_datei(ausgabe):
         """
         Liest die im Web angegebene Datei ein und versucht, sie in der Übergabetabelle zu hinterlegen.
-        ToDo Die Fehlerbehandlung muss verbessert werden
 
         :param ausgabe: boolean flag, ob die Funktion Textausgaben erzeugen soll (debug)
         :return: Laufzeiten-Summen der Funktionen zum Einlesen und Bearbeiten

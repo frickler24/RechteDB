@@ -224,6 +224,7 @@ class TblUserIDundName(models.Model):
     gruppe = models.CharField(db_column='gruppe', max_length=32, db_index=True)
     npu_rolle = models.CharField(max_length=20, blank=True, null=True)
     npu_grund = models.CharField(max_length=2000, blank=True, null=True)
+    iiq_organisation = models.CharField(max_length=64, blank=True, null=True, db_index=True)
 
     class Meta:
         managed = True
@@ -573,6 +574,7 @@ class Tblrechteneuvonimport(models.Model):
     organisation = models.CharField(max_length=20, blank=False, null=False, default='Fehler!!!')
     npu_rolle = models.CharField(max_length=20, blank=True, null=True)
     npu_grund = models.CharField(max_length=2000, blank=True, null=True)
+    iiq_organisation = models.CharField(max_length=64, blank=True, null=True)
 
     class Meta:
         managed = True
@@ -610,6 +612,7 @@ class Tblrechteamneu(models.Model):
     organisation = models.CharField(max_length=20, blank=False, null=False)
     npu_rolle = models.CharField(max_length=20, blank=True, null=True)
     npu_grund = models.CharField(max_length=2000, blank=True, null=True)
+    iiq_organisation = models.CharField(max_length=64, blank=True, null=True)
 
     class Meta:
         managed = True

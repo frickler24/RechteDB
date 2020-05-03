@@ -55,6 +55,20 @@
         <p>Anschließend kann die weitere Verarbeitung über den roten Button unten angestoßen
             oder der Vorgang abgebrochen werden. </p>
 
+        <p>&nbsp;</p>
+        <div class="container alert-secondary">
+            <h5>Liste neuer oder wiedergefundener User</h5>
+            <div class="row">
+                {% if request.session.neueUser %}
+                    {% with links=1 %}
+                        {% include 'rapp/import2_tabelle.html' %}
+                    {% endwith %}
+                {% else %}
+                    <p class="ml-5">Keine neuen User gefunden</p>
+                {% endif %}
+            </div>
+        </div>
+
         <form id="form2b" method="post" name="import" novalidate>
             {% csrf_token %}
             <div class="container bg-light">
@@ -89,6 +103,8 @@
                </div>
             </div>
         </form>
+        <p>&nbsp;</p>
+
         <script type="text/javascript">
             (function (d) {
                 d.getElementById('hochladen').onclick = function () {
@@ -99,20 +115,5 @@
                 };
             }(document));
         </script>
-
-        <p>&nbsp;</p>
-        <div class="container alert-secondary">
-            <h5>Liste neuer oder wiedergefundener User</h5>
-            <div class="row">
-                {% if request.session.neueUser %}
-                    {% with links=1 %}
-                        {% include 'rapp/import2_tabelle.html' %}
-                    {% endwith %}
-                {% else %}
-                    <p class="ml-5">Keine neuen User gefunden</p>
-                {% endif %}
-            </div>
-        </div>
-        <p>&nbsp;</p>
 	</div>
 {% endblock %}

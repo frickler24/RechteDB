@@ -159,7 +159,7 @@ BEGIN
     */
 
     /*
-        Leeren und Füllen der eigentlichen Importtabelle
+        Löschen und Füllen der eigentlichen Importtabelle
         Einschließlich Herausfiltern der doppelten Zeilen
         (> 1% der Zeilen werden aus IIQ doppelt geliefert)
     */
@@ -183,7 +183,8 @@ BEGIN
                `af zuweisungsdatum`              AS af_zuweisungsdatum,
                `organisation`,
                `npu_rolle`,
-               `npu_grund`
+               `npu_grund`,
+               `iiq_organisation`
         FROM tblRechteNeuVonImport
         GROUP BY `userid`,
                  `tf`,
@@ -203,7 +204,7 @@ BEGIN
                 `tf_eigentuemer_org`, `tf_technische_plattform`, GF, 
                 `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
                 `gf_beschreibung`, `af_zuweisungsdatum`, organisation,
-                `npu_rolle`, `npu_grund`,
+                `npu_rolle`, `npu_grund`, `iiq_organisation`,
                 doppelerkennung)
     SELECT rapp_NeuVonImportDuplikatfrei.userid,
            rapp_NeuVonImportDuplikatfrei.name,
@@ -224,9 +225,10 @@ BEGIN
            rapp_NeuVonImportDuplikatfrei.`organisation`,
            rapp_NeuVonImportDuplikatfrei.`npu_rolle`,
            rapp_NeuVonImportDuplikatfrei.`npu_grund`,
+           rapp_NeuVonImportDuplikatfrei.`iiq_organisation`,
            0
     FROM rapp_NeuVonImportDuplikatfrei
-    ON DUPLICATE KEY UPDATE doppelerkennung=doppelerkennung+1;
+    ON DUPLICATE KEY UPDATE doppelerkennung = doppelerkennung + 1;
 
     /*
         Beim Kopieren ist wichtig, dass die Felder,
@@ -558,6 +560,20 @@ BEGIN
         SET tblUserIDundName.abteilung = rapp_neue_user.abteilung,
             tblUserIDundName.gruppe = rapp_neue_user.gruppe;
     END IF;
+    
+    /*
+        Abschließend werden alle gefundenen EInträge aus IIQ zur Organisation (in unserem SInn die Gruppe)
+        in das entsprechende Feld kopiert - unabhängig von Update-Flag.
+        
+        Das hat zum Zweck, dass anschließend dauerhaft Abfragen zu Inkonsistenzen durchgeführt werden können.
+        Dazu wird es mindestens eine Liste geben, in der die Abweichungen dargestellt werden.
+    */
+    
+    UPDATE tblUserIDundName
+    INNER JOIN tblRechteAMNeu
+        ON tblUserIDundName.userid = tblRechteAMNeu.userid
+    SET tblUserIDundName.iiq_organisation = tblRechteAMNeu.iiq_organisation
+    WHERE not tblUserIDundName.geloescht;
 END
 """
     return push_sp('behandleUser', sp, procs_schon_geladen)

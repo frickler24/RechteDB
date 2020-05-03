@@ -126,10 +126,13 @@ class UserIDundNameAdmin(admin.ModelAdmin):
     list_display = ('id', 'userid', 'colored_name', 'orga', 'zi_organisation',
                     'get_active', 'abteilung', 'gruppe',
                     'npu_rolle', 'npu_grund',
+                    'iiq_organisation',
                     )
     list_display_links = ('userid', 'colored_name', 'get_active', )
     list_editable = ('orga', 'zi_organisation', 'abteilung', 'gruppe', )
-    search_fields = ['name', 'zi_organisation', 'abteilung', 'gruppe', 'userid', 'npu_rolle', 'npu_grund']
+    search_fields = ['name', 'zi_organisation', 'abteilung', 'gruppe', 'userid',
+                     'npu_rolle', 'npu_grund', 'iiq_organisation',
+                     ]
 
     list_filter = ('geloescht', 'abteilung', 'gruppe', 'orga', 'npu_rolle', 'npu_grund', )
 
