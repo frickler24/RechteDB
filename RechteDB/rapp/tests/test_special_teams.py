@@ -1544,37 +1544,38 @@ class SpecialTeamTests(TestCase):
 
         url = '{0}{1}{2}{3}'.format(reverse('uhr_matrix'), '?name=&orga=', id, '&pagesize=100')
         response = self.client.get(url)
+
         self.assertContains(response, 'GrossTeam 1', 1)
         self.assertContains(response, 'GrossTeam 2', 1)
 
         con = str(response.content).replace('\\n', '\n').replace('\\r', '\r').replace('\\t', '\t')
 
         self.assertTrue(bool(re.search(
-            '<thead>\s*<tr class="bg-primary text-left">\s*<th width="10%">Name<\/th>\s*<th width="10%">Teams<\/th>\s*<th><small>Rolle R1<\/small><\/th>\s*<th><small>Rolle R2<\/small><\/th>\s*<th><small>Rolle R3<\/small><\/th>\s*<\/tr>\s*<\/thead>',
+            '<thead>\s*<tr class="bg-primary text-left">\s*<th width="10%">Name</th>\s*<th width="10%">Teams</th>\s*<th width="10%">UserIDs</th>\s*<th><small>Rolle R1</small></th>\s*<th><small>Rolle R2</small></th>\s*<th><small>Rolle R3</small></th>\s*<th width="5%">NPU-Rolle</th>\s*<th width="10%">NPU-Grund</th>\s*</tr>\s*</thead>',
             con,
             re.MULTILINE | re.IGNORECASE | re.UNICODE)
         )
         )
         self.assertTrue(bool(re.search(
-            '<tr>\s*<td>\s*User_xv13254\s*<\/td>\s*<td>\s*<small>\s*KleinTeam A\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*Schwerpunkt\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*<\/small>\s*<\/td>\s*<\/tr>',
+            '<tr>\s*<td>\s*User_xv13254\s*</td>\s*<td>\s*<small>\s*KleinTeam A\s*</small>\s*</td>\s*<td>\s*<small>\s*xv13254,<br />\s*</small>\s*<small>\s*dv13254\s*</small>\s*</td>\s*<td>\s*<small>\s*Schwerpunkt\s*</small>\s*</td>\s*<td>\s*<small>\s*</small>\s*</td>\s*<td>\s*<small>\s*</small>\s*</td>\s*<td>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None\s*</small>\s*</td>\s*<td>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None\s*</small>\s*</td>\s*</tr>',
             con,
             re.MULTILINE | re.IGNORECASE | re.UNICODE)
         )
         )
         self.assertTrue(bool(re.search(
-            '<tr>\s*<td>\s*User_xv13254\s*<\/td>\s*<td>\s*<small>\s*KleinTeam A\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*Schwerpunkt\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*<\/small>\s*<\/td>\s*<\/tr>',
+            '<tr>\s*<td>\s*User_xv55555\s*</td>\s*<td>\s*<small>\s*KleinTeam A\s*</small>\s*</td>\s*<td>\s*<small>\s*xv55555,<br />\s*</small>\s*<small>\s*cv55555,<br />\s*</small>\s*<small>\s*bv55555,<br />\s*</small>\s*<small>\s*av55555\s*</small>\s*</td>\s*<td>\s*<small>\s*</small>\s*</td>\s*<td>\s*<small>\s*</small>\s*</td>\s*<td>\s*<small>\s*Schwerpunkt\s*</small>\s*</td>\s*<td>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None\s*</small>\s*</td>\s*<td>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None\s*</small>\s*</td>\s*</tr>',
             con,
             re.MULTILINE | re.IGNORECASE | re.UNICODE)
         )
         )
         self.assertTrue(bool(re.search(
-            '<tr>\s*<td>\s*User_xv66666\s*<\/td>\s*<td>\s*<small>\s*KleinTeam B\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*Schwerpunkt\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*Vertretung\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*Vertretung\s*<\/small>\s*<\/td>\s*<\/tr>',
+            '<tr>\s*<td>\s*User_xv66666\s*</td>\s*<td>\s*<small>\s*KleinTeam B\s*</small>\s*</td>\s*<td>\s*<small>\s*xv66666,<br />\s*</small>\s*<small>\s*dv66666\s*</small>\s*</td>\s*<td>\s*<small>\s*Schwerpunkt\s*</small>\s*</td>\s*<td>\s*<small>\s*Vertretung\s*</small>\s*</td>\s*<td>\s*<small>\s*Vertretung\s*</small>\s*</td>\s*<td>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None\s*</small>\s*</td>\s*<td>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None\s*</small>\s*</td>\s*</tr>',
             con,
             re.MULTILINE | re.IGNORECASE | re.UNICODE)
         )
         )
         self.assertTrue(bool(re.search(
-            '<tr>\s*<td>\s*User_xv98765\s*<\/td>\s*<td>\s*<small>\s*KleinTeam B\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*Schwerpunkt\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*Vertretung\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*<\/small>\s*<\/td>\s*<\/tr>',
+            '<tr>\s*<td>\s*User_xv98765\s*</td>\s*<td>\s*<small>\s*KleinTeam B\s*</small>\s*</td>\s*<td>\s*<small>\s*xv98765,<br />\s*</small>\s*<small>\s*av98765\s*</small>\s*</td>\s*<td>\s*<small>\s*Schwerpunkt\s*</small>\s*</td>\s*<td>\s*<small>\s*Vertretung\s*</small>\s*</td>\s*<td>\s*<small>\s*</small>\s*</td>\s*<td>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None\s*</small>\s*</td>\s*<td>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None\s*</small>\s*</td>\s*</tr>',
             con,
             re.MULTILINE | re.IGNORECASE | re.UNICODE)
         )
@@ -1595,26 +1596,26 @@ class SpecialTeamTests(TestCase):
         # schoen(response.content)
 
         self.assertTrue(bool(re.search(
-            '<thead>\s*<tr class="bg-primary text-left">\s*<th width="10%">Name<\/th>\s*<th width="10%">Teams<\/th>\s*<th><small>Rolle R1<\/small><\/th>\s*<th><small>Rolle R2<\/small><\/th>\s*<th><small>Rolle R3<\/small><\/th>\s*<\/tr>\s*<\/thead>',
+            '<thead>\s*<tr class="bg-primary text-left">\s*<th width="10%">Name</th>\s*<th width="10%">Teams</th>\s*<th width="10%">UserIDs</th>\s*<th><small>Rolle R1</small></th>\s*<th><small>Rolle R2</small></th>\s*<th><small>Rolle R3</small></th>\s*<th width="5%">NPU-Rolle</th>\s*<th width="10%">NPU-Grund</th>\s*</tr>\s*</thead>',
             con,
             re.MULTILINE | re.IGNORECASE | re.UNICODE)
         )
         )
 
         self.assertTrue(bool(re.search(
-            '<tr>\s*<td>\s*User_xv44444\s*<\/td>\s*<td>\s*<small>\s*KleinTeam C\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*Schwerpunkt\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*<\/small>\s*<\/td>\s*<\/tr>',
+            '<tr>\s*<td>\s*User_xv44444\s*</td>\s*<td>\s*<small>\s*KleinTeam C\s*</small>\s*</td>\s*<td>\s*<small>\s*xv44444,<br />\s*</small>\s*<small>\s*dv44444,<br />\s*</small>\s*<small>\s*bv44444\s*</small>\s*</td>\s*<td>\s*<small>\s*</small>\s*</td>\s*<td>\s*<small>\s*Schwerpunkt\s*</small>\s*</td>\s*<td>\s*<small>\s*</small>\s*</td>\s*<td>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None\s*</small>\s*</td>\s*<td>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None\s*</small>\s*</td>\s*</tr>',
             con,
             re.MULTILINE | re.IGNORECASE | re.UNICODE)
         )
         )
         self.assertTrue(bool(re.search(
-            '<tr>\s*<td>\s*User_xv66666\s*<\/td>\s*<td>\s*<small>\s*KleinTeam B\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*Schwerpunkt\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*Vertretung\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*Vertretung\s*<\/small>\s*<\/td>\s*<\/tr>',
+            '<tr>\s*<td>\s*User_xv66666\s*</td>\s*<td>\s*<small>\s*KleinTeam B\s*</small>\s*</td>\s*<td>\s*<small>\s*xv66666,<br />\s*</small>\s*<small>\s*dv66666\s*</small>\s*</td>\s*<td>\s*<small>\s*Schwerpunkt\s*</small>\s*</td>\s*<td>\s*<small>\s*Vertretung\s*</small>\s*</td>\s*<td>\s*<small>\s*Vertretung\s*</small>\s*</td>\s*<td>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None\s*</small>\s*</td>\s*<td>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None\s*</small>\s*</td>\s*</tr>',
             con,
             re.MULTILINE | re.IGNORECASE | re.UNICODE)
         )
         )
         self.assertTrue(bool(re.search(
-            '<tr>\s*<td>\s*User_xv98765\s*<\/td>\s*<td>\s*<small>\s*KleinTeam B\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*Schwerpunkt\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*Vertretung\s*<\/small>\s*<\/td>\s*<td>\s*<small>\s*<\/small>\s*<\/td>\s*<\/tr>',
+            '<tr>\s*<td>\s*User_xv98765\s*</td>\s*<td>\s*<small>\s*KleinTeam B\s*</small>\s*</td>\s*<td>\s*<small>\s*xv98765,<br />\s*</small>\s*<small>\s*av98765\s*</small>\s*</td>\s*<td>\s*<small>\s*Schwerpunkt\s*</small>\s*</td>\s*<td>\s*<small>\s*Vertretung\s*</small>\s*</td>\s*<td>\s*<small>\s*</small>\s*</td>\s*<td>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None\s*</small>\s*</td>\s*<td>\s*<small>\s*None,<br />\s*</small>\s*<small>\s*None\s*</small>\s*</td>\s*</tr>',
             con,
             re.MULTILINE | re.IGNORECASE | re.UNICODE)
         )

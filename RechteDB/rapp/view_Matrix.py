@@ -20,7 +20,7 @@ def string_aus_liste(liste):
     :param liste: Eine Liste mit Strings, bspw. ['abc', 'def']
     :return: String mit den Inhalten, getrennt durch ', ': "abc, def"
     """
-    return ",".join(liste)
+    return ", ".join(liste)
 
 
 def logging(request, rollen_je_username, rollenmenge, usernamen, namen_liste):
@@ -89,8 +89,6 @@ def erzeuge_UhR_matrixdaten(request, namen_liste):
             rollen = TblUserhatrolle.objects.filter(userid=row.userid)
         else:
             spezialteam = TblOrga.objects.get(id=request.GET.get('orga'))
-            print('\nspezial_team =', spezialteam)
-            print('erzeuge_UhR_matrixdaten für Userid {}, {}'.format(row.userid, row.name))
             rollen = TblUserhatrolle.objects \
                 .filter(userid=row.userid) \
                 .filter(teamspezifisch=spezialteam)
@@ -140,6 +138,7 @@ def hole_npu_detail(selektierter_name):
     details = [(q['npu_rolle'], q['npu_grund']) for q in query]
     return details
 
+
 def erzeuge_npu_details(namen_liste):
     """
     Hole die Rolle und den Grund für die angegebenen NPUs.
@@ -167,10 +166,10 @@ def panel_UhR_matrix(request):
 
     if request.method == 'GET':
         (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(request, namen_liste)
-        UserIDen_je_name = erzeuge_userIDlisten(namen_liste)
-        npu_details_je_name = erzeuge_npu_details(namen_liste)
+        UserIDen_je_username = erzeuge_userIDlisten(namen_liste)
+        npu_details_je_username = erzeuge_npu_details(namen_liste)
     else:
-        (usernamen, rollenmenge, rollen_je_username, teams_je_username, UserIDen_je_name, npu_details_je_name) \
+        (usernamen, rollenmenge, rollen_je_username, teams_je_username, UserIDen_je_username, npu_details_je_username) \
             = (set(), set(), set(), {})
 
     logging(request, rollen_je_username, rollenmenge, usernamen, namen_liste)
@@ -181,8 +180,8 @@ def panel_UhR_matrix(request):
         'rollen_je_username': rollen_je_username,
         'teams_je_username': teams_je_username,
         'version': version,
-        'UserIDen_je_name': UserIDen_je_name,
-        'npu_details_je_name': npu_details_je_name,
+        'UserIDen_je_username': UserIDen_je_username,
+        'npu_details_je_username': npu_details_je_username,
     }
     return render(request, 'rapp/panel_UhR_matrix.html', context)
 
@@ -191,7 +190,7 @@ def panel_UhR_matrix_csv(request, flag=False):
     """
     Exportfunktion für das Filter-Panel zum Selektieren aus der "User und Rollen"-Tabelle).
     :param request: GET oder POST Request vom Browser
-    :param flag: False oder nicht gegeben -> liefere ausführliche Text, 'kommpakt' -> liefere nur Anfangsbuchstaben
+    :param flag: False oder nicht gegeben -> liefere ausführliche Text, 'kompakt' -> liefere nur Anfangsbuchstaben
     :return: Gerendertes HTML mit den CSV-Daten oder eine Fehlermeldung
     """
     if request.method != 'GET':
@@ -199,16 +198,21 @@ def panel_UhR_matrix_csv(request, flag=False):
 
     (namen_liste, _) = UhR_erzeuge_gefiltere_namensliste(request)
     (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(request, namen_liste)
+    UserIDen_je_username = erzeuge_userIDlisten(namen_liste)
+    npu_details_je_name = erzeuge_npu_details(namen_liste)
 
-    headline = [smart_str(u'Name')] + [smart_str(u'Teams')]
+    headline = [smart_str(u'Name')] + [smart_str(u'Teams')] + [smart_str(u'UserIDs')]
     for r in rollenmenge:
         headline += [smart_str(r.rollenname)]
+    headline += [smart_str(u'NPU-Rolle')] + [smart_str(u'NPU-Grund')]
 
     excel = Excel("matrix.csv")
     excel.writerow(headline)
 
     for user in usernamen:
-        line = [user] + [smart_str(string_aus_liste(teams_je_username[user]))]
+        line = [user] \
+               + [smart_str(string_aus_liste(teams_je_username[user]))] \
+               + [smart_str(string_aus_liste(UserIDen_je_username[user]))]
         for rolle in rollenmenge:
             if flag:
                 wert = finde(rollen_je_username[user], rolle)
@@ -218,6 +222,7 @@ def panel_UhR_matrix_csv(request, flag=False):
                     line += [smart_str(wert[0])]
             else:
                 line += [smart_str(finde(rollen_je_username[user], rolle))]
+        line += [smart_str(npu_details_je_name[user][0][0])] + [smart_str(npu_details_je_name[user][0][1])]
         excel.writerow(line)
 
     return excel.response

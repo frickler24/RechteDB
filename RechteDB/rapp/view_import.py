@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 # Imports für die Selektions-Views panel, selektion u.a.
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from django.utils import timezone
@@ -559,7 +560,6 @@ def import_status(request):
             'proz': -1,
         }
 
-    print(str(context))
     return render(request, 'rapp/import_statusjson.html', context)
 
 
