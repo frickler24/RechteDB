@@ -1152,7 +1152,6 @@ class NeueListenUhr(UhR):
         """
         (namen_liste, panel_filter, rollen_liste, rollen_filter) = \
             UhR_erzeuge_listen_mit_rollen(request)
-
         (userids, af_per_uid, vorhanden, optional) \
             = UhR_hole_rollengefilterte_daten(namen_liste, "-")
 
@@ -1205,10 +1204,13 @@ class NeueListenUhr(UhR):
                         continue
                     bastelkey = userid + '!' + af
                     numoptional = len(context['optional'][bastelkey]) - 1  # wegen des Leerstrings am Ende
-
-                    for i in range(numoptional):
-                        opti = context['optional'][bastelkey][i]
-                        line = [name, userid, af, opti]
+                    if numoptional > 0:
+                        for i in range(numoptional):
+                            opti = context['optional'][bastelkey][i]
+                            line = [name, userid, af, opti]
+                            excel.writerow(line)
+                    else:
+                        line = [name, userid, af, '']
                         excel.writerow(line)
 
         return excel.response
