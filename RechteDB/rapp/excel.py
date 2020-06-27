@@ -22,7 +22,7 @@ class Excel():
         self.response.write(u'\ufeff'.encode('utf8'))  # BOM (optional...Excel needs it to open UTF-8 file properly)
         self.writer = csv.writer(self.response, csv.excel, delimiter='\t', quotechar='"')
 
-    def writerow(self, content: str) -> None:
+    def writerow(self, content: object) -> None:
         """
         Schreibe genua eine Datenzeile
         :param content: Der Inhalt
