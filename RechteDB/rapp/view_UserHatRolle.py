@@ -1152,7 +1152,6 @@ class NeueListenUhr(UhR):
         """
         (namen_liste, panel_filter, rollen_liste, rollen_filter) = \
             UhR_erzeuge_listen_mit_rollen(request)
-
         (userids, af_per_uid, vorhanden, optional) \
             = UhR_hole_rollengefilterte_daten(namen_liste, "-")
 
@@ -1522,7 +1521,6 @@ def liefere_af_kritikalitaet(rollenMenge):
     krit_liste = TblGesamt.objects \
         .exclude(userid_name_id__geloescht=True) \
         .exclude(geloescht=True) \
-        .exclude(tf='Kein Name') \
         .filter(enthalten_in_af__in=af_menge) \
         .order_by('enthalten_in_af', '-letzte_aenderung') \
         .values('enthalten_in_af',

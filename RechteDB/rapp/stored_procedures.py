@@ -120,166 +120,167 @@ def push_sp_vorbereitung(procs_schon_geladen):
     :return: den Returnwert von push_sp
     """
     sp = """
-        create procedure vorbereitung()
-        BEGIN
-            /*
-                Die Daten werden zunächst in eine Hilfstabelle tblRechteNeuVonImport eingelesen
-                und dann von dort in die vorher geleerte tblRechteAMNeu kopiert.
-                tblRechteAMNeu ist ab dann die Arbeitsdatei für alle weiteren Vorgänge,
-                die Hilfsdatei wird nicht mehr benutzt.
-                
-                Dieser Zwischenschritt war früher erforderlich,
-                weil der gespeicherte Import die Tabelle komplett geloescht hat
-                (also eine DROP - CREATE - Sequenz durchlief),
-                damit waren die Datentypangaben und Referenzen futsch.
-                Heute wird er nur noch genutzt, um die doppelt vorhandenen Zeilen zu entfernen
-                und dynamische Werte zu erzeugen.
-            */
-        
-            /*
-                Seit IIQ werden die wirklichen UserIDen nicht mehr unter der Identität gehalten,
-                sondern unter `AF zugewiesen an Account-name`. Das müssen wir in die userid
-                umkopieren, wo nötig.
-            */
-            UPDATE tblRechteNeuVonImport
-                SET `AF zugewiesen an Account-name` = `Identität`
-            WHERE tblRechteNeuVonImport.`AF zugewiesen an Account-name` Is Null
-                Or tblRechteNeuVonImport.`AF zugewiesen an Account-name` = "";
-        
-            /*
-                Da hat es wohl mal andere Konventionen bei Unix mit useriden gegeben:
-                Technische User wurden mit anderen useriden angelegt, als XV86-er Nummern.
-                Das wird hier gepatcht. Ist eigentlich nicht ganz korrekt, 
-                soll uns aber erst mal jemand nachweisen.
-            */
-        
-            UPDATE tblRechteNeuVonImport
-                SET tblRechteNeuVonImport.`AF zugewiesen an Account-name` = `Identität`
-            WHERE tblRechteNeuVonImport.`Identität` Like 'xv86%'
-                AND tblRechteNeuVonImport.`AF zugewiesen an Account-name` Not Like 'xv86%';
-        
-            /*
-                zum Nachschauen
-        
-            select `Identität`, `AF zugewiesen an Account-name` from tblRechteNeuVonImport
-            WHERE tblRechteNeuVonImport.`AF zugewiesen an Account-name` Not Like 'xv86%'
-                AND `tblRechteNeuVonImport`.`Identität` Like 'xv86%';
-            */
-        
-            /*
-                Löschen und Füllen der eigentlichen Importtabelle
-                Einschließlich Herausfiltern der doppelten Zeilen
-                (> 1% der Zeilen werden aus IIQ doppelt geliefert)
-            */
-            drop table if exists rapp_NeuVonImportDuplikatfrei;
-            create temporary table rapp_NeuVonImportDuplikatfrei as
-                SELECT `AF zugewiesen an Account-name`   AS userid,
-                       CONCAT(`Nachname`,', ',`Vorname`) AS name,
-                       `tf name`                         AS tf,
-                       `tf beschreibung`                 AS tf_beschreibung,
-                       `AF Anzeigename`                  AS enthalten_in_af,
-                       `AF Beschreibung`                 AS af_beschreibung,
-                       `tf kritikalität`                 AS tf_kritikalitaet,
-                       `tf eigentümer org`               AS tf_eigentuemer_org,
-                       `tf Applikation`                  AS tf_technische_plattform,
-                       `GF name`                         AS GF,
-                       `af gültig ab`                    AS af_gueltig_ab,
-                       `af gültig bis`                   AS af_gueltig_bis,
-                       `direct connect`                  AS direct_connect,
-                       `höchste kritikalität tf in af`   AS hk_tf_in_af,
-                       `gf beschreibung`                 AS gf_beschreibung,
-                       `af zuweisungsdatum`              AS af_zuweisungsdatum,
-                       `organisation`,
-                       `npu_rolle`,
-                       `npu_grund`,
-                       `iiq_organisation`
-                FROM tblRechteNeuVonImport
-                GROUP BY `userid`,
-                         `tf`,
-                         `enthalten_in_af`,
-                         `tf_technische_plattform`,
-                         `GF`,
-                         organisation;
-        
-            /*
-                Umkopieren der Daten von einer Tabelle in die andere
-            */
-        
-            TRUNCATE table tblRechteAMNeu;
-            INSERT INTO tblRechteAMNeu (userid, name, tf, `tf_beschreibung`, 
-                        `enthalten_in_af`, `af_beschreibung`,
-                        `tf_kritikalitaet`,
-                        `tf_eigentuemer_org`, `tf_technische_plattform`, GF, 
-                        `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
-                        `gf_beschreibung`, `af_zuweisungsdatum`, organisation,
-                        `npu_rolle`, `npu_grund`, `iiq_organisation`,
-                        doppelerkennung)
-            SELECT rapp_NeuVonImportDuplikatfrei.userid,
-                   rapp_NeuVonImportDuplikatfrei.name,
-                   rapp_NeuVonImportDuplikatfrei.tf,
-                   rapp_NeuVonImportDuplikatfrei.`tf_beschreibung`,
-                   rapp_NeuVonImportDuplikatfrei.`enthalten_in_af`,
-                   rapp_NeuVonImportDuplikatfrei.`af_beschreibung`,
-                   rapp_NeuVonImportDuplikatfrei.`tf_kritikalitaet`,
-                   rapp_NeuVonImportDuplikatfrei.`tf_eigentuemer_org`,
-                   rapp_NeuVonImportDuplikatfrei.`tf_technische_plattform`,
-                   rapp_NeuVonImportDuplikatfrei.GF,
-                   rapp_NeuVonImportDuplikatfrei.`af_gueltig_ab`,
-                   rapp_NeuVonImportDuplikatfrei.`af_gueltig_bis`,
-                   rapp_NeuVonImportDuplikatfrei.`direct_connect`,
-                   rapp_NeuVonImportDuplikatfrei.`hk_tf_in_af`,
-                   rapp_NeuVonImportDuplikatfrei.`gf_beschreibung`,
-                   rapp_NeuVonImportDuplikatfrei.`af_zuweisungsdatum`,
-                   rapp_NeuVonImportDuplikatfrei.`organisation`,
-                   rapp_NeuVonImportDuplikatfrei.`npu_rolle`,
-                   rapp_NeuVonImportDuplikatfrei.`npu_grund`,
-                   rapp_NeuVonImportDuplikatfrei.`iiq_organisation`,
-                   0
-            FROM rapp_NeuVonImportDuplikatfrei
-            ON DUPLICATE KEY UPDATE doppelerkennung = doppelerkennung + 1;
-        
-            /*
-                Beim Kopieren ist wichtig, dass die Felder,
-                die später in JOINs verwendet werden sollen,
-                keine NULL-Werte enthalten.
-                Das wird durch die nachfolgenden simplen Korrektur-SQLs sichergestellt.
-            */
-        
-            UPDATE tblRechteAMNeu SET `tf_beschreibung` = 'ka' WHERE `tf_beschreibung` Is Null Or `tf_beschreibung` = '';
-            UPDATE tblRechteAMNeu SET `enthalten_in_af` = 'ka' WHERE `enthalten_in_af` Is Null or `enthalten_in_af`  ='';
-            UPDATE tblRechteAMNeu SET `tf` = 'Kein name' WHERE `tf` Is Null or `tf`  = '';
-            UPDATE tblRechteAMNeu SET `tf_technische_plattform` = 'Kein Name' WHERE `tf_technische_plattform` Is Null or `tf_technische_plattform`  = '';
-            UPDATE tblRechteAMNeu SET `tf_kritikalitaet` = 'ka' WHERE `tf_kritikalitaet` Is Null or  `tf_kritikalitaet` = '';
-            UPDATE tblRechteAMNeu SET `tf_eigentuemer_org` = 'ka' WHERE `tf_eigentuemer_org` Is Null or  `tf_eigentuemer_org` = '';
-            UPDATE tblRechteAMNeu SET `GF` = 'k.A.' WHERE GF Is Null or GF = '';
-            UPDATE tblRechteAMNeu SET `hk_tf_in_af` = 'k.A.' WHERE `hk_tf_in_af` Is Null or `hk_tf_in_af` = '';
-            UPDATE tblRechteAMNeu SET `af_beschreibung` = 'keine geliefert bekommmen' WHERE `af_beschreibung` Is Null or `af_beschreibung` = '';
-            UPDATE tblRechteAMNeu SET `npu_rolle` = '' WHERE `npu_rolle` Is Null;
-            UPDATE tblRechteAMNeu SET `npu_grund` = '' WHERE `npu_grund` Is Null;
-        
-            /*
-            -- Sollte nun 0 ergeben:
-            select count(*) from tblRechteAMNeu
-                WHERE `tf_beschreibung` Is Null Or `tf_beschreibung` = ''
-                or `enthalten_in_af` Is Null or `enthalten_in_af`  = ''
-                or `tf` Is Null or `tf`  = ''
-                or `tf_technische_plattform` Is Null or `tf_technische_plattform`  = ''
-                or `tf_kritikalitaet` Is Null or  `tf_kritikalitaet` = ''
-                or `tf_eigentuemer_org` Is Null or  `tf_eigentuemer_org` = ''
-                or GF Is Null or GF = ''
-                or `hk_tf_in_af` Is Null or  `hk_tf_in_af` = ''
-                or `af_beschreibung` Is Null or `af_beschreibung` = '';
-            */
-        
-            /*
-                Bis hierhin ging die Vorbereitung.
-                Die nächsten Schritte müssen manuell und visuell unterstützt werden:
-                    - Sichtung der neu hinzugekommenen useriden,
-                    - Übernahme in die userid-Liste
-                    - Sichtung der nicht mehr vorhandenen User, deren Einträge im weiteren Verlauf geloescht werden sollen
-            */
-        END
+      create procedure vorbereitung()
+      BEGIN
+          /*
+              Die Daten werden zunächst in eine Hilfstabelle tblRechteNeuVonImport eingelesen
+              und dann von dort in die vorher geleerte tblRechteAMNeu kopiert.
+              tblRechteAMNeu ist ab dann die Arbeitsdatei für alle weiteren Vorgänge,
+              die Hilfsdatei wird nicht mehr benutzt.
+
+              Dieser Zwischenschritt war früher erforderlich,
+              weil der gespeicherte Import die Tabelle komplett geloescht hat
+              (also eine DROP - CREATE - Sequenz durchlief),
+              damit waren die Datentypangaben und Referenzen futsch.
+              Heute wird er nur noch genutzt, um die doppelt vorhandenen Zeilen zu entfernen
+              und dynamische Werte zu erzeugen.
+          */
+
+          /*
+              Seit IIQ werden die wirklichen UserIDen nicht mehr unter der Identität gehalten,
+              sondern unter `AF zugewiesen an Account-name`. Das müssen wir in die userid
+              umkopieren, wo nötig.
+          */
+          UPDATE tblRechteNeuVonImport
+              SET `AF zugewiesen an Account-name` = `Identität`
+          WHERE tblRechteNeuVonImport.`AF zugewiesen an Account-name` Is Null
+              Or tblRechteNeuVonImport.`AF zugewiesen an Account-name` = "";
+
+          /*
+              Da hat es wohl mal andere Konventionen bei Unix mit useriden gegeben:
+              Technische User wurden mit anderen useriden angelegt, als XV86-er Nummern.
+              Das wird hier gepatcht. Ist eigentlich nicht ganz korrekt, 
+              soll uns aber erst mal jemand nachweisen.
+          */
+
+          UPDATE tblRechteNeuVonImport
+              SET tblRechteNeuVonImport.`AF zugewiesen an Account-name` = `Identität`
+          WHERE tblRechteNeuVonImport.`Identität` Like 'xv86%'
+              AND tblRechteNeuVonImport.`AF zugewiesen an Account-name` Not Like 'xv86%';
+
+          /*
+              zum Nachschauen
+
+          select `Identität`, `AF zugewiesen an Account-name` from tblRechteNeuVonImport
+          WHERE tblRechteNeuVonImport.`AF zugewiesen an Account-name` Not Like 'xv86%'
+              AND `tblRechteNeuVonImport`.`Identität` Like 'xv86%';
+          */
+
+          /*
+              Löschen und Füllen der eigentlichen Importtabelle
+              Einschließlich Herausfiltern der doppelten Zeilen
+              (> 1% der Zeilen werden aus IIQ doppelt geliefert)
+          */
+          drop table if exists rapp_NeuVonImportDuplikatfrei;
+          create temporary table rapp_NeuVonImportDuplikatfrei as
+              SELECT `AF zugewiesen an Account-name`   AS userid,
+                     CONCAT(`Nachname`,', ',`Vorname`) AS name,
+                     `tf name`                         AS tf,
+                     `tf beschreibung`                 AS tf_beschreibung,
+                     `AF Anzeigename`                  AS enthalten_in_af,
+                     `AF Beschreibung`                 AS af_beschreibung,
+                     `tf kritikalität`                 AS tf_kritikalitaet,
+                     `tf eigentümer org`               AS tf_eigentuemer_org,
+                     `tf Applikation`                  AS tf_technische_plattform,
+                     `GF name`                         AS GF,
+                     `af gültig ab`                    AS af_gueltig_ab,
+                     `af gültig bis`                   AS af_gueltig_bis,
+                     `direct connect`                  AS direct_connect,
+                     `höchste kritikalität tf in af`   AS hk_tf_in_af,
+                     `gf beschreibung`                 AS gf_beschreibung,
+                     `af zuweisungsdatum`              AS af_zuweisungsdatum,
+                     `organisation`,
+                     `npu_rolle`,
+                     `npu_grund`,
+                     `iiq_organisation`
+              FROM tblRechteNeuVonImport
+              GROUP BY `userid`,
+                       `tf`,
+                       `enthalten_in_af`,
+                       `tf_technische_plattform`,
+                       `GF`,
+                       organisation;
+
+          /*
+              Umkopieren der Daten von einer Tabelle in die andere
+          */
+
+          TRUNCATE table tblRechteAMNeu;
+          INSERT INTO tblRechteAMNeu (userid, name, tf, `tf_beschreibung`, 
+                      `enthalten_in_af`, `af_beschreibung`,
+                      `tf_kritikalitaet`,
+                      `tf_eigentuemer_org`, `tf_technische_plattform`, GF, 
+                      `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
+                      `gf_beschreibung`, `af_zuweisungsdatum`, organisation,
+                      `npu_rolle`, `npu_grund`, `iiq_organisation`,
+                      doppelerkennung)
+          SELECT rapp_NeuVonImportDuplikatfrei.userid,
+                 rapp_NeuVonImportDuplikatfrei.name,
+                 rapp_NeuVonImportDuplikatfrei.tf,
+                 rapp_NeuVonImportDuplikatfrei.`tf_beschreibung`,
+                 rapp_NeuVonImportDuplikatfrei.`enthalten_in_af`,
+                 rapp_NeuVonImportDuplikatfrei.`af_beschreibung`,
+                 rapp_NeuVonImportDuplikatfrei.`tf_kritikalitaet`,
+                 rapp_NeuVonImportDuplikatfrei.`tf_eigentuemer_org`,
+                 rapp_NeuVonImportDuplikatfrei.`tf_technische_plattform`,
+                 rapp_NeuVonImportDuplikatfrei.GF,
+                 rapp_NeuVonImportDuplikatfrei.`af_gueltig_ab`,
+                 rapp_NeuVonImportDuplikatfrei.`af_gueltig_bis`,
+                 rapp_NeuVonImportDuplikatfrei.`direct_connect`,
+                 rapp_NeuVonImportDuplikatfrei.`hk_tf_in_af`,
+                 rapp_NeuVonImportDuplikatfrei.`gf_beschreibung`,
+                 rapp_NeuVonImportDuplikatfrei.`af_zuweisungsdatum`,
+                 rapp_NeuVonImportDuplikatfrei.`organisation`,
+                 rapp_NeuVonImportDuplikatfrei.`npu_rolle`,
+                 rapp_NeuVonImportDuplikatfrei.`npu_grund`,
+                 rapp_NeuVonImportDuplikatfrei.`iiq_organisation`,
+                 0
+          FROM rapp_NeuVonImportDuplikatfrei
+          ON DUPLICATE KEY UPDATE doppelerkennung = doppelerkennung + 1;
+
+          /*
+              Beim Kopieren ist wichtig, dass die Felder,
+              die später in JOINs verwendet werden sollen,
+              keine NULL-Werte enthalten.
+              Das wird durch die nachfolgenden simplen Korrektur-SQLs sichergestellt.
+          */
+
+          UPDATE tblRechteAMNeu SET `tf_beschreibung` = 'ka' WHERE `tf_beschreibung` Is Null Or `tf_beschreibung` = '';
+          UPDATE tblRechteAMNeu SET `enthalten_in_af` = 'ka' WHERE `enthalten_in_af` Is Null or `enthalten_in_af`  ='';
+          UPDATE tblRechteAMNeu SET `tf` = 'Kein Name' WHERE `tf` Is Null or `tf`  = '';
+          UPDATE tblRechteAMNeu SET `tf_technische_plattform` = 'Kein Name' WHERE `tf_technische_plattform` Is Null or `tf_technische_plattform`  = '';
+          UPDATE tblRechteAMNeu SET `tf_kritikalitaet` = 'ka' WHERE `tf_kritikalitaet` Is Null or  `tf_kritikalitaet` = '';
+          UPDATE tblRechteAMNeu SET `tf_eigentuemer_org` = 'ka' WHERE `tf_eigentuemer_org` Is Null or  `tf_eigentuemer_org` = '';
+          UPDATE tblRechteAMNeu SET `GF` = 'k.A.' WHERE GF Is Null or GF = '';
+          UPDATE tblRechteAMNeu SET `hk_tf_in_af` = 'k.A.' WHERE `hk_tf_in_af` Is Null or `hk_tf_in_af` = '';
+          UPDATE tblRechteAMNeu SET `af_beschreibung` = 'keine geliefert bekommmen' WHERE `af_beschreibung` Is Null or `af_beschreibung` = '';
+          UPDATE tblRechteAMNeu SET `npu_rolle` = '' WHERE `npu_rolle` Is Null;
+          UPDATE tblRechteAMNeu SET `npu_grund` = '' WHERE `npu_grund` Is Null;
+
+          /*
+          -- Sollte nun 0 ergeben:
+          select count(*) from tblRechteAMNeu
+              WHERE `tf_beschreibung` Is Null Or `tf_beschreibung` = ''
+              or `enthalten_in_af` Is Null or `enthalten_in_af`  = ''
+              or `tf` Is Null or `tf`  = ''
+              or `tf_technische_plattform` Is Null or `tf_technische_plattform`  = ''
+              or `tf_kritikalitaet` Is Null or  `tf_kritikalitaet` = ''
+              or `tf_eigentuemer_org` Is Null or  `tf_eigentuemer_org` = ''
+              or GF Is Null or GF = ''
+              or `hk_tf_in_af` Is Null or  `hk_tf_in_af` = ''
+              or `af_beschreibung` Is Null or `af_beschreibung` = '';
+          */
+
+          /*
+              Bis hierhin ging die Vorbereitung.
+              Die nächsten Schritte müssen manuell und visuell unterstützt werden:
+                  - Sichtung der neu hinzugekommenen useriden,
+                  - Übernahme in die userid-Liste
+                  - Sichtung der nicht mehr vorhandenen User, deren Einträge im weiteren Verlauf geloescht werden sollen
+          */
+      END
     """
+
     return push_sp('vorbereitung', sp, procs_schon_geladen)
 
 
