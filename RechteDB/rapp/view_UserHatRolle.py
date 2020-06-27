@@ -1521,7 +1521,6 @@ def liefere_af_kritikalitaet(rollenMenge, userids):
     krit_liste = TblGesamt.objects \
         .exclude(userid_name_id__geloescht=True) \
         .exclude(geloescht=True) \
-        .exclude(tf='Kein Name') \
         .filter(enthalten_in_af__in=af_menge) \
         .order_by('enthalten_in_af', '-letzte_aenderung') \
         .values('enthalten_in_af',

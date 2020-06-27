@@ -87,7 +87,7 @@ def naechster_schritt(request, schrittnummer):
 
 def letzter_schritt():
     """
-    SChließe den EIntrag in der LogDB und beende damit für alle diesen Import.
+    Schließe den Eintrag in der LogDB und beende damit für alle diesen Import.
 
     :param request: HTTP_Request für mögliche Fehlermeldung / Session-Daten
     :return: --
