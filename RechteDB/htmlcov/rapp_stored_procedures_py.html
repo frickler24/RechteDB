@@ -1575,7 +1575,7 @@
 <p id="t64" class="stm run hide_run">        <span class="key">return</span> <span class="nam">fehler</span> <span class="op">+</span> <span class="nam">check_sp</span><span class="op">(</span><span class="nam">name</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t65" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t66" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t67" class="stm run hide_run"><span class="key">def</span> <span class="nam">push_sp_test</span><span class="op">(</span><span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t67" class="stm run hide_run"><span class="key">def</span> <span class="nam">push_sp_anzahl_import_elemente</span><span class="op">(</span><span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t68" class="stm run hide_run">    <span class="nam">sp</span> <span class="op">=</span> <span class="str">"""</span><span class="strut">&nbsp;</span></p>
 <p id="t69" class="pln"><span class="str">CREATE PROCEDURE anzahl_import_elemente()</span><span class="strut">&nbsp;</span></p>
 <p id="t70" class="pln"><span class="str">BEGIN</span><span class="strut">&nbsp;</span></p>
@@ -1750,7 +1750,7 @@
 <p id="t239" class="stm run hide_run">    <span class="key">return</span> <span class="nam">push_sp</span><span class="op">(</span><span class="str">'vorbereitung'</span><span class="op">,</span> <span class="nam">sp</span><span class="op">,</span> <span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t240" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t241" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t242" class="stm run hide_run"><span class="key">def</span> <span class="nam">push_sp_neueUser</span><span class="op">(</span><span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t242" class="stm run hide_run"><span class="key">def</span> <span class="nam">push_sp_neue_user</span><span class="op">(</span><span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t243" class="stm run hide_run">    <span class="nam">sp</span> <span class="op">=</span> <span class="str">"""</span><span class="strut">&nbsp;</span></p>
 <p id="t244" class="pln"><span class="str">create procedure neueUser (IN orga char(32))</span><span class="strut">&nbsp;</span></p>
 <p id="t245" class="pln"><span class="str">BEGIN</span><span class="strut">&nbsp;</span></p>
@@ -1838,7 +1838,7 @@
 <p id="t327" class="stm run hide_run">    <span class="key">return</span> <span class="nam">push_sp</span><span class="op">(</span><span class="str">'neueUser'</span><span class="op">,</span> <span class="nam">sp</span><span class="op">,</span> <span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t328" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t329" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t330" class="stm run hide_run"><span class="key">def</span> <span class="nam">push_sp_behandleUser</span><span class="op">(</span><span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t330" class="stm run hide_run"><span class="key">def</span> <span class="nam">push_sp_behandle_user</span><span class="op">(</span><span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t331" class="stm run hide_run">    <span class="nam">sp</span> <span class="op">=</span> <span class="str">"""</span><span class="strut">&nbsp;</span></p>
 <p id="t332" class="pln"><span class="str">create procedure behandleUser ()</span><span class="strut">&nbsp;</span></p>
 <p id="t333" class="pln"><span class="str">BEGIN</span><span class="strut">&nbsp;</span></p>
@@ -1957,7 +1957,7 @@
 <p id="t446" class="stm run hide_run">    <span class="key">return</span> <span class="nam">push_sp</span><span class="op">(</span><span class="str">'behandleUser'</span><span class="op">,</span> <span class="nam">sp</span><span class="op">,</span> <span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t447" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t448" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t449" class="stm run hide_run"><span class="key">def</span> <span class="nam">push_sp_behandleRechte</span><span class="op">(</span><span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t449" class="stm run hide_run"><span class="key">def</span> <span class="nam">push_sp_behandle_rechte</span><span class="op">(</span><span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t450" class="stm run hide_run">    <span class="nam">sp</span> <span class="op">=</span> <span class="str">"""</span><span class="strut">&nbsp;</span></p>
 <p id="t451" class="pln"><span class="str">create procedure behandleRechte (IN orga char(32))</span><span class="strut">&nbsp;</span></p>
 <p id="t452" class="pln"><span class="str">BEGIN</span><span class="strut">&nbsp;</span></p>
@@ -2454,7 +2454,7 @@
 <p id="t943" class="stm run hide_run">    <span class="key">return</span> <span class="nam">push_sp</span><span class="op">(</span><span class="str">'behandleRechte'</span><span class="op">,</span> <span class="nam">sp</span><span class="op">,</span> <span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t944" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t945" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t946" class="stm run hide_run"><span class="key">def</span> <span class="nam">push_sp_loescheDoppelteRechte</span><span class="op">(</span><span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t946" class="stm run hide_run"><span class="key">def</span> <span class="nam">push_sp_loesche_doppelte_rechte</span><span class="op">(</span><span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t947" class="stm run hide_run">    <span class="nam">sp</span> <span class="op">=</span> <span class="str">"""</span><span class="strut">&nbsp;</span></p>
 <p id="t948" class="pln"><span class="str">create procedure loescheDoppelteRechte (IN nurLesen bool)</span><span class="strut">&nbsp;</span></p>
 <p id="t949" class="pln"><span class="str">BEGIN</span><span class="strut">&nbsp;</span></p>
@@ -2672,7 +2672,7 @@
 <p id="t1161" class="stm run hide_run">    <span class="key">return</span> <span class="nam">push_sp</span><span class="op">(</span><span class="str">'setzeNichtAIFlag'</span><span class="op">,</span> <span class="nam">sp</span><span class="op">,</span> <span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t1162" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t1163" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t1164" class="stm run hide_run"><span class="key">def</span> <span class="nam">push_sp_erzeugeAFListe</span><span class="op">(</span><span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t1164" class="stm run hide_run"><span class="key">def</span> <span class="nam">push_sp_erzeuge_af_liste</span><span class="op">(</span><span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t1165" class="stm run hide_run">    <span class="nam">sp</span> <span class="op">=</span> <span class="str">"""</span><span class="strut">&nbsp;</span></p>
 <p id="t1166" class="pln"><span class="str">CREATE PROCEDURE erzeuge_af_liste()</span><span class="strut">&nbsp;</span></p>
 <p id="t1167" class="pln"><span class="str">BEGIN</span><span class="strut">&nbsp;</span></p>
@@ -2690,7 +2690,7 @@
 <p id="t1179" class="stm run hide_run">    <span class="key">return</span> <span class="nam">push_sp</span><span class="op">(</span><span class="str">'erzeuge_af_liste'</span><span class="op">,</span> <span class="nam">sp</span><span class="op">,</span> <span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t1180" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t1181" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t1182" class="stm run hide_run"><span class="key">def</span> <span class="nam">push_sp_ueberschreibeModelle</span><span class="op">(</span><span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t1182" class="stm run hide_run"><span class="key">def</span> <span class="nam">push_sp_ueberschreibe_modelle</span><span class="op">(</span><span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t1183" class="stm run hide_run">    <span class="nam">sp</span> <span class="op">=</span> <span class="str">"""</span><span class="strut">&nbsp;</span></p>
 <p id="t1184" class="pln"><span class="str">CREATE PROCEDURE ueberschreibeModelle()</span><span class="strut">&nbsp;</span></p>
 <p id="t1185" class="pln"><span class="str">BEGIN</span><span class="strut">&nbsp;</span></p>
@@ -2727,7 +2727,7 @@
 <p id="t1216" class="stm run hide_run">    <span class="key">return</span> <span class="nam">push_sp</span><span class="op">(</span><span class="str">'ueberschreibeModelle'</span><span class="op">,</span> <span class="nam">sp</span><span class="op">,</span> <span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="strut">&nbsp;</span></p>
 <p id="t1217" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t1218" class="pln"><span class="strut">&nbsp;</span></p>
-<p id="t1219" class="stm run hide_run"><span class="key">def</span> <span class="nam">push_sp_directConnects</span><span class="op">(</span><span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
+<p id="t1219" class="stm run hide_run"><span class="key">def</span> <span class="nam">push_sp_direct_connects</span><span class="op">(</span><span class="nam">procs_schon_geladen</span><span class="op">)</span><span class="op">:</span><span class="strut">&nbsp;</span></p>
 <p id="t1220" class="stm run hide_run">    <span class="nam">sp</span> <span class="op">=</span> <span class="str">"""</span><span class="strut">&nbsp;</span></p>
 <p id="t1221" class="pln"><span class="str">CREATE PROCEDURE directConnects()</span><span class="strut">&nbsp;</span></p>
 <p id="t1222" class="pln"><span class="str">-- ----------------------------------------</span><span class="strut">&nbsp;</span></p>
@@ -2907,16 +2907,16 @@
 <p id="t1396" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t1397" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t1398" class="stm run hide_run"><span class="nam">sps</span> <span class="op">=</span> <span class="op">{</span><span class="strut">&nbsp;</span></p>
-<p id="t1399" class="pln">    <span class="num">1</span><span class="op">:</span> <span class="nam">push_sp_test</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t1399" class="pln">    <span class="num">1</span><span class="op">:</span> <span class="nam">push_sp_anzahl_import_elemente</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t1400" class="pln">    <span class="num">2</span><span class="op">:</span> <span class="nam">push_sp_vorbereitung</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t1401" class="pln">    <span class="num">3</span><span class="op">:</span> <span class="nam">push_sp_neueUser</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t1402" class="pln">    <span class="num">4</span><span class="op">:</span> <span class="nam">push_sp_behandleUser</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t1403" class="pln">    <span class="num">5</span><span class="op">:</span> <span class="nam">push_sp_behandleRechte</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t1404" class="pln">    <span class="num">6</span><span class="op">:</span> <span class="nam">push_sp_loescheDoppelteRechte</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t1401" class="pln">    <span class="num">3</span><span class="op">:</span> <span class="nam">push_sp_neue_user</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t1402" class="pln">    <span class="num">4</span><span class="op">:</span> <span class="nam">push_sp_behandle_user</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t1403" class="pln">    <span class="num">5</span><span class="op">:</span> <span class="nam">push_sp_behandle_rechte</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t1404" class="pln">    <span class="num">6</span><span class="op">:</span> <span class="nam">push_sp_loesche_doppelte_rechte</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t1405" class="pln">    <span class="num">7</span><span class="op">:</span> <span class="nam">push_sp_nichtai</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t1406" class="pln">    <span class="num">8</span><span class="op">:</span> <span class="nam">push_sp_erzeugeAFListe</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t1407" class="pln">    <span class="num">9</span><span class="op">:</span> <span class="nam">push_sp_ueberschreibeModelle</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
-<p id="t1408" class="pln">    <span class="num">10</span><span class="op">:</span> <span class="nam">push_sp_directConnects</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t1406" class="pln">    <span class="num">8</span><span class="op">:</span> <span class="nam">push_sp_erzeuge_af_liste</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t1407" class="pln">    <span class="num">9</span><span class="op">:</span> <span class="nam">push_sp_ueberschreibe_modelle</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
+<p id="t1408" class="pln">    <span class="num">10</span><span class="op">:</span> <span class="nam">push_sp_direct_connects</span><span class="op">,</span><span class="strut">&nbsp;</span></p>
 <p id="t1409" class="pln"><span class="op">}</span><span class="strut">&nbsp;</span></p>
 <p id="t1410" class="pln"><span class="strut">&nbsp;</span></p>
 <p id="t1411" class="pln"><span class="strut">&nbsp;</span></p>
