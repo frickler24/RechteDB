@@ -1206,6 +1206,9 @@ class NeueListenUhr(UhR):
                     bastelkey = userid + '!' + af
                     numoptional = len(context['optional'][bastelkey]) - 1  # wegen des Leerstrings am Ende
 
+                    if numoptional == 0:    # keine Optionen gefunden, also nur die gefundene AF ausgeben
+                        line = [name, userid, af, "--"]
+                        excel.writerow(line)
                     for i in range(numoptional):
                         opti = context['optional'][bastelkey][i]
                         line = [name, userid, af, opti]
