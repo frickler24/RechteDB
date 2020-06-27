@@ -6,7 +6,7 @@
 -- bspw. bei Organisationsveränderungen oder Verschiebungen von Rechten zwischen den Organisationen.
 --
 -- Idee:
---  Es gibt eine LIste von Rechten mit altem und neuem Nammen
+--  Es gibt eine Liste von Rechten mit altem und neuem Nammen
 --  Diese Liste wird in den folgenden Tabellen angepasst:
 --      tblGesamt
 --          (nicht auch in der Historie, denn da waren die Namen ja noch korrekt;
@@ -15,7 +15,7 @@
 --      tblUEbersichtAF_GFs
 -- ------------------------------------------------------------
 
--- Importiere die Liste der angeblichneuen Arbeitsplatzfunktionen mit ihren (evtl auch neuen) GFen.
+-- Importiere die Liste der angeblich neuen Arbeitsplatzfunktionen mit ihren (evtl auch neuen) GFen.
 -- Ein Beispiel ist dazu die other_files/neue_AFGF-AI-BA nach erster Umbenennung 20200222.ods
 
 USE RechteDB;
