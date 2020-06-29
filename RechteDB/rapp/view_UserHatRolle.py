@@ -414,8 +414,8 @@ def UhR_hole_daten(panel_liste, id):
         selektierter_name = -1
         selektierte_haupt_userid = 'keine_userID'
 
-    return (userHatRolle_liste, selektierter_name, userids, usernamen,
-            selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID)
+    return userHatRolle_liste, selektierter_name, userids, usernamen, \
+           selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID
 
 
 def hole_rollen_zuordnungen(af_dict):
@@ -1533,13 +1533,14 @@ def liefere_af_kritikalitaet(rollenMenge, userids):
     letzter_eintrag = ''
     for krit in krit_liste:
         """
-        print(krit['enthalten_in_af'], ' ->', krit['hoechste_kritikalitaet_tf_in_af'],
-            'letzte_aenderung =', krit['letzte_aenderung'],
-            'Letzter Eintrag war', letzter_eintrag
-        )
+        if krit['enthalten_in_af'] == "rva_00770_Personen":
+            print(krit['enthalten_in_af'], ' ->', krit['hoechste_kritikalitaet_tf_in_af'],
+                'letzte_aenderung =', krit['letzte_aenderung'],
+                'Letzter Eintrag war', letzter_eintrag
+            )
         """
         if krit['enthalten_in_af'].lower() != letzter_eintrag:
-            hoechste_kritikalitaet_tf_in_af[krit['enthalten_in_af']] \
+            hoechste_kritikalitaet_tf_in_af[str(krit['enthalten_in_af']).lower()] \
                 = str(krit['hoechste_kritikalitaet_tf_in_af']).lower()
             letzter_eintrag = str(krit['enthalten_in_af']).lower()
     return hoechste_kritikalitaet_tf_in_af
@@ -1576,7 +1577,6 @@ def erzeuge_UhR_konzept(request, ansicht):
         (rollenMenge, userids, usernamen) = (set(), set(), set())
 
     log(request, rollenMenge, userids, usernamen)
-
     af_kritikalitaet = liefere_af_kritikalitaet(rollenMenge, userids)
 
     winnoe = None
