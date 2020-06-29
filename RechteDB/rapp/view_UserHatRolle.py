@@ -1,12 +1,12 @@
 from __future__ import unicode_literals
 
 import re
+import sys
 from copy import deepcopy
 
 from django.db import connection
 from django.db.models import Count
 from django.http import HttpResponse
-
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
@@ -29,6 +29,17 @@ from .models import TblUserIDundName
 from .models import TblUserhatrolle
 from .views import version, pagination
 from .xhtml2 import render_to_pdf
+
+
+def success_url(self):
+    usernr = self.request.GET.get('user', 0)  # Sicherheitshalber - falls mal kein User angegeben ist
+
+    urlparams = "%s?"
+    for k in self.request.GET.keys():
+        if k != 'user' and self.request.GET[k] != '':
+            urlparams += "&" + k + "=" + self.request.GET[k]
+    url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
+    return url
 
 
 ###################################################################
@@ -64,14 +75,7 @@ class UhRCreate(CreateView):
     # Im Erfolgsfall soll die vorherige Selektion im Panel "User und Rollen" wieder aktualisiert gezeigt werden.
     # Dazu werden nebem dem URL-Stamm die Nummer des anzuzeigenden Users sowie die gesetzte Suchparameter benötigt.
     def get_success_url(self):
-        usernr = self.request.GET.get('user', 0)  # Sicherheitshalber - falls mal kein User angegeben ist
-
-        urlparams = "%s?"
-        for k in self.request.GET.keys():
-            if (k != 'user' and self.request.GET[k] != ''):
-                urlparams += "&" + k + "=" + self.request.GET[k]
-        url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
-        return url
+        return success_url(self)
 
 
 class UhRDelete(DeleteView):
@@ -86,7 +90,7 @@ class UhRDelete(DeleteView):
 
         urlparams = "%s?"
         for k in self.request.GET.keys():
-            if (k != 'user' and self.request.GET[k] != ''):
+            if k != 'user' and self.request.GET[k] != '':
                 urlparams += "&" + k + "=" + self.request.GET[k]
         # Falls dieUsernr leer ist, kommmen wir von der Rollensicht des Panels, weil dort die Usernummer egal ist.
         # Die Nummer ist nur gesetzt wen wir auf der Standard-Factory aufgerufen werden.
@@ -106,14 +110,7 @@ class UhRUpdate(UpdateView):
     # Im Erfolgsfall soll die vorherige Selektion im Panel "User und RolleN" wieder aktualisiert gezeigt werden.
     # Dazu werden nebem dem URL-Stamm die Nummer des anzuzeigenden Users sowie die gesetzte Suchparameter benötigt.
     def get_success_url(self):
-        usernr = self.request.GET.get('user', 0)  # Sicherheitshalber - falls mal kein User angegeben ist
-
-        urlparams = "%s?"
-        for k in self.request.GET.keys():
-            if (k != 'user' and self.request.GET[k] != ''):
-                urlparams += "&" + k + "=" + self.request.GET[k]
-        url = urlparams % reverse('user_rolle_af_parm', kwargs={'id': usernr})
-        return url
+        return success_url(self)
 
 
 def UhR_erzeuge_gefiltere_namensliste(request):
@@ -141,19 +138,19 @@ def UhR_erzeuge_gefiltere_namensliste(request):
     namen_liste = panel_filter.qs.filter(userid__istartswith="xv").select_related("orga")
 
     teamnr = request.GET.get('orga')
-    if teamnr != None and teamnr != '':
+    if teamnr is not None and teamnr != '':
         teamqs = TblOrga.objects.get(id=teamnr)
-        if teamqs.teamliste != None \
-                and teamqs.freies_team != None \
+        if teamqs.teamliste is not None \
+                and teamqs.freies_team is not None \
                 and teamqs.teamliste != '' \
                 and teamqs.freies_team != '':
             print("""Fehler in UhR_erzeuge_gefiltere_namensliste: \
             Sowohl teamliste als auch freies_team sind gesetzt in Team {}: teammliste = {}, freies_team = {}."""
                   .format(teamnr, teamqs.teamliste, teamqs.freies_team))
-            return (namen_liste, panel_filter)
-        if teamqs.teamliste != None and teamqs.teamliste != '':
+            return namen_liste, panel_filter
+        if teamqs.teamliste is not None and teamqs.teamliste != '':
             namen_liste = behandle_teamliste(panel_liste, request, teamqs)
-        elif teamqs.freies_team != None and teamqs.freies_team != '':
+        elif teamqs.freies_team is not None and teamqs.freies_team != '':
             namen_liste = behandle_freies_team(panel_liste, request, teamqs)
 
     """
@@ -192,7 +189,7 @@ def UhR_erzeuge_gefiltere_namensliste(request):
     af_liste = TblUserIDundName.objects.get(id=id).enthalten_in_af
     print ('6:', af_liste)
     """
-    return (namen_liste, panel_filter)
+    return namen_liste, panel_filter
 
 
 def behandle_freies_team(panel_liste, request, teamqs):
@@ -246,11 +243,11 @@ def behandle_ft_oder_tl(namen_liste, request):
     name = request.GET.get('name')
     gruppe = request.GET.get('gruppe')
     # print('gefundene namen_liste vor Filterung =', namen_liste)
-    if gruppe != None and gruppe != '':
+    if gruppe is not None and gruppe != '':
         # print('Filtere nach Gruppe', gruppe)
         namen_liste = namen_liste.filter(gruppe__icontains=gruppe)
         # print(namen_liste)
-    if name != None and name != '':
+    if name is not None and name != '':
         # print('Filtere nach Name', name)
         namen_liste = namen_liste.filter(name__istartswith=name)
         # print(namen_liste)
@@ -273,7 +270,7 @@ def UhR_erzeuge_listen_ohne_rollen(request):
 
     # Und nun die eigentlich wichtigen Daten holen
     (namen_liste, panel_filter) = UhR_erzeuge_gefiltere_namensliste(request)
-    return (namen_liste, panel_filter, rollen_liste, rollen_filter)
+    return namen_liste, panel_filter, rollen_liste, rollen_filter
 
 
 def UhR_erzeuge_listen_mit_rollen(request):
@@ -303,7 +300,7 @@ def UhR_erzeuge_listen_mit_rollen(request):
 
     (namen_liste, panel_filter) = UhR_erzeuge_gefiltere_namensliste(request)
 
-    return (namen_liste, panel_filter, rollen_liste, rollen_filter)
+    return namen_liste, panel_filter, rollen_liste, rollen_filter
 
 
 def hole_unnoetigte_afen(namen_liste):
@@ -382,7 +379,7 @@ def UhR_hole_daten(panel_liste, id):
         usernamen.add(row.name)  # Ist Menge, also keine Doppeleinträge möglich
         userids.add(row.userid)
 
-    if (id != 0):  # Dann wurde der ReST-Parameter 'id' mitgegeben
+    if id != 0:  # Dann wurde der ReST-Parameter 'id' mitgegeben
 
         userHatRolle_liste = TblUserhatrolle.objects.filter(userid__id=id).order_by('rollenname')
         selektierter_name = TblUserIDundName.objects.get(id=id).name
@@ -444,7 +441,7 @@ def hole_rollen_zuordnungen(af_dict):
             tag = '!'.join((userid, af))  # Flache Datenstruktur für Template erforderlich
             vorhanden[tag] = ex
             optional[tag] = opt
-    return (vorhanden, optional)
+    return vorhanden, optional
 
 
 """
@@ -496,7 +493,7 @@ def suche_rolle_fuer_userid_und_af(userid, af):
     optional.sort()
     vorhanden.append('')  # Das hier sind die beiden Leerstrings am Ende der Liste
     optional.append('')
-    return (vorhanden, optional)
+    return vorhanden, optional
 
 
 def hole_af_mengen(userids, gesuchte_rolle):
@@ -547,8 +544,10 @@ def hole_alle_offenen_AFen_zur_userid(userid, erledigt):
     """
     Liefert eine Menge aller AFen, die für eine UserID in der Gesamttabelle aufgeführt sind
     und die nicht in der erledigt-Liste auftauchen
+    :param erledigt: Liste der bereits erledigten AFen
     :param userid:
     :return: QuerySet mit den gesuchten AFen
+    """
     """
     print('erledigt Anzahl = {}\n Inhalt ='.format(erledigt.count(), list(erledigt)))
     print('ungefilterte Gesamtliste = ',
@@ -569,6 +568,7 @@ def hole_alle_offenen_AFen_zur_userid(userid, erledigt):
           .distinct()
           .count()
           )
+    """
     af_qs = TblGesamt.objects \
         .exclude(geloescht=True) \
         .exclude(userid_name_id__geloescht=True) \
@@ -577,7 +577,7 @@ def hole_alle_offenen_AFen_zur_userid(userid, erledigt):
         .values('enthalten_in_af') \
         .distinct() \
         .order_by('enthalten_in_af')
-    print('AF_QS Anzahl = {}, Inhalt = {}'.format(af_qs.count(), list(af_qs)))
+    # print('AF_QS Anzahl = {}, Inhalt = {}'.format(af_qs.count(), list(af_qs)))
     return af_qs
 
 
@@ -660,7 +660,7 @@ def UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle=None):
 
     af_dict = hole_af_mengen(userids, gesuchte_rolle)
     (vorhanden, optional) = hole_rollen_zuordnungen(af_dict)
-    return (userids, af_dict, vorhanden, optional)
+    return userids, af_dict, vorhanden, optional
 
 
 def freies_team(request):
@@ -674,11 +674,11 @@ def kein_freies_team(request):
     :return: True, wenn "freies_feld" weder None noch '' ist
     """
     teamnr = request.GET.get('orga')
-    if teamnr == None or teamnr == '':
+    if teamnr is None or teamnr == '':
         return True
 
     teamqs = TblOrga.objects.get(id=teamnr)
-    return teamqs.freies_team == None or teamqs.freies_team == ''
+    return teamqs.freies_team is None or teamqs.freies_team == ''
 
 
 def soll_komplett(request, row):
@@ -691,7 +691,7 @@ def soll_komplett(request, row):
     """
     teamnr = request.GET.get('orga')
     teamqs = TblOrga.objects.get(id=teamnr)
-    assert (teamqs.freies_team != None)
+    assert teamqs.freies_team is not None
     eintraege = teamqs.freies_team.split('|')
     for e in eintraege:
         zeile = e.split(':')
@@ -723,15 +723,15 @@ def UhR_verdichte_daten(request, panel_liste):
             if kein_freies_team(request) or soll_komplett(request, row):
                 (rollenmenge, usernamen, userids) = verdichte_standardfall(rollenmenge, row, userids, usernamen)
             else:
-                print('\nUhR_verdichte_daten: Start rollenmenge =', rollenmenge)
+                # print('\nUhR_verdichte_daten: Start rollenmenge =', rollenmenge)
                 (rollenmenge, usernamen, userids) = \
                     verdichte_spezialfall(rollenmenge, row, userids, usernamen, request)
-                print('\nUhR_verdichte_daten: ergebnis rollenmenge =', rollenmenge)
+                # print('\nUhR_verdichte_daten: ergebnis rollenmenge =', rollenmenge)
 
     def order(a):
         return a.rollenname.lower()  # Liefert das kleingeschriebene Element, nach dem sortiert werden soll
 
-    return (sorted(list(rollenmenge), key=order), userids, usernamen)
+    return sorted(list(rollenmenge), key=order), userids, usernamen
 
 
 def verdichte_standardfall(rollenmenge, row, userids, usernamen):
@@ -756,7 +756,7 @@ def verdichte_standardfall(rollenmenge, row, userids, usernamen):
     userHatRollen = TblUserhatrolle.objects.filter(userid__userid=row.userid).order_by('rollenname')
     for e in userHatRollen:
         rollenmenge.add(e.rollenname)
-    return (rollenmenge, usernamen, userids)
+    return rollenmenge, usernamen, userids
 
 
 def verdichte_spezialfall(rollenmenge, row, userids, usernamen, request):
@@ -768,6 +768,7 @@ def verdichte_spezialfall(rollenmenge, row, userids, usernamen, request):
             - Alle AFen des Users, die nicht bereits über rollenmenge adressiert sind, werden der neuen Rolle hinzugefügt
             - Die neu konfigurierte Rolle wird der Rollenmenge hinzugefügt
 
+    :param request: Der ursprüngliche HTTP-Request
     :param rollenmenge: Die bislang zusammengestellten Rollen
     :param row: Der aktuelle User
     :param userids: Die bislang behandelten UserIDs
@@ -778,7 +779,7 @@ def verdichte_spezialfall(rollenmenge, row, userids, usernamen, request):
     userids.add(row.userid)
     userHatRollen = TblUserhatrolle.objects.filter(userid__userid=row.userid).order_by('rollenname')
 
-    assert (request.GET.get('orga') != None)
+    assert request.GET.get('orga') is not None
     spezialteam = TblOrga.objects.get(id=request.GET.get('orga'))
     erlaubte_rollenqs = TblUserhatrolle.objects \
         .filter(userid__name=row.name) \
@@ -790,15 +791,15 @@ def verdichte_spezialfall(rollenmenge, row, userids, usernamen, request):
         erlaubte_rollen.add(e.rollenname)
         rollenmenge.add(e.rollenname)
 
-    print('verdichte_spezialfall: Rollenmenge nach Ergänzung erlaubte Rollen =', rollenmenge)
+    # print('verdichte_spezialfall: Rollenmenge nach Ergänzung erlaubte Rollen =', rollenmenge)
 
     restrolle = erzeuge_restrolle(row.userid, erlaubte_rollen, spezialteam)
-    print('Restrolle =', restrolle)
+    # print('Restrolle =', restrolle)
 
     rollenmenge.add(restrolle)
+    # print('verdichte_spezialfall: Ergebnis Rollenmenge =', rollenmenge)
 
-    print('verdichte_spezialfall: Ergebnis Rollenmenge =', rollenmenge)
-    return (rollenmenge, usernamen, userids)
+    return rollenmenge, usernamen, userids
 
 
 def erzeuge_restrolle(userid, rollenmenge, team):
@@ -836,7 +837,8 @@ def erzeuge_restrolle(userid, rollenmenge, team):
                 with connection.cursor() as cursor:
                     try:
                         cursor.callproc("erzeuge_af_liste")
-                    except(e):
+                    except:
+                        e = sys.exc_info()[0]
                         print('Fehler in alte_oder_neue_restrolle, StoredProc erzeuge_af_liste: {}'.format(e))
                     cursor.close()
             merkaf = TblAfliste.objects.get(af_name='Noch_nicht_akzeptierte_AF')
@@ -994,7 +996,6 @@ class RollenListenUhr(UhR):
         Das ist die Factory-Klasse für die Betrachtung aller User mit spezifischen Rollen- oder AF-Namen
 
         :param request: GET oder POST Request vom Browser
-        :param id: wird hier nicht verwendet, deshalb "_"
         :return: Zu renderndes HTML-File, Context für das zu rendernde HTML
         """
         (namen_liste, panel_filter, rollen_liste, rollen_filter) = \
@@ -1079,16 +1080,16 @@ class RollenListenUhr(UhR):
             excel.writerow(line)
         return excel.response
 
-    def zweiter(self, str):
+    def zweiter(self, string):
         """
         Liefert den zweiten Teil eines mit '!' getrennten Strings.
         Wenn der String Leerstring ist, liefere nur den Leerstring zurück
-        :param str: Der String xxx!yyyyy
+        :param string: Der String xxx!yyyyy
         :return: yyyyy oder '' wenn String == ''
         """
-        if str == '':
-            return str
-        return str.split('!')[1]
+        if string == '':
+            return string
+        return string.split('!')[1]
 
     def exportiere_stern(self, request):
         """
@@ -1098,7 +1099,7 @@ class RollenListenUhr(UhR):
         Der etwas wirre Block im letzten Teil ist bei Verwendung von HTML-Tabellen wesentlich einfacher,
         aber hier müssen die Spalten selbständig nebeneinander aufgefüllt werden.
 
-        :param context: Die gefundenen Daten uzur Anzeige
+        :param request: Der HTTP-Request
         :return: Die csv-Daten zum Download
         """
         _, context = self.setze_context(request)
@@ -1147,7 +1148,6 @@ class NeueListenUhr(UhR):
         Darüber hinaus werden alle Optionen gesucht, die für die jeweiligen AFen gültig sind.
 
         :param request: GET oder POST Request vom Browser
-        :param id: wird hier nicht verwendet, deshalb "_"
         :return: Context für das zu rendernde HTML
         """
         (namen_liste, panel_filter, rollen_liste, rollen_filter) = \
@@ -1182,7 +1182,7 @@ class NeueListenUhr(UhR):
         Liefert die Liste der AFen, die für den User derzeit keiner Rolle zugeordnet sind
         sowie die Menge der Rollen, die für die AF vergeben werden könnten.
 
-        :param context: Die gefundenen Daten uzur Anzeige
+        :param request: der HTTP-Request, enthält '-' als rollenname
         :return: Die csv-Daten zum Download
         """
         context = self.setze_context(request)
@@ -1204,13 +1204,13 @@ class NeueListenUhr(UhR):
                         continue
                     bastelkey = userid + '!' + af
                     numoptional = len(context['optional'][bastelkey]) - 1  # wegen des Leerstrings am Ende
-                    if numoptional > 0:
-                        for i in range(numoptional):
-                            opti = context['optional'][bastelkey][i]
-                            line = [name, userid, af, opti]
-                            excel.writerow(line)
-                    else:
-                        line = [name, userid, af, '']
+
+                    if numoptional == 0:  # keine Optionen gefunden, also nur die gefundene AF ausgeben
+                        line = [name, userid, af, "--"]
+                        excel.writerow(line)
+                    for i in range(numoptional):
+                        opti = context['optional'][bastelkey][i]
+                        line = [name, userid, af, opti]
                         excel.writerow(line)
 
         return excel.response
@@ -1236,7 +1236,7 @@ def panel_UhR(request, id=0):
     - Ansonsten rufe die Standard-Factory "einzel"
 
     :param request: GET oder POST Request vom Browser
-    :param pk: ID des XV-UserID-Eintrags, zu dem die Detaildaten geliefert werden sollen
+    :param id: ID des XV-UserID-Eintrags, zu dem die Detaildaten geliefert werden sollen
     :return: Gerendertes HTML
     """
     assert request.method != 'POST', 'Irgendwas ist im panel_UhR über POST angekommen'
@@ -1303,10 +1303,10 @@ def erzeuge_ueberschrift(request):
 
 def element_noch_nicht_vorhanden(liste, element):
     """
-    Suche nach Einträgen in der übergebenen Menge,
+    Suche nach Einträgen in der übergebenen Liste,
     die - außer in der Klein-/Großschreibung - identisch mmit dem Suchstring sind
 
-    :param menge: Die bereits vorhandene Menge
+    :param liste: Die bereits vorhandene Liste
     :param element: Der Suchstring
     :return: True, wenn das Element noch nicht vorhanden ist, sonst False
     """
@@ -1378,14 +1378,14 @@ def liefere_win_lw_Liste(tf_menge):
     for t in tf_menge:
         if 'CN=' in t['tf']:
             ad = re.search("^CN=\w+?(_[\w-]+?),", t['tf'])
-            if ad == None:
+            if ad is None:
                 s = 'ACHTUNG: regexp konnte nicht mehr gefunden werden in Eintrag ' + t['tf']
                 rest.add(s)
                 continue
             for acl in winacl:
                 if ad[1] in acl['tf']:
                     suchmenge.add(acl['tf'])
-                    break;
+                    break
             rest.add(t['tf'])
 
     retval = ACLGruppen.objects \
@@ -1394,7 +1394,7 @@ def liefere_win_lw_Liste(tf_menge):
         .distinct() \
         .values()
 
-    return (retval, rest)
+    return retval, rest
 
 
 def kurze_tf_liste(aftf_dict):
@@ -1409,7 +1409,7 @@ def kurze_tf_liste(aftf_dict):
     Deshalb suchen wir zunächst nach dem einzufügenden Element in Klein-Schreibweise
     und fügen es nur dann dem Ergbnis hinzu, wenn es noch nicht existiert.
 
-    :param af_menge: Ein Dictionary AF->TF, zu denen die TF-Menge geliefert werden soll
+    :param aftf_dict: Ein Dictionary AF->TF, zu denen die TF-Menge geliefert werden soll
     :return: Die TF-Liste
     """
 
@@ -1482,7 +1482,8 @@ def liefere_tf_liste(rollenMenge, userids):
     Dies geschieht zunächst über die Ermittlung der Arbeitsplatzfunktionen,
     die für die angegebenen Rollen definiert sind.
     In der Anzeige müssen die jeweiligen TFs zu ihren AFs dargestellt werden können,
-    das ist besonders bei redundant mmodellierten TFen relevant.
+    das ist besonders bei redundant modellierten TFen relevant.
+    :param userids: Menge der UserIDs, zu denen gesucht werden soll
     :param rollenMenge:
     :return: Menge der den Rollen zugeordneten TFen als Dict aftfDict[AF] = TF_Querysyset
     """
@@ -1504,15 +1505,14 @@ def liefere_af_menge(rollenMenge):
     return af_menge
 
 
-def liefere_af_kritikalitaet(rollenMenge, userids):
+def liefere_af_kritikalitaet(rollenMenge):
     """
     Für die Menge der gegebenen Rollen liefer die Liste der jeweils höchsten TF-Kritikalitäten.
     Achtung: Bei veralteten Daten in der Gesamt-Tabelle kann es sein, dass diese Informationen
     ebenfalls nicht mehr korrekt sind. Deshalb erfolgt eine Filterung nach UserIDen,
     um ausschließlich aktuelle Werte in der Gesamt-Tabelle zu selektieren.
 
-    :param rollenMenge: Hierüber wird die LIste der AFen ermmittelt, die adressiert werden sollen
-    :param userids: Dies dient der Reduzierung der Treffermenge (nur die gefundenen AF/TF-Kombination zu den UserIDs)
+    :param rollenMenge: Hierüber wird die Liste der AFen ermmittelt, die adressiert werden sollen
     :return: Das Dict der AF => Höchste_Kritikalität_der_TF_in_der_AF laut dem IIQ-Feld
     """
     # .filter(userid_name__userid__in=userids) \
@@ -1577,7 +1577,7 @@ def erzeuge_UhR_konzept(request, ansicht):
         (rollenMenge, userids, usernamen) = (set(), set(), set())
 
     log(request, rollenMenge, userids, usernamen)
-    af_kritikalitaet = liefere_af_kritikalitaet(rollenMenge, userids)
+    af_kritikalitaet = liefere_af_kritikalitaet(rollenMenge)
 
     winnoe = None
     tf_liste = None
@@ -1612,7 +1612,7 @@ def erzeuge_UhR_konzept(request, ansicht):
         'ueberschrift': erzeuge_ueberschrift(request),
         'episch': episch,
     }
-    if (ansicht):
+    if ansicht:
         return render(request, 'rapp/panel_UhR_konzept.html', context)
 
     pdf = render_to_pdf('rapp/panel_UhR_konzept_pdf.html', context)
@@ -1636,6 +1636,7 @@ def panel_UhR_af_export(request, id):
     """
     Exportfunktion für das Filter-Panel aus der "User und Rollen"-Tabelle).
     :param request: GET Request vom Browser
+    :param id: id = 0: alle UserIDen, sonst wird nur nach der UserID mit der tabelleninternen ID = id gesucht
     :return: Gerendertes HTML mit den CSV-Daten oder eine Fehlermeldung
     """
     if request.method != 'GET':

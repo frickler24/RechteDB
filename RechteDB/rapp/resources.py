@@ -1,21 +1,12 @@
 """
-Some Ressources for handling csv and Excel sheets
-
+Einige Ressourcen für das Handling von csv and Excel sheets
+Über diese Klassen in dem Modul werden die Inhalte bestimmt,
+die in den jkeweiligen Funktionen exportiert werden sollen.
 """
 
 from import_export import resources
-from .models import Tblrechteneuvonimport, TblGesamt, Modellierung, Direktverbindungen
 
-
-class MeinCSVImporterModel(resources.ModelResource):
-    """
-        Resource-Class für import/export neuer Daten (erster Versuch, nur zum Export nutzen)
-    """
-
-    class Meta:
-        model = Tblrechteneuvonimport
-        # encoding = "utf-8"
-        delimiter = ";"
+from .models import TblGesamt, Modellierung, Direktverbindungen
 
 
 class GesamtExporterModel(resources.ModelResource):
@@ -25,7 +16,7 @@ class GesamtExporterModel(resources.ModelResource):
 
     class Meta:
         model = TblGesamt
-        # encoding = "utf-8"
+        encoding = "utf-8"
         delimiter = ";"
         fields = (
             'id', 'userid_name',

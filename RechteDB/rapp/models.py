@@ -293,6 +293,9 @@ def hole_organisationen():
 
 # Die verschiedenen technischne Plattformen (RACF, CICS, Unix, Win, AD, LDAP, test/Prod usw.)
 class TblPlattform(models.Model):
+    """
+    Das heißt heute in IIQ eher "Application" und beschreibt die Umgebung, in der sihc das Recht befindet.
+    """
     id = models.AutoField(db_column='id', primary_key=True)
     tf_technische_plattform = models.CharField(db_column='tf_technische_plattform', max_length=32,
                                                verbose_name='Plattform', unique=True)
@@ -309,8 +312,10 @@ class TblPlattform(models.Model):
         return self.tf_technische_plattform
 
 
-# tblGesamt enthält alle Daten zu TFs in GFs in AFs für jeden User und seine UserIDen
 class TblGesamt(models.Model):
+    """
+    tblGesamt enthält alle Daten zu TFs in GFs in AFs für jeden User und seine UserIDen
+    """
     id = models.AutoField(db_column='id', primary_key=True)
     userid_name = models.ForeignKey('TblUserIDundName', db_column='userid_und_name_id',
                                     on_delete=models.CASCADE)

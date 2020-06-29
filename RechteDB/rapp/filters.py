@@ -1,12 +1,17 @@
 import django_filters
 
 from .models import TblGesamt
+from .models import TblRollehataf
 from .models import TblUserIDundName
 from .models import TblUserhatrolle
-from .models import TblRollehataf
 
 
 class PanelFilter(django_filters.FilterSet):
+    """
+    Das ist der Hauptfilter.
+    Er wird vom Suche-Panel verwendet und enthält dementsprechend viele Einträge.
+    Einträge, die aktuelle nictt zur Suche verwendet werden, sind auskommentiert,
+    """
     tf = django_filters.CharFilter(lookup_expr='icontains')
     tf_beschreibung = django_filters.CharFilter(lookup_expr='icontains')
     enthalten_in_af = django_filters.CharFilter(lookup_expr='icontains')
@@ -18,19 +23,19 @@ class PanelFilter(django_filters.FilterSet):
     userid_name__gruppe = django_filters.CharFilter(lookup_expr='icontains')
     userid_name__zi_organisation = django_filters.CharFilter(lookup_expr='iexact')
     modell__name_af_neu = django_filters.CharFilter(lookup_expr='icontains')
-    modell__name_gf_neu = django_filters.CharFilter(lookup_expr='icontains')
-
     plattform_id__tf_technische_plattform = django_filters.ChoiceFilter()
-    modell__gf_beschreibung = django_filters.CharFilter(lookup_expr='icontains')
-    loeschdatum = django_filters.CharFilter(lookup_expr='icontains')
-    af_gueltig_ab = django_filters.CharFilter(lookup_expr='icontains')
-    af_gueltig_bis = django_filters.CharFilter(lookup_expr='icontains')
     direct_connect = django_filters.CharFilter(lookup_expr='icontains')
-    af_zuweisungsdatum = django_filters.CharFilter(lookup_expr='icontains')
-    tf_eigentuemer_org = django_filters.CharFilter(lookup_expr='icontains')
-    gefunden = django_filters.BooleanFilter()
-    wiedergefunden = django_filters.CharFilter(lookup_expr='icontains')
-    letzte_aenderung = django_filters.CharFilter(lookup_expr='icontains')
+
+    # modell__name_gf_neu = django_filters.CharFilter(lookup_expr='icontains')
+    # modell__gf_beschreibung = django_filters.CharFilter(lookup_expr='icontains')
+    # loeschdatum = django_filters.CharFilter(lookup_expr='icontains')
+    # af_gueltig_ab = django_filters.CharFilter(lookup_expr='icontains')
+    # af_gueltig_bis = django_filters.CharFilter(lookup_expr='icontains')
+    # af_zuweisungsdatum = django_filters.CharFilter(lookup_expr='icontains')
+    # tf_eigentuemer_org = django_filters.CharFilter(lookup_expr='icontains')
+    # gefunden = django_filters.BooleanFilter()
+    # wiedergefunden = django_filters.CharFilter(lookup_expr='icontains')
+    # letzte_aenderung = django_filters.CharFilter(lookup_expr='icontains')
 
     class Meta:
         model = TblGesamt
@@ -61,12 +66,19 @@ class PanelFilter(django_filters.FilterSet):
 
 
 class UseridRollenFilter(django_filters.FilterSet):
+    """
+    Dies ist der EInstiegsfilter für die "User und Rollen"-Suche.
+    Zusätzlich zu den drei Elementen ist in der Anzeige noch die Möglichkeit, nach Rollen zu suchen.
+    Warum das hier nicht steht, weiß ich nicht mehr - ist irgendwie anders gehandelt worden
+    ToDo: Warum wird nach dem Rollennamen nicht auch über den Filter gesucht?
+    """
     userid__name = django_filters.CharFilter(lookup_expr='istartswith')
-    userid__userid = django_filters.CharFilter(lookup_expr='istartswith')
-    userid__geloescht = django_filters.BooleanFilter()
-    userid__abteilung = django_filters.CharFilter(lookup_expr='icontains')
     userid__gruppe = django_filters.CharFilter(lookup_expr='icontains')
     userid__zi_organisation = django_filters.CharFilter(lookup_expr='icontains')
+
+    # userid__userid = django_filters.CharFilter(lookup_expr='istartswith')
+    # userid__geloescht = django_filters.BooleanFilter()
+    # userid__abteilung = django_filters.CharFilter(lookup_expr='icontains')
 
     class Meta:
         model = TblUserhatrolle
@@ -78,6 +90,10 @@ class UseridRollenFilter(django_filters.FilterSet):
 
 
 class UseridFilter(django_filters.FilterSet):
+    """
+    Wird genutzt in UhR_erzeuge_gefiltere_namensliste(request)
+    ToDo: Was auch immer ich da gemacht habe - das kann der Grund dafür sein, dass die Suche in "User und Rollen" so viele SQLs erzeugt
+    """
     name = django_filters.CharFilter(lookup_expr='istartswith')
     gruppe = django_filters.CharFilter(lookup_expr='icontains')
 
@@ -96,11 +112,12 @@ class UseridFilter(django_filters.FilterSet):
 
 
 class RollenFilter(django_filters.FilterSet):
+    """
+    Wird genutzt in UhR_erzeuge_listen_ohne_rollen(request)
+    """
     name = django_filters.CharFilter(lookup_expr='istartswith')
     gruppe = django_filters.CharFilter(lookup_expr='icontains')
     rollenname = django_filters.CharFilter(lookup_expr='icontains')
-
-    # afname = django_filters.CharFilter(lookup_expr='icontains')
 
     class Meta:
         model = TblUserhatrolle
@@ -114,9 +131,11 @@ class RollenFilter(django_filters.FilterSet):
         ]
 
 
-# Filter für das halbautomatische Selektieren über die Arbeitsplatzfunktion.
-# Wird insbesondere in der AF-Factory bei UhR genutzt
 class RolleAFFilter(django_filters.FilterSet):
+    """
+    Filter für das halbautomatische Selektieren über die Arbeitsplatzfunktion.
+    Wird insbesondere in der AF-Factory bei UhR genutzt
+    """
     rollenname = django_filters.CharFilter(lookup_expr='istartswith')
     af = django_filters.CharFilter(lookup_expr='istartswith')
     af__af_name = django_filters.CharFilter(lookup_expr='istartswith')
