@@ -71,6 +71,6 @@ def sort(menge):
 def vergleich(einzel, menge):
 	einzel = einzel.strip()
 	for element in menge:
-		if element == einzel:
+		if element.lower() == einzel:
 			return True
 	return False
