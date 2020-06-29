@@ -1667,7 +1667,7 @@ def panel_UhR_af_export(request, id):
             else:
                 line.append('nein')
             for userid in selektierte_userids:
-                if str(rollendefinition.af).strip().lower() in afmenge_je_userID[userid]:
+                if str(rollendefinition.af).strip().lower() in str(afmenge_je_userID[userid]).lower():
                     line.append('ja')
                 else:
                     line.append('nein')
