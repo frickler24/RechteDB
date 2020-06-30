@@ -1365,15 +1365,15 @@ class UserRolleAFTests(TestCase):
         # print('____________')
         # print(response.content)
         gesuchter_exportstring = "Name\tRollenname\tAF\tMussrecht\txv13254\tdv13254\r\n" \
-                                 + "User_xv13254\tErste Neue Rolle\trva_01219_beta91_job_abst\tja\tnein\tnein\r\n" \
+                                 + "User_xv13254\tErste Neue Rolle\trva_01219_beta91_job_abst\tja\tja\tnein\r\n" \
                                  + "User_xv13254\tErste Neue Rolle\trva_01219_beta91_job_abst_nicht_zugewiesen\tja\tnein\tnein\r\n" \
-                                 + "User_xv13254\tZweite Neue Rolle\trva_01219_beta91_job_abst\tnein\tnein\tnein\r\n"
+                                 + "User_xv13254\tZweite Neue Rolle\trva_01219_beta91_job_abst\tnein\tja\tnein\r\n"
         self.assertContains(response, 'Name\tRollenname\tAF\tMussrecht\txv13254\tdv13254\r\n')
-        self.assertContains(response, 'User_xv13254\tErste Neue Rolle\trva_01219_beta91_job_abst\tja\tnein\tnein\r\n')
+        self.assertContains(response, 'User_xv13254\tErste Neue Rolle\trva_01219_beta91_job_abst\tja\tja\tnein\r\n')
         self.assertContains(response,
                             'User_xv13254\tErste Neue Rolle\trva_01219_beta91_job_abst_nicht_zugewiesen\tja\tnein\tnein\r\n')
         self.assertContains(response,
-                            'User_xv13254\tZweite Neue Rolle\trva_01219_beta91_job_abst\tnein\tnein\tnein\r\n')
+                            'User_xv13254\tZweite Neue Rolle\trva_01219_beta91_job_abst\tnein\tja\tnein\r\n')
         self.assertContains(response, gesuchter_exportstring)
 
     def test_panel_view_with_invalid_selection_status_code(self):
