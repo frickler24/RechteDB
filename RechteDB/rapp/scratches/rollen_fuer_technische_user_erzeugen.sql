@@ -20,17 +20,17 @@ USE RechteDB;
 BEGIN;
     SELECT COUNT(*) as "Anzahl Rollen bei Transaktionsstart" FROM tbl_Rollen;
     INSERT INTO tbl_Rollen
-        SELECT LEFT(concat("Technischer User: ", tblUserIDundName.name), 90) AS `rollenname`,
+        SELECT LEFT(concat("NPU: ", tblUserIDundName.userID, "-", tblUserIDundName.name), 90) AS `rollenname`,
                     "Technischer User" AS `system`,
                     "" AS `rollenbeschreibung`,
                     now() AS `datum`
                     FROM `tblUserIDundName`
                     LEFT JOIN tbl_Rollen
-            ON concat("Technischer User: ", tblUserIDundName.name) = tbl_Rollen.rollenname
+            ON LEFT(concat("NPU: ", tblUserIDundName.userID, "-", tblUserIDundName.name), 90) = tbl_Rollen.rollenname
 
         WHERE
             tblUserIDundName.userid like "xv86%"
-                AND tblUserIDundName.zi_organisation = "ai-xa"
+                AND tblUserIDundName.zi_organisation = "ai-st"
                 AND NOT tblUserIDundName.geloescht
                 AND tbl_Rollen.rollenname is null
 
@@ -45,7 +45,7 @@ BEGIN;
     --
     DROP TABLE IF EXISTS patchTU_alleAF;
     CREATE TABLE patchTU_alleAF
-    SELECT DISTINCT LEFT(concat("Technischer User: ", tblUserIDundName.name), 90) AS `rollenname`,
+    SELECT DISTINCT LEFT(concat("NPU: ", tblUserIDundName.userID, "-", tblUserIDundName.name), 90) AS `rollenname`,
         tblUserIDundName.userid, tblUserIDundName.name,
         tblGesamt.enthalten_in_af,
         tbl_AFListe.id as af
@@ -56,7 +56,7 @@ BEGIN;
         ON tblGesamt.enthalten_in_af = tbl_AFListe.af_name
     WHERE
         tblUserIDundName.userid like "xv86%"
-            AND tblUserIDundName.zi_organisation = "ai-xa"
+            AND tblUserIDundName.zi_organisation = "ai-st"
             AND NOT tblUserIDundName.geloescht
             AND NOT tblGesamt.geloescht
             AND NOT tblGesamt.enthalten_in_af = "ka"
@@ -75,7 +75,7 @@ BEGIN;
         tbl_AFListe.af_name
     FROM `tblUserIDundName`
     INNER JOIN tbl_Rollen
-        ON LEFT(concat("Technischer User: ", tblUserIDundName.name), 90) = tbl_Rollen.rollenname
+        ON LEFT(concat("NPU: ", tblUserIDundName.userID, "-", tblUserIDundName.name), 90) = tbl_Rollen.rollenname
         INNER JOIN tbl_RolleHatAF
             ON tbl_Rollen.rollenname = tbl_RolleHatAF.rollenname
             LEFT JOIN tbl_AFListe
@@ -153,17 +153,17 @@ BEGIN;
             "Schwerpunkt" AS schwerpunkt_vertretung,
             "Spezifische Rolle für Technischen User" AS `bemerkung`,
             now() AS `letzte_aenderung`,
-            LEFT(concat("Technischer User: ", tblUserIDundName.name), 90) AS `rollenname`,
+            LEFT(concat("NPU: ", tblUserIDundName.userID, "-", tblUserIDundName.name), 90) AS `rollenname`,
             tblUserIDundName.userID,
             null as id
 
             FROM `tblUserIDundName`
             LEFT JOIN tbl_Rollen
-                ON concat("Technischer User: ", tblUserIDundName.name) = tbl_Rollen.rollenname
+                ON LEFT(concat("NPU: ", tblUserIDundName.userID, "-", tblUserIDundName.name), 90) = tbl_Rollen.rollenname
 
         WHERE
             tblUserIDundName.userid like "xv86%"
-                AND tblUserIDundName.zi_organisation = "ai-xa"
+                AND tblUserIDundName.zi_organisation = "ai-st"
                 AND NOT tblUserIDundName.geloescht
                 AND tbl_Rollen.rollenname is not null
         ORDER BY tblUserIDundName.name
@@ -174,39 +174,3 @@ BEGIN;
 
 ROLLBACK;
 
--- Danach manuelle Zuordnung der fehlenden UserHatRolle - Verbindungen
-
-
--- -----------------------------------------------------
---
--- Aktualisiere Spezialrollen für Technische User
---   Rollen müssen bereits bestehen und mit AFen verknüpft sein
---
--- -----------------------------------------------------
-
-BEGIN;
-    INSERT INTO tbl_UserHatRolle
-        SELECT 0 as userundrollenid,
-            "Schwerpunkt" AS schwerpunkt_vertretung,
-            "Spezifische Rolle für Technischen User" AS `bemerkung`,
-            now() AS `letzte_aenderung`,
-            LEFT(concat("Technischer User: ", tblUserIDundName.name), 90) AS `rollenname`,
-            tblUserIDundName.userID,
-            null as id
-
-            FROM `tblUserIDundName`
-            LEFT JOIN tbl_Rollen
-                ON concat("Technischer User: ", tblUserIDundName.name) = tbl_Rollen.rollenname
-
-        WHERE
-            tblUserIDundName.userid like "xv86%"
-                AND tblUserIDundName.zi_organisation = "ai-xa"
-                AND NOT tblUserIDundName.geloescht
-                AND tbl_Rollen.rollenname is not null
-        ORDER BY tblUserIDundName.name
-    ON DUPLICATE KEY UPDATE tbl_UserHatRolle.`letzte_aenderung` = now()
-    ;
-
-    SELECT * FROM tbl_UserHatRolle ORDER BY userundrollenid DESC LIMIT 100;
-
-ROLLBACK;
