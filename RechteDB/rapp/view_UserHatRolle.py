@@ -291,7 +291,7 @@ def UhR_erzeuge_listen_mit_rollen(request):
     # Hole erst mal die Menge an Rollen, die namentlich passen
     suchstring = request.GET.get('rollenname', 'nix')
     if suchstring == "*" or suchstring == "-":
-        rollen_liste = TblUserhatrolle.objects.all().order_by('rollenname').order_by('rollenname')
+        rollen_liste = TblUserhatrolle.objects.all().order_by('rollenname')
     else:
         rollen_liste = TblUserhatrolle.objects \
             .filter(rollenname__rollenname__icontains=suchstring) \
@@ -344,11 +344,19 @@ def hole_userids_zum_namen(selektierter_name):
     Dies funktioniert nur, weil der Name ein unique Key in der Tabelle ist.
     Wichtig: Filtere gelöschte User heraus, sonst gibt es falsche Anzeigen
 
-    :param selektierter_name: Zu welchem Namen sollen die UserIDs gesucht werden?
+    Zunächst wird der zusammengesetzte userid|Name-String getrennt,
+    dann wird von der Userid die erste Stelle entfernt,
+    damit anschließend nach allen UserIDs gesucht werden kann, die dem Muster ?v<Nummer> entsprechen.
+    Das wird benötigt, weil es User mit gleichem Namen, aber diskunkten UserIDs gibt.
+
+    :param selektierter_name: Zu welchem Namen ("xv|name, vorname") sollen die UserIDs gesucht werden?
     :return: Liste der UserIDs (als String[])
     """
+    userid, name = str(selektierter_name).split(" | ")
+    userid = userid[1:]
     query = TblUserIDundName.objects \
-        .filter(name=selektierter_name) \
+        .filter(name=name) \
+        .filter(userid__iendswith=userid) \
         .order_by('-userid') \
         .filter(geloescht=False) \
         .values('userid')
@@ -617,7 +625,7 @@ def hole_soll_af_mengen(rollenmenge):
 
 def suche_nach_none_wert(bekannte_rollen):
     """
-    #Suche nach Einträgen in der Tabelle RolleHatAf, bei denen die AF None ist.
+    Suche nach Einträgen in der Tabelle RolleHatAf, bei denen die AF None ist.
     :param bekannte_rollen:
     :return: True, wenn was gefunden wurde, sonst False
     """
@@ -656,7 +664,7 @@ def UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle=None):
     """
     userids = {}
     for name in namen_liste:
-        userids[name.name] = hole_userids_zum_namen(name.name)
+        userids[name] = hole_userids_zum_namen(name)
 
     af_dict = hole_af_mengen(userids, gesuchte_rolle)
     (vorhanden, optional) = hole_rollen_zuordnungen(af_dict)

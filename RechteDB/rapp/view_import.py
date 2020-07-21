@@ -191,32 +191,40 @@ def import_csv(request):
             # Sicherheitshalber werden alle eingelesenen Daten auf Maximallänge reduziert.
             # Derzeit gibt es bereits Einträge in 'TF Name' und 'TF Beschreibung',
             # die die Grenzen bei weitem überschreiten.
-            neuerRecord = Tblrechteneuvonimport(
-                identitaet=textwrap.shorten(line['Identität'], width=150, placeholder="..."),
-                nachname=textwrap.shorten(line['Nachname'], width=150, placeholder="..."),
-                vorname=textwrap.shorten(line['Vorname'], width=150, placeholder="..."),
-                tf_name=textwrap.shorten(line['TF Name'], width=100, placeholder="..."),
-                tf_beschreibung=textwrap.shorten(line['TF Beschreibung'], width=500, placeholder="..."),
-                af_anzeigename=textwrap.shorten(line['AF Anzeigename'], width=100, placeholder="..."),
-                af_beschreibung=textwrap.shorten(line['AF Beschreibung'], width=250, placeholder="..."),
-                hoechste_kritikalitaet_tf_in_af=textwrap.shorten(line['Höchste Kritikalität TF in AF'],
-                                                                 width=150, placeholder="..."),
-                tf_eigentuemer_org=textwrap.shorten(line['TF Eigentümer Org'], width=150, placeholder="..."),
-                tf_applikation=textwrap.shorten(line['TF Applikation'], width=250, placeholder="..."),
-                tf_kritikalitaet=textwrap.shorten(line['TF Kritikalitätskennzeichen'], width=150, placeholder="..."),
-                gf_name=textwrap.shorten(line['GF Name'], width=150, placeholder="..."),
-                gf_beschreibung=textwrap.shorten(line['GF Beschreibung'], width=250, placeholder="..."),
-                direct_connect=textwrap.shorten(line['Direct Connect'], width=150, placeholder="..."),
-                af_zugewiesen_an_account_name=textwrap.shorten(line['AF Zugewiesen an Account-Name'],
-                                                               width=150, placeholder="..."),
-                af_gueltig_ab=patch_datum(line['AF Gültig ab']),
-                af_gueltig_bis=patch_datum(line['AF Gültig bis']),
-                af_zuweisungsdatum=patch_datum(line['AF Zuweisungsdatum']),
-                organisation=textwrap.shorten(line['Organisation'], width=15, placeholder="Hä?"),
-                npu_rolle=textwrap.shorten(line['Kategorie NPU'], width=10, placeholder="Hä?"),
-                npu_grund=textwrap.shorten(line['Grund NPU'], width=2000, placeholder="..."),
-                iiq_organisation=textwrap.shorten(line['Organisation'], width=64, placeholder="..."),
-            )
+            try:
+                neuerRecord = Tblrechteneuvonimport(
+                    identitaet=textwrap.shorten(line['Identität'], width=150, placeholder="..."),
+                    nachname=textwrap.shorten(line['Nachname'], width=150, placeholder="..."),
+                    vorname=textwrap.shorten(line['Vorname'], width=150, placeholder="..."),
+                    tf_name=textwrap.shorten(line['TF Name'], width=100, placeholder="..."),
+                    tf_beschreibung=textwrap.shorten(line['TF Beschreibung'], width=500, placeholder="..."),
+                    af_anzeigename=textwrap.shorten(line['AF Anzeigename'], width=100, placeholder="..."),
+                    af_beschreibung=textwrap.shorten(line['AF Beschreibung'], width=250, placeholder="..."),
+                    hoechste_kritikalitaet_tf_in_af=textwrap.shorten(line['Höchste Kritikalität TF in AF'],
+                                                                     width=150, placeholder="..."),
+                    tf_eigentuemer_org=textwrap.shorten(line['TF Eigentümer Org'], width=150, placeholder="..."),
+                    tf_applikation=textwrap.shorten(line['TF Applikation'], width=250, placeholder="..."),
+                    tf_kritikalitaet=textwrap.shorten(line['TF Kritikalitätskennzeichen'], width=150, placeholder="..."),
+                    gf_name=textwrap.shorten(line['GF Name'], width=150, placeholder="..."),
+                    gf_beschreibung=textwrap.shorten(line['GF Beschreibung'], width=250, placeholder="..."),
+                    direct_connect=textwrap.shorten(line['Direct Connect'], width=150, placeholder="..."),
+                    af_zugewiesen_an_account_name=textwrap.shorten(line['AF Zugewiesen an Account-Name'],
+                                                                   width=150, placeholder="..."),
+                    af_gueltig_ab=patch_datum(line['AF Gültig ab']),
+                    af_gueltig_bis=patch_datum(line['AF Gültig bis']),
+                    af_zuweisungsdatum=patch_datum(line['AF Zuweisungsdatum']),
+                    organisation=textwrap.shorten(line['Organisation'], width=15, placeholder="Hä?"),
+                    npu_rolle=textwrap.shorten(line['Kategorie NPU'], width=10, placeholder="Hä?"),
+                    npu_grund=textwrap.shorten(line['Grund NPU'], width=2000, placeholder="..."),
+                    iiq_organisation=textwrap.shorten(line['Organisation'], width=64, placeholder="..."),
+                )
+            except:
+                print("ERROR: Fehlerhafte Importzeile mit Sonderzeichen führt zu Exception.")
+                for e in line:
+                    print(e, ":", line[e])
+                # ToDo: Fehlermeldung zurückliefern an UI
+                continue
+
             neuerRecord.save()
             import_datum.aktuell += 1
             if import_datum.aktuell % 42 == 0:
