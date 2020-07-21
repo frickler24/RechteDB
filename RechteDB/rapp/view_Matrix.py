@@ -111,7 +111,7 @@ def erzeuge_UhR_matrixdaten(request, namen_liste):
     return (sorted(usernamen), sorted(list(rollenmenge), key=order), rollen_je_username, teams_je_username)
 
 
-def erzeuge_userIDlisten(namen_liste):
+def erzeuge_userIDlisten(erweiterte_namen_liste):
     """
     Liefert die Menge der UserIDen, die zu einem Namen derzeit aktuell vorliegen
     :param namen_liste: Zu welchen Namen sollen die UserIDs gesucht werden?
@@ -119,7 +119,7 @@ def erzeuge_userIDlisten(namen_liste):
     """
     uids_je_username = {}
 
-    for row in namen_liste:
+    for row in erweiterte_namen_liste:
         uids = hole_userids_zum_namen(row)
         uids_je_username[str(row)] = uids
     return uids_je_username
