@@ -71,18 +71,23 @@ def erzeuge_UhR_matrixdaten(request, namen_liste):
     rollen_je_username = {}  # Die Rollen, die zum Namen gehören
 
     for row in namen_liste:
-        usernamen.add(row.name)
+        index = str(row)
+        usernamen.add(index)
+        userid, name = index.split(' | ')
+        userid = userid[1:]
         teamliste = TblOrga.objects \
-            .filter(tbluseridundname__name=row.name, tbluseridundname__geloescht=False) \
+            .filter(tbluseridundname__name=row.name,
+                    tbluseridundname__userid__iendswith=userid,
+                    tbluseridundname__geloescht=False) \
             .exclude(team="Gelöschter User")  # Die als gelöscht markierten User werden nicht mehr angezeigt
 
         teammenge = set()
         for team in teamliste:
             teammenge.add(str(team))
-        teams_je_username[row.name] = [str(team) for team in teammenge]
+        teams_je_username[index] = [str(team) for team in teammenge]
 
         # Erzeuge zunächst die Hashes für die UserIDs. Daran werden nachher die Listen der Rechte gehängt.
-        rollen_je_username[row.name] = set()
+        rollen_je_username[index] = set()
 
         # Fallunterscheidung nach "freies_team" und "spezielles_team"
         if kein_freies_team(request) or soll_komplett(request, row):  # Standardfall
@@ -98,26 +103,25 @@ def erzeuge_UhR_matrixdaten(request, namen_liste):
         # Achtung: rolle ist nur eine für den User spezifische Linknummer auf das Rollenobjekt.
         for rolle in rollen:
             info = (rolle.rollenname, rolle.schwerpunkt_vertretung)
-            rollen_je_username[row.name].add(info)
+            rollen_je_username[index].add(info)
             rollenmenge.add(rolle.rollenname)
 
     def order(a):
         return a.rollenname.lower()  # Liefert das kleingeschriebene Element, nach dem sortiert werden soll
-
     return (sorted(usernamen), sorted(list(rollenmenge), key=order), rollen_je_username, teams_je_username)
 
 
-def erzeuge_userIDlisten(namen_liste):
+def erzeuge_userIDlisten(erweiterte_namen_liste):
     """
     Liefert die Menge der UserIDen, die zu einem Namen derzeit aktuell vorliegen
     :param namen_liste: Zu welchen Namen sollen die UserIDs gesucht werden?
-    :return: Liste der UserIDs je Identität
+    :return: Liste der UserIDs je Identität, jeweils als String
     """
     uids_je_username = {}
 
-    for row in namen_liste:
-        uids = hole_userids_zum_namen(row.name)
-        uids_je_username[row.name] = uids
+    for row in erweiterte_namen_liste:
+        uids = hole_userids_zum_namen(row)
+        uids_je_username[str(row)] = uids
     return uids_je_username
 
 
@@ -127,11 +131,14 @@ def hole_npu_detail(selektierter_name):
     Dies funktioniert nur, weil der Name ein unique Key in der Tabelle ist.
     Wichtig: Filtere gelöschte User heraus, sonst gibt es falsche Anzeigen
 
-    :param selektierter_name: Zu welchem Namen sollen die NPU-Details gesucht werden?
+    :param selektierter_name: (userid | name) Zu welchem Namen sollen die NPU-Details gesucht werden?
     :return: tupel (npu_rolle, npu_grund)
     """
+    userid, name = str(selektierter_name).split(' | ')
+    userid = userid[1:]
     query = TblUserIDundName.objects \
-        .filter(name=selektierter_name) \
+        .filter(name=name) \
+        .filter(userid__iendswith=userid) \
         .order_by('-userid') \
         .filter(geloescht=False) \
         .values('npu_rolle', 'npu_grund')
@@ -149,8 +156,8 @@ def erzeuge_npu_details(namen_liste):
     details_je_username = {}
 
     for row in namen_liste:
-        details = hole_npu_detail(row.name)
-        details_je_username[row.name] = details
+        details = hole_npu_detail(row)
+        details_je_username[str(row)] = details
     return details_je_username
 
 

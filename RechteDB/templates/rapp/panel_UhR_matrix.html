@@ -36,10 +36,9 @@
 				zeige den Usernamen sowie in jeder zu dem User passenden Rolle die Art der Verwendung (S/V/A)
 					in Kurz- oder Langversion, je nach Flag
 
-		Dann gehe über alle Namen
+		Dann gehe über alle Namen (Achtung: Wegen Namensgleichheiten besteht ein Name aus "USERID | Name")
 			über alle Rollen aus der Rollen-Gesamtliste (in der Reihenfole, wie sie in der Überschriftenzeile stehen)
-				und gibt erst mal ein Kreuz aus, wenn da was trifft.
-				Das muss später noch der eigentliche Zweck werden, aber den haben wir noch nicht im Context.
+				und gibt den Zweck an.
 
 	{% endcomment %}
 	<div class="container-fluid pb-5 mb-5">
@@ -82,7 +81,7 @@
 					{% for user in usernamen %}
 						<tr>
 							<td>
-								{{ user }}
+								{{ user|part2a }}
 							</td>
 							<td>
 								{% for team in teams_je_username|hash:user %}

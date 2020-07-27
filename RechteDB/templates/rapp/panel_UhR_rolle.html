@@ -51,7 +51,7 @@
 							{% for af in af_per_uid|hash:uid|sort %}
 								{% if af != "ka" %}
 									<tr id="{{ uid }}.{{ af }}">
-										<td>{% ifchanged %}{{ name }}{% endifchanged %}</td>
+										<td>{% ifchanged name %}{{ name|part2a }}{% endifchanged %}</td>
 										<td>{% ifchanged %}{{ uid }}{% endifchanged %}</td>
 										<td>{% ifchanged %}{{ af }}{% endifchanged %}</td>
 										<td>
@@ -87,7 +87,7 @@
 								{% endif %}
 							{% empty %}
 								<tr>
-									<td>{% ifchanged %}{{ name }}{% endifchanged %}</td>
+									<td>{% ifchanged name %}{{ name|part2a }}{% endifchanged %}</td>
 									<td>{% ifchanged %}{{ uid }}{% endifchanged %}</td>
 									<td>Keine AF zugewiesen oder durch Filter ausgeblendet</td>
 								</tr>

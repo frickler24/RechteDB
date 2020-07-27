@@ -291,7 +291,7 @@ def UhR_erzeuge_listen_mit_rollen(request):
     # Hole erst mal die Menge an Rollen, die namentlich passen
     suchstring = request.GET.get('rollenname', 'nix')
     if suchstring == "*" or suchstring == "-":
-        rollen_liste = TblUserhatrolle.objects.all().order_by('rollenname').order_by('rollenname')
+        rollen_liste = TblUserhatrolle.objects.all().order_by('rollenname')
     else:
         rollen_liste = TblUserhatrolle.objects \
             .filter(rollenname__rollenname__icontains=suchstring) \
@@ -344,11 +344,19 @@ def hole_userids_zum_namen(selektierter_name):
     Dies funktioniert nur, weil der Name ein unique Key in der Tabelle ist.
     Wichtig: Filtere gelöschte User heraus, sonst gibt es falsche Anzeigen
 
-    :param selektierter_name: Zu welchem Namen sollen die UserIDs gesucht werden?
+    Zunächst wird der zusammengesetzte userid|Name-String getrennt,
+    dann wird von der Userid die erste Stelle entfernt,
+    damit anschließend nach allen UserIDs gesucht werden kann, die dem Muster ?v<Nummer> entsprechen.
+    Das wird benötigt, weil es User mit gleichem Namen, aber diskunkten UserIDs gibt.
+
+    :param selektierter_name: Zu welchem Namen ("xv|name, vorname") sollen die UserIDs gesucht werden?
     :return: Liste der UserIDs (als String[])
     """
+    userid, name = str(selektierter_name).split(" | ")
+    userid = userid[1:]
     query = TblUserIDundName.objects \
-        .filter(name=selektierter_name) \
+        .filter(name=name) \
+        .filter(userid__iendswith=userid) \
         .order_by('-userid') \
         .filter(geloescht=False) \
         .values('userid')
@@ -388,7 +396,7 @@ def UhR_hole_daten(panel_liste, id):
         selektierte_haupt_userid = TblUserIDundName.objects.get(id=id).userid
 
         # Hole alle UserIDs, die zu dem ausgesuchten User passen.
-        selektierte_userids = hole_userids_zum_namen(selektierter_name)
+        selektierte_userids = hole_userids_zum_namen("{} | {}".format(selektierte_haupt_userid, selektierter_name))
 
         # Selektiere alle Arbeitsplatzfunktionen, die derzeit mit dem User verknüpft sind.
         afliste = TblUserIDundName.objects.get(id=id).tblgesamt_set.all()  # Das QuerySet
@@ -617,7 +625,7 @@ def hole_soll_af_mengen(rollenmenge):
 
 def suche_nach_none_wert(bekannte_rollen):
     """
-    #Suche nach Einträgen in der Tabelle RolleHatAf, bei denen die AF None ist.
+    Suche nach Einträgen in der Tabelle RolleHatAf, bei denen die AF None ist.
     :param bekannte_rollen:
     :return: True, wenn was gefunden wurde, sonst False
     """
@@ -631,7 +639,7 @@ def suche_nach_none_wert(bekannte_rollen):
     return False
 
 
-def UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle=None):
+def UhR_hole_rollengefilterte_daten(erweiterte_namen_liste, gesuchte_rolle=None):
     """
     Finde alle UserIDs, die über die angegebene Rolle verfügen.
     Wenn gesuchte_rolle is None, dann finde alle Rollen.
@@ -655,8 +663,8 @@ def UhR_hole_rollengefilterte_daten(namen_liste, gesuchte_rolle=None):
     :return: (rollenhash, userids)
     """
     userids = {}
-    for name in namen_liste:
-        userids[name.name] = hole_userids_zum_namen(name.name)
+    for name in erweiterte_namen_liste:
+        userids[name] = hole_userids_zum_namen(name)
 
     af_dict = hole_af_mengen(userids, gesuchte_rolle)
     (vorhanden, optional) = hole_rollen_zuordnungen(af_dict)
@@ -1030,6 +1038,17 @@ class RollenListenUhr(UhR):
         }
         return 'rapp/panel_UhR_rolle.html', context
 
+    def zweiter(self, string):
+        """
+        Liefert den zweiten Teil eines mit '!' getrennten Strings.
+        Wenn der String Leerstring ist, liefere nur den Leerstring zurück
+        :param string: Der String xxx!yyyyy
+        :return: yyyyy oder '' wenn String == ''
+        """
+        if string == '':
+            return string
+        return string.split('!')[1]
+
     def behandle(self, request, _):
         """
         Erzeuge die HTML-Sicht für den Dialog
@@ -1080,17 +1099,6 @@ class RollenListenUhr(UhR):
             excel.writerow(line)
         return excel.response
 
-    def zweiter(self, string):
-        """
-        Liefert den zweiten Teil eines mit '!' getrennten Strings.
-        Wenn der String Leerstring ist, liefere nur den Leerstring zurück
-        :param string: Der String xxx!yyyyy
-        :return: yyyyy oder '' wenn String == ''
-        """
-        if string == '':
-            return string
-        return string.split('!')[1]
-
     def exportiere_stern(self, request):
         """
         Liefert die Liste der AFen, die zur aktuellen Treffernmenge mit Rollen hinterlegt sind
@@ -1119,21 +1127,28 @@ class RollenListenUhr(UhR):
         for name in userids:
             for userid in userids[name]:
                 for af in sorted(context['af_per_uid'][userid]):
+                    if af == 'ka':  # Das Zeug interessiert niemanden
+                        continue
+
                     bastelkey = userid + '!' + af
                     numvorhanden = len(context['vorhanden'][bastelkey]) - 1  # wegen des Leerstrings am Ende
                     numoptional = len(context['optional'][bastelkey]) - 1  # wegen des Leerstrings am Ende
 
-                    for i in range(max(numvorhanden, numoptional)):
-                        if i < numvorhanden:
-                            vorh = self.zweiter(context['vorhanden'][bastelkey][i])  # den aktuellen Wert
-                        elif i >= 0:
-                            # letzten Wert bis zum Ende wiederholen für bessere Darstellung
-                            vorh = self.zweiter(context['vorhanden'][bastelkey][numvorhanden - 1])
-                        else:
-                            vorh = 'keine Zuordnung'
-                        opti = context['optional'][bastelkey][i] if i < numoptional else ' '
-                        line = [name, userid, af, vorh, opti]
+                    if (numvorhanden == 0 and numoptional == 0):
+                        line = [name, userid, af, " ", " "]
                         excel.writerow(line)
+                    else:
+                        for i in range(max(numvorhanden, numoptional)):
+                            if i < numvorhanden:
+                                vorh = self.zweiter(context['vorhanden'][bastelkey][i])  # den aktuellen Wert
+                            elif i >= 0:
+                                # letzten Wert bis zum Ende wiederholen für bessere Darstellung
+                                vorh = self.zweiter(context['vorhanden'][bastelkey][numvorhanden - 1])
+                            else:
+                                vorh = 'keine Zuordnung'
+                            opti = context['optional'][bastelkey][i] if i < numoptional else ' '
+                            line = [name, userid, af, vorh, opti]
+                            excel.writerow(line)
 
         return excel.response
 
