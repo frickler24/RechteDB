@@ -88,6 +88,20 @@ def part2(_1):
 		return "Kein zweites Element gefunden"
 
 @register.filter
+def part2a(_1):
+	"""
+	Liefere den zweiten Teil eines durch " | " getrennten Elements, das zunächst in einen Strings gewandelt wird
+
+	:param _1: Ein Objekt, bestehend aus <s1> ?! ?<s2>   bspw. "XV12345 ! FoobarUser"
+	:return: <s2>
+	"""
+	s = str(_1).split(" | ")
+	if len(s) > 1:
+		return s[1]
+	else:
+		return "Kein zweites Element gefunden"
+
+@register.filter
 def finde(inputset, search):
 	"""
 	Liefert den Zweck einer Rolle (ist der zweite Teil des Tupels)

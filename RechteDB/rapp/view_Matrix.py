@@ -173,11 +173,8 @@ def panel_UhR_matrix(request):
 
     if request.method == 'GET':
         (usernamen, rollenmenge, rollen_je_username, teams_je_username) = erzeuge_UhR_matrixdaten(request, namen_liste)
-        print("usernamen", usernamen)
         UserIDen_je_username = erzeuge_userIDlisten(namen_liste)
-        print("UserIDen_je_username:", UserIDen_je_username)
         npu_details_je_username = erzeuge_npu_details(namen_liste)
-        print("npu_details_je_username:", npu_details_je_username)
     else:
         (usernamen, rollenmenge, rollen_je_username, teams_je_username, UserIDen_je_username, npu_details_je_username) \
             = (set(), set(), set(), {})

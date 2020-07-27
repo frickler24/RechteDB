@@ -81,7 +81,7 @@
 					{% for user in usernamen %}
 						<tr>
 							<td>
-								{{ user }}
+								{{ user|part2a }}
 							</td>
 							<td>
 								{% for team in teams_je_username|hash:user %}

@@ -1549,7 +1549,6 @@ class SpecialTeamTests(TestCase):
         self.assertContains(response, 'GrossTeam 2', 1)
 
         con = str(response.content).replace('\\n', '\n').replace('\\r', '\r').replace('\\t', '\t')
-
         self.assertTrue(bool(re.search(
             '<thead>\s*<tr class="bg-primary text-left">\s*<th width="10%">Name</th>\s*<th width="10%">Teams</th>\s*<th width="10%">UserIDs</th>\s*<th><small>Rolle R1</small></th>\s*<th><small>Rolle R2</small></th>\s*<th><small>Rolle R3</small></th>\s*<th width="5%">NPU-Rolle</th>\s*<th width="10%">NPU-Grund</th>\s*</tr>\s*</thead>',
             con,
