@@ -349,11 +349,12 @@ def push_sp_neue_user(procs_schon_geladen):
                 FROM tblRechteAMNeu
                     LEFT JOIN tblUserIDundName
                     ON tblRechteAMNeu.userid = tblUserIDundName.userid
-                    AND tblUserIDundName.name = tblRechteAMNeu.name
+                    -- AND tblUserIDundName.name = tblRechteAMNeu.name
         
                 WHERE tblRechteAMNeu.organisation NOT REGEXP '^[0-9]{5}'
                     AND (
                         (tblRechteAMNeu.userid    IS NOT NULL AND tblUserIDundName.userid IS NULL)
+                        OR tblRechteAMNeu.name <> tblUserIDundName.name
                         OR (tblRechteAMNeu.name     IS NOT NULL AND tblUserIDundName.name   IS NULL)
                         OR tblUserIDundName.`geloescht` = TRUE
                         OR (tblRechteAMNeu.organisation != tblUserIDundName.gruppe 

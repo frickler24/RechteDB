@@ -28,7 +28,13 @@
                                                 {{ elem }}
                                                 </a>
                                             {% else %}
-                                                {{ elem }}
+                                                {# Das liest sich ein bisschen blöd, #}
+                                                {# aber Klammerung in Temmplates gehen nicht wirklich gut #}
+                                                {% if forloop.counter >= 9 and forloop.counter <= 10 and user.1 != user.9 %}
+                                                    <div class="text-danger font-weight-bold">{{ elem }}</div>
+                                                {% else %}
+                                                    {{ elem }}
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                     {% endfor %}

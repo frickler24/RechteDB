@@ -406,7 +406,7 @@ def import2(request):
         Führt die Stored Procedure behandleUser() zum Aktualisieren der UserIDundName-Tabelle aus
         In der Procedure ist relevant,
         ob die Gruppenzugehörigkeit auf die aktuell gelesene Information aktualisiert
-        oder die bestehden Daten erhalten bleiben sollen (per Übergabe der Session-Varaible).
+        oder die bestehenden Daten erhalten bleiben sollen (per Übergabe der Session-Variable).
 
         :return: Fehler-Information (False = kein Fehler)
         """
