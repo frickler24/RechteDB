@@ -463,6 +463,10 @@ def import2_quittung(request):
     um die User-Tabelle manuell anzupassen.
     Buttons werden angeboten, um den nächsten Schritt anzustoßen oder das Ganze abzubrechen.
 
+    Bislang wurde nach dem Namen des Users gesucht für die Anzeige (Link-Aufbau), nun nach der UserID.
+    Das hilft bei Usern mit identischen Namen+Vornamen und bei Namensänderungen (Heirat o.ä.).
+    Änderungen dazu erfolgen nur im HTML-Template.
+
     :param request: GET- oder POST-Request
     :return: HTML-Output
     """

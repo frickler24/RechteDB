@@ -24,7 +24,7 @@
                                         {% endif %}
                                         <td>{% if forloop.counter < 9 %}<strong>{% endif %}
                                             {% if links != 0 and forloop.counter < 9%}
-                                                <a href="/adminrapp/tbluseridundname?name={{ user.1 }}" target="_blank">
+                                                <a href="/adminrapp/tbluseridundname?userid={{ user.0 }}" target="_blank">
                                                 {{ elem }}
                                                 </a>
                                             {% else %}
