@@ -71,5 +71,6 @@ other_files/dump_20200426.sql.gz.kannwegnachDemoITSec
 other_files/letsencrypt/
 documentation/experiment_Übersicht.drawio
 !/.mypy_cache/
-01 Mitarbeiterberechtigungen ZI-AI-ST-konvertiert.csv
+01 Mitarbeiterberechtigungen*
+Rechte ZI-AI-alles.csv
 
