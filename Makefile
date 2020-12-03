@@ -239,6 +239,7 @@ letsencrypt: vorbereitung
 				--agree-tos \
 				--email m5@frickler24.de \
 				--http-01-port=80
+				sudo chown lutz /home/lutz/Projekte/RechteDB2MySQL/RechteDB/other_files/letsencrypt/etc/live/frickler.eichler-web.de/privkey.pem
 		cat /home/lutz/Projekte/RechteDB2MySQL/RechteDB/other_files/letsencrypt/etc/live/frickler.eichler-web.de/fullchain.pem \
 			/home/lutz/Projekte/RechteDB2MySQL/RechteDB/other_files/letsencrypt/etc/live/frickler.eichler-web.de/privkey.pem \
 			> /home/lutz/Projekte/RechteDB2MySQL/RechteDB/other_files/certs/RApp.pem
