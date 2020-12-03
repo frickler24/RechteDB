@@ -189,23 +189,24 @@ rappviele: vieleweg
 			rapp:latest; done')
 
 chaos:
-	docker login -u=_ -p=$$CMKEY docker.chaosmesh.io
-	docker pull docker.chaosmesh.io/chaosmesh/agent
+	docker login -u=_ -p=$$CMKEY docker.steadybit.io
+	docker pull docker.steadybit.io/steadybit/agent
 	docker run \
 		--detach \
-		--name chaosmesh-agent \
+        --restart always \
+		--name steadybit-agent \
 		--volume /var/run:/var/run \
 		--privileged \
 		--net=host \
 		--pid=host \
 		--ipc=host \
 		--restart unless-stopped \
-		--env="CHAOSMESH_AGENT_KEY=$$CMKEY" \
-		--env="CHAOSMESH_AGENT_REGISTER_URL=https://platform.chaosmesh.io" \
-		docker.chaosmesh.io/chaosmesh/agent
+		--env="STEADYBIT_AGENT_KEY=$$CMKEY" \
+		--env="STEADYBIT_AGENT_REGISTER_URL=https://platform.chaosmesh.io" \
+		docker.steadybit.io/steadybit/agent
 
 nochaos:
-	-docker container rm -f chaosmesh-agent
+	-docker container rm -f steadybit-agent
 
 prod:
 	(cd RechteDB; docker-compose up -d)
