@@ -1677,10 +1677,13 @@ def panel_UhR_af_export(request, id):
     for rolle in userHatRolle_liste:
         for rollendefinition in TblRollehataf.objects.filter(rollenname=rolle.rollenname):
             line = [selektierter_name, rolle.rollenname, rollendefinition.af]
-            if rollendefinition.mussfeld > 0:
-                line.append('ja')
+            if (rollendefinition.mussfeld != None):
+                if rollendefinition.mussfeld > 0:
+                    line.append('ja')
+                else:
+                    line.append('nein')
             else:
-                line.append('nein')
+                line.append('undef')
             for userid in selektierte_userids:
                 if str(rollendefinition.af).strip().lower() in str(afmenge_je_userID[userid]).lower():
                     line.append('ja')
