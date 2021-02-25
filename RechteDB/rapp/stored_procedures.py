@@ -661,11 +661,11 @@ def push_sp_behandle_rechte(procs_schon_geladen):
             */
         
             drop table if exists uids;
-            create temporary table uids as
+            create table uids as
                 select distinct userid as uid from tblRechteAMNeu;
         
             drop table if exists rapp_Gesamt_komplett;
-            create temporary table rapp_Gesamt_komplett as
+            create table rapp_Gesamt_komplett as
                 SELECT tblGesamt.id,
                        tblUserIDundName.userid,
                        tblUserIDundName.name,
