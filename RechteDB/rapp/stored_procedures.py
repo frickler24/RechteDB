@@ -607,10 +607,11 @@ def push_sp_behandle_rechte(procs_schon_geladen):
                 müssen schrittweise in die Gesamttabelle eingetragen werden.
             */
         
-            -- Markiere zunächst Plattform-Namen, die in der Gesamttabelle nicht mehr auftauchen, als gelöscht0
+            -- Markiere zunächst Plattform-Namen, die in der Gesamttabelle nicht mehr auftauchen, als gelöscht
             -- (manchmal werden Plattformen einfach umbenannt).
             -- Das echte Löschen muss bei Bedarf in Schritten erfolgen,
-            -- weil in der Historientabelle weiterhin Referenzen auf die nicht mehr aktuellen PlattformIDs stehen können.
+            -- weil in der Historientabelle weiterhin Referenzen 
+            -- auf die nicht mehr aktuellen PlattformIDs stehen können.
             drop table if exists bloed;
             CREATE TEMPORARY TABLE bloed as
                 SELECT tblPlattform.`tf_technische_plattform` as x
@@ -624,12 +625,12 @@ def push_sp_behandle_rechte(procs_schon_geladen):
         
             -- Ergänze alle Plattformen, die bislang nur in tblRechteAMNeu bekannt sind
             INSERT INTO tblPlattform (`tf_technische_plattform`)
-            SELECT DISTINCT tblRechteAMNeu.`tf_technische_plattform`
-            FROM tblRechteAMNeu
-                LEFT JOIN tblPlattform
-                ON tblRechteAMNeu.`tf_technische_plattform` = tblPlattform.`tf_technische_plattform`
-            WHERE not tblPlattform.geloescht
-                AND tblPlattform.`tf_technische_plattform` IS NULL;
+                SELECT DISTINCT tblRechteAMNeu.`tf_technische_plattform`
+                FROM tblRechteAMNeu
+                    LEFT JOIN tblPlattform
+                    ON tblRechteAMNeu.`tf_technische_plattform` = tblPlattform.`tf_technische_plattform`
+                WHERE COALESCE(tblPlattform.geloescht is null, not tblPlattform.geloescht)
+                    AND tblPlattform.`tf_technische_plattform` IS NULL;
         
             /*
                 Der Status "gefunden" dient dazu,
@@ -968,12 +969,12 @@ def push_sp_behandle_rechte(procs_schon_geladen):
                 qryF5_AktualisierePlattformListe
         
             INSERT INTO tblPlattform (`tf_technische_plattform`)
-            SELECT DISTINCT tblRechteAMNeu.`tf_technische_plattform`
-            FROM tblRechteAMNeu
-                LEFT JOIN tblPlattform
-                ON tblRechteAMNeu.`tf_technische_plattform` = tblPlattform.`tf_technische_plattform`
-            WHERE not tblPlattform.geloescht
-                AND tblPlattform.`tf_technische_plattform` IS NULL;
+                SELECT DISTINCT tblRechteAMNeu.`tf_technische_plattform`
+                FROM tblRechteAMNeu
+                    LEFT JOIN tblPlattform
+                    ON tblRechteAMNeu.`tf_technische_plattform` = tblPlattform.`tf_technische_plattform`
+                WHERE not tblPlattform.geloescht
+                    AND tblPlattform.`tf_technische_plattform` IS NULL;
             */
         
         
@@ -990,34 +991,34 @@ def push_sp_behandle_rechte(procs_schon_geladen):
                         plattform_id, Gefunden, `geaendert`, `tf_kritikalitaet`, `tf_eigentuemer_org`, geloescht, GF,
                         `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`,
                         `hk_tf_in_af`, `gf_beschreibung`, `af_zuweisungsdatum`, letzte_aenderung)
-            SELECT  tblRechteAMNeu.tf,
-                    tblRechteAMNeu.`tf_beschreibung`,
-                    tblRechteAMNeu.`enthalten_in_af`,
-                    tblRechteAMNeu.`af_beschreibung`,
-                    Now() AS datumNeu,
-        
-                    (SELECT `id` FROM `tblUEbersichtAF_GFs` WHERE `name_af_neu` LIKE 'Neues Recht noch nicht eingruppiert') AS modellNeu,
-        
-                    (SELECT id FROM tblUserIDundName WHERE userid = tblRechteAMNeu.userid) AS UidnameNeu,
-        
-                    (SELECT id FROM tblPlattform
-                        WHERE `tf_technische_plattform` = tblRechteAMNeu.`tf_technische_plattform`) AS PlattformNeu,
-        
-                    TRUE AS Ausdr1,
-                    FALSE AS Ausdr2,
-                    tblRechteAMNeu.`tf_kritikalitaet`,
-                    tblRechteAMNeu.`tf_eigentuemer_org`,
-                    FALSE AS Ausdr3,
-                    tblRechteAMNeu.GF,
-                    tblRechteAMNeu.`af_gueltig_ab`,
-                    tblRechteAMNeu.`af_gueltig_bis`,
-                    tblRechteAMNeu.`direct_connect`,
-                    tblRechteAMNeu.`hk_tf_in_af`,
-                    tblRechteAMNeu.`gf_beschreibung`,
-                    tblRechteAMNeu.`af_zuweisungsdatum`,
-                    now() as letzte_aenderung
-            FROM tblRechteAMNeu
-            WHERE tblRechteAMNeu.`angehaengt_sonst` = TRUE;
+                SELECT  tblRechteAMNeu.tf,
+                        tblRechteAMNeu.`tf_beschreibung`,
+                        tblRechteAMNeu.`enthalten_in_af`,
+                        tblRechteAMNeu.`af_beschreibung`,
+                        Now() AS datumNeu,
+            
+                        (SELECT `id` FROM `tblUEbersichtAF_GFs` WHERE `name_af_neu` LIKE 'Neues Recht noch nicht eingruppiert') AS modellNeu,
+            
+                        (SELECT id FROM tblUserIDundName WHERE userid = tblRechteAMNeu.userid) AS UidnameNeu,
+            
+                        (SELECT id FROM tblPlattform
+                            WHERE `tf_technische_plattform` = tblRechteAMNeu.`tf_technische_plattform`) AS PlattformNeu,
+            
+                        TRUE AS Ausdr1,
+                        FALSE AS Ausdr2,
+                        tblRechteAMNeu.`tf_kritikalitaet`,
+                        tblRechteAMNeu.`tf_eigentuemer_org`,
+                        FALSE AS Ausdr3,
+                        tblRechteAMNeu.GF,
+                        tblRechteAMNeu.`af_gueltig_ab`,
+                        tblRechteAMNeu.`af_gueltig_bis`,
+                        tblRechteAMNeu.`direct_connect`,
+                        tblRechteAMNeu.`hk_tf_in_af`,
+                        tblRechteAMNeu.`gf_beschreibung`,
+                        tblRechteAMNeu.`af_zuweisungsdatum`,
+                        now() as letzte_aenderung
+                FROM tblRechteAMNeu
+                WHERE tblRechteAMNeu.`angehaengt_sonst` = TRUE;
         
         
             /*
