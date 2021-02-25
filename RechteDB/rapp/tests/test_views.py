@@ -1166,6 +1166,13 @@ class UserRolleAFTests(TestCase):
             rollenname=TblRollen.objects.get(rollenname='Erste Neue Rolle'),
         )
         TblRollehataf.objects.create(
+            mussfeld=None,
+            einsatz=TblRollehataf.EINSATZ_XABCV,
+            bemerkung='Hier fehlt die Mussfeld-Angabe',
+            af=TblAfliste.objects.get(af_name='rva_01219_beta91_job_abst_nicht_zugewiesen'),
+            rollenname=TblRollen.objects.get(rollenname='Erste Neue Rolle'),
+        )
+        TblRollehataf.objects.create(
             mussfeld=False,
             einsatz=TblRollehataf.EINSATZ_XABCV,
             bemerkung='Auch irgend eine halbwegs sinnvolle Beschreibung',
@@ -1277,7 +1284,8 @@ class UserRolleAFTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "User_xv13254")
         self.assertContains(response, 'icon-yes', 2)
-        self.assertContains(response, 'icon-no', 4)
+        self.assertContains(response, 'icon-no', 5)
+        self.assertContains(response, 'icon-alert', 1)
 
     def test_panel_view_with_deep_insight_find_delete_link(self):
         id = TblUserIDundName.objects.get(userid='xv13254').id
@@ -1365,9 +1373,10 @@ class UserRolleAFTests(TestCase):
         # print('____________')
         # print(response.content)
         gesuchter_exportstring = "Name\tRollenname\tAF\tMussrecht\txv13254\tdv13254\r\n" \
-                                 + "User_xv13254\tErste Neue Rolle\trva_01219_beta91_job_abst\tja\tja\tnein\r\n" \
-                                 + "User_xv13254\tErste Neue Rolle\trva_01219_beta91_job_abst_nicht_zugewiesen\tja\tnein\tnein\r\n" \
-                                 + "User_xv13254\tZweite Neue Rolle\trva_01219_beta91_job_abst\tnein\tja\tnein\r\n"
+                                + "User_xv13254\tErste Neue Rolle\trva_01219_beta91_job_abst\tja\tja\tnein\r\n" \
+                                + "User_xv13254\tErste Neue Rolle\trva_01219_beta91_job_abst_nicht_zugewiesen\tja\tnein\tnein\r\n" \
+                                + "User_xv13254\tErste Neue Rolle\trva_01219_beta91_job_abst_nicht_zugewiesen\tundef\tnein\tnein\r\n" \
+                                + "User_xv13254\tZweite Neue Rolle\trva_01219_beta91_job_abst\tnein\tja\tnein\r\n"
         self.assertContains(response, 'Name\tRollenname\tAF\tMussrecht\txv13254\tdv13254\r\n')
         self.assertContains(response, 'User_xv13254\tErste Neue Rolle\trva_01219_beta91_job_abst\tja\tja\tnein\r\n')
         self.assertContains(response,
@@ -1420,7 +1429,7 @@ class UserRolleAFTests(TestCase):
         self.assertContains(response, 'href="{0}?episch=1"'.format(pdf_url), 1)
         self.assertContains(response, 'Erste Neue Rolle', 1)
         self.assertContains(response, 'Zweite Neue Rolle', 1)
-        self.assertContains(response, 'rva_01219_beta91_job_abst', 3)
+        self.assertContains(response, 'rva_01219_beta91_job_abst', 4)
         self.assertContains(response, 'Das ist eine Testrolle', 1)
         self.assertContains(response, 'Das ist auch eine Testrolle', 1)
         self.assertContains(response, 'Testsystem', 1)
