@@ -189,7 +189,6 @@ def push_sp_vorbereitung(procs_schon_geladen):
                      `höchste kritikalität tf in af`   AS hk_tf_in_af,
                      `gf beschreibung`                 AS gf_beschreibung,
                      `af zuweisungsdatum`              AS af_zuweisungsdatum,
-                     `organisation`,
                      `npu_rolle`,
                      `npu_grund`,
                      `iiq_organisation`
@@ -199,7 +198,7 @@ def push_sp_vorbereitung(procs_schon_geladen):
                        `enthalten_in_af`,
                        `tf_technische_plattform`,
                        `GF`,
-                       organisation;
+                       iiq_organisation;
 
           /*
               Umkopieren der Daten von einer Tabelle in die andere
@@ -211,7 +210,7 @@ def push_sp_vorbereitung(procs_schon_geladen):
                       `tf_kritikalitaet`,
                       `tf_eigentuemer_org`, `tf_technische_plattform`, GF, 
                       `af_gueltig_ab`, `af_gueltig_bis`, `direct_connect`, `hk_tf_in_af`,
-                      `gf_beschreibung`, `af_zuweisungsdatum`, organisation,
+                      `gf_beschreibung`, `af_zuweisungsdatum`, 
                       `npu_rolle`, `npu_grund`, `iiq_organisation`,
                       doppelerkennung)
           SELECT rapp_NeuVonImportDuplikatfrei.userid,
@@ -230,7 +229,6 @@ def push_sp_vorbereitung(procs_schon_geladen):
                  rapp_NeuVonImportDuplikatfrei.`hk_tf_in_af`,
                  rapp_NeuVonImportDuplikatfrei.`gf_beschreibung`,
                  rapp_NeuVonImportDuplikatfrei.`af_zuweisungsdatum`,
-                 rapp_NeuVonImportDuplikatfrei.`organisation`,
                  rapp_NeuVonImportDuplikatfrei.`npu_rolle`,
                  rapp_NeuVonImportDuplikatfrei.`npu_grund`,
                  rapp_NeuVonImportDuplikatfrei.`iiq_organisation`,
@@ -334,7 +332,7 @@ def push_sp_neue_user(procs_schon_geladen):
                                 COALESCE(tblUserIDundName.orga_id, 35) AS Ausdr1,
                                 orga AS Ausdr2,
                                 concat('ZI-', orga) as abteilung,
-                                tblRechteAMNeu.organisation as gruppe,
+                                tblRechteAMNeu.iiq_organisation as gruppe,
                                 tblRechteAMNeu.npu_rolle,
                                 tblRechteAMNeu.npu_grund,
                                 tblUserIDundName.userid as userid_alt,
@@ -351,19 +349,16 @@ def push_sp_neue_user(procs_schon_geladen):
                     ON tblRechteAMNeu.userid = tblUserIDundName.userid
                     -- AND tblUserIDundName.name = tblRechteAMNeu.name
         
-                WHERE tblRechteAMNeu.organisation NOT REGEXP '^[0-9]{5}'
-                    AND (
-                        (tblRechteAMNeu.userid    IS NOT NULL AND tblUserIDundName.userid IS NULL)
+                WHERE (tblRechteAMNeu.userid IS NOT NULL AND tblUserIDundName.userid IS NULL)
                         OR tblRechteAMNeu.name <> tblUserIDundName.name
-                        OR (tblRechteAMNeu.name     IS NOT NULL AND tblUserIDundName.name   IS NULL)
+                        OR (tblRechteAMNeu.name IS NOT NULL AND tblUserIDundName.name IS NULL)
                         OR tblUserIDundName.`geloescht` = TRUE
-                        OR (tblRechteAMNeu.organisation != tblUserIDundName.gruppe 
-                            AND concat(tblRechteAMNeu.organisation, '--') != tblUserIDundName.gruppe)
+                        OR (tblRechteAMNeu.iiq_organisation != tblUserIDundName.gruppe 
+                            AND concat(tblRechteAMNeu.iiq_organisation, '--') != tblUserIDundName.gruppe)
                         OR tblRechteAMNeu.npu_rolle != tblUserIDundName.npu_rolle 
                         OR tblRechteAMNeu.npu_rolle not like "" AND tblUserIDundName.npu_rolle is null
                         OR tblRechteAMNeu.npu_grund != tblUserIDundName.npu_grund
                         OR tblRechteAMNeu.npu_grund not like "" AND tblUserIDundName.npu_grund is null
-                    )
                 ;
         
             /*

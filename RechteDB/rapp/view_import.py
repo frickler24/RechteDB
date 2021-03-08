@@ -213,7 +213,6 @@ def import_csv(request):
                     af_gueltig_ab=patch_datum(line['AF Gültig ab']),
                     af_gueltig_bis=patch_datum(line['AF Gültig bis']),
                     af_zuweisungsdatum=patch_datum(line['AF Zuweisungsdatum']),
-                    organisation=textwrap.shorten(line['Organisation'], width=15, placeholder="Hä?"),
                     npu_rolle=textwrap.shorten(line['Kategorie NPU'], width=10, placeholder="Hä?"),
                     npu_grund=textwrap.shorten(line['Grund NPU'], width=2000, placeholder="..."),
                     iiq_organisation=textwrap.shorten(line['Organisation'], width=64, placeholder="..."),
