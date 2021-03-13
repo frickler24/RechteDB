@@ -967,7 +967,7 @@ class EinzelUhr(UhR):
         userHatRolle_liste, selektierter_name, userids, usernamen, \
                 selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID \
             = UhR_hole_daten(namen_liste, id)
-        paginator, pages, pagesize = pagination(request, namen_liste, 10000)
+        paginator, pages, pagesize = pagination(request, namen_liste, 100)
 
         form = ShowUhRForm(request.GET)
         context = {
@@ -1260,8 +1260,8 @@ def panel_UhR(request, id=0):
         name = 'nur_neue'
     elif request.GET.get('rollenname', None) is not None and request.GET.get('rollenname', None) != "":
         name = 'rolle'
-    elif request.GET.get('afname', None) is not None and request.GET.get('afname', None) != "":
-        name = 'af'
+    # elif request.GET.get('afname', None) is not None and request.GET.get('afname', None) != "":
+    #    name = 'af'
     else:
         name = 'einzel'
 

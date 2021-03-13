@@ -7,7 +7,7 @@ all:	it image codefile rapptest rappprod status
 
 clean:
 	-docker rm -f rapp
-	-docker rm -f phpmyadmin
+	-docker rm -f pma
 	-docker rm -f mariadb
 	-docker rm -f hap
 	-docker network rm mariaNetz
@@ -40,7 +40,8 @@ crawler:
 
 phpmyadmin:
 	docker run -d \
-		--name phpmyadmin \
+		--name pma \
+        --publish 8888:80 \
 		--network mariaNetz \
 		--network-alias pma \
 		--restart unless-stopped \
@@ -48,7 +49,7 @@ phpmyadmin:
 		-e PMA_HOST=maria \
 		mypma
 
-pma:
+WEGDAMITpma:
 	docker run -d \
 		-p 8088:80 \
 		--name phpmyadmin \

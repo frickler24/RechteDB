@@ -73,7 +73,7 @@ backend letsencrypt
     timeout server 1h
 
 
-# Die eingentliche Anwendung
+# Die eigentliche Anwendung
 
 backend rapp_server
     option httpchk HEAD /rapp/ HTTP/1.1\r\nHost:\ rapp:8081\r\nUser-agent:\ Der\ wilde\ Watz

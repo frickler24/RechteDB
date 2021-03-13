@@ -11,6 +11,12 @@
 				<label class="control-label" for="{{ filter.form.orga.id_for_label }}">Team</label>
 				{% render_field filter.form.orga class="form-control" %}
 			</div>
+            {% comment %}
+			<div class="form-group form-group-sm col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
+				<label class="control-label" for="{{ filter.form.abteilung.id_for_label }}">Abteilung enthält</label>
+				{% render_field filter.form.abteilung class="form-control" %}
+			</div>
+            {% endcomment %}
 			<div class="form-group form-group-sm col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
 				<label class="control-label" for="{{ rollenfilter.form.rollenname.id_for_label }}">Rolle enthält</label>
 				{% render_field rollen_filter.form.rollenname class="form-control" %}
@@ -19,17 +25,14 @@
 				<label class="control-label" for="{{ filter.form.gruppe.id_for_label }}">Gruppe enthält</label>
 				{% render_field filter.form.gruppe class="form-control" %}
 			</div>
-			</div>
+            <div class="form-group form-group-sm col-12 col-sm-3 col-md-3 col-lg-2 col-xl-2">
+                <label class="control-label" for="pagesize">Zeilen pro Seite</label>
+                <input type="text" class="form-control" placeholder="# Zeilen/Seite"
+                       id="pagesize" name="pagesize" type="text" maxlength="5"
+                       {% if pagesize %} value="{{ pagesize }}" {% endif %} />
+            </div>
 			<div class="container">
 				<div class="row mt-0 mb-5 justify-content-lg-center">
-				{% comment %}
-					<div class="form-group form-group-sm col col-md-auto">
-						<label class="control-label" for="pagesize">Zeilen pro Seite</label>
-						<input type="text" class="form-control" placeholder="# Zeilen/Seite"
-							   id="pagesize" name="pagesize" type="text" maxlength="5"
-							   {% if pagesize %} value="{{ pagesize }}" {% endif %} />
-					</div>
-				{% endcomment %}
 					<div class="form-group form-group-sm col col-md-auto mt-3 pt-3">
 						<button type="submit" class="btn btn-outline-primary btn-sm">Suche</button>
 					</div>
