@@ -963,11 +963,11 @@ class EinzelUhr(UhR):
         :param id: ID des XV-UserID-Eintrags, zu dem die Detaildaten geliefert werden sollen; 0 -> kein User gewählt
         :return: Gerendertes HTML
         """
-        (namen_liste, panel_filter, rollen_liste, rollen_filter) = UhR_erzeuge_listen_ohne_rollen(request)
-        (userHatRolle_liste, selektierter_name, userids, usernamen,
-         selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID) \
+        namen_liste, panel_filter, rollen_liste, rollen_filter = UhR_erzeuge_listen_ohne_rollen(request)
+        userHatRolle_liste, selektierter_name, userids, usernamen, \
+                selektierte_haupt_userid, selektierte_userids, afmenge, afmenge_je_userID \
             = UhR_hole_daten(namen_liste, id)
-        (paginator, pages, pagesize) = pagination(request, namen_liste, 10000)
+        paginator, pages, pagesize = pagination(request, namen_liste, 10000)
 
         form = ShowUhRForm(request.GET)
         context = {
@@ -1254,7 +1254,6 @@ def panel_UhR(request, id=0):
     :param id: ID des XV-UserID-Eintrags, zu dem die Detaildaten geliefert werden sollen
     :return: Gerendertes HTML
     """
-    assert request.method != 'POST', 'Irgendwas ist im panel_UhR über POST angekommen'
     assert request.method == 'GET', 'Irgendwas ist im panel_UhR nicht über GET angekommen: ' + request.method
 
     if request.GET.get('rollenname', None) is not None and request.GET.get('rollenname', None) == "-":
@@ -1262,7 +1261,6 @@ def panel_UhR(request, id=0):
     elif request.GET.get('rollenname', None) is not None and request.GET.get('rollenname', None) != "":
         name = 'rolle'
     elif request.GET.get('afname', None) is not None and request.GET.get('afname', None) != "":
-        print('Factory AF')
         name = 'af'
     else:
         name = 'einzel'
