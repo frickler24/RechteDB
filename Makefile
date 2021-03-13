@@ -136,7 +136,9 @@ rapptest:
 		--network mariaNetz \
 		-e TZ='Europe/Berlin' \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB:/RechteDB \
+		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/.env.docker:/RechteDB/.env \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB:/RechteDB/code \
+		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB/.env.docker:/RechteDB/code/.env \
 		rapp:latest sh -c "/RechteDB/code/manage.py test --no-input"
 
 rapptest2:
@@ -156,7 +158,9 @@ rappprod:
 		--restart unless-stopped \
 		-e TZ='Europe/Berlin' \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB:/RechteDB \
+		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/.env.docker:/RechteDB/.env \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB:/RechteDB/code \
+		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB/.env.docker:/RechteDB/code/.env \
 		rapp:latest
 
 rappfull:
@@ -253,7 +257,6 @@ letsencrypt: vorbereitung
 hap:
 	-docker run -d \
 		--name hap \
-		--restart unless-stopped \
 		--publish 8088:80 \
 		--publish 18443:443 \
 		--network mariaNetz \

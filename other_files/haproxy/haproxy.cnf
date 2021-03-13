@@ -80,7 +80,6 @@ backend rapp_server
     option forwardfor
     balance roundrobin
     timeout check 7000
-    option httplog
     # server server1 rapp1:8000 check fall 1 rise 2 resolvers mydns
     # server server2 rapp2:8000 check fall 1 rise 2 resolvers mydns
     # server server3 rapp3:8000 check fall 1 rise 2 resolvers mydns
