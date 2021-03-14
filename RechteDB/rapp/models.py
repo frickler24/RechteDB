@@ -783,3 +783,16 @@ class ACLGruppen(models.Model):
         verbose_name = "ACL-Gruppen"
         verbose_name_plural = "95_ACL-Gruppen"
         ordering = ['tf']
+
+
+class Setze_NPU_namen_status(models.Model):
+    """
+    Die Tabelle hält das Ergbnis der einzelnen Schritte beim Setzen der NPU-Rollen
+    """
+    anzeige = models.CharField(max_length=200, null=True, db_index=False, )
+    wert = models.IntegerField(null=True, db_index=False,)
+    stamp = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        managed = True
+

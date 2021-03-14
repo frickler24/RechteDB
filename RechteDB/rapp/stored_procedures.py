@@ -1613,17 +1613,11 @@ def push_sp_rollen_fuer_NPU(procs_schon_geladen):
             --
             
             START TRANSACTION ;
-                DROP TABLE IF EXISTS `setze_NPU_namen_status`;
-                CREATE TABLE `setze_NPU_namen_status` (
-                `Anzeige` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-                `Wert` bigint(10) NULL,
-                `Stamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-            COMMIT;
-
-            START TRANSACTION ;
-                Insert INTO setze_NPU_namen_status
-                    SELECT 
+                TRUNCATE `rapp_setze_npu_namen_status`;
+                
+                Insert INTO rapp_setze_npu_namen_status
+                    SELECT
+                        0 as id, 
                         "Anzahl Rollen bei Transaktionsstart" as "Anzeige",
                         COUNT(*) as "Wert",
                         now() as Stamp
@@ -1648,8 +1642,9 @@ def push_sp_rollen_fuer_NPU(procs_schon_geladen):
                 ON DUPLICATE KEY UPDATE tbl_Rollen.`datum` = now()
                 ;
 
-                Insert INTO setze_NPU_namen_status
+                Insert INTO rapp_setze_npu_namen_status
                     SELECT 
+                        0 as id, 
                         "Anzahl Rollen nach Erzeugung" as "Anzeige",
                         COUNT(*) as "Wert",
                         now() as Stamp
@@ -1736,16 +1731,18 @@ def push_sp_rollen_fuer_NPU(procs_schon_geladen):
 
 
                 -- Update Statustabelle
-                Insert INTO setze_NPU_namen_status
+                Insert INTO rapp_setze_npu_namen_status
                 SELECT 
+                    0 as id, 
                     "Anzahl einzutragender Werte" as "Anzeige",
                     COUNT(*) as "Wert",
                     now() as Stamp
                 FROM Patch_tbl_RolleHatAF
                 ;
 
-                Insert INTO setze_NPU_namen_status
+                Insert INTO rapp_setze_npu_namen_status
                 SELECT 
+                    0 as id, 
                     "Anzahl in tbl_RolleHatAF vorher" as "Anzeige",
                     COUNT(*) as "Wert",
                     now() as Stamp
@@ -1765,8 +1762,9 @@ def push_sp_rollen_fuer_NPU(procs_schon_geladen):
                     FROM `Patch_tbl_RolleHatAF`
                 ON DUPLICATE KEY UPDATE tbl_RolleHatAF.bemerkung = concat("Doppeleintrag: ", tbl_RolleHatAF.bemerkung);
 
-                Insert INTO setze_NPU_namen_status
+                Insert INTO rapp_setze_npu_namen_status
                 SELECT 
+                    0 as id, 
                     "Anzahl nicht eingetragener Werte" as "Anzeige",
                     COUNT(*) as "Wert",
                     now() as Stamp
@@ -1777,8 +1775,9 @@ def push_sp_rollen_fuer_NPU(procs_schon_geladen):
                 ;
 
 
-                Insert INTO setze_NPU_namen_status
+                Insert INTO rapp_setze_npu_namen_status
                 SELECT 
+                    0 as id, 
                     "Anzahl in tbl_RolleHatAF nach Inserts" as "Anzeige",
                     COUNT(*) as "Wert",
                     now() as Stamp
@@ -1814,15 +1813,16 @@ def push_sp_rollen_fuer_NPU(procs_schon_geladen):
                 ON DUPLICATE KEY UPDATE tbl_UserHatRolle.`letzte_aenderung` = now()
                 ;
 
-                Insert INTO setze_NPU_namen_status
+                Insert INTO rapp_setze_npu_namen_status
                 SELECT 
+                    0 as id, 
                     "Anzahl in tbl_UserHatRolle nach Verbindung der Rollen mit den Usern" as "Anzeige",
                     COUNT(*) as "Wert",
                     now() as Stamp
                 FROM tbl_UserHatRolle
                 ;
 
-                SELECT * FROM setze_NPU_namen_status;
+                SELECT * FROM rapp_setze_npu_namen_status;
             COMMIT;
         END
     """

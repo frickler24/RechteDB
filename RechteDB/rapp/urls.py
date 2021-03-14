@@ -14,6 +14,8 @@ from . import view_rolle_umbenennen
 from . import view_ungenutzte_rollen
 from . import view_ungenutzte_afgf
 from . import view_Matrix
+from . import view_setze_npu_rolle
+
 
 # app_name = 'rapp'        # Wird nur benötigt als namespace, falls mehrere Apps dieselbe Teil-URL haben
 
@@ -145,6 +147,11 @@ urlpatterns += [
     path('neue_afgf/', login_required(view_neueAFGF.zeige_neue_afgf), name='zeige_neue_afgf'),
     path('neueAFGF_download/', login_required(view_neueAFGF.neue_afgf_download), name='neueAFGF_download'),
     path('neueAFGF_setzen/', login_required(view_neueAFGF.neueAFGF_setzen), name='neueAFGF_setzen'),
+]
+
+# Setzen der Rollen für Technishce User NPU
+urlpatterns += [
+    path('setze_NPU_rollen/', login_required(view_setze_npu_rolle.panel_setze_npu_rolle), name='setze_NPU_rollen'),
 ]
 
 # Finden ungenutzter Kombinationen aus AF und GF: Anzeige mit spezifischen Links auf die jeweilige Adminseite
