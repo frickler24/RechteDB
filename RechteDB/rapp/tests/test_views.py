@@ -2951,6 +2951,15 @@ class NeuAFGFTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
+class SetzeNPURollen(TestCase):
+    # Nur check, ob die Seite da ist
+    def test_SetzeNPURollen_seite(self):
+        url = reverse('setze_NPU_rollen')
+        response = self.client.get(url)
+        if response.status_code != 200 and response.status_code != 302:
+            self.assertEqual(response.status_code, 200)
+
+
 """
 Die Dinger hier gehen wieder nicht, weil die SPs nicht geladen sind
 class ListenTest(TestCase):
