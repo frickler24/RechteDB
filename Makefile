@@ -7,13 +7,13 @@ all:	it image codefile rapptest rappprod status
 
 clean:
 	-docker rm -f rapp
-	-docker rm -f phpmyadmin
+	-docker rm -f pma
 	-docker rm -f mariadb
 	-docker rm -f hap
 	-docker network rm mariaNetz
 
 netzwerk:
-	docker network create --subnet 172.42.0.0/16 mariaNetz
+	docker network create --subnet 10.42.0.0/24 mariaNetz
 
 mariadb:
 	docker run -d \
@@ -40,7 +40,7 @@ crawler:
 
 phpmyadmin:
 	docker run -d \
-		--name phpmyadmin \
+		--name pma \
 		--network mariaNetz \
 		--network-alias pma \
 		--restart unless-stopped \
@@ -48,18 +48,6 @@ phpmyadmin:
 		-e PMA_HOST=maria \
 		mypma
 
-pma:
-	docker run -d \
-		-p 8088:80 \
-		--name phpmyadmin \
-		--network mariaNetz \
-		--network-alias pma \
-		--restart unless-stopped \
-		-e TZ='Europe/Berlin' \
-		-e PMA_HOST=maria \
-		-e PMA_CONTROLUSER=pma \
-		-e PMA_CONTROLPASS=0oWiPLfdhAcSqy9TnmhKcI222QQIO87BvvjiHX9r57\
-		mypma
 
 importfile:
 	cd irgendwohin
@@ -135,7 +123,9 @@ rapptest:
 		--network mariaNetz \
 		-e TZ='Europe/Berlin' \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB:/RechteDB \
+		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/.env.docker:/RechteDB/.env \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB:/RechteDB/code \
+		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB/.env.docker:/RechteDB/code/.env \
 		rapp:latest sh -c "/RechteDB/code/manage.py test --no-input"
 
 rapptest2:
@@ -150,12 +140,15 @@ rapptest2:
 rappprod:
 	docker run -d \
 		--name rapp \
+		--publish 8989:8000 \
 		--network mariaNetz \
 		--network-alias rapp \
 		--restart unless-stopped \
 		-e TZ='Europe/Berlin' \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB:/RechteDB \
+		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/.env.docker:/RechteDB/.env \
 		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB:/RechteDB/code \
+		-v /home/lutz/Projekte/RechteDB2MySQL/RechteDB/RechteDB/.env.docker:/RechteDB/code/.env \
 		rapp:latest
 
 rappfull:
@@ -227,7 +220,7 @@ letsencrypt: vorbereitung
 	docker run -it \
 		--rm \
 		--name certcont \
-		--ip=172.42.0.99 \
+		--ip=10.42.0.99 \
 		--network mariaNetz \
 		--network-alias letsencrypt \
 		--volume "/home/lutz/Projekte/RechteDB2MySQL/RechteDB/other_files/letsencrypt/etc:/etc/letsencrypt:rw" \
@@ -252,7 +245,6 @@ letsencrypt: vorbereitung
 hap:
 	-docker run -d \
 		--name hap \
-		--restart unless-stopped \
 		--publish 8088:80 \
 		--publish 18443:443 \
 		--network mariaNetz \
