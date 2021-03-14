@@ -81,3 +81,9 @@ class FormUmbenennen(forms.Form):
     neuer_name = forms.CharField(max_length=50, label='Zukünftiger Rollenname',
                                  error_messages={'required': 'Bitte geben Sie den zukünftigen Rollennamen an',
                                                  'invalid': 'Zukünftiger Rollennamen wird benötigt'})
+
+class FormNPUSetzen(forms.Form):
+    """
+    Formular für das Erzeugen der Rollen für NPUs
+    Wir benötigen keine Eingfabefelder
+    """

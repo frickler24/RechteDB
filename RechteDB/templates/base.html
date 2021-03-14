@@ -89,10 +89,11 @@
 							   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Magie</a>
 							<div class="dropdown-menu" aria-labelledby="navbarDropdownMagic">
 								<a class="dropdown-item" href="{% url 'import' %}">Import IIQ-Daten</a>
+			                    <a class="dropdown-item" href="{% url 'zeige_neue_afgf' %}">Neue AF/GF</a>
+			                    <a class="dropdown-item" href="{% url 'setze_NPU_rollen' %}">NPU-Rollen generieren</a>
+			                    <a class="dropdown-item" href="{% url 'rolle_umbenennen' %}">Rolle umbenennen</a>
 			                    <a class="dropdown-item" href="{% url 'stored_procedures' %}">DB Aufsetzen</a>
 			                    <!-- <a class="dropdown-item" href="{% url 'magic_click' %}">Neue Funktion</a> -->
-			                    <a class="dropdown-item" href="{% url 'zeige_neue_afgf' %}">Neue AF/GF</a>
-			                    <a class="dropdown-item" href="{% url 'rolle_umbenennen' %}">Rolle umbenennen</a>
 			                    {% comment %}<a class="dropdown-item" href="{% url 'rolle_kopieren' %}">Rolle kopieren</a>{% endcomment %}
 								<a class="dropdown-item" href="{% url 'serienbrief' %}">Serienbrief</a>
 								<a class="dropdown-item" href="{% url 'einzelbrief' %}">Einzelbrief-ZIP</a>
