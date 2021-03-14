@@ -13,7 +13,7 @@ clean:
 	-docker network rm mariaNetz
 
 netzwerk:
-	docker network create --subnet 172.42.0.0/16 mariaNetz
+	docker network create --subnet 10.42.0.0/24 mariaNetz
 
 mariadb:
 	docker run -d \
@@ -41,7 +41,6 @@ crawler:
 phpmyadmin:
 	docker run -d \
 		--name pma \
-        --publish 8888:80 \
 		--network mariaNetz \
 		--network-alias pma \
 		--restart unless-stopped \
@@ -49,18 +48,6 @@ phpmyadmin:
 		-e PMA_HOST=maria \
 		mypma
 
-WEGDAMITpma:
-	docker run -d \
-		-p 8088:80 \
-		--name phpmyadmin \
-		--network mariaNetz \
-		--network-alias pma \
-		--restart unless-stopped \
-		-e TZ='Europe/Berlin' \
-		-e PMA_HOST=maria \
-		-e PMA_CONTROLUSER=pma \
-		-e PMA_CONTROLPASS=0oWiPLfdhAcSqy9TnmhKcI222QQIO87BvvjiHX9r57\
-		mypma
 
 importfile:
 	cd irgendwohin
@@ -153,6 +140,7 @@ rapptest2:
 rappprod:
 	docker run -d \
 		--name rapp \
+		--publish 8989:8000 \
 		--network mariaNetz \
 		--network-alias rapp \
 		--restart unless-stopped \
@@ -232,7 +220,7 @@ letsencrypt: vorbereitung
 	docker run -it \
 		--rm \
 		--name certcont \
-		--ip=172.42.0.99 \
+		--ip=10.42.0.99 \
 		--network mariaNetz \
 		--network-alias letsencrypt \
 		--volume "/home/lutz/Projekte/RechteDB2MySQL/RechteDB/other_files/letsencrypt/etc:/etc/letsencrypt:rw" \
