@@ -11,6 +11,7 @@ my3.6venv
 .idea/workspace.xml
 01\ Mitarbeiterberechtigungen\ ZI-AI-BA*.csv
 **/.env
+**/.env-docker
 *.xmi
 *.mdj
 other_files/RechteDB 20180825 Erster Export der Neuimplementierung.sql.gz
